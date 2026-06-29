@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTC.Contract.Repositories\NTC.Contract.Repositories.csproj" />
+    <ProjectReference Include="..\NTC.Core\NTC.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EmailModelView\" />
+  </ItemGroup>
+
+</Project>

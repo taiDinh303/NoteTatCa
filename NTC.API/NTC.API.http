@@ -1,0 +1,6 @@
+@NTC.API_HostAddress = http://localhost:5032
+
+GET {{NTC.API_HostAddress}}/swagger/
+Accept: application/json
+
+###

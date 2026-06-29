@@ -1,0 +1,300 @@
+﻿@using NTC.Contract.Repositories.Entities.Tasks
+
+<!-- Reminder Settings Modal -->
+<div id="reminderModal" class="reminder-modal">
+    <div class="reminder-modal-box">
+
+        <div class="reminder-modal-header">
+            <h3>Manage Reminders</h3>
+            <button class="modal-close" onclick="closeReminderModal()">✕</button>
+        </div>
+
+        <div class="reminder-modal-body">
+            <table class="reminder-table">
+                <tbody id="reminderTableBody">
+
+                    <!-- Create Reminder Row -->
+                    <tr class="create-reminder-main-row">
+                        <td>
+                            <label>Time</label><br />
+                            <input type="datetime-local" class="create-reminder-time" />
+                        </td>
+
+                        <td>
+                            <label>Repeat</label><br />
+                            <select class="create-repeat-type">
+                                <option value="0">No repeat</option>
+                                <option value="1">Daily</option>
+                                <option value="2">Weekly</option>
+                                <option value="3">Monthly</option>
+                                <option value="4">Yearly</option>
+                            </select>
+                        </td>
+
+                        <td>
+                            <label>Active</label><br />
+                            <input type="checkbox" class="create-is-active" checked />
+                        </td>
+
+                        <td>
+                            <div class="row-actions">
+                                <button type="button" class="btn-create-reminder">Create</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="create-reminder-extra-row">
+                        <td class="interval-wrapper">
+                            <label>Interval</label><br />
+                            <input type="number" class="create-repeat-interval" min="1" value="1" />
+                        </td>
+
+                        <td class="weekday-wrapper create-weekday-wrapper">
+                            <label>Days (Weekly)</label><br />
+                            <div class="weekday-group create-weekdays">
+                                <button type="button" data-value="1">Mon</button>
+                                <button type="button" data-value="2">Tue</button>
+                                <button type="button" data-value="4">Wed</button>
+                                <button type="button" data-value="8">Thu</button>
+                                <button type="button" data-value="16">Fri</button>
+                                <button type="button" data-value="32">Sat</button>
+                                <button type="button" data-value="64">Sun</button>
+                            </div>
+                        </td>
+
+
+                        <td class="until-wrapper">
+                            <label>Until</label><br />
+                            <input type="datetime-local" class="create-repeat-until" />
+                        </td>
+
+                        <td class="count-wrapper">
+                            <label>Count</label><br />
+                            <input type="number" class="create-repeat-count" placeholder="Optional" />
+                        </td>
+
+
+
+
+
+
+                    </tr>
+
+                    <tr class="reminder-divider-row">
+                        <td colspan="8">
+                            <div class="reminder-divider"></div>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<template id="reminder-row-template">
+
+    <!-- Reminder Main Row -->
+    <tr class="reminder-main-row">
+        <td>
+            <label>Time</label><br />
+            <input type="datetime-local" class="reminder-time-input" disabled />
+        </td>
+
+        <td>
+            <label>Repeat</label><br />
+            <select class="reminder-repeat-input" disabled>
+                <option value="0">No repeat</option>
+                <option value="1">Daily</option>
+                <option value="2">Weekly</option>
+                <option value="3">Monthly</option>
+                <option value="4">Yearly</option>
+            </select>
+        </td>
+
+        <td>
+            <label>Active</label><br />
+            <input type="checkbox" class="reminder-active-input" disabled />
+        </td>
+
+        <td>
+            <div class="row-actions">
+                <button type="button" class="btn-edit-reminder">Edit</button>
+                <button type="button" class="btn-save-reminder d-none">Save</button>
+                <button type="button" class="btn-delete-reminder">Delete</button>
+            </div>
+        </td>
+    </tr>
+
+    <!-- Reminder Extra Row -->
+    <tr class="reminder-extra-row">
+        <td class="interval-wrapper">
+            <label>Interval</label><br />
+            <input type="number" class="reminder-interval-input" min="1" value="1" disabled />
+        </td>
+
+        <td class="weekday-wrapper reminder-weekday-wrapper">
+            <label>Days</label><br />
+            <div class="weekday-group reminder-weekdays">
+                <button type="button" data-value="1">Mon</button>
+                <button type="button" data-value="2">Tue</button>
+                <button type="button" data-value="4">Wed</button>
+                <button type="button" data-value="8">Thu</button>
+                <button type="button" data-value="16">Fri</button>
+                <button type="button" data-value="32">Sat</button>
+                <button type="button" data-value="64">Sun</button>
+            </div>
+        </td>
+
+        <td class="until-wrapper">
+            <label>Until</label><br />
+            <input type="datetime-local" class="reminder-until-input" disabled />
+        </td>
+
+        <td class="count-wrapper">
+            <label>Repetition</label><br />
+            <input type="number" class="reminder-count-input" value="0" disabled />
+        </td>
+    </tr>
+
+    <!-- Divider Row -->
+    <tr class="reminder-divider-row">
+        <td colspan="8">
+            <div class="reminder-divider"></div>
+        </td>
+    </tr>
+
+</template>
+
+<style>
+    .reminder-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.4);
+        z-index: 9999;
+    }
+
+        .reminder-modal.show {
+            display: flex;
+        }
+
+    .reminder-modal-box {
+        width: 95%;
+        max-width: 1200px;
+        height: 70vh;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .reminder-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 18px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+    }
+
+        .reminder-modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+    .modal-close {
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .reminder-modal-body {
+        padding: 16px;
+        height: calc(70vh - 60px);
+        overflow-y: auto;
+    }
+
+    .reminder-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .reminder-table td {
+            padding: 8px;
+            vertical-align: top;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+    .reminder-modal input,
+    .reminder-modal select {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+
+        .reminder-modal input:disabled,
+        .reminder-modal select:disabled {
+            background: #f5f5f5;
+        }
+
+    .row-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 18px;
+    }
+
+    .reminder-modal button {
+        padding: 6px 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+    }
+
+        .reminder-modal button:hover {
+            background: #f5f5f5;
+        }
+
+    .create-reminder-row {
+        background: #fafafa;
+    }
+
+    .weekday-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+        .weekday-group button.active {
+            background: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+    .hidden {
+        display: none;
+    }
+
+    .reminder-main-row td {
+        border-bottom: none;
+    }
+
+    .reminder-extra-row td {
+        padding-top: 0;
+    }
+
+    .reminder-divider-row td {
+        padding: 0;
+        border-bottom: none;
+    }
+
+    .reminder-divider {
+        height: 1px;
+        background: #e5e5e5;
+        margin: 10px 0;
+    }
+</style>

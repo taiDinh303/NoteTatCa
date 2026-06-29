@@ -1,0 +1,122 @@
+﻿@page "/auth/login"
+@model NTC.Razor.Pages.Auth.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_AuthLayout";
+}
+
+<div class="login-register-page">
+
+    <div class="login-card">
+
+        <h2 class="login-title">Login</h2>
+
+        @if (Model.ErrorMessage != null)
+        {
+            <div class="alert-error">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+
+            <div class="form-group">
+                <label for="Username">Username</label>
+                <input asp-for="Input.Username" id="Username" required />
+            </div>
+
+            <div class="form-group password-group">
+
+                <label for="passwordInput">Password</label>
+
+                <div class="password-wrapper">
+                    <input asp-for="Input.Password"
+                           type="password"
+                           id="passwordInput"
+                           required />
+
+                    <button type="button" id="togglePassword" class="password-toggle">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <label class="remember">
+                    <input asp-for="Input.RememberMe" type="checkbox" />
+                    Remember me
+                </label>
+
+                <a href="/Auth/ForgotPassword" class="forgot">
+                    Forgot password?
+                </a>
+
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Sign In
+            </button>
+
+            <div class="divider">
+                <span>Or continue with</span>
+            </div>
+
+            <!-- Google -->
+            <div class="google-login">
+
+                <div id="g_id_onload"
+                     data-client_id="813592713426-11v4mjc0j0805kc7b31ohnr4g2ajksvb.apps.googleusercontent.com"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left"
+                     data-width="320">
+                </div>
+
+            </div>
+
+            <div class="register-link">
+                <a href="/auth/register">
+                    Don't have an account? <strong>Register</strong>
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('passwordInput');
+
+        toggleBtn.addEventListener('click', () => {
+
+            const type = passwordInput.getAttribute('type') === 'password'
+                ? 'text'
+                : 'password';
+
+            passwordInput.setAttribute('type', type);
+
+        });
+
+        function handleCredentialResponse(response) {
+            const id_token = response.credential;
+            window.location.href = `/Auth/External/GoogleCallback?id_token=${id_token}`;
+        }
+
+    </script>
+}

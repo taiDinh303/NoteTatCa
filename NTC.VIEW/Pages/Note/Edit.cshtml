@@ -1,0 +1,99 @@
+﻿@page "{id:guid}"
+@model NTC.Razor.Pages.Note.EditModel
+@{
+    ViewData["Title"] = "Edit Note";
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm w-100">
+        <div class="card-body">
+            <form method="post" id="editForm">
+
+
+                <input type="hidden" asp-for="Note.Id" />
+
+                <div class="note-editor mb-3">
+                    <input asp-for="Note.Title"
+                           class="note-title"
+                           placeholder="Title" />
+
+                    <textarea asp-for="Note.Content"
+                              class="note-content auto-resize"
+                              placeholder="Content"></textarea>
+                </div>
+
+
+                <!-- Completed -->
+                <div class="form-check mb-3">
+                    <input asp-for="Note.IsCompleted" class="form-check-input" />
+                    <label class="form-check-label" for="Note_IsCompleted">Completed</label>
+                </div>
+
+                <button type="button"
+                        class="btn btn-secondary w-100"
+                        onclick="handleCloseOrSave()">
+                    Close
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    let originalData = null;
+
+    function normalizeText(value) {
+        return (value || '').replace(/\r\n/g, '\n');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        originalData = {
+            title: normalizeText(document.querySelector('[name="Note.Title"]').value),
+            content: normalizeText(document.querySelector('[name="Note.Content"]').value),
+            isCompleted: document.querySelector('[name="Note.IsCompleted"]').checked
+        };
+    });
+
+    function handleCloseOrSave() {
+        const currentData = {
+            title: normalizeText(document.querySelector('[name="Note.Title"]').value),
+            content: normalizeText(document.querySelector('[name="Note.Content"]').value),
+            isCompleted: document.querySelector('[name="Note.IsCompleted"]').checked
+        };
+
+        const isChanged = Object.keys(originalData)
+            .some(key => originalData[key] !== currentData[key]);
+
+        if (!isChanged) {
+            window.location.href = '@Url.Page("Index")';
+        } else {
+            document.getElementById('editForm').submit();
+        }
+    }
+
+
+        function autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    document.querySelectorAll('textarea.auto-resize')
+        .forEach(textarea => {
+            autoResize(textarea);
+            textarea.addEventListener('input', () => autoResize(textarea));
+        });
+
+
+
+
+
+</script>
+
+
+
+@section Styles{
+    <link rel="stylesheet" href="~/css/note/edit.css" asp-append-version="true" />
+}

@@ -1,0 +1,155 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home";
+
+    if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+    {
+        Layout = null;
+    }
+}
+
+<style>
+
+    .hero {
+        padding: 60px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        color: white;
+        border-radius: 0 0 30px 30px;
+    }
+
+        .hero h1 {
+            font-size: 42px;
+        }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        padding: 40px;
+    }
+
+    .card-box {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        transition: 0.2s;
+    }
+
+        .card-box:hover {
+            transform: translateY(-5px);
+        }
+
+    .icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        margin-bottom: 10px;
+    }
+
+    .carousel {
+        margin: 40px auto;
+        max-width: 900px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .carousel-track {
+        display: flex;
+        width: 300%;
+        animation: slide 9s infinite;
+    }
+
+    .slide {
+        width: 100%;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        font-weight: bold;
+    }
+
+    .s1 {
+        background: #ff6b6b;
+    }
+
+    .s2 {
+        background: #4ecdc4;
+    }
+
+    .s3 {
+        background: #5f27cd;
+    }
+
+    @@keyframes slide {
+        0% {
+            transform: translateX(0%);
+        }
+
+        33% {
+            transform: translateX(0%);
+        }
+
+        38% {
+            transform: translateX(-100%);
+        }
+
+        66% {
+            transform: translateX(-100%);
+        }
+
+        71% {
+            transform: translateX(-200%);
+        }
+
+        100% {
+            transform: translateX(-200%);
+        }
+    }
+</style>
+
+<div class="hero">
+    
+    <h1>Smart Notes</h1>
+    <p>Capture ideas, organize tasks, and boost productivity.</p>
+</div>
+
+<div class="carousel">
+    <div class="carousel-track">
+        <div class="slide s1">Pin Notes</div>
+        <div class="slide s2">Reminders</div>
+        <div class="slide s3">Tags</div>
+    </div>
+</div>
+
+<div class="features">
+    <div class="card-box">
+        <div class="icon"></div>
+        <h3>Fast Notes</h3>
+        <p>Create notes instantly with a clean UI.</p>
+    </div>
+
+    <div class="card-box">
+        <div class="icon"></div>
+        <h3>Pin Important</h3>
+        <p>Keep important notes always on top.</p>
+    </div>
+
+    <div class="card-box">
+        <div class="icon"></div>
+        <h3>Smart Reminders</h3>
+        <p>Never forget tasks again.</p>
+    </div>
+
+    <div class="card-box">
+        <div class="icon"></div>
+        <h3>Organized</h3>
+        <p>Group notes by tags.</p>
+    </div>
+</div>

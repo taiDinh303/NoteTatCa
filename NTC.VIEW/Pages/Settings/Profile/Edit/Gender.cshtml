@@ -1,0 +1,83 @@
+﻿@page
+@model NTC.Razor.Pages.Settings.Profile.Edit.GenderModel
+@using NTC.Contract.Repositories.Entities
+
+@{
+    ViewData["Title"] = "Gender";
+}
+
+<div class="settings-page">
+
+    <div class="settings-card">
+
+        <div class="settings-card-header">
+            Gender
+        </div>
+
+        <div class="settings-card-body">
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div class="settings-alert settings-alert-danger">
+                    @ViewData["ErrorMessage"]
+                </div>
+            }
+
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <div class="settings-alert settings-alert-success">
+                    @ViewData["SuccessMessage"]
+                </div>
+            }
+
+            <form method="post">
+
+                <div class="settings-form-group">
+
+                    <label asp-for="Gender"
+                           class="settings-label">
+                        Gender
+                    </label>
+
+                    <select asp-for="Gender"
+                            class="settings-select">
+
+                        <option value="@((int)GenderType.RatherNotSay)">
+                            Rather not say
+                        </option>
+
+                        <option value="@((int)GenderType.Male)">
+                            Male
+                        </option>
+
+                        <option value="@((int)GenderType.Female)">
+                            Female
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button type="submit"
+                        class="settings-btn settings-btn-submit">
+                    Save
+                </button>
+
+                <a href="/settings/profile"
+                   class="settings-btn settings-btn-cancel">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/setting_edit.css"
+          asp-append-version="true" />
+}

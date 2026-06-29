@@ -1,0 +1,192 @@
+﻿@page "/settings/profile"
+@model NTC.Razor.Pages.Settings.Profile.IndexModel
+
+@{
+    ViewData["Title"] = "User Information";
+    Layout = "_AuthLayout";
+    @using System.Globalization
+}
+
+<style>
+
+    .layout {
+        max-width: 1000px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    /* Top navigation */
+    .top-nav {
+        display: flex;
+        gap: 8px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+
+        .top-nav a {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+            .top-nav a:hover {
+                background: #f1f3f5;
+            }
+
+            .top-nav a.active {
+                background: #e7f1ff;
+                color: #0d6efd;
+                font-weight: 600;
+            }
+
+    /* Content */
+    .content {
+        flex: 1;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 12px 14px;
+        background: #f8f9fa;
+        font-weight: bold;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+    }
+
+    th {
+        text-align: left;
+        color: #666;
+        width: 140px;
+    }
+
+    td {
+        text-align: right;
+    }
+
+    .row-click {
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .row-click:hover {
+            background: #f1f3f5;
+        }
+
+    .alert {
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .alert-danger {
+        background: #ffe3e3;
+        color: #c92a2a;
+    }
+
+    .alert-success {
+        background: #d3f9d8;
+        color: #2b8a3e;
+    }
+</style>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <div class="top-nav">
+        <a class="active" href="/settings/profile">👤 Profile</a>
+        <a href="/settings/account">🔒 Account</a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+        }
+
+        @if (ViewData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@ViewData["SuccessMessage"]</div>
+        }
+
+        @if (Model.UserInfoData != null)
+        {
+            <div class="card">
+
+                <div class="card-header">
+                    General Information
+                </div>
+
+                <div class="card-body">
+
+                    <table>
+                        <tbody>
+
+                            <tr class="row-click" onclick="editField('Name')">
+                                <th>Name</th>
+                                <td>@Model.UserInfoData.FullName</td>
+                            </tr>
+
+                            <tr class="row-click" onclick="editField('BirthDate')">
+                                <th>Birthday</th>
+                                <td>
+                                    @(Model.UserInfoData.BirthDate?
+                                        .ToString("MMMM d, yyyy", CultureInfo.InvariantCulture)
+                                        ?? "")
+                                </td>
+                            </tr>
+
+                            <tr class="row-click" onclick="editField('Gender')">
+                                <th>Gender</th>
+                                <td>@Model.UserInfoData.Gender</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">No user data available.</div>
+        }
+
+    </div>
+</div>
+
+<script>
+    function editField(fieldName) {
+        switch (fieldName) {
+            case 'Name': window.location.href = '/settings/profile/edit/name'; break;
+            case 'BirthDate': window.location.href = '/settings/profile/edit/birthday'; break;
+            case 'Gender': window.location.href = '/settings/profile/edit/gender'; break;
+            case 'Address': window.location.href = '/settings/profile/edit/address'; break;
+        }
+    }
+</script>

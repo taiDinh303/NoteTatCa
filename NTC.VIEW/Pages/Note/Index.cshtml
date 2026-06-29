@@ -1,0 +1,69 @@
+﻿@page
+@model NTC.Razor.Pages.Note.IndexModel
+@{
+    ViewData["Title"] = "Notes";
+
+    // nếu request là ajax thì bỏ layout
+    if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "/Pages/Shared/_NoteLayout.cshtml";
+    }
+}
+
+<div class="note-container">
+
+
+
+
+
+    <!-- Main note-->
+    <div id="noteListWrapper">
+        @await Html.PartialAsync("_NoteListPartial", Model.Notes)
+    </div>
+
+    <button type="button"
+            class="note-create-btn"
+            onclick="openCreateNoteModal()">
+        New Note
+    </button>
+
+
+</div>
+
+
+<form method="post" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
+
+
+<div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div>
+    <partial name="_tagModalPartial" model="Model.Tags" />
+    <partial name="_LabelModalPartial" model="Model.Tags" />
+    <partial name="_ReminderModalPartial" />
+
+    <partial name="_NoteCreateModalPartial"
+             model="new NTC.ModelViews.NoteModelView.CreateNoteModelView()" />
+
+    <partial name="_NoteEditModalPartial"
+             model="new NTC.ModelViews.NoteModelView.UpdateNoteModelView()" />
+
+
+</div>

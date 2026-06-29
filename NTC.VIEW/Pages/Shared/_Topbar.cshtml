@@ -1,0 +1,52 @@
+﻿@{
+    var isLogin = Context.Session.GetString("UserId") != null;
+    var fullName = Context.Session.GetString("FullName");
+
+
+    var page = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    bool showSidebar = page.StartsWith("/Note");
+}
+
+<header class="site-header">
+
+    <div class="topbar">
+        <div class="topbar-inner">
+
+            <div>
+                @if (isLogin && showSidebar)
+                {
+                    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                }
+
+                <a class="logo" asp-page="/note/index">NTC.VIEW</a>
+
+            </div>
+
+            <div class="auth-area">
+                @if (!isLogin)
+                {
+                    <a class="btn-login" asp-page="/auth/login">Login</a>
+                }
+                else
+                {
+                    <div class="user-dropdown">
+                        <button onclick="toggleMenu(event)" class="user-btn">
+                            👤 @fullName
+                        </button>
+
+                        <ul id="user-menu" hidden>
+                            <li>
+                                <a href="/settings/profile">Settings</a>
+                            </li>
+                            <li>
+                                <a class="logout" asp-page="/auth/logout">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+</header>

@@ -1,0 +1,81 @@
+﻿@page
+@model NTC.Razor.Pages.Settings.Profile.Edit.NameModel
+
+@{
+    ViewData["Title"] = "Name";
+}
+
+<div class="settings-page">
+
+    <div class="settings-card">
+
+        <div class="settings-card-header">
+            Name
+        </div>
+
+        <div class="settings-card-body">
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div class="settings-alert settings-alert-danger">
+                    @ViewData["ErrorMessage"]
+                </div>
+            }
+
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <div class="settings-alert settings-alert-success">
+                    @ViewData["SuccessMessage"]
+                </div>
+            }
+
+            <form method="post">
+
+                <div class="settings-form-group">
+
+                    <label asp-for="FamilyName"
+                           class="settings-label">
+                        Last Name
+                    </label>
+
+                    <input asp-for="FamilyName"
+                           class="settings-input" />
+
+                </div>
+
+                <div class="settings-form-group">
+
+                    <label asp-for="GivenName"
+                           class="settings-label">
+                        First Name
+                    </label>
+
+                    <input asp-for="GivenName"
+                           class="settings-input"
+                           required />
+
+                </div>
+
+                <button type="submit"
+                        class="settings-btn settings-btn-submit">
+                    Save
+                </button>
+
+                <a href="/settings/profile"
+                   class="settings-btn settings-btn-cancel">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/setting_edit.css"
+          asp-append-version="true" />
+}

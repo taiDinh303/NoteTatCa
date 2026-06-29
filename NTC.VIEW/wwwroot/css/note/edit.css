@@ -1,0 +1,37 @@
+﻿.note-paper {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+}
+
+.note-title {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: .75rem;
+}
+
+.note-divider {
+    height: 1px;
+    background: #eee;
+    margin-bottom: .75rem;
+}
+
+.note-content {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    min-height: 120px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.note-paper input::placeholder,
+.note-paper textarea::placeholder {
+    color: #aaa;
+}

@@ -1,0 +1,71 @@
+﻿@page
+@model NTC.Razor.Pages.Settings.Account.Edit.EmailModel
+
+@{
+    ViewData["Title"] = "Email";
+}
+
+<div class="settings-page">
+
+    <div class="settings-card">
+
+        <div class="settings-card-header">
+            Email
+        </div>
+
+        <div class="settings-card-body">
+
+            @if (!string.IsNullOrEmpty(ViewData["SuccessMessage"] as string))
+            {
+                <div class="settings-alert settings-alert-success">
+                    @ViewData["SuccessMessage"]
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewData["ErrorMessage"] as string))
+            {
+                <div class="settings-alert settings-alert-danger">
+                    @ViewData["ErrorMessage"]
+                </div>
+            }
+
+            <form method="post">
+
+                <div class="settings-form-group">
+
+                    <label asp-for="Email"
+                           class="settings-label">
+                        New Email
+                    </label>
+
+                    <input asp-for="Email"
+                           type="email"
+                           class="settings-input"
+                           placeholder="Enter new email"
+                           required />
+
+                </div>
+
+                <button type="submit"
+                        class="settings-btn settings-btn-submit">
+                    Send Confirmation Email
+                </button>
+
+                <a href="/settings/account"
+                   class="settings-btn settings-btn-cancel">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/setting_edit.css"
+          asp-append-version="true" />
+}

@@ -1,0 +1,82 @@
+﻿@model NTC.ModelViews.NoteModelView.UpdateNoteModelView
+
+<!-- Edit Note Modal -->
+<div id="editNoteModal" class="note-modal">
+
+    <div class="note-modal-box">
+
+        <div class="note-modal-header">
+            <h3>Edit Note</h3>
+        </div>
+
+        <div class="note-modal-body">
+
+            <form id="editNoteForm">
+
+                <input type="hidden"
+                       asp-for="Id"
+                       id="editNoteId" />
+
+                <input asp-for="Title"
+                       id="editNoteTitle"
+                       class="note-title"
+                       placeholder="Title" />
+
+                <div class="note-divider"></div>
+
+                <textarea asp-for="Content"
+                          id="editNoteContent"
+                          class="note-content"
+                          placeholder="Write your note..."></textarea>
+
+                <div class="note-check-row">
+                    <label>
+                        <input asp-for="IsCompleted"
+                               id="editNoteCompleted"
+                               type="checkbox" />
+                        Completed
+                    </label>
+                </div>
+
+                <div class="note-modal-footer">
+
+                    <button type="button"
+                            class="btn-cancel-note"
+                            onclick="closeEditNoteModal()">
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Template -->
+<template id="edit-note-template">
+
+    <input type="hidden"
+           class="note-id" />
+
+    <input type="text"
+           class="note-title"
+           placeholder="Title" />
+
+    <div class="note-divider"></div>
+
+    <textarea class="note-content"
+              placeholder="Write your note..."></textarea>
+
+    <div class="note-check-row">
+        <label>
+            <input type="checkbox"
+                   class="note-completed" />
+            Completed
+        </label>
+    </div>
+
+</template>

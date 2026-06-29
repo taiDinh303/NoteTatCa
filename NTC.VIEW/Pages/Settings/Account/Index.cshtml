@@ -1,0 +1,375 @@
+﻿@page
+@model NTC.Razor.Pages.Settings.Account.IndexModel
+@{
+    ViewData["Title"] = "Account settings";
+    Layout = "_AuthLayout";
+
+    string? email = Model.UserData?.Email;
+    string maskedEmail = email;
+    if (!string.IsNullOrEmpty(email))
+    {
+        var atIndex = email.IndexOf('@');
+        if (atIndex > 2)
+        {
+            maskedEmail = email.Substring(0, 2) + new string('*', atIndex - 2) + email.Substring(atIndex);
+        }
+        else if (atIndex > 0)
+        {
+            maskedEmail = email.Substring(0, 1) + new string('*', atIndex - 1) + email.Substring(atIndex);
+        }
+    }
+    bool emailConfirmed = Model.UserData?.EmailConfirmed ?? false;
+}
+
+
+<style>
+
+    .layout {
+        max-width: 1000px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    /* Top nav */
+    .top-nav {
+        display: flex;
+        gap: 8px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 8px;
+        margin-bottom: 20px;
+    }
+
+        .top-nav a {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            border-radius: 8px;
+        }
+
+            .top-nav a:hover {
+                background: #f1f3f5;
+            }
+
+            .top-nav a.active {
+                background: #e7f1ff;
+                color: #0d6efd;
+                font-weight: 600;
+            }
+
+    /* Card */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        padding: 12px 14px;
+        background: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 1px solid #eee;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+    }
+
+    th {
+        text-align: left;
+        color: #666;
+        width: 160px;
+    }
+
+    td {
+        text-align: right;
+    }
+
+    /* Row hover */
+    .row-click {
+        cursor: pointer;
+    }
+
+        .row-click:hover {
+            background: #f1f3f5;
+        }
+
+    /* Button */
+    .btn {
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border-color: #ccc;
+    }
+
+    .btn-danger {
+        background: #fa5252;
+        color: #fff;
+    }
+
+    /* Alert */
+    .alert {
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .alert-danger {
+        background: #ffe3e3;
+        color: #c92a2a;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+        /* show */
+        .modal-overlay.show {
+            display: flex;
+        }
+
+    /* modal box */
+    .modal-box {
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden;
+        animation: fadeIn 0.2s ease;
+    }
+
+    /* header */
+    .modal-header {
+        padding: 12px 14px;
+        background: #fff3bf;
+        border-bottom: 1px solid #ffe066;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #5f3f00;
+    }
+
+    /* close btn */
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    /* body */
+    .modal-body {
+        padding: 16px;
+        color: #333;
+    }
+
+    /* footer */
+    .modal-footer {
+        padding: 12px 16px;
+        text-align: center;
+    }
+</style>
+
+
+<div class="layout">
+
+    <!-- Top Navigation -->
+    <div class="top-nav">
+        <a href="/settings/profile">👤 Profile</a>
+        <a class="active" href="/settings/account">🔒 Account</a>
+    </div>
+
+    <!-- General -->
+    <div class="card">
+        <div class="card-header">General</div>
+
+        <div class="card-body">
+            <table>
+                <tbody>
+
+                    <!-- Email -->
+                    <tr class="row-click" onclick="editField('Email')">
+                        <th>Email address</th>
+                        <td>
+                            @maskedEmail
+
+                            @if (!string.IsNullOrEmpty(email) && !emailConfirmed)
+                            {
+                                <span style="color:#e03131; font-weight:600; margin-left:6px;">
+                                    (Unverified)
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                    <!-- Password -->
+                    @if (Model.PasswordStatus != "Not Set")
+                    {
+                        <tr class="row-click" onclick="editField('Password')">
+                            <th>Password</th>
+                            <td></td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Account Authorization -->
+    <div class="card">
+        <div class="card-header">Account authorization</div>
+
+        <div class="card-body">
+
+            @if (ViewData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+            }
+            else
+            {
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    padding:10px 0;
+                    border-bottom:1px solid #eee;
+                        ">
+
+                    <div>
+                        <div style="font-weight:600;">Google</div>
+                        <div style="font-size:13px; color:#777;">
+                            Connect to log in with your Google account
+                        </div>
+                    </div>
+
+                    @if (Model.IsGoogleConnected)
+                    {
+                        <form method="post" asp-page-handler="DisconnectGoogle" id="disconnectGoogleForm">
+                            <button type="button" class="btn btn-danger" onclick="editField('DisconnectGoogle')">
+                                Disconnect
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="ConnectGoogle" id="connectGoogleForm">
+                            <button type="button" class="btn btn-primary" onclick="editField('ConnectGoogle')">
+                                Connect
+                            </button>
+                        </form>
+                    }
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- ⚠️ Modal warning: password not set -->
+<div id="needPasswordModal" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <div class="modal-title">⚠️ Password required</div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <p>You need to <strong>set a password</strong> before making changes.</p>
+            <p>Please click below to receive a setup email.</p>
+        </div>
+
+        <div class="modal-footer">
+            <form method="post" asp-page-handler="SendSetPasswordEmail">
+                <button type="submit" class="btn btn-primary">
+                    Send password setup email
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+        function openModal() {
+        document.getElementById("needPasswordModal").classList.add("show");
+    }
+
+    function closeModal() {
+        document.getElementById("needPasswordModal").classList.remove("show");
+    }
+
+    // click outside to close
+    document.addEventListener("click", function (e) {
+        const modal = document.getElementById("needPasswordModal");
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+
+    const userHasPassword = '@(Model.UserData != null && Model.UserData.HasPassword ? "true" : "false")';
+
+    function editField(fieldName) {
+        if (userHasPassword === "false") {
+            openModal();
+            return;
+        }
+
+        switch (fieldName) {
+            case 'Email': window.location.href = '/settings/account/edit/email'; break;
+            case 'PhoneNumber': window.location.href = '/settings/account/edit/phone'; break;
+            case 'Password': window.location.href = '/settings/account/edit/password'; break;
+            case 'ConnectGoogle':
+                document.getElementById('connectGoogleForm').submit();
+                break;
+            case 'DisconnectGoogle':
+                document.getElementById('disconnectGoogleForm').submit();
+                break;
+            default: console.warn('Chưa có trang Edit cho: ' + fieldName);
+        }
+    }
+</script>

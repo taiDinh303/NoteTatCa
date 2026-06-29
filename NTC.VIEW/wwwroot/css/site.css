@@ -1,0 +1,258 @@
+﻿*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+main {
+    flex: 1;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+
+/* layout */
+.page-layout {
+    display: flex;
+}
+
+/* turn off animation when loading */
+body.preload .sidebar {
+    transition: none !important;
+}
+
+/* sidebar */
+.sidebar {
+    width: 0;
+    overflow: hidden;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    transition: width .25s ease;
+    height: 100vh;
+}
+
+body.sidebar-open .sidebar {
+    width: 280px;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 0;
+    overflow: hidden;
+    background: #fff;
+    border-right: 1px solid #ddd;
+    transition: width .25s ease;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid #4f46e5;
+}
+
+body.sidebar-open .sidebar {
+    width: 280px;
+}
+
+/* Menu */
+/* Menu link + Tag button */
+.sidebar a,
+.tag-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+    .sidebar a:hover {
+        background: #f5f5f5;
+    }
+
+/* menu side */
+.sidebar-menu {
+    padding-top: 8px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+/* tag side */
+.note-tag-row {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+/*    gap: 8px;*/
+    overflow-y: auto;
+}
+
+/* Tag button */
+.tag-btn {
+    justify-content: space-between;
+    border-radius: 8px;
+}
+
+    .sidebar a:hover,
+    .tag-btn:hover {
+        background: #f5f5f5;
+    }
+
+
+
+
+
+.site-header {
+    width: 100%;
+/*    font-family: Roboto, system-ui, -apple-system, sans-serif;*/
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 100;
+}
+
+/* ===== TOPBAR ===== */
+
+.topbar {
+    background: #fff;
+}
+
+.topbar-inner {
+    width: 100%;
+    padding: 8px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo giống Keep */
+.logo {
+    font-size: 18px;
+    font-weight: 500;
+    color: #202124;
+    text-decoration: none;
+    letter-spacing: .3px;
+}
+
+/* Login button */
+.btn-login {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #1a73e8;
+    transition: background .15s;
+}
+
+.btn-login:hover {
+    background: #f1f3f4;
+}
+
+/* ===== USER DROPDOWN ===== */
+
+/* ===== USER AREA ===== */
+.auth-area {
+    display: flex;
+    align-items: center;
+}
+
+/* button user */
+.user-btn {
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #202124;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.user-btn:hover {
+    background: #f1f3f4;
+}
+
+/* dropdown container */
+.user-dropdown {
+    position: relative;
+}
+
+/* dropdown menu */
+#user-menu {
+    position: absolute;
+    right: 0;
+    top: 126%;
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
+    min-width: 125px;
+
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+
+/* item */
+#user-menu li {
+    width: 100%;
+}
+
+/* link */
+#user-menu a {
+    display: block;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #202124;
+    font-size: 14px;
+}
+
+/* hover */
+#user-menu a:hover {
+    background: #f1f3f4;
+}
+
+/* logout color */
+#user-menu .logout {
+    color: #d93025;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================
+   UTILITIES
+========================= */
+.d-none {
+    display: none;
+}
+
+
+
+
