@@ -1,50 +1,53 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NTC.API\NTC.API.csproj" />
-    <ProjectReference Include="..\NTC.Contract.Repositories\NTC.Contract.Repositories.csproj" />
-    <ProjectReference Include="..\NTC.Contract.Services\NTC.Contract.Services.csproj" />
-    <ProjectReference Include="..\NTC.Core\NTC.Core.csproj" />
-    <ProjectReference Include="..\NTC.ModelViews\NTC.ModelViews.csproj" />
-    <ProjectReference Include="..\NTC.Repositories\NTC.Repositories.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<!--<ProjectReference Include="..\NTC.API\NTC.API.csproj" />-->
+		<ProjectReference Include="..\NTC.Contract.Repositories\NTC.Contract.Repositories.csproj" />
+		<ProjectReference Include="..\NTC.Contract.Services\NTC.Contract.Services.csproj" />
+		<ProjectReference Include="..\NTC.Core\NTC.Core.csproj" />
+		<ProjectReference Include="..\NTC.ModelViews\NTC.ModelViews.csproj" />
+		<ProjectReference Include="..\NTC.Repositories\NTC.Repositories.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Data\" />
-    <Folder Include="Models\" />
-    <Folder Include="Pages\Auth\Challenge\" />
-    <Folder Include="Pages\Shared\Partials\" />
-    <Folder Include="wwwroot\images\" />
-    <Folder Include="wwwroot\lib\bootstrap\" />
-    <Folder Include="wwwroot\lib\bootstrap\dist\css\" />
-    <Folder Include="wwwroot\lib\bootstrap\dist\js\" />
-    <Folder Include="wwwroot\lib\jquery-validation-unobtrusive\" />
-    <Folder Include="wwwroot\lib\jquery-validation\" />
-    <Folder Include="wwwroot\lib\jquery-validation\dist\" />
-    <Folder Include="wwwroot\lib\jquery\" />
-    <Folder Include="wwwroot\lib\jquery\dist\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Controllers\" />
+		<Folder Include="Data\" />
+		<Folder Include="Models\" />
+		<Folder Include="Pages\Auth\Challenge\" />
+		<Folder Include="Pages\Note\Tag\" />
+		<Folder Include="Pages\Shared\Partials\" />
+		<Folder Include="wwwroot\css\layout\" />
+		<Folder Include="wwwroot\js\pages\auth\" />
+		<Folder Include="wwwroot\lib\bootstrap\" />
+		<Folder Include="wwwroot\lib\bootstrap\dist\css\" />
+		<Folder Include="wwwroot\lib\bootstrap\dist\js\" />
+		<Folder Include="wwwroot\lib\jquery-validation-unobtrusive\" />
+		<Folder Include="wwwroot\lib\jquery-validation\" />
+		<Folder Include="wwwroot\lib\jquery-validation\dist\" />
+		<Folder Include="wwwroot\lib\jquery\" />
+		<Folder Include="wwwroot\lib\jquery\dist\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Update="Pages\Shared\_AccountLayout.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
+	<ItemGroup>
+		<Content Update="Pages\Shared\_AccountLayout.cshtml">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
+

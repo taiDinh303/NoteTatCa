@@ -1,0 +1,82 @@
+﻿@using NTC.Core.Base
+@using System.Text.Json
+
+@model BasePaginatedList<NTC.ModelViews.NoteModelView.NoteResponseModelView>
+
+@{
+    var notes = Model?.Items ?? Enumerable.Empty<NTC.ModelViews.NoteModelView.NoteResponseModelView>();
+    bool hasNotes = notes.Any();
+}
+
+<div class="note-container mt-4">
+
+    <div class="note-empty-message @(hasNotes ? "d-none" : "")">
+        <img src="/images/no_note_yet.png" alt="No notes" class="note-empty-image">
+    </div>
+
+    <div class="note-section">
+        <div class="note-grid" id="trashNoteList">
+
+            @foreach (var note in notes.OrderByDescending(x => x.DeletedTime))
+            {
+                <div class="note-item" data-note-id="@note.Id">
+
+                    <div class="note-card" style="background-color:@(note.BackgroundColor ?? "#ffffff")">
+
+                        <div class="note-card-body">
+
+                            <div class="note-title-row"><strong>@note.Title</strong></div>
+
+                            <div class="note-content">@note.Content</div>
+
+                            @if (note.Tags.Any())
+                            {
+                                var visibleTags = note.Tags.Take(3).ToList();
+                                var remainingTags = note.Tags.Count() - visibleTags.Count;
+
+                                <div class="note-tags note-tags-bottom">
+                                    @foreach (var cat in visibleTags)
+                                    {
+                                        <div class="tag-item">
+                                            <span class="tag-dot" style="background:@(cat.Color ?? "#adb5bd")"></span>
+                                            <span class="tag-name">@cat.Name</span>
+                                        </div>
+                                    }
+
+                                    @if (remainingTags > 0)
+                                    {
+                                        <div class="tag-item tag-more">+@remainingTags</div>
+                                    }
+                                </div>
+                            }
+
+                        </div>
+                        <div class="trash-note-actions">
+                            <button class="trash-note-action-btn" data-action="restore-note" title="Restore">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <button class="trash-note-action-btn" data-action="delete-note" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+@{
+    var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+}
+
+<script>
+    window.noteCache = @Html.Raw(JsonSerializer.Serialize(Model.Items.ToDictionary(x => x.Id.ToString()), jsonOptions));
+</script>

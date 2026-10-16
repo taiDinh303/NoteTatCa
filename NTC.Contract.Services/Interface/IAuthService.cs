@@ -9,8 +9,6 @@ namespace NTC.Contract.Services.Interface
         Task SendEmailConfirmationAsync(string email);
         Task<AuthResponseModelView> LoginWithGoogle(string idToken);
         Task<bool> VerifyPassword(VerifyPasswordModelView model);
-
-
         Task SendForgotPasswordLinkAsync(string email);
 
     }

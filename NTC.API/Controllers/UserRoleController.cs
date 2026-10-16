@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -7,6 +8,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserRoleController : ControllerBase
     {
         private readonly IUserRoleService _userRoleService;
@@ -15,7 +17,9 @@ namespace NTC.API.Controllers
         {
             _userRoleService = userRoleService;
         }
-
+        /// <summary>
+        /// Assigns a role to a user
+        /// </summary>
         [HttpPost("add-role")]
         public async Task<IActionResult> AddRoleToUser(Guid UserId, Guid RoleId)
         {
@@ -27,7 +31,9 @@ namespace NTC.API.Controllers
                 data: "Role added to user successfully!"
             ));
         }
-
+        /// <summary>
+        /// Removes a role from a user
+        /// </summary>
         [HttpDelete("remove-role")]
         public async Task<IActionResult> RemoveRoleFormUser(Guid UserId, Guid RoleId)
         {

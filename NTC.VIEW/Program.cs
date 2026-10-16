@@ -1,9 +1,22 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using System.Text.Json;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 builder.Services.AddSession();
+
+
+builder.Services
+    .AddRazorPages()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
+
+
 
 // ✅ Cấu hình Authentication phải đặt TRƯỚC app.Build()
 builder.Services.AddAuthentication(options =>

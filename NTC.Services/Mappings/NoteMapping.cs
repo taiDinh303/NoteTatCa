@@ -2,6 +2,7 @@
 using NTC.Contract.Repositories.Entities;
 using NTC.ModelViews.TagModelView;
 using NTC.ModelViews.NoteModelView;
+using NTC.Core.Utils;
 
 namespace NTC.Services.Mappings
 {
@@ -21,11 +22,9 @@ namespace NTC.Services.Mappings
                 Title = note.Title,
                 Content = note.Content,
 
-                IsCompleted = note.IsCompleted,
-                DueDate = note.DueDate,
-                CompletedAt = note.CompletedAt,
 
                 IsPinned = note.IsPinned,
+                PinnedAt = note.PinnedAt,
                 Priority = note.Priority,
 
                 //
@@ -45,8 +44,6 @@ namespace NTC.Services.Mappings
                             .ToList() ?? new(),
 
                 Reminders = note.Reminders?.ToViewModelList() ?? new(),
-
-                //
 
 
 
@@ -86,16 +83,15 @@ namespace NTC.Services.Mappings
                 Title = model.Title,
                 Content = model.Content ?? string.Empty,
 
-                IsCompleted = model.IsCompleted,
-                DueDate = model.DueDate,
-                CompletedAt = model.CompletedAt,
-
                 IsPinned = model.IsPinned,
+                PinnedAt = model.PinnedAt,
                 Priority = model.Priority,
 
                 //
                 BackgroundColor = model.BackgroundColor,
                 SortOrder = model.SortOrder,
+
+                
 
                 // Audit
                 CreatedBy = model.CreatedBy,
@@ -115,17 +111,18 @@ namespace NTC.Services.Mappings
 
             return new Note
             {
+
                 UserId = model.UserId,
                 Title = model.Title?.Trim() ?? string.Empty,
                 Content = model.Content ?? string.Empty,
-                DueDate = model.DueDate,
-                Priority = model.Priority,
+
                 IsPinned = model.IsPinned,
-                IsCompleted = false,
+                PinnedAt = model.IsPinned ? CoreHelper.SystemTimeNow : null,
+                Priority = model.Priority,
 
                 //
                 BackgroundColor = model.BackgroundColor,
-                SortOrder = model.SortOrder
+                //SortOrder = model.SortOrder
             };
         }
 
@@ -140,20 +137,10 @@ namespace NTC.Services.Mappings
 
             note.Title = model.Title ?? string.Empty;
             note.Content = model.Content ?? string.Empty;
-            note.DueDate = model.DueDate;
-            note.IsPinned = model.IsPinned;
             note.Priority = model.Priority;
-            note.IsCompleted = model.IsCompleted;
-
-            if (model.IsCompleted && note.CompletedAt == null)
-                note.CompletedAt = DateTime.UtcNow;
-
-            if (!model.IsCompleted)
-                note.CompletedAt = null;
-
-            //
             note.BackgroundColor = model.BackgroundColor;
-            note.SortOrder = model.SortOrder;
         }
+
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -8,7 +9,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Roles = "Admin")]
     public class RoleController : ControllerBase
     {
         private readonly IRoleService _roleService;
@@ -18,6 +19,11 @@ namespace NTC.API.Controllers
             _roleService = roleService;
         }
 
+
+
+        /// <summary>
+        /// Retrieve all roles with pagination
+        /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
         {
@@ -29,6 +35,10 @@ namespace NTC.API.Controllers
             ));
         }
 
+
+        /// <summary>
+        /// Retrieve a role by its ID
+        /// </summary>
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -39,7 +49,9 @@ namespace NTC.API.Controllers
                 data: result
             ));
         }
-
+        /// <summary>
+        /// Creates a new role
+        /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateRoleModelView model)
         {
@@ -51,6 +63,9 @@ namespace NTC.API.Controllers
             ));
         }
 
+        /// <summary>
+        /// Updates an existing role
+        /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateRoleModelView model)
         {
@@ -62,6 +77,11 @@ namespace NTC.API.Controllers
             ));
         }
 
+
+
+        /// <summary>
+        /// Soft deletes a role
+        /// </summary>
         [HttpDelete("soft-delete/{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
@@ -73,6 +93,9 @@ namespace NTC.API.Controllers
             ));
         }
 
+        /// <summary>
+        /// Permanently deletes a role
+        /// </summary>
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {

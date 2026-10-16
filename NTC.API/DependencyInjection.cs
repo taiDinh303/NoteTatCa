@@ -11,6 +11,8 @@ using NTC.Services;
 using NTC.Services.Infrastructure;
 using NTC.Services.Notifications;
 using NTC.Services.Service;
+using NTC.Core.Base;
+using System.Reflection;
 
 
 namespace NTC.API
@@ -30,10 +32,10 @@ namespace NTC.API
             services.AddGoogleAuthentication(configuration);
             services.AddMemoryCache();
 
-            //services.AddSwaggerGen(options =>
-            //{
-            //    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
-            //});
+            services.AddSwaggerGen(options =>
+            {
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+            });
 
 
             services.AddCors(options =>
@@ -126,11 +128,62 @@ namespace NTC.API
                 {
                     ValidateIssuer = true,
                     ValidIssuer = configuration["Jwtsettings:Issuer"],
+
                     ValidateAudience = true,
                     ValidAudience = configuration["Jwtsettings:Audience"],
+
                     ValidateLifetime = true,
+
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuerSigningKey = true
+                };
+
+
+                // ==========================
+                // Handle 401 / 403 Response
+                // ==========================
+                options.Events = new JwtBearerEvents
+                {
+                    // Không có token hoặc token sai
+                    OnChallenge = async context =>
+                    {
+                        context.HandleResponse();
+
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+
+                        var response = new
+                        {
+                            statusCode = 401,
+                            code = ResponseCodeConstants.UNAUTHORIZED,
+                            message = "You are not authenticated",
+                            data = (object?)null
+                        };
+
+
+                        await context.Response.WriteAsJsonAsync(response);
+                    },
+
+
+                    // Có token nhưng không đủ quyền Role
+                    OnForbidden = async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+
+
+                        var response = new
+                        {
+                            statusCode = 403,
+                            code = ResponseCodeConstants.FORBIDDEN,
+                            message = "You do not have permission to access this resource",
+                            data = (object?)null
+                        };
+
+
+                        await context.Response.WriteAsJsonAsync(response);
+                    }
                 };
             });
         }

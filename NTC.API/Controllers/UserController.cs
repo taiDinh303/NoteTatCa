@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -9,7 +10,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    //[Authorize(Roles = "Admin,User")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -20,7 +21,13 @@ namespace NTC.API.Controllers
         }
 
         #region User
+
+
+        /// <summary>
+        /// Retrieves all users with pagination
+        /// </summary>
         [HttpGet("get-all")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
         {
             BasePaginatedList<UserResponseModelView> result = await _userService.GetAllAsync(pageNumber, pageSize);
@@ -30,7 +37,9 @@ namespace NTC.API.Controllers
                 data: result
             ));
         }
-
+        /// <summary>
+        /// Retrieves a user by ID
+        /// </summary>
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -42,7 +51,9 @@ namespace NTC.API.Controllers
                 data: result
             ));
         }
-
+        /// <summary>
+        /// Creates a new user
+        /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateUserModelView model)
         {
@@ -54,7 +65,9 @@ namespace NTC.API.Controllers
             ));
         }
 
-
+        /// <summary>
+        /// Updates user information
+        /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateUserModelView model)
         {
@@ -68,6 +81,9 @@ namespace NTC.API.Controllers
         }
 
 
+        /// <summary>
+        /// Soft deletes a user
+        /// </summary>
         [HttpDelete("soft-delete/{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)
         {
@@ -80,6 +96,9 @@ namespace NTC.API.Controllers
             ));
         }
 
+        /// <summary>
+        /// Permanently deletes a user
+        /// </summary>
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -96,6 +115,10 @@ namespace NTC.API.Controllers
 
 
         #region Email
+
+        /// <summary>
+        /// Sends a confirmation email to change the user's email address
+        /// </summary>
         [HttpPost("send-change-email")]
         public async Task<IActionResult> SendChangeEmail([FromBody] UpdateEmailModelView request)
         {
@@ -107,7 +130,9 @@ namespace NTC.API.Controllers
                  data: "Confirmation email sent"
             ));
         }
-
+        /// <summary>
+        /// Confirms the user's email address change
+        /// </summary>
         [HttpGet("confirm-change-email")]
         public async Task<IActionResult> ConfirmChangeEmail(Guid userId, string token, string newEmail)
         {
@@ -123,9 +148,8 @@ namespace NTC.API.Controllers
         #endregion
 
         #region Password Management
-
         /// <summary>
-        /// Gửi email để tạo mật khẩu cho tài khoản đăng nhập bằng Google
+        /// Sends an email to set a password for a Google account
         /// </summary>
         [HttpPost("send-set-password-email/{userId}")]
         public async Task<IActionResult> SendSetPasswordEmail(Guid userId)
@@ -140,7 +164,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Cập nhật (đặt) mật khẩu mới thông qua token được gửi qua email
+        /// Sets a new password using the email confirmation token
         /// </summary>
         [HttpPost("set-password")]
         public async Task<IActionResult> SetPassword([FromBody] SetPasswordRequest model)
@@ -154,7 +178,9 @@ namespace NTC.API.Controllers
             ));
         }
 
-
+        /// <summary>
+        /// Changes the user's password
+        /// </summary>
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModelView model)
         {

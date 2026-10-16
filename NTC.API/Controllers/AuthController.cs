@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Repositories.Entities;
 using NTC.Contract.Services.Interface;
@@ -10,6 +11,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    // No Authorize
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

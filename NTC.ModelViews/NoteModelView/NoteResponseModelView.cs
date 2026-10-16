@@ -11,16 +11,14 @@ namespace NTC.ModelViews.NoteModelView
         public string? Title { get; set; }
         public string Content { get; set; } = string.Empty;
 
-        public bool IsCompleted { get; set; }
-        public DateTimeOffset? DueDate { get; set; }
-        public DateTimeOffset? CompletedAt { get; set; }
-
         public bool IsPinned { get; set; }
+        public DateTimeOffset? PinnedAt { get; set; }
         public int Priority { get; set; }
 
         public string? BackgroundColor { get; set; }
 
-        public int SortOrder { get; set; } = -99;
+        public double SortOrder { get; set; }
+
 
         // Navigation
         public List<TagResponseModelView> Tags { get; set; } = new();
@@ -33,5 +31,7 @@ namespace NTC.ModelViews.NoteModelView
         public DateTimeOffset CreatedTime { get; set; }
         public string? LastUpdatedBy { get; set; }
         public DateTimeOffset LastUpdatedTime { get; set; }
+        public DateTimeOffset? DeletedTime { get; set; }
+
     }
 }

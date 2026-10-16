@@ -41,7 +41,15 @@ namespace NTC.Services.Service
 
         public async Task CreateAsync(CreateUserModelView model)
         {
-            ApplicationUser user = model.ToEntity();
+            ApplicationUser user = new ApplicationUser
+            {
+                UserName = model.Username,
+                Email = model.Email,
+                EmailConfirmed = true
+            };
+
+
+            // Create Identity User
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
@@ -49,13 +57,46 @@ namespace NTC.Services.Service
                 string error = result.Errors.FirstOrDefault()?.Description
                                ?? "Unknown error occurred";
 
-                throw new ErrorException(400, "INVALID_INPUT", error);
+                throw new ErrorException(
+                    400,
+                    "INVALID_INPUT",
+                    error
+                );
             }
 
+
+            // Check role exists
+            bool roleExists = await _userManager.IsInRoleAsync(user, model.Role);
+
+            if (!roleExists)
+            {
+                IdentityResult roleResult = await _userManager.AddToRoleAsync(
+                    user,
+                    model.Role
+                );
+
+                if (!roleResult.Succeeded)
+                {
+                    string error = roleResult.Errors.FirstOrDefault()?.Description
+                                   ?? "Failed to assign role";
+
+                    throw new ErrorException(
+                        400,
+                        "ROLE_ERROR",
+                        error
+                    );
+                }
+            }
+
+
+            // Create UserInfo
             if (model.CreateUserInfoModelView != null)
             {
                 model.CreateUserInfoModelView.UserId = user.Id;
-                await _userInfoService.CreateAsync(model.CreateUserInfoModelView);
+
+                await _userInfoService.CreateAsync(
+                    model.CreateUserInfoModelView
+                );
             }
             else
             {
@@ -110,6 +151,7 @@ namespace NTC.Services.Service
             UserResponseModelView userViewModel = user.ToViewModel();
             return userViewModel;
         }
+
         public async Task UpdateAsync(UpdateUserModelView request)
         {
             var userRepo = _unitOfWork.GetRepository<ApplicationUser>();

@@ -12,13 +12,13 @@ namespace NTC.ModelViews.NoteModelView
 
         public string Content { get; set; } = string.Empty;
 
-        public bool IsCompleted { get; set; }
-        public DateTimeOffset? DueDate { get; set; }
+        //
         public bool IsPinned { get; set; }
-        public int Priority { get; set; }
+        public DateTimeOffset? PinnedAt { get; set; }
 
+        public int Priority { get; set; }
+        //
         public string? BackgroundColor { get; set; }
 
-        public int SortOrder { get; set; }
     }
 }

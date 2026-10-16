@@ -128,7 +128,7 @@ namespace NTC.Services.Service
             }
 
             // Add default role
-            //await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "User");
 
             // Create profile
             var defaultUserInfo = new CreateUserInfoModelView

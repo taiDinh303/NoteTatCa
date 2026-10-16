@@ -28,7 +28,7 @@ namespace NTC.Razor.Pages.Note
 
 
         // Load notes and tags
-        public async Task<IActionResult> OnGetAsync(Guid? tagId, int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> OnGetAsync(Guid? tagId, int pageNumber = 1, int pageSize = 50)
         {
             string? token = HttpContext.Request.Cookies["JwtToken"];
             if (string.IsNullOrEmpty(token))
@@ -61,7 +61,7 @@ namespace NTC.Razor.Pages.Note
 
 
         // Load notes partial for pagination and filtering
-        public async Task<IActionResult> OnGetNotesPartialAsync(Guid? tagId, int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> OnGetNotesPartialAsync(Guid? tagId, int pageNumber = 1, int pageSize = 50)
         {
             string? token = HttpContext.Request.Cookies["JwtToken"];
             if (string.IsNullOrEmpty(token))
@@ -80,11 +80,14 @@ namespace NTC.Razor.Pages.Note
                 BaseResponse<BasePaginatedList<NoteResponseModelView>>
             >(noteUrl);
 
-            return Partial("_NoteListPartial", res?.Data);
+            return Partial(
+                "~/Pages/Note/Partials/_NoteListPartial.cshtml",
+                res?.Data
+            );
         }
 
-
-        public async Task<IActionResult> OnGetReminderPartialAsync(int pageNumber = 1, int pageSize = 10)
+        //
+        public async Task<IActionResult> OnGetReminderPartialAsync(int pageNumber = 1, int pageSize = 50)
         {
             string? token = HttpContext.Request.Cookies["JwtToken"];
             if (string.IsNullOrEmpty(token))
@@ -101,8 +104,6 @@ namespace NTC.Razor.Pages.Note
 
             return Partial("_NoteListPartial", res?.Data);
         }
-
-
 
 
 
@@ -128,7 +129,25 @@ namespace NTC.Razor.Pages.Note
             return new JsonResult(new { success = true });
         }
 
+        // Move note to trash
+        public async Task<IActionResult> OnPostMoveToTrashAsync(Guid id)
+        {
+            string? token = HttpContext.Request.Cookies["JwtToken"];
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
 
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_config["ApiSettings:BaseUrl"]!);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var res = await client.DeleteAsync($"api/note/soft-delete/{id}");
+
+            if (!res.IsSuccessStatusCode)
+                return BadRequest(new { success = false });
+
+            return new JsonResult(new { success = true });
+        }
 
         // Toggle pin note
         public async Task<IActionResult> OnPostTogglePinAsync(Guid id)
@@ -269,6 +288,7 @@ namespace NTC.Razor.Pages.Note
 
             return new JsonResult(new { success = true });
         }
+
         // Remove tag from note
         public async Task<IActionResult> OnPostRemoveTagFromNoteAsync(Guid noteId, Guid tagId)
         {
@@ -425,11 +445,7 @@ namespace NTC.Razor.Pages.Note
                 return BadRequest();
 
 
-            return new JsonResult(new
-            {
-                success = true,
-                id = apiResponse.Data.Id
-            });
+            return new JsonResult(apiResponse.Data);
         }
 
         public async Task<IActionResult> OnPutUpdateNoteAsync([FromBody] UpdateNoteModelView model)
@@ -459,6 +475,68 @@ namespace NTC.Razor.Pages.Note
                 success = true
             });
         }
+
+
+        public async Task<IActionResult> OnPutReorderNoteAsync([FromBody] ReorderNoteModelView model)
+        {
+            string? token = HttpContext.Request.Cookies["JwtToken"];
+
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
+
+
+            var client = _httpClientFactory.CreateClient();
+
+            client.BaseAddress =
+                new Uri(_config["ApiSettings:BaseUrl"]!);
+
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+
+            var res = await client.PutAsJsonAsync(
+                "api/note/reorder",
+                model);
+
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return BadRequest(new
+                {
+                    success = false
+                });
+            }
+
+
+            return new JsonResult(new
+            {
+                success = true
+            });
+        }
+
+
+
+        public async Task<IActionResult> OnPostRemoveAllTagFromNoteAsync(Guid noteId)
+        {
+            string? token = HttpContext.Request.Cookies["JwtToken"];
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized();
+
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_config["ApiSettings:BaseUrl"]!);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            var res = await client.DeleteAsync($"api/notetag/remove-all?noteId={noteId}");
+
+            if (!res.IsSuccessStatusCode)
+                return BadRequest();
+
+            return new JsonResult(new { success = true });
+        }
+
+
 
 
 

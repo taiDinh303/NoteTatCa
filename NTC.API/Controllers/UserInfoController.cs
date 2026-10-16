@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -9,6 +10,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize(Roles = "User")]
     public class UserInfoController : ControllerBase
     {
         private readonly IUserInfoService _userInfoService;
@@ -19,6 +21,9 @@ namespace NTC.API.Controllers
         }
 
 
+        /// <summary>
+        /// Retrieves all user information with pagination
+        /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 5)
         {
@@ -30,6 +35,9 @@ namespace NTC.API.Controllers
             ));
         }
 
+        /// <summary>
+        /// Retrieves user information by ID
+        /// </summary>
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -42,6 +50,9 @@ namespace NTC.API.Controllers
             ));
         }
 
+        /// <summary>
+        /// Creates new user information
+        /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateUserInfoModelView model)
         {
@@ -54,7 +65,9 @@ namespace NTC.API.Controllers
         }
 
 
-
+        /// <summary>
+        /// Updates user information
+        /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateUserInfoModelView model)
         {
@@ -66,7 +79,9 @@ namespace NTC.API.Controllers
                 data: "User Information updated successfully!"
             ));
         }
-
+        /// <summary>
+        /// Updates the user's name
+        /// </summary>
         [HttpPut("update-name")]
         public async Task<IActionResult> UpdateName([FromBody] UpdateNameModelView model)
         {
@@ -77,7 +92,9 @@ namespace NTC.API.Controllers
                 data: "Name updated successfully!"
             ));
         }
-
+        /// <summary>
+        /// Updates the user's gender
+        /// </summary>
         [HttpPut("update-gender")]
         public async Task<IActionResult> UpdateGender([FromBody] UpdateGenderModelView model)
         {
@@ -88,7 +105,9 @@ namespace NTC.API.Controllers
                 data: "Gender updated successfully!"
             ));
         }
-
+        /// <summary>
+        /// Updates the user's birthday
+        /// </summary>
         [HttpPut("update-birthday")]
         public async Task<IActionResult> UpdateBirthday([FromBody] UpdateBirthdayModelView model)
         {

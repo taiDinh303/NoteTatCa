@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -8,7 +9,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    //[Authorize(Roles = "Admin,User")]
     public class NoteController : ControllerBase
     {
         private readonly INoteService _noteService;
@@ -21,7 +22,7 @@ namespace NTC.API.Controllers
         #region Note
 
         /// <summary>
-        /// Retrieve all notes with pagination.
+        /// Retrieve all notes with pagination
         /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
@@ -36,7 +37,22 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Retrieve notes by tag with pagination.
+        /// Retrieve all notes in trash with pagination
+        /// </summary>
+        [HttpGet("get-trash")]
+        public async Task<IActionResult> GetTrash(int pageNumber = 1, int pageSize = 10)
+        {
+            BasePaginatedList<NoteResponseModelView> result = await _noteService.GetTrashAsync(pageNumber, pageSize);
+
+            return Ok(new BaseResponse<BasePaginatedList<NoteResponseModelView>>(
+                statusCode: StatusCodeHelper.OK,
+                code: ResponseCodeConstants.SUCCESS,
+                data: result
+            ));
+        }
+
+        /// <summary>
+        /// Retrieve notes by tag with pagination
         /// </summary>
         [HttpGet("get-by-tag")]
         public async Task<IActionResult> GetByTag(Guid tagId, int pageNumber = 1, int pageSize = 10)
@@ -51,7 +67,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Retrieve notes that have reminders with pagination.
+        /// Retrieve notes that have reminders with pagination
         /// </summary>
         [HttpGet("get-by-reminder")]
         public async Task<IActionResult> GetByReminder(int pageNumber = 1, int pageSize = 10)
@@ -66,11 +82,8 @@ namespace NTC.API.Controllers
             ));
         }
 
-
-
-
         /// <summary>
-        /// Retrieve a note by its ID.
+        /// Retrieve a note by its ID
         /// </summary>
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -85,28 +98,37 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Retrieve a note by its ID.
+        /// Create a new note
         /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateNoteModelView model)
         {
-            await _noteService.CreateAsync(model);
+            var note = await _noteService.CreateAsync(model);
 
             return Ok(new BaseResponse<NoteResponseModelView>(
                 statusCode: StatusCodeHelper.OK,
                 code: ResponseCodeConstants.SUCCESS,
                 data: new NoteResponseModelView
                 {
-                    Id = model.UserId,
-                    Title = model.Title,
-                    Content = model.Content,
-                    IsPinned = model.IsPinned,
+                    Id = note.Id,
+                    UserId = note.UserId,
+
+                    Title = note.Title,
+                    Content = note.Content,
+
+                    IsPinned = note.IsPinned,
+                    PinnedAt = note.PinnedAt,
+                    Priority = note.Priority,
+
+                    SortOrder = note.SortOrder,
+                    BackgroundColor = note.BackgroundColor,
                 }
             ));
         }
 
+
         /// <summary>
-        /// Update an existing note.
+        /// Update an existing note
         /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UpdateNoteModelView model)
@@ -121,7 +143,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Soft delete a note.
+        /// Soft delete a note
         /// </summary>
         [HttpDelete("soft-delete/{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)
@@ -136,7 +158,22 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Permanently delete a note.
+        /// Soft delete a note
+        /// </summary>
+        [HttpDelete("restore/{id}")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            await _noteService.RestoreAsync(id);
+
+            return Ok(new BaseResponse<string>(
+                statusCode: StatusCodeHelper.OK,
+                code: ResponseCodeConstants.SUCCESS,
+                data: "Note restored successfully!"
+            ));
+        }
+
+        /// <summary>
+        /// Permanently delete a note
         /// </summary>
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
@@ -151,7 +188,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Toggle the pinned status of a note.
+        /// Toggle the pinned status of a note
         /// </summary>
         [HttpPut("toggle-pin/{id}")]
         public async Task<IActionResult> TogglePin(Guid id)
@@ -162,6 +199,21 @@ namespace NTC.API.Controllers
                 statusCode: StatusCodeHelper.OK,
                 code: ResponseCodeConstants.SUCCESS,
                 data: "Toggle pin successfully!"
+            ));
+        }
+
+        /// <summary>
+        /// Reorder a note
+        /// </summary>
+        [HttpPut("reorder")]
+        public async Task<IActionResult> Reorder([FromBody] ReorderNoteModelView model)
+        {
+            await _noteService.ReorderAsync(model);
+
+            return Ok(new BaseResponse<string>(
+                statusCode: StatusCodeHelper.OK,
+                code: ResponseCodeConstants.SUCCESS,
+                data: "Reorder note successfully!"
             ));
         }
 

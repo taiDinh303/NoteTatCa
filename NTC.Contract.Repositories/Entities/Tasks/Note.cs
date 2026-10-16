@@ -19,12 +19,6 @@ namespace NTC.Contract.Repositories.Entities
 
         public string Content { get; set; } = string.Empty;
 
-        // Todo behavior
-        public bool IsCompleted { get; set; }
-        public DateTimeOffset? DueDate { get; set; }
-        public DateTimeOffset? CompletedAt { get; set; }
-
-
 
         // UI / UX
         public bool IsPinned { get; set; }
@@ -34,7 +28,7 @@ namespace NTC.Contract.Repositories.Entities
         //
         public string? BackgroundColor { get; set; }
         //
-        public int SortOrder { get; set; } = -99;
+        public double SortOrder { get; set; }
 
 
         // Navigation

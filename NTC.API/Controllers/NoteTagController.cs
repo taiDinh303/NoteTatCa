@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -7,7 +8,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize]
+    //[Authorize(Roles = "Admin,User")]
     public class NoteTagController : ControllerBase
     {
         private readonly INoteTagService _noteTagService;
@@ -53,19 +54,43 @@ namespace NTC.API.Controllers
 
 
         /// <summary>
-        /// Remove all tag from a note
+        /// Remove a tag from all notes
         /// </summary>
-        [HttpDelete("remove-all")]
-        public async Task<IActionResult> RemoveTagFromAllNotesAsync([FromQuery] Guid noteId)
+        [HttpDelete("remove-tag-from-all-notes")]
+        public async Task<IActionResult> RemoveTagFromAllNotesAsync([FromQuery] Guid tagId)
         {
-            await _noteTagService.RemoveTagFromAllNotesAsync(noteId);
+            await _noteTagService.RemoveTagFromAllNotesAsync(tagId);
 
             return Ok(new BaseResponse<string>(
                 statusCode: StatusCodeHelper.OK,
                 code: ResponseCodeConstants.SUCCESS,
-                data: "All tag removed from note successfully!"
+                data: "Tag removed from all notes successfully!"
             ));
         }
+
+
+        /// <summary>
+        /// Remove all tags from a note
+        /// </summary>
+        [HttpDelete("remove-all-tags-from-note")]
+        public async Task<IActionResult> RemoveAllTagsFromNote([FromQuery] Guid noteId)
+        {
+            await _noteTagService.RemoveAllTagsFromNoteAsync(noteId);
+
+            return Ok(new BaseResponse<string>(
+                statusCode: StatusCodeHelper.OK,
+                code: ResponseCodeConstants.SUCCESS,
+                data: "All tags removed from note successfully!"
+            ));
+        }
+
+
+
+
+
+
+
+
 
 
 

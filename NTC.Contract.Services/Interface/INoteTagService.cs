@@ -6,5 +6,7 @@
         Task RemoveTagFromNoteAsync(Guid noteId, Guid tagId);
 
         Task RemoveTagFromAllNotesAsync(Guid tagId);
+
+        Task RemoveAllTagsFromNoteAsync(Guid noteId);
     }
 }

@@ -76,6 +76,7 @@ namespace NTC.Services.Mappings
             return new ApplicationUser
             {
                 UserName = model.Username,
+                Email = model.Email,
                 // Audit info
                 CreatedBy = model.Username,
             };

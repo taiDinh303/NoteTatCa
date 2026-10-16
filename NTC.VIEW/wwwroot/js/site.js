@@ -1,41 +1,20 @@
 ﻿// Write your Javascript code.
 
-// tắt animation khi load
-document.body.classList.add("preload");
+function initPage() {
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    let sidebarState = localStorage.getItem("sidebar");
-
-    // nếu chưa có thì mặc định là close
-    if (!sidebarState) {
-        localStorage.setItem("sidebar", "close");
-        sidebarState = "close";
+    if (window.initNotePage && document.querySelector("#noteListWrapper")) {
+        window.initNotePage();
     }
-
-    if (sidebarState === "open") {
-        document.body.classList.add("sidebar-open");
-    }
-
-    // bật lại animation sau khi render xong
-    setTimeout(() => {
-        document.body.classList.remove("preload");
-    }, 50);
-
-});
-
-function toggleSidebar() {
-
-    document.body.classList.toggle("sidebar-open");
-
-    if (document.body.classList.contains("sidebar-open")) {
-        localStorage.setItem("sidebar", "open");
-    } else {
-        localStorage.setItem("sidebar", "close");
-    }
-
+    initNoteResizeObserver();
 }
 
+window.addEventListener("popstate", () => {
+    loadPage(location.pathname, false);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    initPage();
+});
 
 async function loadPage(url, addHistory = true) {
 
@@ -74,13 +53,6 @@ async function loadPage(url, addHistory = true) {
     }
 }
 
-function initPage() {
-
-    if (window.initNotePage && document.querySelector("#noteListWrapper")) {
-        window.initNotePage();
-    }
-
-}
 
 document.addEventListener("click", function (e) {
 
@@ -94,15 +66,6 @@ document.addEventListener("click", function (e) {
     loadPage(link.getAttribute("href"));
 
 });
-
-window.addEventListener("popstate", () => {
-    loadPage(location.pathname, false);
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    initPage();
-});
-
 
 
 
@@ -128,6 +91,64 @@ document.addEventListener("click", function (e) {
     }
 
 });
+
+
+// tắt animation khi load
+document.body.classList.add("preload");
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    let sidebarState = localStorage.getItem("sidebar");
+
+    // nếu chưa có thì mặc định là close
+    if (!sidebarState) {
+        localStorage.setItem("sidebar", "close");
+        sidebarState = "close";
+    }
+
+    if (sidebarState === "open") {
+        document.body.classList.add("sidebar-open");
+    }
+
+    // bật lại animation sau khi render xong
+    setTimeout(() => {
+        document.body.classList.remove("preload");
+    }, 50);
+
+});
+
+function toggleSidebar() {
+
+    document.body.classList.toggle("sidebar-open");
+
+    localStorage.setItem(
+        "sidebar",
+        document.body.classList.contains("sidebar-open")
+            ? "open"
+            : "close"
+    );
+}
+
+
+
+let noteResizeObserver = null;
+
+function initNoteResizeObserver() {
+
+    const wrapper = document.getElementById("noteListWrapper");
+    if (!wrapper) return;
+
+    // Tránh tạo nhiều observer khi SPA load lại
+    noteResizeObserver?.disconnect();
+
+    noteResizeObserver = new ResizeObserver(() => {
+        window.NoteBoard?.refresh();
+    });
+
+    noteResizeObserver.observe(wrapper);
+}
+
+
 
 
 

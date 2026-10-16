@@ -14,25 +14,17 @@
     }
 }
 
-<div class="note-container">
 
 
-
-
-
-    <!-- Main note-->
-    <div id="noteListWrapper">
-        @await Html.PartialAsync("_NoteListPartial", Model.Notes)
-    </div>
-
-    <button type="button"
-            class="note-create-btn"
-            onclick="openCreateNoteModal()">
-        New Note
-    </button>
-
-
+<!-- Main note-->
+<div id="noteListWrapper">
+    <partial name="~/Pages/Note/Partials/_NoteListPartial.cshtml"
+             model="Model.Notes" />
 </div>
+
+
+
+
 
 
 <form method="post" style="display:none">
@@ -40,30 +32,21 @@
 </form>
 
 
-<div>
-</div>
-
-
-
-
-
-
-
-
-
 
 
 <!-- Modal -->
 <div>
-    <partial name="_tagModalPartial" model="Model.Tags" />
-    <partial name="_LabelModalPartial" model="Model.Tags" />
-    <partial name="_ReminderModalPartial" />
+    <partial name="~/Pages/Note/Partials/_TagModalPartial.cshtml"
+             model="Model.Tags" />
 
-    <partial name="_NoteCreateModalPartial"
+    <partial name="~/Pages/Note/Partials/_NoteTagsModalPartial.cshtml"
+             model="Model.Tags" />
+
+    <partial name="~/Pages/Note/Partials/_ReminderModalPartial.cshtml" />
+
+    <partial name="~/Pages/Note/Partials/_NoteCreateModalPartial.cshtml"
              model="new NTC.ModelViews.NoteModelView.CreateNoteModelView()" />
 
-    <partial name="_NoteEditModalPartial"
+    <partial name="~/Pages/Note/Partials/_NoteEditModalPartial.cshtml"
              model="new NTC.ModelViews.NoteModelView.UpdateNoteModelView()" />
-
-
 </div>

@@ -10,6 +10,12 @@ namespace NTC.Razor.Pages.Auth
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _httpClientFactory;
 
+        public SetPasswordModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        {
+            _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
+        }
+
         [BindProperty(SupportsGet = true)]
         public Guid UserId { get; set; }
 
@@ -22,39 +28,36 @@ namespace NTC.Razor.Pages.Auth
         [BindProperty]
         public string? ConfirmPassword { get; set; }
 
-        public SetPasswordModel(IConfiguration configuration, IHttpClientFactory httpClientFactory)
-        {
-            _configuration = configuration;
-            _httpClientFactory = httpClientFactory;
-        }
+        public string? ErrorMessage { get; set; }
+        public string? SuccessMessage { get; set; }
 
         public void OnGet()
         {
-            // Page opened from email link; UserId and Token are in query parameters
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (NewPassword != ConfirmPassword)
             {
-                ViewData["ErrorMessage"] = "Password confirmation does not match.";
+                ErrorMessage = "Password confirmation does not match.";
                 return Page();
             }
 
             if (UserId == Guid.Empty || string.IsNullOrEmpty(Token))
             {
-                ViewData["ErrorMessage"] = "Invalid link.";
+                ErrorMessage = "Invalid link.";
                 return Page();
             }
 
             try
             {
                 var client = _httpClientFactory.CreateClient();
+
                 var baseUrl = _configuration["Apisettings:BaseUrl"];
                 if (!baseUrl!.EndsWith("/")) baseUrl += "/";
+
                 client.BaseAddress = new Uri(baseUrl);
 
-                // Call the API to set password
                 var request = new
                 {
                     userId = UserId,
@@ -62,21 +65,20 @@ namespace NTC.Razor.Pages.Auth
                     newPassword = NewPassword
                 };
 
-                var response = await client.PostAsJsonAsync("/api/user/set-password", request);
+                var response = await client.PostAsJsonAsync("api/user/set-password", request);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    ViewData["SuccessMessage"] = "Password has been successfully set! You can now log in with your email and new password.";
+                    SuccessMessage = "Password has been successfully set! You can now log in with your new password.";
                 }
                 else
                 {
-                    var err = await response.Content.ReadAsStringAsync();
-                    ViewData["ErrorMessage"] = $"Unable to set password: {err}";
+                    ErrorMessage = await response.Content.ReadAsStringAsync();
                 }
             }
             catch (Exception ex)
             {
-                ViewData["ErrorMessage"] = $"System error: {ex.Message}";
+                ErrorMessage = $"System error: {ex.Message}";
             }
 
             return Page();

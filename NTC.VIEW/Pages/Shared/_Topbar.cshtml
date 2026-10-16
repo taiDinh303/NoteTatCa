@@ -2,7 +2,6 @@
     var isLogin = Context.Session.GetString("UserId") != null;
     var fullName = Context.Session.GetString("FullName");
 
-
     var page = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
     bool showSidebar = page.StartsWith("/Note");
 }
@@ -12,38 +11,89 @@
     <div class="topbar">
         <div class="topbar-inner">
 
-            <div>
+            <div class="topbar-left">
+
                 @if (isLogin && showSidebar)
                 {
-                    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                    <button class="menu-btn"
+                            type="button"
+                            onclick="toggleSidebar()"
+                            aria-label="Toggle sidebar">
+                        ☰
+                    </button>
                 }
 
-                <a class="logo" asp-page="/note/index">NTC.VIEW</a>
+                <a class="logo" asp-page="/note/index">
+
+                    <span class="logo-icon">
+                        NTC
+                    </span>
+
+                </a>
 
             </div>
 
+
             <div class="auth-area">
+
                 @if (!isLogin)
                 {
-                    <a class="btn-login" asp-page="/auth/login">Login</a>
+                    <a class="btn-login"
+                       asp-page="/auth/login">
+                        Login
+                    </a>
                 }
                 else
                 {
                     <div class="user-dropdown">
-                        <button onclick="toggleMenu(event)" class="user-btn">
-                            👤 @fullName
+
+                        <button onclick="toggleMenu(event)"
+                                class="user-btn"
+                                type="button">
+
+                            <span class="user-avatar">
+                                @(
+                                    string.IsNullOrWhiteSpace(fullName)
+                                    ? "U"
+                                    : fullName.Substring(0, 1).ToUpper()
+                                    )
+                            </span>
+
+                            <span class="user-name">
+                                @fullName
+                            </span>
+
+                            <span class="user-arrow">
+                                ▾
+                            </span>
+
                         </button>
 
-                        <ul id="user-menu" hidden>
+
+                        <ul id="user-menu"
+                            class="user-menu"
+                            hidden>
+
                             <li>
-                                <a href="/settings/profile">Settings</a>
+                                <a href="/settings/profile">
+                                    <span>⚙️</span>
+                                    Settings
+                                </a>
                             </li>
+
                             <li>
-                                <a class="logout" asp-page="/auth/logout">Logout</a>
+                                <a class="logout"
+                                   asp-page="/auth/logout">
+                                    <span>↪</span>
+                                    Logout
+                                </a>
                             </li>
+
                         </ul>
+
                     </div>
                 }
+
             </div>
 
         </div>

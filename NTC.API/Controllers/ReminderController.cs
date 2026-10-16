@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Store;
@@ -8,7 +9,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Roles = "Admin,User")]
     public class ReminderController : ControllerBase
     {
         private readonly IReminderService _reminderService;
@@ -21,7 +22,7 @@ namespace NTC.API.Controllers
         #region Reminder
 
         /// <summary>
-        /// Retrieve all reminders with pagination.
+        /// Retrieve all reminders with pagination
         /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
@@ -36,7 +37,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Retrieve a reminder by its ID.
+        /// Retrieve a reminder by its ID
         /// </summary>
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -52,7 +53,7 @@ namespace NTC.API.Controllers
 
 
         /// <summary>
-        /// Retrieve reminders for a note.
+        /// Retrieve reminders for a note
         /// </summary>
         [HttpGet("get-by-note/{noteId}")]
         public async Task<IActionResult> GetByNote(Guid noteId)
@@ -67,7 +68,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Create a new reminder.
+        /// Create a new reminder
         /// </summary>
         [HttpPost("create")]
         public async Task<IActionResult> Create(
@@ -94,7 +95,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Update an existing reminder.
+        /// Update an existing reminder
         /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> Update(
@@ -110,7 +111,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Soft delete a reminder.
+        /// Soft delete a reminder
         /// </summary>
         [HttpDelete("soft-delete/{id}")]
         public async Task<IActionResult> SoftDelete(Guid id)
@@ -124,7 +125,7 @@ namespace NTC.API.Controllers
             ));
         }
         /// <summary>
-        /// Permanently delete a reminder.
+        /// Permanently delete a reminder
         /// </summary>
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)

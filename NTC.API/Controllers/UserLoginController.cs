@@ -7,7 +7,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    // No Authorize
     public class UserLoginController : ControllerBase
     {
         private readonly IUserLoginService _userLoginService;
@@ -18,7 +18,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Check if the user has linked a Google account (or another provider).
+        /// Check if the user has linked a Google account (or another provider)
         /// </summary>
         [HttpGet("is-connected")]
         public async Task<IActionResult> IsConnected(Guid userId, string provider = "Google")
@@ -33,7 +33,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        ///  Get all linked login providers for the user.
+        ///  Get all linked login providers for the user
         /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll(Guid userId)
@@ -48,7 +48,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Link a Google account (or another provider).
+        /// Link a Google account (or another provider)
         /// </summary>
         [HttpPost("connect")]
         public async Task<IActionResult> Connect(Guid userId, string provider, string providerKey, string? displayName = null)
@@ -63,7 +63,7 @@ namespace NTC.API.Controllers
         }
 
         /// <summary>
-        /// Unlink a connected account (e.g., Google).
+        /// Unlink a connected account (e.g., Google)
         /// </summary>
         [HttpDelete("disconnect")]
         public async Task<IActionResult> Disconnect(Guid userId, string provider = "Google")

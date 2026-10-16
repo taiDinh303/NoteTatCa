@@ -1,0 +1,227 @@
+﻿@using NTC.Contract.Repositories.Entities.Tasks
+@using NTC.Core.Base
+@using System.Text.Json
+
+@model BasePaginatedList<NTC.ModelViews.NoteModelView.NoteResponseModelView>
+
+@{
+    var notes = Model?.Items ?? Enumerable.Empty<NTC.ModelViews.NoteModelView.NoteResponseModelView>();
+
+    var pinnedNotes = notes
+        .Where(x => x.IsPinned)
+        .OrderBy(x => x.SortOrder)
+        .ToList();
+
+    var normalNotes = notes
+        .Where(x => !x.IsPinned)
+        .OrderBy(x => x.SortOrder)
+        .ToList();
+
+    bool hasNotes = notes.Any();
+}
+
+<div class="note-container mt-4">
+
+    <div class="note-empty-message @(hasNotes ? "d-none" : "")">
+        <img src="/images/no_note_yet.png"
+             alt="No notes"
+             class="note-empty-image">
+    </div>
+
+    @* Pinned section *@
+    <div class="note-section pinned-section" style="@(pinnedNotes.Any() ? "" : "display:none")">
+
+        <div class="note-grid" id="pinnedNoteList">
+
+            @foreach (var note in pinnedNotes)
+            {
+                <div class="note-item" data-note-id="@note.Id" data-pinned="@note.IsPinned.ToString().ToLower()">
+
+                    <div class="note-card" style="background-color:@(note.BackgroundColor ?? "#ffffff")">
+
+
+
+                        <div class="note-card-body">
+                            <!-- title -->
+                            <div class="note-title-row"><strong>@note.Title</strong></div>
+                            <!-- Content -->
+                            <div class="note-content">@note.Content</div>
+
+
+                            @if (note.Tags.Any())
+                            {
+                                var visibleTags = note.Tags.Take(3).ToList();
+                                var remainingTags = note.Tags.Count() - visibleTags.Count;
+
+                                <div class="note-tags note-tags-bottom">
+                                    @foreach (var cat in visibleTags)
+                                    {
+                                        <div class="tag-item">
+                                            <span class="tag-dot" style="background:@(cat.Color ?? "#adb5bd")"></span>
+                                            <span class="tag-name">@cat.Name</span>
+                                        </div>
+                                    }
+
+                                    @if (remainingTags > 0)
+                                    {
+                                        <div class="tag-item tag-more">+@remainingTags</div>
+                                    }
+                                </div>
+                            }
+
+
+                        </div>
+
+
+
+                        <!-- PIN -->
+                        <div class="note-pin">
+
+
+                            <button class="note-pin-btn clickable"
+                                    data-url="@Url.Page("Index", "TogglePin", new { id = note.Id })"
+                                    data-pinned="@note.IsPinned.ToString().ToLower()">
+
+                                <i class="bi bi-pin-fill"></i>
+
+                            </button>
+
+
+                        </div>
+
+
+                        <!-- ACTIONS (3 dots) -->
+
+                        <div class="note-actions">
+                            <div class="dropdown">
+                                <button class="note-action-btn" data-action="toggle-dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item" data-action="label-note" data-note-id="@note.Id" data-note-tags="@string.Join(",", note.Tags.Select(c => c.Id))">Tags</button>
+                                    <button class="dropdown-item" data-action="move-to-trash">Move to Trash</button>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+    @* Normal section *@
+    <div class="note-section normal-section" style="@(normalNotes.Any() ? "" : "display:none")">
+
+        <div class="note-grid" id="normalNoteList">
+
+
+            @foreach (var note in normalNotes)
+            {
+                <div class="note-item" data-note-id="@note.Id" data-pinned="@note.IsPinned.ToString().ToLower()">
+
+
+                    <div class="note-card" style="background-color:@(note.BackgroundColor ?? "#ffffff")">
+
+
+
+                        <div class="note-card-body">
+                            <!-- title -->
+                            <div class="note-title-row"><strong>@note.Title</strong></div>
+                            <!-- Content -->
+                            <div class="note-content">@note.Content</div>
+
+
+                            @if (note.Tags.Any())
+                            {
+                                var visibleTags = note.Tags.Take(3).ToList();
+                                var remainingTags = note.Tags.Count() - visibleTags.Count;
+
+                                <div class="note-tags note-tags-bottom">
+                                    @foreach (var cat in visibleTags)
+                                    {
+                                        <div class="tag-item">
+                                            <span class="tag-dot" style="background:@(cat.Color ?? "#adb5bd")"></span>
+                                            <span class="tag-name">@cat.Name</span>
+                                        </div>
+                                    }
+
+                                    @if (remainingTags > 0)
+                                    {
+                                        <div class="tag-item tag-more">+@remainingTags</div>
+                                    }
+                                </div>
+                            }
+
+
+                        </div>
+
+
+
+                        <!-- PIN -->
+                        <div class="note-pin">
+
+                            <button class="note-pin-btn clickable"
+                                    data-url="@Url.Page("Index", "TogglePin", new { id = note.Id })"
+                                    data-pinned="@note.IsPinned.ToString().ToLower()">
+
+                                <i class="bi bi-pin"></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- ACTIONS (3 dots) -->
+
+                        <div class="note-actions">
+                            <div class="dropdown">
+                                <button class="note-action-btn" data-action="toggle-dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+
+                                <div class="dropdown-menu">
+                                    <button class="dropdown-item" data-action="label-note" data-note-id="@note.Id" data-note-tags="@string.Join(",", note.Tags.Select(c => c.Id))">Tags</button>
+                                    <button class="dropdown-item" data-action="move-to-trash">Move to Trash</button>
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            }
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+@using System.Text.Json
+
+@{
+    var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+}
+
+<script>
+    window.noteCache = @Html.Raw(JsonSerializer.Serialize(Model.Items.ToDictionary(x => x.Id.ToString()), jsonOptions));
+</script>
+
+
+
+
+

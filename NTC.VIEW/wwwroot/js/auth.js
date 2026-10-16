@@ -1,31 +1,21 @@
-﻿
-document.querySelectorAll(".password-toggle")
-    .forEach(btn => {
+﻿function togglePassword(inputId, button) {
 
-        btn.addEventListener("click", () => {
+    const input = document.getElementById(inputId);
+    const icon = button.querySelector("i");
 
-            const input =
-                document.getElementById(btn.dataset.target);
+    if (input.type === "password") {
 
-            const isPassword =
-                input.type === "password";
+        input.type = "text";
 
-            input.type =
-                isPassword ? "text" : "password";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
 
-            if (btn.querySelector("i")) {
+    } else {
 
-                btn.innerHTML =
-                    isPassword
-                        ? '<i class="bi bi-eye-slash"></i>'
-                        : '<i class="bi bi-eye"></i>';
+        input.type = "password";
 
-            } else {
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
 
-                btn.textContent =
-                    isPassword ? "🙈" : "👁";
-
-            }
-        });
-
-    });
+    }
+}

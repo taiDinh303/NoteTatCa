@@ -101,12 +101,27 @@ namespace NTC.Services.Service
             foreach (var item in items)
                 await repo.DeleteAsync(item);
 
-            await _unitOfWork.SaveAsync();
+            //await _unitOfWork.SaveAsync();
         }
 
 
+        // Remove all tags from note
+        public async Task RemoveAllTagsFromNoteAsync(Guid noteId)
+        {
+            var repo = _unitOfWork.GetRepository<NoteTag>();
 
+            var items = await repo.Entities
+                .Where(x => x.NoteId == noteId)
+                .ToListAsync();
 
+            if (!items.Any())
+                return;
+
+            foreach (var item in items)
+                await repo.DeleteAsync(item);
+
+            //await _unitOfWork.SaveAsync();
+        }
 
 
 

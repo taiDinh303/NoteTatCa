@@ -6,12 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Layout</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/note/note.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/note/modal.css" asp-append-version="true" />
-
-
+    <link rel="stylesheet" href="~/css/components/header.css" asp-append-version="true" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-    @*     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
 
 
     @RenderSection("Styles", required: false)
@@ -36,7 +32,7 @@
 
     <main role="main" class="page-layout">
 
-@*         <partial name="_Sidebar" /> *@
+        @*         <partial name="_Sidebar" /> *@
 
         <main class="page-content">
             @RenderBody()
@@ -47,8 +43,8 @@
 
     <!-- Scripts -->
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/auth.js" asp-append-version="true"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
 
     <script src="~/js/note/tag.js" asp-append-version="true"></script>

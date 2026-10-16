@@ -1,0 +1,555 @@
+﻿```css
+/* =========================================================
+   SETTINGS
+   Profile + Account
+========================================================= */
+/* =========================================================
+   PAGE
+========================================================= */
+.layout {
+    width: min(900px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 32px 0 60px;
+}
+
+.content {
+    width: 100%;
+}
+
+
+/* =========================================================
+   SETTINGS NAVIGATION
+========================================================= */
+
+.top-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    padding: 5px;
+    margin: 24px auto 24px;
+    background: #ffffff;
+    border: 1px solid #e7eaf0;
+    border-radius: 13px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03), 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+    .top-nav a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-width: 150px;
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 9px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .top-nav a:hover {
+            color: #334155;
+            background: #f8fafc;
+        }
+
+        .top-nav a.active {
+            color: #5f27cd;
+            background: linear-gradient( 135deg, #f3e8ff, #eff6ff );
+            box-shadow: inset 0 0 0 1px rgba(95, 39, 205, 0.08);
+        }
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid #e7eaf0;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02), 0 10px 30px rgba(15, 23, 42, 0.045);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+    .card:hover {
+        border-color: #dfe4ec;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, 0.025), 0 14px 35px rgba(15, 23, 42, 0.06);
+    }
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-header {
+    display: flex;
+    align-items: center;
+    min-height: 54px;
+    padding: 0 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #eef1f5;
+    color: #111827;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.card-body {
+    padding: 4px 0;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.card th,
+.card td {
+    padding: 17px 20px;
+}
+
+
+/* Left label */
+
+.card th {
+    width: 190px;
+    color: #64748b;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* Right value */
+
+.card td {
+    color: #1e293b;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   SETTINGS ROW
+========================================================= */
+
+.row-click {
+    position: relative;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+
+    /* Divider */
+
+    .row-click:not(:last-child) th,
+    .row-click:not(:last-child) td {
+        border-bottom: 1px solid #f0f2f5;
+    }
+
+
+    /* Hover */
+
+    .row-click:hover {
+        background: #f8fafc;
+    }
+
+        .row-click:hover th {
+            color: #475569;
+        }
+
+        .row-click:hover td {
+            color: #5f27cd;
+        }
+
+
+    /* Small arrow when hovering */
+
+    .row-click td::after {
+        content: "›";
+        display: inline-block;
+        margin-left: 8px;
+        color: #cbd5e1;
+        font-size: 18px;
+        font-weight: 400;
+        transform: translateX(-3px);
+        opacity: 0;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .row-click:hover td::after {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.alert {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* Error */
+
+.alert-danger {
+    color: #b42318;
+    background: #fff5f5;
+    border: 1px solid #ffd6d6;
+}
+
+
+/* Success */
+
+.alert-success {
+    color: #287a3e;
+    background: #f0fdf4;
+    border: 1px solid #c9f0d2;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 7px 15px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .btn:active {
+        transform: scale(0.97);
+    }
+
+
+/* Primary */
+
+.btn-primary {
+    color: #ffffff;
+    background: linear-gradient( 135deg, #6a11cb, #2575fc );
+    box-shadow: 0 5px 12px rgba(37, 117, 252, 0.18);
+}
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 16px rgba(37, 117, 252, 0.25);
+    }
+
+
+/* Outline */
+
+.btn-outline {
+    color: #475569;
+    background: #ffffff;
+    border-color: #d1d5db;
+}
+
+    .btn-outline:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+    }
+
+
+/* Danger */
+
+.btn-danger {
+    color: #ffffff;
+    background: #ef4444;
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.12);
+}
+
+    .btn-danger:hover {
+        background: #dc2626;
+        box-shadow: 0 6px 14px rgba(239, 68, 68, 0.2);
+    }
+
+
+/* =========================================================
+   ACCOUNT AUTHORIZATION
+========================================================= */
+
+/*
+    Dùng cho phần Google authorization
+    đang có inline style trong Account.cshtml.
+*/
+
+.card-body > div[style*="justify-content:space-between"] {
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #f0f2f5 !important;
+}
+
+    .card-body > div[style*="justify-content:space-between"]:last-child {
+        border-bottom: none !important;
+    }
+
+
+    /* Google title */
+
+    .card-body > div[style*="justify-content:space-between"] > div:first-child > div:first-child {
+        color: #1e293b;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+    /* Google description */
+
+    .card-body > div[style*="justify-content:space-between"] > div:first-child > div:last-child {
+        margin-top: 4px;
+        color: #94a3b8 !important;
+        font-size: 13px !important;
+    }
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.42);
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+    .modal-overlay.show {
+        display: flex;
+    }
+
+
+/* Modal box */
+
+.modal-box {
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18), 0 5px 15px rgba(15, 23, 42, 0.08);
+    animation: modal-in 0.2s ease-out;
+}
+
+
+/* Animation */
+
+@keyframes modal-in {
+
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* Modal header */
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 18px;
+    background: #fffaf0;
+    border-bottom: 1px solid #f5dfad;
+}
+
+.modal-title {
+    color: #5f3f00;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+
+/* Close button */
+
+.modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+    .modal-close:hover {
+        background: #f1f5f9;
+        color: #111827;
+    }
+
+
+/* Modal body */
+
+.modal-body {
+    padding: 20px 18px;
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+    .modal-body p {
+        margin: 0 0 10px;
+    }
+
+        .modal-body p:last-child {
+            margin-bottom: 0;
+        }
+
+
+/* Modal footer */
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 13px 18px;
+    border-top: 1px solid #eef1f5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .layout {
+        width: calc(100% - 24px);
+        padding: 20px 0 40px;
+    }
+
+
+    /* Navigation */
+
+    .top-nav {
+        width: 100%;
+        margin-bottom: 18px;
+    }
+
+        .top-nav a {
+            min-width: 0;
+            height: 38px;
+            padding: 0 8px;
+            font-size: 13px;
+        }
+
+
+    /* Card */
+
+    .card {
+        border-radius: 13px;
+    }
+
+    .card-header {
+        min-height: 50px;
+        padding: 0 15px;
+    }
+
+    .card-body {
+        padding: 2px 0;
+    }
+
+
+    /* Table */
+
+    .card th,
+    .card td {
+        padding: 15px 14px;
+    }
+
+    .card th {
+        width: 120px;
+        font-size: 13px;
+    }
+
+    .card td {
+        font-size: 13px;
+    }
+
+
+    /* Hide hover arrow on mobile */
+
+    .row-click td::after {
+        display: none;
+    }
+
+
+    /* Account authorization */
+
+    .card-body > div[style*="justify-content:space-between"] {
+        align-items: center !important;
+        gap: 15px;
+        padding: 14px !important;
+    }
+
+
+    /* Modal */
+
+    .modal-overlay {
+        padding: 15px;
+    }
+
+    .modal-box {
+        max-width: 100%;
+        border-radius: 14px;
+    }
+
+    .modal-footer {
+        justify-content: stretch;
+    }
+
+        .modal-footer .btn {
+            width: 100%;
+        }
+}
+
+```

@@ -16,13 +16,13 @@ namespace NTC.Services.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INoteTagService _noteTagService;
 
-        public TagService(
-            IUnitOfWork unitOfWork,
-            IHttpContextAccessor httpContextAccessor)
+        public TagService(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor, INoteTagService noteTagService)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
+            _noteTagService = noteTagService;
         }
 
         // GET ALL
@@ -163,8 +163,6 @@ namespace NTC.Services.Service
         public async Task DeleteAsync(Guid tagId)
         {
             var tagRepo = _unitOfWork.GetRepository<Tag>();
-            var noteTagRepo = _unitOfWork.GetRepository<NoteTag>();
-
 
             Guid userId = Guid.Parse(
                 _httpContextAccessor.HttpContext?
@@ -177,7 +175,6 @@ namespace NTC.Services.Service
                 )
             );
 
-            // Check tag tồn tại & thuộc user
             Tag tag = await tagRepo.Entities
                 .FirstOrDefaultAsync(x => x.Id == tagId && x.UserId == userId)
                 ?? throw new ErrorException(
@@ -186,18 +183,9 @@ namespace NTC.Services.Service
                     "Tag not found"
                 );
 
-            // Remove ALL relations
-            var relations = await noteTagRepo.Entities
-                .Where(x => x.TagId == tagId)
-                .ToListAsync();
+            await _noteTagService.RemoveTagFromAllNotesAsync(tagId);
 
-            foreach (var r in relations)
-                await noteTagRepo.DeleteAsync(r);
-
-            // Delete tag
             await tagRepo.DeleteAsync(tag);
-
-            // Save once (transaction-like)
             await _unitOfWork.SaveAsync();
         }
 
