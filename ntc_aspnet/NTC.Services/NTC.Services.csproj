@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.32" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NTC.Contract.Repositories\NTC.Contract.Repositories.csproj" />
+    <ProjectReference Include="..\NTC.Contract.Services\NTC.Contract.Services.csproj" />
+    <ProjectReference Include="..\NTC.Core\NTC.Core.csproj" />
+    <ProjectReference Include="..\NTC.ModelViews\NTC.ModelViews.csproj" />
+
+  </ItemGroup>
+
+</Project>

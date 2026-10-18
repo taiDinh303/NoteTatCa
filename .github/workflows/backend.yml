@@ -1,0 +1,46 @@
+name: NoteTatCa backend verification
+on:
+  push:
+    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
+  pull_request:
+    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ntc_ci
+          POSTGRES_PASSWORD: isolated_fixture_only
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NTC_TEST_POSTGRES: Host=127.0.0.1;Port=5432;Database=postgres;Username=ntc_ci;Password=isolated_fixture_only
+      NTC_ARTIFACT_DIR: ${{ github.workspace }}/TestResults/artifacts
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet tool restore
+      - run: dotnet restore ntc_aspnet/NTC.Backend.slnf -warnaserror
+      - run: dotnet build ntc_aspnet/NTC.Backend.slnf -c Release --no-restore -warnaserror
+      - run: dotnet test ntc_aspnet/NTC.Tests/NTC.Tests.csproj -c Release --no-build --logger trx --results-directory TestResults
+      - run: python3 scripts/verify_docs.py
+      - run: dotnet publish ntc_aspnet/NTC.API/NTC.API.csproj -c Release --no-build -o artifacts/publish
+      - run: docker build -t notetatca-verify .
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: backend-verification
+          path: TestResults/

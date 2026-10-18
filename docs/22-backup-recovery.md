@@ -1,13 +1,17 @@
 # 22 — Sao lưu và khôi phục
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | TARGET giữ tài khoản/ghi chú cũ; backup runtime chưa kiểm
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+Nguồn thật chưa backup/restore trong phiên. Test SQL migration fixture chứng minh compatibility dữ liệu giả, không thay recovery drill. Giữ ID/hash/content/UTC instant, Identity token keyring backup bảo vệ riêng; mã hóa/retention/RPO/RTO cần operator chốt. Purge7 ngày không xóa backup. Restore trước tiên DB biệt lập, jobs off tránh gửi/purge khi smoke.
 
 ## Chính sách đề xuất
 
 | Dataset | RPO/RTO đề xuất | Lịch/retention đề xuất | Quyền / lưu trữ |
 | --- | --- | --- | --- |
-| SQL Server nguồn | Snapshot trước mọi migration; target vận hành 24h/4h | Daily; giữ 14 ngày ban đầu | Backup mã hóa, hạn chế quyền, ngoài working copy |
-| Supabase PostgreSQL đích | 24h/4h ban đầu, cần budget/plan thật | Theo plan + bản logical khi cần; không giả định Free có PITR | Role backup riêng; kiểm restore |
+| SQL Server nguồn | Snapshot trước mọi migration; target vận hành 24 giờ/4h | Daily; giữ 14 ngày ban đầu | Backup mã hóa, hạn chế quyền, ngoài working copy |
+| Supabase PostgreSQL đích | 24 giờ/4h ban đầu, cần budget/plan thật | Theo plan + bản logical khi cần; không giả định Free có PITR | Role backup riêng; kiểm restore |
 | Repo/docs/config schema | Theo commit + backup workspace local | Git khi docs vào repo; secret tách riêng | Git không chứa credential |
 
 Trash tự xóa 7 ngày là policy ứng dụng đã chốt; backup retention là policy khác chưa duyệt. Người dùng không restore note đã purge qua UI; restore backup là vận hành có đánh giá mất dữ liệu mới. Chưa có file đính kèm nên chưa thiết kế storage backup.

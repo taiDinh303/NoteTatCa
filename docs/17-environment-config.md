@@ -1,40 +1,39 @@
 # 17 — Cấu hình và biến môi trường
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | Chỉ tên biến, không giá trị bí mật
+> 2026-10-17 | CURRENT keys; không có giá trị bí mật.
 
-## Registry CURRENT
+WebApplication.CreateBuilder dùng cấu hình .NET mặc định: JSON → JSON theo environment → user secrets ở Development nếu cấu hình → environment → command line. .NET key lồng dùng `__`; `.env.example` là registry, ASP.NET không tự đọc .env. Không in toàn bộ environment khi debug.
 
-| Key .NET / tên environment | Ý nghĩa | Bắt buộc | Secret / consumer |
-| --- | --- | --- | --- |
-| ConnectionStrings:MyCnn / ConnectionStrings__MyCnn | SQL Server hiện tại; Postgres sau đổi provider | DB | Có / API DbContext |
-| Jwtsettings:Key / Jwtsettings__Key | Khóa ký JWT | Startup auth | Có / API/AuthService |
-| Jwtsettings:Issuer / Jwtsettings__Issuer | Issuer | JWT validate/generate | Không / API |
-| Jwtsettings:Audience / Jwtsettings__Audience | Audience | JWT validate/generate | Không / API |
-| Jwtsettings:ExpirationMinutes / Jwtsettings__ExpirationMinutes | TTL bình thường, int >0 | Login | Không / AuthService |
-| Jwtsettings:RememberMeExpirationMinutes / Jwtsettings__RememberMeExpirationMinutes | TTL RememberMe hiện tại | Password login | Không / AuthService |
-| Authentication:Google:ClientId / Authentication__Google__ClientId | Google client ID | Source startup hiện bắt buộc | Public identifier, không in giá trị thật / API và Razor |
-| Authentication:Google:ClientSecret / Authentication__Google__ClientSecret | Google client secret | Source startup hiện bắt buộc | Có / server API và Razor |
-| SmtpSettings:Host/Port/FromEmail/Password/EnableSsl | Kết nối SMTP | Gửi OTP/recovery/email reminder | Password secret; server |
-| Appsettings:BaseUrl / Appsettings:ClientUrl | URL API/client trong config hiện có | Rà EmailService/template trước đổi link | Không / backend |
-| ApiSettings:BaseUrl / ApiSettings__BaseUrl | API URL cho Razor | Khi chạy NTC.VIEW | Không / Razor |
-| ASPNETCORE_ENVIRONMENT | Chọn môi trường | Mọi deployment | Không / host |
+| Environment key | Ý nghĩa / default / secret |
+| --- | --- |
+| Database__Provider | SqlServer mặc định hoặc PostgreSQL; không chỉ thay connection string |
+| ConnectionStrings__MyCnn | DB connection string đúng provider; secret chỉ backend |
+| Jwtsettings__Key | HMAC secret≥32 bytes; bắt buộc |
+| Jwtsettings__Issuer / Audience | JWT issuer/audience bắt buộc |
+| Jwtsettings__ExpirationMinutes | Access TTL mặc định15, clamp1–60; RememberMe không kéo dài access |
+| Authentication__Google__Enabled | false trong env mẫu để tắt; bỏ flag vẫn cho Google nếu có ClientId (legacy compatibility) |
+| Authentication__Google__ClientId | Audience Google ID token; public identifier; API không cần ClientSecret |
+| Cors__AllowedOrigins__0... | Origin cụ thể; local mặc định https://localhost:5037 và http://localhost:5173 |
+| SmtpSettings__Host / Port / FromEmail / Password / EnableSsl | SMTP OTP/recovery/reminder; password secret, port587/SSLtrue mẫu |
+| AppSettings__ClientUrl | Base URL link frontend email; phải trỏ trang auth/notes thật trước release |
+| BackgroundJobs__Enabled | false mặc định; bật mới dispatch/email/purge/prune mỗi30 giây |
+| Swagger__Enabled | false mẫu; Development/Testing vẫn bật |
+| RateLimiting__AuthRequestsPerMinute | 20/IP/phút default, clamp1–1000 |
+| RateLimiting__ApiRequestsPerMinute | 600/user hoặc IP/phút default, clamp1–10000 |
+| DataProtection__KeysDirectory | Persist Identity token keyring; thư mục bảo vệ, chung qua replica/restart |
+| Bootstrap__AdminEmail | Chỉ dùng explicit --grant-admin với user verified; không seed password |
+| ASPNETCORE_ENVIRONMENT | Development local, Production cloud |
+| PORT | Hosting port; Docker bind qua entrypoint |
+| ApiSettings__BaseUrl | Legacy Razor API URL, chỉ khi chạy NTC.VIEW |
 
-.NET dùng `__` thay dấu `:` cho biến lồng nhau. Source Program nạp appsettings.json, appsettings theo Environment rồi environment variables; có mặc định builder trước đó, phải kiểm precedence thực tế nếu thêm provider. Không giả định user-secrets luôn thắng sau AddJsonFile tùy chỉnh. Chưa cấu hình UserSecretsId cho API được xác minh.
+OTP10phút/5lần/60s, refresh7/30 ngày tuyệt đối, trash7 ngày, catch-up24 giờ và quota là policy hiện trong code; không có biến giả `Trash:RetentionDays`/`Reminder:CatchUpHours`. Đổi policy phải cập nhật test/docs.
 
-## Registry TARGET/PROPOSED
+Frontend ở ntc_react; `VITE_API_BASE_URL` mặc định /api/v1, `VITE_GOOGLE_CLIENT_ID` tùy chọn; `NTC_API_PROXY_TARGET` server-only mặc định http://localhost:5032, không đưa DB password/JWT key/SMTP secret vào đó. API/client Google OAuth configuration phải đồng bộ audience khi làm React.
 
-| Tên | Mục đích | Trạng thái / nơi lưu |
-| --- | --- | --- |
-| VITE_API_BASE_URL | API Render/local URL công khai | PROPOSED frontend; không chứa secret |
-| VITE_GOOGLE_CLIENT_ID | Google identifier cho SPA nếu flow cần | PROPOSED, không client secret |
-| Cors:AllowedOrigins / Cors__AllowedOrigins__0... | Allowlist React/Razor theo môi trường | PROPOSED; code hiện hardcode AllowRazor |
-| Reminder:CatchUpHours | Policy gửi bù, đã chốt 24h | Cần code config; không có hiện tại |
-| Trash:RetentionDays | 7 ngày đã chốt | Cần code config; không có hiện tại |
-| PORT | Port do Render cung cấp | Bind trong Docker/entrypoint tương lai |
-| DB migration credential | Credential DDL riêng | Secret store/release job, không app client |
+JWT validate-on-start; Google thiếu ClientId hoặc Enabled=false trả503 GOOGLE_DISABLED khi gọi; không làm API startup thất bại. DB readiness chỉ CanConnect, không xác nhận migration. Connection target staging/prod và migration credential tách riêng; preview không dùng prod DB. Data Protection persist vẫn cần operator cấu hình trước production, không mặc định filesystem container bền vững.
 
-Nếu chỉ dùng Supabase PostgreSQL, không cần đưa publishable/service key vào React. DB connection credential chỉ nằm Render/local backend. Cấu hình staging/production tách hoàn toàn; preview không dùng DB prod.
+Rotate: cấp credential mới → cập nhật secret store consumer → smoke → thu hồi cũ; JWT key đổi làm access/OTP hash cũ mất hiệu lực. Hai appsettings local đã modified trước phiên, không đổi/commit trong đợt code. Docker loại tất cả appsettings và env thật khỏi build context; cấp config bằng host env.
 
-## Kiểm tra và rotation
+## Vị trí file sau khi gom root
 
-Validate presence/type/range/URL tại startup mà không log giá trị. Thiếu Google hiện làm app throw trước chạy; cần test config fixture phù hợp. Khi đổi provider phải đổi cả EF/Npgsql config và migrations, không chỉ MyCnn. Cấp credential mới → cập nhật consumer → smoke → thu hồi cũ; không in environment toàn bộ. Appsettings local đang khác bản sanitize trên GitHub, phải bảo toàn khi sửa repo.
+.env.example ở NTC root; API settings vẫn ntc_aspnet/NTC.API/appsettings.json và appsettings.Development.json, Razor settings vẫn ntc_aspnet/NTC.VIEW. Không đổi nội dung connection string/secret khi chuyển Git root. Docker context root tiếp tục loại tất cả appsettings. Các biến environment vẫn ghi đè JSON theo thứ tự .NET mặc định.

@@ -1,0 +1,33 @@
+# Deployment blueprint only; no resource has been created by this change.
+# Select plan/region/budget before applying. TLS terminates at Render's ingress.
+services:
+  - type: web
+    name: notetatca-api
+    runtime: docker
+    # Free demo/staging baseline; review uptime/plan before enabling reminder jobs.
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeployTrigger: off
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Database__Provider
+        value: PostgreSQL
+      - key: BackgroundJobs__Enabled
+        value: "false"
+      - key: Swagger__Enabled
+        value: "false"
+      - key: ConnectionStrings__MyCnn
+        sync: false
+      - key: Jwtsettings__Key
+        sync: false
+      - key: Jwtsettings__Issuer
+        sync: false
+      - key: Jwtsettings__Audience
+        sync: false
+      - key: Cors__AllowedOrigins__0
+        sync: false
+      - key: AppSettings__ClientUrl
+        sync: false

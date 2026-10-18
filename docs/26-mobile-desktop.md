@@ -1,6 +1,10 @@
 # 26 — Mobile và desktop native
 
-> 2026-10-16 | DRAFT | Áp dụng: NO cho native app
+> Cập nhật: 2026-10-17 | Áp dụng: NO | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+NO native vẫn giữ. React responsive/keyboard nằm trong ntc_react, evidence browser ở FRONTEND-IMPLEMENTATION; không có native mobile/desktop package. Backend bearer API không tự tạo offline capability.
 
 Phạm vi hiện được chốt là web React. Không có yêu cầu iOS/Android native, Windows installer, signing, store distribution hoặc native offline DB. Không tạo ứng dụng native chỉ để hoàn thành mẫu.
 

@@ -1,43 +1,45 @@
-# 10 — Setup local
+# 10 — Chạy local và kiểm tra backend
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | Lệnh hướng dẫn chưa chạy, trừ lệnh kiểm SDK trong worklog
+> 2026-10-17 | Lệnh đã kiểm ở [worklog](worklog.md); không apply DB của chủ dự án.
 
-## Công cụ và đường dẫn
+## Build/test biệt lập
 
-| Thành phần | Đã biết | Cách kiểm tra |
-| --- | --- | --- |
-| OS/shell | Windows, PowerShell | Môi trường phiên hiện tại |
-| Git root backend | D:\My Project\NTC\NoteTatCa | `git -C .\NoteTatCa status --short` từ NTC |
-| .NET target | net8.0 trong csproj; máy có SDK 9.0.317 | `dotnet --list-sdks`; runtime .NET 8 chưa kiểm |
-| SQL Server | Provider trong code, instance chưa xác minh | Kiểm kết nối DB local được chỉ định, không in secret |
-| EF tool | Chưa kiểm tool global/local cho API | `dotnet tool list --global` và tìm manifest phù hợp |
-| Node/npm | Chưa kiểm; React chưa có package.json | `node --version`, `npm --version` khi làm React |
-
-SDK/runtime phiên bản triển khai sẽ chọn và pin khi làm API; không tự nâng target trong phiên docs.
-
-## Chuẩn bị backend
-
-1. Mở workspace NTC, vào repo backend bên dưới. Giữ thay đổi local `NTC.API/appsettings.json` và `NTC.VIEW/appsettings.json`.
-2. Cấp cấu hình qua environment/session secret store; xem file 17. Không dùng config đã sanitize trên GitHub để suy ra app khởi động được.
-3. Cần SQL Server database test đúng tên, JWT signing key, issuer/audience, TTL, Google ClientId/Secret hiện bắt buộc ở startup; SMTP cho OTP/forgot-password.
-4. Restore/build (PowerShell, cwd `D:\My Project\NTC\NoteTatCa`, NOT RUN):
+PowerShell, cwd `D:\My Project\NTC`. Cần SDK tương thích net8.0 và Python3 cho kiểm docs. Package Microsoft ASP.NET/EF8.0.32, Npgsql EF8.0.11; local dotnet-ef8.0.32 tại .config/dotnet-tools.json.
 
 ```powershell
-dotnet restore .\NTC.API\NTC.API.csproj
-dotnet build .\NTC.API\NTC.API.csproj --no-restore
-dotnet run --project .\NTC.API\NTC.API.csproj --launch-profile https
+dotnet tool restore
+dotnet restore ntc_aspnet/NTC.Backend.slnf
+dotnet build ntc_aspnet/NTC.Backend.slnf -c Release --no-restore -warnaserror
+dotnet test ntc_aspnet/NTC.Tests/NTC.Tests.csproj -c Release --no-build --logger trx --results-directory artifacts/test-results
+python scripts/verify_docs.py
+dotnet publish ntc_aspnet/NTC.API/NTC.API.csproj -c Release --no-build -o artifacts/publish
 ```
 
-URL theo source profile: `https://localhost:5033/swagger`, HTTP 5032. Certificate HTTPS cần được chuẩn bị trên máy; chưa thử endpoint. Chạy Razor riêng nếu cần tham khảo, không xem đó là frontend React đã có.
+NTC.Backend.slnf không build Razor; NTC.sln vẫn giữ Razor với6warning legacy chưa sửa. Tests dùng SQLite và database SQLLocalDB `NTC_Test_<guid>` do fixture tạo/drop trên Windows. Không dùng owner connection string. PostgreSQL runtime test chỉ chạy khi NTC_TEST_POSTGRES trỏ loopback database quản trị postgres; fixture tạo/drop ntc_test_<guid>. Không trỏ biến test vào Supabase/DB thật.
 
-## Database và migration
+## Chạy API bằng database riêng đã chuẩn bị
 
-Q-022 đã chốt phải giữ dữ liệu; không chạy `database update` trước backup và đối chiếu migration history. Repo hiện có baseline `20260731153548_InitialCreate`; Git lịch sử trước đó có tên migration khác. Phải dry run DB riêng theo file 23. Không có seed role được xác minh; registration gọi AddToRole(User), cần kiểm role tồn tại và kết quả.
+Xem [.env registry](17-environment-config.md), nhập credential qua shell/secret store; không copy secret vào docs. SQL Server default; PostgreSQL chọn Database__Provider=PostgreSQL. Startup không tự migrate/seed. Trước DB thật cần [preflight/backup](23-data-migration.md).
 
-## React tương lai
+```powershell
+# Export script để review; không apply. Chạy lần lượt vì EF CLI dùng chung file obj.
+dotnet ef migrations script --context DatabaseContext --project ntc_aspnet/NTC.Repositories --startup-project ntc_aspnet/NTC.API --configuration Release --no-build --idempotent --output artifacts/sqlserver-migrations.sql
+dotnet ef migrations script --context PostgreSqlDatabaseContext --project ntc_aspnet/NTC.Repositories --startup-project ntc_aspnet/NTC.API --configuration Release --no-build --idempotent --output artifacts/postgresql-migrations.sql
+# Sau khi operator chuẩn bị schema riêng và cấu hình an toàn:
+dotnet run --project ntc_aspnet/NTC.API -- --bootstrap-roles
+dotnet run --project ntc_aspnet/NTC.API --launch-profile https
+```
 
-Thư mục chốt là `D:\My Project\NTC\frontend`. Chưa scaffold. Khi được giao: chọn/pin phiên bản package, tạo lockfile và scripts; sau đó mới ghi lệnh cài/build/dev thực tế. Dev origin dự kiến `http://localhost:5173` phải được API cho phép; source hiện chỉ allow Razor HTTPS 5037.
+API HTTPS5033/HTTP5032 theo launch profile; trust dev certificate nếu cần `dotnet dev-certs https --trust`. Kiểm /health/live,/health/ready và /swagger trong Development. Register/verify user rồi explicit --grant-admin khi cần, Bootstrap__AdminEmail qua secret env. Không có admin password mặc định.
 
-## Dừng và lỗi thường gặp
+Google/SMTP thật cần credential riêng và callback/client route đúng; suite chỉ fake provider. BackgroundJobs mặc định false; chỉ bật sau review lịch/purge candidates/backups/uptime. NTC.VIEW vẫn giữ, React dùng API v1; evidence browser riêng ở FRONTEND-IMPLEMENTATION.
 
-Ctrl+C dừng dev server. Không drop DB hoặc xóa bin/obj mặc định để chữa mọi lỗi. Startup thiếu Google/JWT: cấp cấu hình đúng, không bỏ qua kiểm tra bảo mật. Lỗi CORS: kiểm origin/scheme/port. DB lỗi: kiểm provider/credential/network. Build/runtime và smoke đều NOT RUN trong phiên docs.
+## Cấu trúc root hiện hành
+
+Mở workspace/Git tại NTC. Solution đầy đủ ntc_aspnet/NTC.sln và filter ntc_aspnet/NTC.Backend.slnf; local settings vẫn ntc_aspnet/NTC.API/appsettings.Development.json. .config/dotnet-tools.json, scripts/, .github/, Dockerfile/render.yaml và docs/ nằm ở root. ASP.NET không tự đổi provider từ vị trí thư mục; cấu hình SQLServer/PostgreSQL giữ nguyên. Không còn ntc_aspnet/docs hoặc nested .git. Các lệnh worklog trước khi chuyển root là lịch sử có cwd riêng.
+
+## React SPA
+
+Từ root chạy `npm --prefix ntc_react ci`, copy ntc_react/.env.example thành .env.local nếu cần, rồi `npm --prefix ntc_react run dev`. Mở http://127.0.0.1:5173. API chạy terminal riêng HTTP5032 trên DB local đã chuẩn bị; React không tự migrate/seed. Proxy /api tránh cấu hình CORS riêng ở dev. Email-link client origin phải trỏ frontend.
+
+Kiểm `npm --prefix ntc_react run typecheck`, `npm --prefix ntc_react run lint`, `npm --prefix ntc_react test`, `npm --prefix ntc_react run build`. Browser: từ ntc_react chạy `npx playwright install chromium` và `npm run test:e2e`; fixture host .NET loopback tự khởi động, SQLite/email/clock giả, không dùng DB thật. Xem [frontend runbook](../ntc_react/README.md).

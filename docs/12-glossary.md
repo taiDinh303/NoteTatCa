@@ -1,6 +1,10 @@
 # 12 — Thuật ngữ và quy ước
 
-> 2026-10-16 | DRAFT | Áp dụng: YES
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+Bổ sung: Version là Guid concurrency token; Idempotency-Key scoped owner/payload; occurrence là một mốc lịch; delivery là lần email có lease/retry; refresh family có hạn tuyệt đối7/30 ngày; schema `ntc` là namespace DB private, không Supabase Auth tenant. CURRENT và TARGET luôn phân biệt bằng evidence06/worklog.
 
 | Thuật ngữ | Nghĩa trong NoteTatCa | Tên / phân biệt |
 | --- | --- | --- |

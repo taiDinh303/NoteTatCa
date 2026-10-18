@@ -1,51 +1,32 @@
 # 03 — Kiến trúc NoteTatCa
 
-> 2026-10-16 | DRAFT | Áp dụng: YES
+> 2026-10-17 | CURRENT: backend đã triển khai và kiểm thử; React SPA triển khai local 2026-10-18; cloud chưa triển khai.
 
-## CURRENT
+## Hệ thống và ranh giới
 
-Monolith chia nhiều project .NET, target `net8.0` trong csproj. API dùng ASP.NET Core controllers, JWT Bearer, Identity, Swagger; repository dùng EF Core/SQL Server. `NTC.VIEW` là Razor Pages, session và Google cookie flow. Source version là bằng chứng cấu hình, chưa chứng minh runtime tương thích/hoạt động.
+React TypeScript/Vite ở `NTC/ntc_react`, UI tiếng Anh → HTTPS bearer API .NET 8 trên Render → Supabase PostgreSQL. Local mặc định vẫn SQL Server. Supabase chỉ database, không thay .NET Identity bằng Supabase Auth. `NTC.VIEW` giữ nguyên tạm thời. Git root hiện là `NTC`; backend projects/solutions giữ trong `NTC/ntc_aspnet`, docs duy nhất `NTC/docs`, scripts/tool/CI/deploy files ở root.
 
-| Thành phần | Trách nhiệm / contract | Đường dẫn dưới NoteTatCa |
-| --- | --- | --- |
-| API | HTTP, DI, auth, middleware lỗi, Swagger | NTC.API |
-| Services | Quy tắc nghiệp vụ, mapping, OTP/email | NTC.Services |
-| Contract.Services | Interface service | NTC.Contract.Services |
-| Repositories | DbContext, EF migrations, generic repo/UOW | NTC.Repositories |
-| Contract.Repositories | Entity, interface repo/UOW | NTC.Contract.Repositories |
-| ModelViews | DTO request/response | NTC.ModelViews |
-| Core | Response, exception, pagination, audit/time helper | NTC.Core |
-| VIEW | Consumer Razor hiện có, giữ tham khảo | NTC.VIEW |
+| Project | Trách nhiệm |
+| --- | --- |
+| NTC.Core | BaseEntity/response/page/errors, ICurrentUser; không HTTP/EF |
+| NTC.Contract.Repositories | Entity và interface repository/UoW |
+| NTC.ModelViews | DTO legacy và request/response v1 |
+| NTC.Contract.Services | Interface nghiệp vụ/adapter; không tham chiếu implementation repository |
+| NTC.Repositories | EF DbContext, provider, migration, repository/UoW, UTC/audit/version |
+| NTC.Services | BaseService, nghiệp vụ cụ thể, rich document/recurrence, auth/email, maintenance |
+| NTC.API | Composition root, cấu hình tập trung, BaseApiController, legacy/v1 controllers, middleware/worker/health |
+| NTC.Tests | HTTP SQLite, lịch lặp, SQL LocalDB migration và PostgreSQL fixture tùy chọn |
 
-Luồng CURRENT: request → middleware lỗi → routing/CORS → authentication/authorization → controller → service → repository/UOW → SQL Server → DTO/response. Quyền owner hiện chưa được áp dụng đồng nhất; xem file 16.
+Áp dụng chọn lọc Marixa: dependency theo tầng, current actor/clock injection, base class chia sẻ hành vi, transaction và kiểm thử HTTP. Không đưa company/HR/staff/public photo vào NTC. Services dùng EF query extension trên IQueryable qua repository: đây là phân tầng thực dụng, không tuyên bố pure DDD. Chi tiết ở `../ARCHITECTURE.md` ở repository root.
 
-## TARGET đã chốt và cấu trúc đề xuất
+## Luồng xử lý
 
-Frontend React TS/Vite tại frontend đã chốt. API .NET giữ Identity; tương lai chạy Render và dùng Supabase PostgreSQL; React chạy Vercel. SQL Server hiện tại chưa migrate, không reset dữ liệu cũ. Không cần chia microservice chỉ để chuyển UI. Các đường dẫn dưới đây chưa phải thư mục đã tạo ngoài docs.
+Request → correlation/no-store → exception envelope → route/CORS → bearer xác minh chữ ký và DB session/user/role → authorization/rate limit → controller DTO → service owner/rule → transaction/UoW → EF. Response có traceId. Không lấy UserId client làm quyền. Admin cũng đi qua owner guard khi gọi note.
 
-```text
-D:\My Project\NTC\
-  docs\                    # bản soạn thảo theo yêu cầu người dùng
-  NoteTatCa\               # Git repo hiện tại, .NET solution
-    docs\                  # bản đồng bộ GitHub, giống bản soạn thảo
-    NTC.API\
-    NTC.Services\
-    NTC.Repositories\
-    ...
-    NTC.VIEW\              # giữ nguyên, chưa xóa
-  frontend\                # TARGET React + TypeScript + Vite, chưa tạo
-```
+Worker tùy chọn chạy trong API mỗi 30 giây, scope riêng cho dispatch/email/purge/prune. Occurrence và delivery lưu DB, version/lease chống xử lý đồng thời; SMTP có thể gửi trùng khi mất ACK. Không phụ thuộc timer trình duyệt.
 
-Luồng đề xuất: React → HTTPS API → auth/owner → service → SQL. Google/SMTP là ranh giới ngoài; UI không giữ client secret/SQL credential. Job nhắc lịch đã nằm trong phạm vi, cần đọc DB bền vững; request tạo reminder không tự đồng nghĩa notification đã gửi.
+## Dữ liệu và tương thích
 
-## Thuộc tính và khoảng trống
+DocumentJson version 1 là nguồn rich content; Content là projection tìm kiếm. Plain note cũ vẫn plain. Guid Version dùng cho autosave, Idempotency-Key cho tạo. Hai context có migration history riêng; PostgreSQL schema `ntc` không expose Data API. Runtime role và migration role phải tách khi vận hành.
 
-- Giữ dependency service/interface/repo hiện tại trước; chưa làm refactor toàn bộ solution khi chỉ cần hoàn thiện API.
-- Transaction cho tạo user+profile/role, note+tag, hard delete và cập nhật thứ tự; cần kiểm tra UOW thực tế trước thiết kế chi tiết.
-- Current response có BaseResponse; validation tự động có thể khác format. Contract đích thống nhất tại file 15.
-- Current CORS `AllowRazor` chỉ cho `https://localhost:5037`; React origin phải cấu hình riêng khi làm React.
-- Auth provider đã chốt giữ .NET Identity, không Supabase Auth. Vòng đời bearer/refresh và cookie còn đề xuất ADR-003, quyết định trước code session.
-- Concurrency: chưa thấy rowversion trong Note. Đề xuất optimistic concurrency khi autosave; trả conflict thay ghi đè âm thầm.
-- Quy mô public nhỏ và hosting Supabase/Render/Vercel đã chốt; timeout/retry/plan/region/budget chưa rõ. Không có cơ sở runtime để tuyên bố chịu tải.
-
-Nguồn: Program.cs/DependencyInjection.cs, csproj, DatabaseContext và Services. Quyết định tại [14](14-architecture-decisions.md); cấu hình tại [17](17-environment-config.md).
+Legacy routes giữ adapter an toàn; thay đổi auth/proof và rich editing có giới hạn tại [API](15-api-contract.md). Không tự migrate/seed hoặc chạy purge khi startup. Xem [migration](23-data-migration.md), [cấu hình](17-environment-config.md), [kiểm thử](06-testing.md).

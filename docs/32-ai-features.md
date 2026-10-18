@@ -1,6 +1,10 @@
 # 32 — Tính năng AI
 
-> 2026-10-16 | DRAFT | Áp dụng: NO trong phạm vi bản đầu
+> Cập nhật: 2026-10-17 | Áp dụng: NO | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+NO vẫn giữ: không thêm AI note summary/chat/embeddings/provider/key. Từ AI trong quy trình tài liệu không có nghĩa sản phẩm tích hợp AI.
 
 Chưa có yêu cầu tóm tắt, viết lại, chat với note, semantic search hoặc agent tự thao tác. Việc dùng AI để viết code/docs không biến NoteTatCa thành sản phẩm có tính năng AI. Không gửi nội dung note đến model/provider, không thêm API key/model/RAG schema.
 

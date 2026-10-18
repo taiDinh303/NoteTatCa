@@ -1,8 +1,8 @@
 # NoteTatCa — Tài liệu dự án
 
-> Cập nhật: 2026-10-16 (Asia/Bangkok) | Trạng thái: DRAFT | Áp dụng: YES
+> Cập nhật: 2026-10-18 (Asia/Bangkok) | Trạng thái: DRAFT | Áp dụng: YES
 
-NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa từ `D:\My Project\docs_mau`, dựa trên khảo sát mã nguồn tại commit `d8f854b` và yêu cầu của chủ dự án. Đây là đặc tả làm việc để chốt nghiệp vụ trước khi hoàn thiện API và xây frontend React.
+NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa từ `D:\My Project\docs_mau`, dựa trên khảo sát mã nguồn tại commit `d8f854b` và yêu cầu của chủ dự án. Bộ docs đã cập nhật theo Marixa và backend 2026-10-17; React triển khai 2026-10-18, cloud còn giai đoạn sau. Source mới ở working tree trên HEAD 176a968, không dùng khảo sát d8f854b làm hiện trạng mới.
 
 ## Bắt đầu
 
@@ -10,16 +10,18 @@ NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa t�
 2. Xem [kế hoạch](01-plan.md), [nghiệp vụ](02-business-analysis.md) và [luồng](05-workflow.md).
 3. Khi làm API, đọc [contract](15-api-contract.md), [bảo mật](16-security-privacy.md), [dữ liệu](04-database-design.md) và [kiểm thử](06-testing.md).
 4. Đọc [worklog](worklog.md) để biết việc đã làm và phần chưa chạy.
+5. Đọc [React implementation](FRONTEND-IMPLEMENTATION.md) cho module/frontend, setup, kiểm thử và giới hạn.
+6. Đợt backend 2026-10-17 thực hiện theo [BACKEND-IMPLEMENTATION](BACKEND-IMPLEMENTATION.md), tham khảo chọn lọc Marixa. Tài liệu này ghi quyết định bổ sung và contract trước code.
 
 ## Ràng buộc đã xác nhận
 
-- Workspace: `D:\My Project\NTC`; Git repo hiện tại: `D:\My Project\NTC\NoteTatCa`.
-- Bản soạn thảo docs đặt ở `D:\My Project\NTC\docs` theo yêu cầu. Để đồng bộ GitHub với Git root hiện tại, bản giống nội dung được lưu ở `D:\My Project\NTC\NoteTatCa\docs` (đường dẫn repo `docs/`). Khi sửa bản soạn thảo, cập nhật bản trong repo cùng lần commit để tránh lệch nhau.
-- React + TypeScript + Vite đặt ở `NTC/frontend`; UI tiếng Anh, hướng public nhỏ. Đã xác nhận Q-008/025.
+- Workspace và Git root: `D:\My Project\NTC`; backend: `ntc_aspnet/`.
+- Docs duy nhất: `D:\My Project\NTC\docs`, chính là `docs/` trong Git. Bản trùng trong backend đã chuyển vào recovery backup của Git; không tạo lại bản sync thứ hai.
+- React + TypeScript + Vite đặt ở `NTC/ntc_react`; UI tiếng Anh, hướng public nhỏ. Đã xác nhận Q-008/025.
 - Cloud tương lai: Supabase PostgreSQL, giữ .NET Identity; Render API, Vercel React. Giữ tài khoản/note cũ, chưa migrate/deploy trong phiên docs.
-- Đã chốt editor unified rich text/checklist/Markdown shortcuts, màu chữ/emoji, autosave + Save, nhắc in-app/email có lặp và gửi bù 24h theo timezone user, trash 7 ngày; admin không đọc nội dung note người khác.
-- Giữ nguyên `NoteTatCa/NTC.VIEW` tạm thời để tham khảo. Không xóa hoặc viết lại Razor trong nhiệm vụ tài liệu.
-- Phiên này chỉ khảo sát và làm docs. Hoàn thiện API là nhiệm vụ tiếp theo khi người dùng giao.
+- Đã chốt editor unified rich text/checklist/Markdown shortcuts, màu chữ/emoji, autosave + Save, nhắc in-app/email có lặp và gửi bù 24 giờ theo timezone user, trash 7 ngày; admin không đọc nội dung note người khác.
+- Giữ nguyên `ntc_aspnet/NTC.VIEW` tạm thời để tham khảo. Không xóa hoặc viết lại Razor trong nhiệm vụ tài liệu.
+- Phiên 2026-10-16 chỉ khảo sát/docs; ngày 2026-10-17 chủ dự án đã giao hoàn thiện backend sau khi cập nhật docs. Không tự deploy hoặc migrate DB thật.
 
 ## Cách đọc trạng thái
 
@@ -43,7 +45,8 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [00-README](00-README.md) | YES | Điểm vào và danh mục |
 | [01-plan](01-plan.md) | YES | Quyết định, thứ tự và backlog API/React |
 | [02-business-analysis](02-business-analysis.md) | YES | Yêu cầu và acceptance criteria |
-| [03-architecture](03-architecture.md) | YES | .NET hiện tại, React dự kiến |
+| [03-architecture](03-architecture.md) | YES | Kiến trúc .NET và React |
+| [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md) | YES | React modules, route mapping, UX và evidence |
 | [04-database-design](04-database-design.md) | YES | Identity, Note, Tag, NoteTag, Reminder |
 | [05-workflow](05-workflow.md) | YES | Auth, ghi chú, thùng rác, nhắc lịch |
 | [06-testing](06-testing.md) | YES | Kịch bản nghiệm thu và bằng chứng |
@@ -55,11 +58,11 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [12-glossary](12-glossary.md) | YES | Thuật ngữ và quy ước |
 | [13-figma-sync](13-figma-sync.md) | NO | Chưa có yêu cầu hoặc file Figma |
 | [14-architecture-decisions](14-architecture-decisions.md) | YES | Quyết định đã chốt và đề xuất |
-| [15-api-contract](15-api-contract.md) | YES | Inventory hiện tại, contract đích đề xuất |
+| [15-api-contract](15-api-contract.md) | YES | Contract v1 hiện hành + legacy compatibility |
 | [16-security-privacy](16-security-privacy.md) | YES | Ownership, auth, dữ liệu ghi chú |
 | [17-environment-config](17-environment-config.md) | YES | Tên cấu hình; không chứa secret |
 | [18-release-checklist](18-release-checklist.md) | YES | Điều kiện nghiệm thu trước phát hành |
-| [19-cicd](19-cicd.md) | YES | Đề xuất pipeline, chưa có workflow |
+| [19-cicd](19-cicd.md) | YES | Workflow backend/PG/Docker đã tạo, chưa chạy GitHub |
 | [20-observability](20-observability.md) | YES | Logging và theo dõi API/job |
 | [21-operations-runbook](21-operations-runbook.md) | YES | Sự cố auth, SQL, email, job |
 | [22-backup-recovery](22-backup-recovery.md) | YES | Note là dữ liệu cần bảo vệ |
@@ -75,6 +78,10 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [32-ai-features](32-ai-features.md) | NO | Chưa có yêu cầu tính năng AI |
 | [33-data-analytics](33-data-analytics.md) | YES | Thống kê admin đã chọn; không analytics nội dung/pipeline |
 | [34-risks-changes](34-risks-changes.md) | YES | Rủi ro và quản lý thay đổi |
+| [BACKEND-IMPLEMENTATION](BACKEND-IMPLEMENTATION.md) | YES | Contract trước code, quyết định và kết quả đợt backend |
+| [ENTITY-REVIEW](ENTITY-REVIEW.md) | YES | Rà17 entities, quan hệ owner/parent, check/audit/migration |
+| [SERVICE-CONTROLLER-REVIEW](SERVICE-CONTROLLER-REVIEW.md) | YES | PATCH/session/admin/inbox/email và evidence hoàn thiện services/controllers |
+| [api-inventory](api-inventory.md) | YES |131 operations từ OpenAPI export |
 | [worklog](worklog.md) | YES | Snapshot, evidence và tồn đọng |
 
 Ma trận này là nguồn chuẩn về phạm vi áp dụng; hồ sơ dẫn lại để tránh lệch trạng thái. NO chỉ có nghĩa ngoài phạm vi đang được giao, không phải quyết định cấm lâu dài.
@@ -86,3 +93,13 @@ Ma trận này là nguồn chuẩn về phạm vi áp dụng; hồ sơ dẫn l�
 - Quy tắc sản phẩm: file 02; luồng: file 05; schema: file 04; API: file 15.
 - Lệnh/kết quả thực tế: file 06 và worklog. Không suy ra PASS từ source.
 - Giá/plan cloud, luật, vòng đời hỗ trợ và phiên bản thư viện tương lai: chưa khảo sát; cần nguồn hiện hành khi chọn thật.
+
+## Rà soát và triển khai 2026-10-17
+
+Đợt triển khai mới đọc BACKEND-IMPLEMENTATION.md. Bộ docs được rà theo Marixa nhưng vẫn giữ toàn bộ quyết định NoteTatCa; số 39 file là mốc thư viện ban đầu, có thể thêm tài liệu triển khai/inventory cần thiết.
+
+## Snapshot hiện hành
+
+44 file Markdown tại root docs duy nhất. Backend .NET8 legacy/v1 đã triển khai owner/auth/editor/version/reminder/jobs/admin và provider migrations. Release strict/PASS80 tests +1PostgreSQLskip/publishAPI; migration SQL thật chỉ trên fixture riêng, không apply dữ liệu chủ dự án. Google/SMTP thật, Docker/GitHub/cloud/restore và SQL→PG data transfer chưa chạy. Đọc06/worklog để biết giới hạn.
+
+React local:14unit/12Chromium E2E và type/lint/build PASS; runbook/route mapping/evidence tại [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md).

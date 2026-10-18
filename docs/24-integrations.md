@@ -1,12 +1,16 @@
 # 24 — Tích hợp bên ngoài
 
-> 2026-10-16 | DRAFT | Áp dụng: YES
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+CURRENT: Google server validates ID token audience/subject/verifiedemail, link explicit khi trùng account; API không cần ClientSecret, Razor OAuth riêng giữ nguyên. SMTP adapter dùng config17, không gửi thật trong tests; OTP/recovery đã fake-test, reminders dùng durable retry/lease. External Google/SMTP deliverability thật NOT RUN. Không dùng Supabase Auth/browser database SDK theo Q-019.
 
 | ID | Provider / mục đích | CURRENT/TARGET | Quyền / rủi ro / kiểm thử |
 | --- | --- | --- | --- |
-| INT-001 | Google login | GoogleJsonWebSignature và .NET Google auth hiện có; React flow cần chỉnh | Audience/subject/email verified/linking; TC-002/011 |
-| INT-002 | SMTP email | SmtpEmailSender/EmailService hiện có; thêm reminder delivery | Server credentials; timeout/retry/dedup/throttle; TC-001/010 |
-| INT-003 | Supabase PostgreSQL | TARGET tương lai, giữ .NET Identity | DB-only connection qua API; không service key/browser DB password; TC-016/018 |
+| INT-001 | Google login | GoogleJsonWebSignature ID-token adapter; Razor OAuth riêng giữ nguyên; React GIS ID-token flow đã có; external Google chưa kiểm thật | Audience/subject/email verified/linking; TC-002/011 |
+| INT-002 | SMTP email | SMTP/EmailService + reminder durable lease/retry đã có | Server credentials; timeout/retry/dedup/throttle; TC-001/010 |
+| INT-003 | Supabase PostgreSQL | Provider/baseline đã thêm, cloud/data transfer chưa chạy; Identity giữ nguyên | DB-only connection qua API; không service key/browser DB password; TC-016/018 |
 | INT-004 | Render | TARGET host API và job theo phương án | Docker/env/PORT/health/uptime; staging smoke |
 | INT-005 | Vercel | TARGET host React TS/Vite | Public env only, SPA route/callback/CORS; TC-014 |
 

@@ -1,36 +1,27 @@
 # 18 — Phát hành và nghiệm thu
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | Chưa có release candidate; không tick hạng mục chưa chạy
+> 2026-10-17 | Backend source gate đã qua; production gate chưa xét.
 
-## Checklist API trước React/public
+## Backend đã kiểm
 
-- [ ] REQ được chốt, DTO/OpenAPI/errors/validation thống nhất.
-- [ ] Email/password + OTP + Google và recovery chạy với fixture đúng.
-- [ ] User/anonymous/admin qua mọi test ownership, không có đường admin đọc nội dung note người khác.
-- [ ] Editor document/checklist/màu/emoji round-trip; sanitizer và giới hạn payload được thử.
-- [ ] Autosave version/conflict/idempotency đã kiểm; không mất bản nhập hoặc tạo trùng do timeout.
-- [ ] Search và pagination ổn định, không chứa note người khác/trash ngoài filter.
-- [ ] Trash đúng 7 ngày; restore/purge race; hard delete graph nguyên tử.
-- [ ] Reminder in-app/email, lịch lặp, timezone và gửi bù 24h; restart/dedup/retry được thử.
-- [ ] Khóa user ngừng truy cập kể cả đang có token; admin audit không chứa note.
+- [x] Contract v1/legacy inventory, validation/envelope/traceId, quota đã chốt.
+- [x] Email/password/OTP/Google proof/recovery với fixture giả; refresh rotation/revoke/lock.
+- [x] HTTP anonymous/ownerA/B/admin, không admin bypass note content.
+- [x] Rich document whitelist/projection/limits; PATCH/version409/create idempotency.
+- [x] Nhãn trùng/owner/transaction, pin/reorder, search/filter/page, trash/hard delete.
+- [x] Recurrence month/DST/catch-up, inbox/email retry fixture, restore future/purge cutoff.
+- [x] SQLlegacy additive preserve và duplicate preflight, provider model/history checks.
+- [x] Release strict build,80 PASS/1PostgreSQLskip,total81, publish API; root docs duy nhất,43Markdown/123links kiểm tra PASS.
 
-## Checklist cloud
+## Cổng phát hành còn mở
 
-- [ ] Dữ liệu account/note cũ đã backup/dry-run/đối soát trước SQL→Postgres.
-- [ ] Identity chỉ có một nguồn auth; login account cũ giữ đúng mapping.
-- [ ] Render API/worker, Vercel React, Supabase DB đúng môi trường; config/secret/TLS/CORS/callback đúng.
-- [ ] Không có secret trong bundle/docs/artifact; không có đường Data API vòng.
-- [ ] Health/readiness, log redaction, cảnh báo job/email và backup/restore có evidence.
-- [ ] SPA deep-link reload và React→API→DB smoke PASS; mobile/keyboard đã kiểm.
-- [ ] Artifact rollback tương thích schema; người nhận và thời gian theo dõi rõ.
+- [ ] PostgreSQL runtime trong CI/staging, Docker build và GitHub workflow thật.
+- [ ] Backup/restore drill và SQL→PG dry run giữ account/hash/note/ID/instant; đối soát owner/count.
+- [ ] Google/SMTP thật, quota/deliverability, client callback/link/reset paths và keyring bền vững.
+- [ ] Runtime DB role/grants/private schema `ntc`; không có Data API vòng; config/TLS/CORS/trusted proxy.
+- [ ] Chọn uptime/plan/worker, review purge candidates trước bật BackgroundJobs.
+- [ ] React auth/token/multi-tab, editor renderer/Markdown warning/XSS, autosave409 không mất nhập liệu.
+- [ ] Browser→API→DB smoke haiuser/admin, deep links, mobile/keyboard.
+- [ ] Log/alert/backup retention/operator, rollback artifact tương thích schema và xử lý ghi mới sau backup.
 
-## Biên bản hiện tại
-
-| Hạng mục | Kết quả | Bằng chứng |
-| --- | --- | --- |
-| Docs cá nhân hóa | Kiểm cuối tại worklog | Danh mục đủ và câu trả lời được ghi |
-| API build/runtime/security | NOT RUN | Phiên docs |
-| React/cloud/migration/restore | NOT RUN | Chưa triển khai |
-| Go/No-go production | Chưa xét | Chủ dự án quyết định sau evidence |
-
-Không hứa production-ready. Release phải có version/commit/operator/ngày/URL thật và ghi giới hạn được chấp nhận. Lỗi quyền, mất note hoặc purge sai là đề xuất điều kiện dừng ngay.
+Mỗi release ghi commit/tag/operator/ngày/URL/backupID/migrationID và evidence. Chưa deploy hoặc xét Go/No-go trong đợt code. Lỗi truy cập chéo owner, mất note hoặc purge sai phải dừng rollout. [Worklog](worklog.md) không thay biên bản kiểm môi trường thật.

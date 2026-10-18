@@ -27,3 +27,23 @@ publish/
 # OS files
 Thumbs.db
 Desktop.ini
+
+# Local secrets, verification output and data-protection keys
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/.keys/
+TestResults/
+artifacts/
+
+# React / frontend tooling
+node_modules/
+dist/
+.vite/
+coverage/
+.vercel/
+.DS_Store
+playwright-report/
+test-results/
+*.tsbuildinfo

@@ -1,6 +1,10 @@
 # 07 — Tổng quan triển khai
 
-> 2026-10-16 | DRAFT | Áp dụng: YES
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+CURRENT: đã có Dockerfile nonroot, render.yaml blueprint demo free autoDeploy off/jobs off, .env.example và GitHub verification workflow. SQL Server local, PostgreSQL/Supabase target đã thêm provider/baseline ntc. Chưa tạo/deploy cloud; region/budget/always-on chưa chốt. Runtime cloud vẫn NOT VERIFIED.
 
 ## Hướng đã chốt
 
@@ -9,7 +13,7 @@ Chủ dự án chọn lộ trình tương lai: Supabase PostgreSQL chỉ làm d�
 | Môi trường | Frontend | API | Database | Trạng thái |
 | --- | --- | --- | --- | --- |
 | Local hiện tại | Razor còn giữ | .NET profile HTTPS 5033 / HTTP 5032 | SQL Server qua MyCnn | Source có config, runtime NOT VERIFIED |
-| Local đích | React TS/Vite, dự kiến 5173 | .NET API | SQL Server ban đầu; Postgres test khi migrate | Frontend chưa tạo |
+| Local đích | React TS/Vite ntc_react, 5173 | .NET API | SQL Server ban đầu; Postgres test khi migrate | SPA local đã tạo; cloud chưa deploy |
 | Staging tương lai | Vercel preview/test | Render service staging | Supabase test riêng | Chưa cấp tài nguyên/URL |
 | Production tương lai | Vercel | Render | Supabase production | Plan/region/domain/budget CHƯA XÁC ĐỊNH |
 

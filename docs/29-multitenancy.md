@@ -1,6 +1,10 @@
 # 29 — Cách ly dữ liệu và tenant
 
-> 2026-10-16 | DRAFT | Áp dụng: NO cho tenant/team; YES cho cách ly owner
+> Cập nhật: 2026-10-17 | Áp dụng: NO | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+NO team/organization tenancy; owner isolation bắt buộc đã có service + HTTP tests. Schema ntc không phải tenant, roleAdmin không quyền đọc note. Không thêm companyId/team scopes từ Marixa.
 
 Q-001 đã chốt nhiều user đăng ký, mỗi user chỉ xem note riêng. Chưa có tổ chức, workspace, thành viên, chia sẻ hoặc nhóm cùng sửa. Không thêm TenantId/membership/billing team vào schema bản đầu.
 

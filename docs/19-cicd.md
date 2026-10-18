@@ -1,19 +1,15 @@
 # 19 — CI/CD
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | PROPOSED; chưa tạo workflow
+> 2026-10-17 | CURRENT workflow đã tạo; GitHub run/deploy NOT RUN.
 
-Khảo sát chưa tìm thấy CI YAML hoặc test project. Git backend ở NoteTatCa, docs/frontend ngoài repo hiện tại. Chủ dự án đã chọn định hướng gom Git root lên NTC khi bắt đầu React, nhưng chưa thực hiện; phải lập kế hoạch bảo toàn lịch sử/remote/config trước khi chỉnh Git.
+`../.github/workflows/backend.yml` tại root NTC chạy push/PR theo backend/docs/scripts/Docker/filter/tool config và workflow_dispatch. Quyền contents:read; actions pin commit SHA, runner Ubuntu, SDK8, PostgreSQL 17 service dữ liệu giả tách biệt. Không dùng prod secrets/database.
 
-| Trigger đề xuất | Job | Cwd / thao tác sau khi có source | Fail khi |
-| --- | --- | --- | --- |
-| PR backend | Restore/build .NET, integration DB test | Backend repo hoặc NoteTatCa dưới root mới | Compile/test/owner fail |
-| PR frontend | Install lockfile, typecheck/lint/test/build | frontend; scripts sẽ xác định khi scaffold | Type/lint/E2E fail |
-| PR docs | Link/placeholder/schema contract consistency | docs | Broken link, quyết định lệch |
-| Release staging | Build Docker/API, React artifact, migration dry run | Repo root đã chốt | Provider/config/data mismatch |
-| Release production được giao | Deploy artifact đã test + smoke | Cloud environments tách biệt | Smoke/security/recovery chưa đạt |
+Pipeline: restore strict → Release build NTC.Backend.slnf warn-as-error → xUnit HTTP/provider tests + TRX → Python docs links → publish API → Docker build → upload TestResults dù fail. PostgreSQL fixture được cấp loopback admin conn, tự tạo/drop DB tên duy nhất. SQLLocalDB tests skip trên Linux. Artifact openapi export dùng NTC_ARTIFACT_DIR; không upload config local.
 
-Pin SDK/runtime/package versions, commit lockfiles, không dùng mutable latest làm chính sách release. Test secrets chỉ cho code được tin cậy và môi trường test; không publish .env, connection string, browser auth trace hoặc note data làm artifact. Workflow permissions tối thiểu.
+Chạy local đã có evidence ở [06](06-testing.md); chưa push workflow mới nên không ghi GitHub CI xanh. Docker CLI không có ở máy hiện tại nên Docker build chưa được xác minh; CI là cổng kiểm tiếp theo. Không có automatic deploy. render.yaml autoDeployTrigger=off, operator review release/migration rồi mới chọn deploy.
 
-Vercel Git integration có thể build/deploy theo branch; cần chọn production branch và release gates để push tài liệu không vô tình phát hành backend/worker. CI đề xuất giữ tests riêng, Vercel xử lý frontend build khi phù hợp. [Vercel Git deployments](https://vercel.com/docs/git), [Deployment checks](https://vercel.com/docs/deployment-checks), kiểm tra 2026-10-16 qua hướng dẫn plugin; live settings chưa xác minh.
+Khi sửa contract: export Swagger → regenerate scripts/update_api_inventory.py → cập nhật root docs duy nhất → check diff. Frontend workflow riêng frontend.yml đã thêm type/lint/unit/build/Chromium E2E và fixture .NET/SQLite; GitHub run chưa thực hiện. Preview/staging/prod tách DB và credentials. Không chạy migration phá dữ liệu trong PR workflow.
 
-Không tự deploy/migrate khi API start. Ghi run URL/commit/job output sau khi tạo pipeline; hiện bằng chứng NOT RUN. Branch protection, người review, artifact retention và budget chưa chốt theo đội ngũ thực tế.
+## Sau khi chuyển Git root
+
+Workflow trigger ntc_aspnet/**, docs/**, scripts/** và root tool/Docker/workflow files. Restore/build/test/publish dùng ntc_aspnet/ prefix từ root; dotnet tool restore đọc .config ở root, artifacts/TestResults dùng đường dẫn root. Dockerfile build ntc_aspnet/NTC.API; .dockerignore loại ntc_aspnet/NTC.VIEW, ntc_aspnet/NTC.Tests, frontend/react và nested artifacts/config local. render.yaml giữ Docker context root. Chỉ kiểm source/local build/test trong task; chưa có Docker CLI hoặc GitHub run để xác nhận pipeline thật.

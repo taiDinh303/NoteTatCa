@@ -1,0 +1,208 @@
+import { lazy, Suspense, useEffect, useRef } from "react";
+import {
+  createBrowserRouter,
+  Link,
+  Navigate,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import { auth } from "./runtime";
+import { useAuth } from "../shared/hooks";
+import { EmptyState, Spinner } from "../shared/ui";
+import { ShieldCheck } from "lucide-react";
+import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
+const AuthPage = lazy(() => import("../features/auth/AuthPage"));
+const AppShell = lazy(() => import("./AppShell"));
+const NotesPage = lazy(() => import("../features/notes/NotesPage"));
+const RemindersPage = lazy(() => import("../features/reminders/RemindersPage"));
+const InboxPage = lazy(() => import("../features/inbox/InboxPage"));
+const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
+const AdminPage = lazy(() => import("../features/admin/AdminPage"));
+function Root() {
+  useEffect(() => {
+    void auth.bootstrap();
+  }, []);
+  return (
+    <Suspense fallback={<Spinner label="Opening your space…" />}>
+      <Outlet />
+    </Suspense>
+  );
+}
+function Authenticated() {
+  const state = useAuth();
+  const location = useLocation();
+  if (state.status === "loading")
+    return <Spinner label="Restoring your session…" />;
+  if (!state.session || state.status === "anonymous")
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  return (
+    <div key={state.session.userId}>
+      <Outlet />
+    </div>
+  );
+}
+function Administrator() {
+  const state = useAuth();
+  return state.session?.roles.includes("Admin") ? (
+    <Outlet />
+  ) : (
+    <EmptyState
+      icon={ShieldCheck}
+      title="This area is for administrators"
+      description="Your private notes are available in your workspace."
+    >
+      <Link to="/notes" className="button secondary">
+        Back to notes
+      </Link>
+    </EmptyState>
+  );
+}
+function LegacyRedirect({ to }: { to: string }) {
+  const location = useLocation();
+  return (
+    <Navigate
+      replace
+      to={
+        to +
+        (to.includes("?")
+          ? location.search
+            ? "&" + location.search.slice(1)
+            : ""
+          : location.search)
+      }
+    />
+  );
+}
+function NoteRoute() {
+  const { id } = useParams();
+  return (
+    <Navigate replace to={"/notes?note=" + encodeURIComponent(id ?? "")} />
+  );
+}
+function Logout() {
+  const navigate = useNavigate();
+  const started = useRef(false);
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    void auth
+      .logout()
+      .catch(() => {})
+      .finally(() => navigate("/login", { replace: true }));
+  }, [navigate]);
+  return <Spinner label="Signing out…" />;
+}
+const aliases: Record<string, string> = {
+  "/Auth/Login": "/login",
+  "/Auth/Register": "/register",
+  "/Auth/ForgotPassword": "/forgot-password",
+  "/Auth/SetPassword": "/auth/set-password",
+  "/Auth/ConfirmChangeEmail": "/auth/confirm-change-email",
+  "/Auth/VerifyPassword": "/verify-password",
+  "/Auth/External/GoogleCallback": "/login",
+  "/Auth/Logout": "/logout",
+  "/Note": "/notes",
+  "/Note/Trash": "/trash",
+  "/Settings/Profile/Edit/Name": "/settings/profile?edit=name",
+  "/Settings/Profile/Edit/Gender": "/settings/profile?edit=gender",
+  "/Settings/Profile/Edit/Birthday": "/settings/profile?edit=birthday",
+  "/Settings/Account/Edit/Email": "/settings/account?edit=email",
+  "/Settings/Account/Edit/Password": "/settings/account?edit=password",
+  "/error": "/not-found",
+};
+export const router = createBrowserRouter([
+  {
+    element: <Root />,
+    errorElement: <NotFound />,
+    children: [
+      { path: "/", element: <Landing /> },
+      { path: "/privacy", element: <Privacy /> },
+      { path: "/login", element: <AuthPage key="login" mode="login" /> },
+      {
+        path: "/register",
+        element: <AuthPage key="register" mode="register" />,
+      },
+      {
+        path: "/forgot-password",
+        element: <AuthPage key="forgot" mode="forgot" />,
+      },
+      {
+        path: "/verify-email",
+        element: <AuthPage key="verify" mode="verify" />,
+      },
+      {
+        path: "/auth/set-password",
+        element: <AuthPage key="reset" mode="reset" />,
+      },
+      {
+        path: "/auth/confirm-change-email",
+        element: <AuthPage key="confirm" mode="confirm" />,
+      },
+      { path: "/logout", element: <Logout /> },
+      ...Object.entries(aliases).map(([path, to]) => ({
+        path,
+        element: <LegacyRedirect to={to} />,
+      })),
+      {
+        element: <Authenticated />,
+        children: [
+          {
+            path: "/verify-password",
+            element: <AuthPage key="password" mode="password" />,
+          },
+          {
+            element: <AppShell />,
+            children: [
+              { path: "/notes", element: <NotesPage /> },
+              { path: "/notes/:id", element: <NoteRoute /> },
+              { path: "/labels/:tagId", element: <NotesPage /> },
+              { path: "/trash", element: <NotesPage trash /> },
+              { path: "/reminders", element: <RemindersPage /> },
+              { path: "/notifications", element: <InboxPage /> },
+              {
+                path: "/settings",
+                element: <Navigate to="/settings/profile" replace />,
+              },
+              {
+                path: "/settings/profile",
+                element: <SettingsPage section="profile" />,
+              },
+              {
+                path: "/settings/account",
+                element: <SettingsPage section="account" />,
+              },
+              {
+                path: "/settings/sessions",
+                element: <SettingsPage section="sessions" />,
+              },
+              {
+                element: <Administrator />,
+                children: [
+                  {
+                    path: "/admin/overview",
+                    element: <AdminPage section="overview" />,
+                  },
+                  {
+                    path: "/admin/users",
+                    element: <AdminPage section="users" />,
+                  },
+                  {
+                    path: "/admin/roles",
+                    element: <AdminPage section="roles" />,
+                  },
+                  {
+                    path: "/admin/audit",
+                    element: <AdminPage section="audit" />,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      { path: "*", element: <NotFound /> },
+    ],
+  },
+]);

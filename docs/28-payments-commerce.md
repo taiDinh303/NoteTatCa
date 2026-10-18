@@ -1,6 +1,10 @@
 # 28 — Thanh toán và thương mại
 
-> 2026-10-16 | DRAFT | Áp dụng: NO trong phạm vi bản đầu
+> Cập nhật: 2026-10-17 | Áp dụng: NO | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+NO vẫn giữ: chưa payment/subscription/checkout/plan enforcement. Không nhập commerce từ Marixa hoặc chọn nhà cung cấp tính phí trong đợt backend.
 
 NoteTatCa hiện chưa có yêu cầu gói trả phí, checkout, hóa đơn, subscription, quảng cáo hoặc bán sản phẩm. Không thêm payment provider/schema/webhook hay khóa tính năng theo billing.
 

@@ -1,10 +1,14 @@
 # 09 — UI React NoteTatCa
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | React chưa triển khai
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/evidence xem FRONTEND-IMPLEMENTATION. Backend đã có v1, version409, idempotency, documentJSON schema 1, inbox/admin no-content. Editor phải có Save/auto-saving/error, Untitled khi title rỗng; duplicate labels phân biệt ID;100k text/1 MiB document. Cảnh báo convert rich→plain/Markdown, giữ bản nhập khi conflict; không tự retry overwrite. Storage refresh/multi-tab/XSS và accessibility cần test khi làm React.
 
 ## Phạm vi đã chốt
 
-React + TypeScript + Vite tại `NTC/frontend`; UI tiếng Anh; giữ Razor ở `NoteTatCa/NTC.VIEW`. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
+React + TypeScript + Vite tại `NTC/ntc_react`; UI tiếng Anh; giữ Razor ở `ntc_aspnet/NTC.VIEW`. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
 
 | ID | Route PROPOSED | Component / hành động | REQ / API |
 | --- | --- | --- | --- |
@@ -18,7 +22,7 @@ React + TypeScript + Vite tại `NTC/frontend`; UI tiếng Anh; giữ Razor ở 
 | UI-008 | /notifications | Inbox, chưa đọc/đã đọc; mở note còn quyền | REQ-008, API-010 |
 | UI-009 | /admin/users, /admin/overview | Quản lý/khóa user, thống kê không chứa nội dung | REQ-012, API-011 |
 
-Route/component là đề xuất, không cam kết đã có trên Razor hoặc React. UI chỉ ẩn/hiện theo capability; API luôn kiểm quyền riêng.
+Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; bảng trên giữ ID UI gốc. UI chỉ ẩn/hiện theo capability; API luôn kiểm quyền riêng.
 
 ## Trạng thái bắt buộc
 
@@ -31,8 +35,8 @@ Route/component là đề xuất, không cam kết đã có trên Razor hoặc R
 
 ## Design system đề xuất
 
-Chưa chọn CSS library/font/palette hoặc có Figma. Dùng token cho màu nền/chữ/border/focus, spacing và radius; NoteCard, EditorToolbar, LabelChip, ReminderDialog, ConfirmDialog, Toast có states rõ. Màu note do user chọn không được làm chữ/toolbar mất khả năng đọc. Icon thao tác có nhãn truy cập, không dùng màu làm dấu hiệu duy nhất.
+Đã chọn CSS tokens, DM Sans/Manrope self-hosted, Radix/Tiptap/dnd-kit; chưa có Figma. Dùng token cho màu nền/chữ/border/focus, spacing và radius; NoteCard, EditorToolbar, LabelChip, ReminderDialog, ConfirmDialog, Toast có states rõ. Màu note do user chọn không được làm chữ/toolbar mất khả năng đọc. Icon thao tác có nhãn truy cập, không dùng màu làm dấu hiệu duy nhất.
 
 PROPOSED responsive kiểm ở 360/768/1280px; grid chuyển list phù hợp, sidebar drawer trên mobile, drag có phương án di chuyển bằng bàn phím. Modal trap focus, Escape/hủy rõ, trả focus về trigger. Title/content dài, tiếng Việt/emoji và lịch dạng địa phương không tràn.
 
-Nghiệm thu: TC-012/014/015; chưa có screenshot/visual QA runtime. UI tiếng Anh đã chốt Q-025; layout/CSS library/editor library còn đề xuất, chọn khi thiết kế được giao; file 13 không tự tạo Figma.
+Nghiệm thu: TC-012/014/015; evidence browser/screenshots ở FRONTEND-IMPLEMENTATION. UI tiếng Anh đã chốt Q-025; layout/CSS/editor đã chọn trong tác vụ React; file 13 không tự tạo Figma.

@@ -1,6 +1,10 @@
 # 08 — Runbook triển khai dự thảo
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | NOT RUN; chưa có release, project cloud, URL hoặc artifact
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+CURRENT release runbook: chạy strict build/test/publish theo10 → Docker build trong CI/máy có Docker → backup/preflight/review DDL theo23 → schema/private role ntc → cấp env17 và persist DataProtection → bootstrap roles explicit → Google/SMTP/CORS/proxy smoke → triển khai API jobs off → review purge/uptime rồi bật. Docker/Render chưa chạy trong phiên; không dùng free demo để hứa uptime reminder. Trình tự dưới là runbook chưa thực thi trên cloud.
 
 ## Đầu vào bắt buộc
 
@@ -9,7 +13,7 @@ Commit release, môi trường, chủ vận hành, domain, Render service, Verce
 | Bước | Nơi thực hiện | Thao tác / kết quả cần có | Điều kiện dừng |
 | --- | --- | --- | --- |
 | Precheck | Workspace + cloud đích đã xác định | Test 06; xác nhận runtime/provider/config/commit | Auth/owner fail hoặc nhầm môi trường |
-| Backup | SQL nguồn / Supabase đích | Backup, restore sample và count | Chưa có backup hoặc Q-010 chưa rõ |
+| Backup | SQL nguồn / Supabase đích | Backup, restore sample và count | Chưa backup/restore hoặc dữ liệu chưa đối soát |
 | Migration | Job riêng bằng DB credential hạn chế | Review SQL provider đúng; migration history và dữ liệu đúng | Drift/schema không tương thích |
 | API | Render staging | Docker build .NET, bind PORT của service, health/readiness | Startup/config/SQL/TLS fail |
 | Worker | Môi trường job đã chọn | Lease/dedup, reminder và purge hoạt động | Gửi trùng hoặc purge sai tuổi |
@@ -18,7 +22,7 @@ Commit release, môi trường, chủ vận hành, domain, Render service, Verce
 | Release | Production được giao | Áp dụng thứ tự tương thích; ghi commit/URL/người làm | Không có phương án quay lại |
 | Theo dõi | Log/metrics | 401/403/500/SQL/job/email và dữ liệu | Trigger rollback đã định |
 
-Tham khảo: [Render Docker](https://render.com/docs/docker), [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase kết nối Postgres](https://supabase.com/docs/guides/database/connecting-to-postgres), kiểm tra 2026-10-16. Lệnh Docker/hosting chính xác sẽ điền sau khi có Dockerfile, project và plan; hiện chưa tạo chúng.
+Tham khảo: [Render Docker](https://render.com/docs/docker), [Vercel Vite](https://vercel.com/docs/frameworks/frontend/vite), [Supabase kết nối Postgres](https://supabase.com/docs/guides/database/connecting-to-postgres), kiểm tra 2026-10-16. Dockerfile và render.yaml đã có; Docker build/hosting apply chưa chạy. Lệnh local build/test/publish và export SQL tại file10.
 
 ## Rollback
 

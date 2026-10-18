@@ -1,0 +1,352 @@
+import { useState } from "react";
+import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
+import { TextStyle } from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import Placeholder from "@tiptap/extension-placeholder";
+import {
+  Bold,
+  CheckSquare,
+  Code2,
+  Heading2,
+  Highlighter,
+  Italic,
+  Link2,
+  List,
+  ListOrdered,
+  Quote,
+  Redo2,
+  Strikethrough,
+  Underline,
+  Undo2,
+} from "lucide-react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+import TurndownService from "turndown";
+import type { RichNode } from "../../domain/models";
+import { canonicalDocument, validateDocument } from "../../domain/document";
+import {
+  Button,
+  ConfirmDialog,
+  ErrorBanner,
+  Field,
+  IconButton,
+  Modal,
+} from "../../shared/ui";
+import { download } from "../../shared/utils";
+const extensions = [
+  StarterKit.configure({
+    link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
+  }),
+  TaskList,
+  TaskItem.configure({ nested: true }),
+  TextStyle,
+  Color,
+  Highlight.configure({ multicolor: true }),
+  Placeholder.configure({
+    placeholder: "Start writing… or try # for a heading, [] for a checklist.",
+  }),
+];
+export interface EditorCommands {
+  exportMarkdown: () => void;
+  importMarkdown: () => void;
+  focus: () => void;
+  plainText: () => string;
+}
+export default function RichEditor({
+  initial,
+  onChange,
+  onReady,
+}: {
+  initial: string;
+  onChange: (json: string) => void;
+  onReady: (commands: EditorCommands) => void;
+}) {
+  const [link, setLink] = useState(false);
+  const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
+  const [error, setError] = useState<unknown>();
+  const [source, setSource] = useState("");
+  const editor = useEditor({
+    extensions,
+    content: JSON.parse(initial),
+    editorProps: {
+      attributes: {
+        class: "rich-editor",
+        "aria-label": "Note content",
+        role: "textbox",
+        "aria-multiline": "true",
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const json = JSON.stringify(
+        canonicalDocument(editor.getJSON() as RichNode),
+      );
+      onChange(json);
+      try {
+        if (editor.getText().length > 100000)
+          throw new Error("Note content can contain up to 100,000 characters.");
+        setError(undefined);
+        validateDocument(json);
+      } catch (error) {
+        setError(error);
+      }
+    },
+    onCreate: ({ editor }) =>
+      onReady({
+        focus: () => editor.commands.focus(),
+        exportMarkdown: () => setMarkdown("export"),
+        importMarkdown: () => setMarkdown("import"),
+        plainText: () => editor.getText(),
+      }),
+  });
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => ({
+      bold: editor?.isActive("bold"),
+      italic: editor?.isActive("italic"),
+      underline: editor?.isActive("underline"),
+      strike: editor?.isActive("strike"),
+      heading: editor?.isActive("heading"),
+      bullet: editor?.isActive("bulletList"),
+      ordered: editor?.isActive("orderedList"),
+      tasks: editor?.isActive("taskList"),
+      quote: editor?.isActive("blockquote"),
+      code: editor?.isActive("codeBlock"),
+      highlight: editor?.isActive("highlight"),
+    }),
+  });
+  if (!editor) return null;
+  return (
+    <>
+      <div className="editor-toolbar" aria-label="Text formatting">
+        <IconButton
+          icon={Bold}
+          label="Bold"
+          active={state?.bold}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        />
+        <IconButton
+          icon={Italic}
+          label="Italic"
+          active={state?.italic}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        />
+        <IconButton
+          icon={Underline}
+          label="Underline"
+          active={state?.underline}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        />
+        <IconButton
+          icon={Strikethrough}
+          label="Strikethrough"
+          active={state?.strike}
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+        />
+        <span className="toolbar-divider" />
+        <IconButton
+          icon={Heading2}
+          label="Heading"
+          active={state?.heading}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
+        />
+        <IconButton
+          icon={List}
+          label="Bullet list"
+          active={state?.bullet}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+        />
+        <IconButton
+          icon={ListOrdered}
+          label="Numbered list"
+          active={state?.ordered}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        />
+        <IconButton
+          icon={CheckSquare}
+          label="Checklist"
+          active={state?.tasks}
+          onClick={() => editor.chain().focus().toggleTaskList().run()}
+        />
+        <IconButton
+          icon={Quote}
+          label="Quote"
+          active={state?.quote}
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        />
+        <IconButton
+          icon={Code2}
+          label="Code block"
+          active={state?.code}
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        />
+        <span className="toolbar-divider" />
+        <IconButton
+          icon={Link2}
+          label="Insert link"
+          onClick={() => setLink(true)}
+        />
+        <label className="text-color-picker" title="Text color">
+          <span>A</span>
+          <input
+            type="color"
+            aria-label="Text color"
+            defaultValue="#374151"
+            onChange={(e) =>
+              editor.chain().focus().setColor(e.target.value).run()
+            }
+          />
+        </label>
+        <IconButton
+          icon={Highlighter}
+          label="Highlight text"
+          active={state?.highlight}
+          onClick={() =>
+            editor.chain().focus().toggleHighlight({ color: "#fff0a3" }).run()
+          }
+        />
+        <div className="toolbar-spacer" />
+        <IconButton
+          icon={Undo2}
+          label="Undo"
+          onClick={() => editor.chain().focus().undo().run()}
+        />
+        <IconButton
+          icon={Redo2}
+          label="Redo"
+          onClick={() => editor.chain().focus().redo().run()}
+        />
+      </div>
+      <ErrorBanner error={error} />
+      <EditorContent editor={editor} />
+      <span className="editor-count">
+        {editor.getText().length.toLocaleString()} / 100,000 characters
+      </span>
+      {link ? (
+        <Modal open onClose={() => setLink(false)} title="Add a link">
+          <form
+            className="modal-body"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const href = String(
+                new FormData(e.currentTarget).get("url"),
+              ).trim();
+              if (href && !/^(https?:\/\/|mailto:)/i.test(href)) {
+                setError(
+                  new Error("Use an https://, http:// or mailto: link."),
+                );
+                return;
+              }
+              if (href)
+                editor
+                  .chain()
+                  .focus()
+                  .extendMarkRange("link")
+                  .setLink({ href })
+                  .run();
+              else editor.chain().focus().unsetLink().run();
+              setLink(false);
+            }}
+          >
+            <ErrorBanner error={error} />
+            <Field label="Link URL" hint="Leave empty to remove the link.">
+              <input
+                name="url"
+                placeholder="https://"
+                defaultValue={editor.getAttributes("link").href ?? ""}
+              />
+            </Field>
+            <Button type="submit">Apply link</Button>
+          </form>
+        </Modal>
+      ) : null}
+      {markdown === "import" ? (
+        <Modal
+          open
+          onClose={() => setMarkdown(null)}
+          title="Import Markdown"
+          description="This replaces the editor content. Unsupported formatting may be simplified; save or copy your current note first."
+        >
+          <div className="modal-body">
+            <Field label="Markdown content">
+              <textarea
+                className="markdown-source"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                maxLength={100000}
+              />
+            </Field>
+            <div className="form-actions">
+              <Button variant="secondary" onClick={() => setMarkdown(null)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  void Promise.resolve(marked.parse(source, { async: false }))
+                    .then((html) => {
+                      const parsed = new DOMParser().parseFromString(
+                        DOMPurify.sanitize(html),
+                        "text/html",
+                      );
+                      parsed
+                        .querySelectorAll('li > input[type="checkbox"]')
+                        .forEach((input) => {
+                          const item = input.parentElement!;
+                          item.setAttribute("data-type", "taskItem");
+                          item.setAttribute(
+                            "data-checked",
+                            String(input.hasAttribute("checked")),
+                          );
+                          item.parentElement?.setAttribute(
+                            "data-type",
+                            "taskList",
+                          );
+                          input.remove();
+                        });
+                      editor.commands.setContent(parsed.body.innerHTML);
+                      setMarkdown(null);
+                      setSource("");
+                    })
+                    .catch(setError);
+                }}
+              >
+                Replace content
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      ) : null}
+      {markdown === "export" ? (
+        <ConfirmDialog
+          title="Export as Markdown?"
+          description="Markdown cannot preserve text colors, highlights or every rich-text detail. Your original note will stay unchanged."
+          confirmLabel="Download Markdown"
+          onClose={() => setMarkdown(null)}
+          onConfirm={() => {
+            const converter = new TurndownService({
+              headingStyle: "atx",
+              codeBlockStyle: "fenced",
+            });
+            converter.addRule("task", {
+              filter: (node) =>
+                node.nodeName === "LI" &&
+                node.getAttribute("data-type") === "taskItem",
+              replacement: (content, node) =>
+                `\n- [${(node as HTMLElement).getAttribute("data-checked") === "true" ? "x" : " "}] ${content.trim()}\n`,
+            });
+            download(
+              "note.md",
+              converter.turndown(editor.getHTML()),
+              "text/markdown",
+            );
+          }}
+        />
+      ) : null}
+    </>
+  );
+}

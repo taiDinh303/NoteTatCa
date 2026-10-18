@@ -1,53 +1,49 @@
-# 16 — Bảo mật và quyền riêng tư
+# 16 — Bảo mật và riêng tư
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | Khảo sát source, chưa security test runtime
+> 2026-10-17 | CURRENT controls có regression tests; chưa audit độc lập hoặc xác nhận cloud.
 
-## Tài sản và trust boundary
+## Quyền dữ liệu
 
-Nội dung note, rich document, checklist, nhãn, lịch nhắc, thông báo, email/profile, password hash, Google link, JWT/refresh, DB/SMTP credentials. Browser là đầu vào không tin cậy; API .NET là nơi kiểm auth/owner/admin; DB Supabase tương lai không được mở đường vòng bỏ qua API. Admin không có quyền đọc nội dung note người khác, kể cả preview/search/export/log.
+Fallback authenticated toàn controller trừ các action AllowAnonymous auth/proof/health. Note/tag/reminder/notification là owner scope tại service; biết ID người khác trả404, không chỉ ẩn menu. Admin không có bypass nội dung note, chỉ metadata account/aggregate. Profile/account tự sửa; role quản trị hoặc proof token cho recovery. DTO không cấp quyền qua UserId client; SaveChanges chặn chuyển owner ở dữ liệu chính.
 
-## Ma trận quyền TARGET
+## Theo dõi phát hiện baseline 2026-10-16
 
-| Actor | Thao tác | Phạm vi | Kết quả |
-| --- | --- | --- | --- |
-| Khách | Đăng ký, OTP, login, Google, khôi phục mật khẩu | Theo proof và rate limit | Cho phép đúng action public |
-| Khách | Note/tag/reminder/profile/admin | Không có | 401 |
-| User | Note/tag/reminder/notification/profile | Chính mình, account không bị khóa | Cho phép, kiểm mọi reference |
-| User A | ID/bulk/reorder/link tới dữ liệu B | Không có | 404 đề xuất, không tác động |
-| User | Admin API | Không có | 403 |
-| Admin | Quản lý/khóa user, thống kê tổng hợp | Metadata cần thiết | Cho phép, audit không nội dung |
-| Admin | Đọc/sửa note user khác | Không có | Từ chối như user khác owner |
-| Worker | Delivery/purge đúng policy | Query theo owner/note state/job scope | Privilege tối thiểu, audit riêng |
-
-Ẩn menu không thay thế server policy. Quyền hệ thống ở DB/dashboard là ranh giới vận hành riêng: không hứa dữ liệu được mã hóa đầu cuối hoặc DB operator không thể đọc. Kiểm soát quyền vận hành và tránh sử dụng credential superuser cho app.
-
-## Khoảng trống CURRENT phải xử lý trước public
-
-| ID | Bằng chứng source | Rủi ro / yêu cầu |
+| ID | Phát hiện cũ | Trạng thái source/test 2026-10-17 |
 | --- | --- | --- |
-| SEC-001 | Authorize bị comment ở Note/Tag/NoteTag/UserInfo; Note detail/update/delete/restore thiếu owner | Áp dụng auth và owner đồng nhất; TC-003/011 |
-| SEC-002 | Reminder list/detail/by-note/delete thiếu owner filter ở service | Rò lịch/nội dung qua quan hệ; lọc Note.UserId + parent state |
-| SEC-003 | Remove/bulk NoteTag query theo ID chưa scope đầy đủ | Gỡ nhãn người khác; rà SaveAsync/transaction |
-| SEC-004 | Google ValidateAsync không truyền audience settings rõ trong call; connect nhận providerKey từ client | Chốt audience, issuer, verified identity, linking proof; không tin email/providerKey đơn thuần |
-| SEC-005 | OTP Random, cache theo email; chưa thấy rate limit/attempt cap | RNG mật mã, TTL/use-once, throttle, giới hạn thử; shared store nếu scale |
-| SEC-006 | PasswordSignInAsync lockoutOnFailure=false, unique email=false | Khóa thất bại và email login đích cần policy/unique normalization |
-| SEC-007 | Current JWT dài theo RememberMe, chưa refresh/revoke/logout server | Khóa user phải ngừng phiên, check account state; ADR-003 |
-| SEC-008 | Google action catch trả ex.Message ở response | Không lộ lỗi nội bộ/token; log đã che và code ổn định |
-| SEC-009 | Config local chứa bí mật, commit mới đã sanitize; lịch sử cũ chưa audit | Không chép vào docs; rà lịch sử và rotation trong nhiệm vụ bảo mật được giao |
+| SEC-001 | Note/Tag/profile quyền không đồng nhất | FIXED: fallback + service owner/self, HTTP A/B/admin âm và legacy |
+| SEC-002 | Reminder không scope parent | FIXED: join note owner/state mọi đường; test cross-owner |
+| SEC-003 | NoteTag remove/bulk/Save thiếu | FIXED: owner2đầu, transaction/save, max20, label mutation bump note version |
+| SEC-004 | Google audience/link proof | FIXED code: client audience/verified email/subject; link có token proof; tests fake adapter, Google thật NOT RUN |
+| SEC-005 | OTP Random/cache/không cap | FIXED: RNG, HMAC DB hash,10min/5attempts/60sresend, auth rate limit |
+| SEC-006 | Login không lockout/unique email | FIXED: Identity unique normalized email,5sai/5phút; migration dừng nếu duplicate |
+| SEC-007 | JWT dài không revoke | FIXED: access ngắn, refresh rotation/reuse/family expiry, DB stamp/session/role check |
+| SEC-008 | Response ex.Message | FIXED: envelope/traceId, internal error đã che |
+| SEC-009 | Secret local/lịch sử cũ | Local config giữ nguyên ngoài đợt code; không audit toàn lịch sử hoặc rotate credential trong phiên |
 
-## Kiểm soát đích đề xuất
+FIXED ở đây là source + kiểm thử biệt lập, không chứng minh bản cloud đang chạy có cùng cấu hình. Ca kiểm thử tại [06](06-testing.md).
 
-- Giữ .NET Identity khi chuyển Supabase PostgreSQL (Q-019 đã chốt); unique email và auth/role quản lý server. Google email verification/subject/audience phải kiểm rõ.
-- Xác định vòng đời token: access TTL ngắn, refresh rotation/revocation hoặc cơ chế phiên thay thế; logout/khóa user có hiệu lực theo policy được kiểm thử. Không chỉ tin role JWT cũ sau khóa.
-- Input rich text cần schema/size/depth limit, sanitize render, whitelist marks/link scheme/color, emoji. Không render HTML tùy ý; chặn script, event handler, javascript URL/paste nguy hiểm. Metadata icon không nhận remote code.
-- CORS chỉ origin đã cho phép; nếu refresh cookie phải xử lý CSRF/SameSite/Secure và third-party cookie trên domain Vercel/Render. Không đưa token vào URL.
-- Rate limit auth/OTP/email/search, limit page/content và retry có kiểm soát. Không trả lỗi account-exists quá chi tiết ở recovery public.
-- Logs không chứa Content/document, OTP, password, JWT, reset token, connection string hoặc email đầy đủ mặc định. Admin thống kê dùng aggregate không nội dung.
+## Các lớp bảo vệ đã có
+
+JWT HMAC SHA256, key≥32 bytes, issuer/audience/lifetime, skew30 giây. Every access kiểm DB active/verified/notlocked, session/security stamp và active role; user lock/revoke có hiệu lực ngay. Refresh chỉ DB hash, family rotation7/30 ngày tuyệt đối; role/password/email change làm phiên cũ mất hiệu lực. Login sai chung; link Google account cùng email phải rõ proof. Recovery dùng Identity token; Data Protection keyring phải bền vững/giữ kín khi deploy nhiều instance/restart.
+
+CORS allowlist origin cụ thể, không wildcard/AllowCredentials. API bearer chưa refresh cookie. Auth limiter20/IP/phút, global600/user hoặc IP/phút mặc định, fixed window in-process; không thay DDoS/distributed limit. Không trust X-Forwarded-For từ client; cần cấu hình proxy/network tin cậy sau khi biết Render topology, nếu không nhiều user có thể chung IP hạn mức.
+
+Rich document allowlist node/mark/attrs/scheme, size/depth/count và màu/emoji; không execute HTML. React renderer/paste/Markdown vẫn cần E2E và XSS test. Không expose content/token/OTP/password/connection string qua response/log; API no-store,nosniff,route-template telemetry. Framework Hosting.Diagnostics ở mức dưới Warning bị tắt bằng filter vì log URL/query có thể chứa proof token; regression bật framework Information vẫn không lộ sentinel token. TLS termination do host, production origin/HTTPS/key storage cần kiểm thật.
 
 ## Supabase và dữ liệu cá nhân
 
-React gọi API Render; API kết nối DB bằng role riêng. PROPOSED dùng schema app không expose Data API hoặc tắt Data API khi không dùng. Nếu bảng nằm trong schema exposed, bật RLS và grants đúng cho mọi bảng; Identity JWT không tự trở thành Supabase `auth.uid()`. App DB credential có thể bypass RLS nên API ownership vẫn bắt buộc. [Supabase API security](https://supabase.com/docs/guides/api/securing-your-api), kiểm tra 2026-10-16.
+PostgreSQL schema app `ntc`, không thêm vào exposed Data API schemas; không cung cấp DB/service secret cho VITE_. Supabase chỉ DB, .NET Identity JWT không tự map `auth.uid()`. Cấp runtime DB role tối thiểu, migration role riêng. Kiểm grants/default privileges theo account thật; nếu bật Data API phải có RLS/grant tests A/B/anon trước dùng. Không coi schema name tự thay thế quyền DB. [Supabase API security](https://supabase.com/docs/guides/api/securing-your-api).
 
-Không đưa service/secret key hay DB password vào VITE_ env. App không cần Supabase Auth hoặc browser DB SDK theo quyết định hiện hành.
+Trash7 ngày không tự xóa backup. Account export/hard delete, backup retention và legal privacy notice còn Q-014/Q-009; hard delete account hiện409. Admin statistics không analytics nội dung. Purge/job mặc định tắt, cần review candidates/backup trước bật; không tự xử lý dữ liệu thật từ task code.
 
-Trash retention đã chốt 7 ngày; backup retention và data export/account deletion chưa chốt Q-014. Purge ở app không tự xóa dữ liệu trong backup. Khu vực pháp lý/privacy notice chưa xác định; chưa có đánh giá pháp lý, không tuyên bố tuân thủ. Kiểm thử tại TC-003/011/012/018 và file 06.
+## Ràng buộc dữ liệu và nhật ký quản trị
+
+Owner guard service được bổ sung composite FK bảo vệ NoteTag/Notification/Delivery ngay khi import/direct SQL. Parent occurrence và session identity không đổi sau tạo. Check constraints ngăn invalid recurrence/expiry/lease states. Không coi FK thay authorization.
+
+AdministrativeAuditEvent không có trường note/title/email/token/free-text; chỉ IDs/action/time, đọc Admin-only, ghi chung transaction. SaveChanges từ chối sửa/xóa audit. Người có quyền SQL quản trị vẫn có thể thay đổi trực tiếp, nên runtime grants và retention cần review trước deploy. Audit không tự purge; khi mở hard delete account phải xử lý FK/retention đúng policy.
+
+## Sessions, admin lifecycle và email
+
+Session list chỉ trả metadata của caller; revoke family kiểm owner, ID cũ qua rotation còn lưu vẫn revoke được family hiện tại. Restore account không hồi token/verification/lock; audit action12 ghi chung transaction, không nội dung note. Me/account chỉ cho phoneNumber, overpost email/role/lock không thay quyền. Linked-login response không serialize raw Identity entity/provider key.
+
+Password mới8–1024 trên register/admin-create/reset/change. Template HTML encode username/email/code/link; query link encode proof/mailbox trước HTML encode. SMTP timeout được retry với EMAIL_TIMEOUT và backoff; vẫn có at-least-once limit đã ghi, không hứa exactly-once. Phạm vi13 regression mới và giới hạn external provider ở [06](06-testing.md).

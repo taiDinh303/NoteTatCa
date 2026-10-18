@@ -1,10 +1,28 @@
 # 06 — Kiểm thử và bằng chứng
 
-> 2026-10-16 | DRAFT | Áp dụng: YES
+> 2026-10-17 | CURRENT:80 PASS,0 FAIL,1 SKIP trong 81 tests. Không thay thế production verification.
 
-## Chiến lược
+## Kết quả và môi trường
 
-Ưu tiên integration API với DB test tách biệt và hai user A/B; bổ sung unit cho lịch lặp/validation, contract cho React, E2E cho auth→note→trash. Admin C chỉ quản lý tài khoản/thống kê, không đọc nội dung ghi chú. Mọi ca dưới đây NOT RUN trong phiên tài liệu.
+Release build `NTC.Backend.slnf -warnaserror`:0 warnings/0 errors. Suite NTC.Tests:80 passed,1skipped(PostgreSQL runtime vì chưa có server fixture loopback). Publish API PASS. TRX/OpenAPI ở artifacts, lệnh và evidence [worklog](worklog.md), cách chạy [10](10-setup-local.md).
+
+HTTP dùng WebApplicationFactory + SQLite in-memory, fake clock/email/Google; không đọc owner connection string hoặc gửi email thật. SQLServer LocalDB tests tạo/drop DB riêng NTC_Test_<guid>: apply baseline → insert account/hash/note cũ → additive → kiểm preserve và version nonempty; duplicate email dừng trước DDL; hai DbContext stale write conflict. PostgreSQL model/DDL/history/no-pending-model checks PASS; runtime fixture test chưa chạy local. CI đã cấu hình PostgreSQL 17, chưa có GitHub run.
+
+| Nhóm source trong NTC.Tests | Coverage đã chạy |
+| --- | --- |
+| AuthorizationTests / HardeningTests | Anonymous, owner A/B, legacy/v1, parent/link sai owner, profile/admin no-content, lock/rate limit/untrusted forwarded IP |
+| SessionTests | OTP/register/email verification, login/Google proof, refresh rotation/reuse/family expiry, logout/revoke/lock, reset raw/encoded token |
+| NoteTests | CRUD/PATCH/limits/rich whitelist, malformed input, idempotency, version conflict, duplicate tags/link version, reorder/trash/restore |
+| MaintenanceTests | Recurrence dispatch/dedup/catch-up, email retry, restore future, cutoff purge, expired identity state prune |
+| Unit recurrence/document tests | Month-end/leap/DST/timezone/ending bounds và nội dung an toàn |
+| ProviderTests / MigrationSafetyTests | Hai provider models/history, SQL additive preserve/duplicate preflight/stale concurrency |
+| ContractTests | Swagger/body schemas/access metadata/export, CORS/health/envelope/trace; request logs không lộ recovery query token khi framework Information bật |
+| ServiceControllerTests |13 cases HTTP: PATCH/version/null/owner, reminder cursor/limits, profile missing/create/overpost, session family, admin lifecycle/roles, inbox bulk, password bounds, email escaping/timeout, DI/Swagger/legacy trace |
+| PostgresTests | SKIP local; runtime migrate/round-trip Unicode/Identity/UTC trên DB riêng nếu cấp NTC_TEST_POSTGRES |
+
+React browser/unit có evidence riêng tại FRONTEND-IMPLEMENTATION. Không chạy: real Google/SMTP, load, backup restore, SQL→PG data transfer, Docker, remote CI/cloud. Các hàng TC dưới là acceptance matrix đầy đủ; coverage nhiều biên đã có backend tests nhưng không đồng nghĩa toàn bộ tổ hợp E2E đã PASS. Khi code đổi chạy focused suite phù hợp rồi cập nhật evidence.
+
+## Ma trận nghiệm thu
 
 | ID | REQ/WF | Thiết lập / thao tác | Kết quả mong đợi | Mức |
 | --- | --- | --- | --- | --- |
@@ -27,27 +45,34 @@
 | TC-017 | File 22 | Restore backup vào DB biệt lập | Đăng nhập/đọc note/owner/reminder đúng, đo RPO/RTO | Recovery |
 | TC-018 | File 16 | Nếu bật Supabase Data API: thử anon/user A/user B và grants/RLS | Không có đường vòng đọc/sửa note hoặc Identity | Security integration |
 
-## Cách chạy hiện tại
+## Quy tắc fixture và nghiệm thu
 
-Chưa tìm thấy project test, package.json hoặc CI workflow trong source được khảo sát. Không đưa lệnh `dotnet test`/`npm test` như suite hiện hữu. Khi tạo test trong phiên API, ghi đúng project, fixture DB, lệnh và kết quả vào bảng evidence.
+Không chạy integration bằng DB chứa dữ liệu thật. PostgreSQL fixture chỉ nhận loopback/admin database postgres, tạo/drop tên ntc_test_<guid>; SQL LocalDB chỉ drop tên đã validate. Không reset database ngoài fixture. Fake Google kiểm luồng service/proof, không chứng minh Google SDK/network hoặc credential production.
 
-Build kiểm tra chuẩn bị, chưa chạy trong phiên docs (PowerShell):
+Lỗi quyền/mất note/purge sai là cổng dừng phát hành. Build xanh không thay kiểm runtime provider và restore. Chỉ ghi test PASS khi có kết quả, ghi rõ SKIP/NOT RUN theo môi trường.
 
-```powershell
-# cwd: D:\My Project\NTC\NoteTatCa
-dotnet restore .\NTC.API\NTC.API.csproj
-dotnet build .\NTC.API\NTC.API.csproj --no-restore
-```
+## Evidence rà entities
 
-Không chạy integration bằng database chứa dữ liệu thật. Dọn dữ liệu fixture theo ID test và database test đã xác minh, không reset production.
+Full suite sau thay đổi: **67 PASS,0 FAIL,1 SKIP,total 68**; TRX `artifacts/test-results/Admin_DESKTOP-DVT_2026-10-17_19_36_05.trx`. Build Release strict: 0 warnings/0 errors; publishAPI/scriptSQL PASS. EntityIntegrityTests + EntityMigrationTests bổ sung17 case executions so với suite 51 test trước, gồm4 trường hợp owner/parent, invalid scalar/session/lease, Identity audit/canonical email, audit admin/no-content/append-only/custom-role delete, crash cuối email và SQL migration preflight/backfill.
 
-## Bằng chứng phiên này
+Test dữ liệu cũ SQLServer giữ hash/note/nhãn/instant rồi backfill NoteTag.UserId. SQL preflight với label/notification/delivery sai dừng50002 trước DDL, không merge/xóa. PostgreSQL fixture đã thêm baseline→upgrade/backfill nhưng vẫn SKIP local; model/history/DDL/no-pending-model checks PASS. Không thay thế PostgreSQL runtime hoặc live database migration.
 
-| Ngày / mốc | Kiểm tra | Kết quả | Giới hạn |
-| --- | --- | --- | --- |
-| 2026-10-16 / d8f854b | Đọc source controllers/services/models/DbContext/csproj | Khảo sát hoàn thành, worklog | Không chứng minh runtime |
-| 2026-10-16 | `dotnet --list-sdks` | Có SDK 9.0.317 | Runtime .NET 8/SQL chưa kiểm |
-| 2026-10-16 | Bộ docs: tên file/link/placeholder | Kết quả cuối ở worklog | Kiểm tra tài liệu |
-| 2026-10-16 | Build/API/DB/E2E/load/restore | NOT RUN | Phiên chỉ docs, không sửa API |
+## Evidence services/controllers hiện hành
 
-Điều kiện API được nghiệm thu: ca thuộc phạm vi PASS, không còn lỗi truy cập chéo owner/admin đọc note, contract nhất quán, migration an toàn. Không tuyên bố production-ready từ build.
+Full suite cuối **80 PASS,0 FAIL,1 SKIP,total81**,59 giây, TRX `artifacts/test-results/Admin_DESKTOP-DVT_2026-10-17_23_07_36.trx`. Release strict0warning/0error; publish API; SQL idempotent hai provider; model/history4SQL/3PG/no-pending-model PASS. PostgreSQL runtime còn SKIP local.13 tests mới chạy qua API/service với A/B/admin/anonymous và dữ liệu riêng; không gửi email thật.
+
+Các fixture mới còn xác nhận restore account không unlock/reverify/hồi token cũ, role changes revoke phiên target, không overpost email/lock/role qua me/account, session output chỉ4metadata fields. Swagger mọi controller action có success schema, common errors và quyền; legacy response có correlation traceId.
+
+## Kiểm lại sau chuyển root
+
+PowerShell cwd NTC root: restore/tool restore PASS; build ntc_aspnet/NTC.Backend.slnf Release -warnaserror0warnings/0errors; fullsuite80PASS/0FAIL/1PGskip,total81,26s. TRX root artifacts/test-results/Admin_DESKTOP-DVT_2026-10-17_23_31_22.trx. Publish ntc_aspnet/NTC.API từ root và EF SQL exports hai provider PASS. Không sửa source .NET trong task cấu trúc.
+
+verify_docs root duy nhất43Markdown/123links/0errors; HEAD/branch/refs/remote và384backend/config hashes giữ nguyên;287 baseline renames thuần stage; git fsck/bundle verify PASS. CI/Docker paths đã cập nhật nhưng chưa chạy remote/image build. Các evidence trước ở cwd backend và docs hai bản là lịch sử.
+
+## Kiểm lại sau đổi folder thành ntc_aspnet
+
+PowerShell cwd NTC: dotnet restore/build ntc_aspnet/NTC.Backend.slnf PASS, Release strict0warnings/0errors. Fullsuite80PASS/0FAIL/1PostgreSQLruntimeSKIP,total81,40s; TRX artifacts/test-results/Admin_DESKTOP-DVT_2026-10-17_23_54_42.trx. Publish API và EF context discovery theo đường dẫn mới PASS; không apply migration hoặc đổi database.43Markdown/123links/0errors;384source/config hashes nguyên byte và Git history/refs/remote/staged blob contents giữ nguyên. Docker/remoteCI/cloud chưa chạy.
+
+## React local — 2026-10-18
+
+14unit và12Chromium E2E PASS; focused conflict chạy lại sau copy/save fix PASS. Scope từng luồng/giới hạn tại [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md). Không coi SQLite E2E là Supabase/SQL Server deployment proof. Backend được chạy lại80PASS/1PostgreSQLskip,total81; TRX mới trong worklog.

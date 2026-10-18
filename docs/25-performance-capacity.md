@@ -1,6 +1,10 @@
 # 25 — Hiệu năng và tải
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | Hướng public nhỏ đã chốt; số tải/SLO dưới đây PROPOSED
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+Chưa load benchmark/SLA. Hiện có pageSize1–100, request8MiB, projection100k/document1MiB/depth32/node20k,20 nhãns/5 active reminders; index owner/state/rank/due/occurrence. Global/auth limiter in-process, search Contains phụ thuộc collation và chưa full-text. Mục tiêu p95/RPO dưới là PROPOSED, cần đo cả SQL/PG với dữ liệu giả phù hợp trước scale.
 
 | Luồng | Dataset test giả lập đề xuất | Tải / mục tiêu | Đo |
 | --- | --- | --- | --- |

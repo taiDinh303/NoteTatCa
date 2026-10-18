@@ -1,65 +1,48 @@
-# 04 — Dữ liệu NoteTatCa
+# 04 — Thiết kế dữ liệu
 
-> 2026-10-16 | DRAFT | Áp dụng: YES | CURRENT từ entity/DbContext/migration, chưa đối chiếu SQL đang chạy
+> 2026-10-17 | CURRENT model/migration; database thật chưa thay đổi.
 
-## Entity và quan hệ
+## Entity và invariant
 
-| Entity | PK | Quan hệ / ownership | Nguồn |
-| --- | --- | --- | --- |
-| ApplicationUser | Guid Id | Identity user; owner Note/Tag; tham chiếu UserInfo | Entities/ApplicationUser.cs |
-| UserInfo | Guid Id | Id đồng thời liên kết user; hồ sơ cá nhân | Entities/UserInfo.cs |
-| ApplicationRole và Identity phụ | Identity keys | UserRole, UserLogin, Claim, Token | DatabaseContext |
-| Note | Guid Id | UserId → user; nhiều NoteTag và Reminder | Entities/Tasks/Note.cs |
-| Tag | Guid Id | UserId → user; nhiều NoteTag | Entities/Tasks/Tag.cs |
-| NoteTag | (NoteId, TagId) | N–N Note/Tag, xóa FK Restrict | DatabaseContext |
-| Reminder | Guid Id | NoteId → Note → owner | Entities/Tasks/Reminder.cs |
+| Entity | Dữ liệu / quan hệ chính |
+| --- | --- |
+| ApplicationUser / Identity | Guid ID, password hash, email normalized unique khi khác null, role/login/claim/token; IsLocked, TimeZoneId mặc định Asia/Ho_Chi_Minh |
+| UserInfo | Hồ sơ theo user; không mở quyền đọc hồ sơ người khác |
+| Note | UserId, Title required nhưng cho chuỗi rỗng ≤150, Content ≤100.000 ký tự khi lưu mới/sửa, DocumentJson ≤1 MiB, DocumentSchemaVersion=1, IconEmoji một grapheme, màu hex, pin/rank, audit UTC, Guid Version |
+| Tag | UserId, Name required ≤50; **tên trùng được phép**, phân biệt bằng ID |
+| NoteTag | Composite PK NoteId/TagId; UserId + composite FK ép cùng owner, tối đa20 nhãn/note |
+| Reminder | NoteId, anchor ReminderAt, RepeatType/Interval/Days/Until/Count, timezone, NextOccurrenceAt, OccurrencesProcessed, IsActive, SendEmail, Version; tối đa5 lịch bật/note |
+| Notification | Owner/note/reminder/occurrence/readAt; unique ReminderId + OccurrenceAt |
+| ReminderDelivery | Occurrence, email lease/attempt/backoff/sent/abandoned; unique ReminderId + OccurrenceAt |
+| AdministrativeAuditEvent | Actor/target/role IDs, action enum, occurredAt; append-only metadata, không note/email/token |
+| RefreshSession | Hash opaque token, user/family/security stamp, expiry/revocation/replacement, concurrency version; không lưu token rõ |
+| EmailChallenge | Normalized email key, OTP HMAC hash, expiry/attempt/lastsent/version; không lưu OTP rõ |
 
-DbContext cấu hình Note.UserId/Tag.UserId cascade khi xóa user. NoteTag dùng Restrict ở cả hai FK. Cần xem schema SQL thực tế và toàn bộ graph trước hard-delete user; không giả định cascade đủ xử lý mọi đường.
+BaseEntity có audit và Guid Version. SaveChanges chuẩn hóa DateTimeOffset về UTC, server cấp audit/version; không cho đổi owner Note/Tag hoặc đổi parent Reminder. Version cũ trả409. Danh sách/gán tag lọc owner kể cả khi quan hệ legacy bị sai. Xóa nhãn chỉ gỡ liên kết, giữ note. Hard delete note xóa graph có transaction; FK phụ Restrict yêu cầu service xử lý đầy đủ.
 
-## Trường nghiệp vụ hiện có
+Index hiện có: Note(owner,trash,pin,rank), unique owner/CreateRequestId khi key khác null; Tag(owner,trash); Reminder(active,next); notification/delivery occurrence unique; inbox owner/read/created; refresh token hash unique và user/family. Không có unique Tag.Name. Chưa benchmark execution plan; search hiện là Contains, độ nhạy hoa/dấu phụ thuộc collation/provider.
 
-| Entity.trường | Kiểu C# / ràng buộc đã thấy | Ý nghĩa / khoảng trống |
+## Provider và migration
+
+| Provider | Context / migration | Kiểm chứng |
 | --- | --- | --- |
-| Note.Title | string nullable ở entity; MaxLength 150; DbContext IsRequired | Nullability không thống nhất DTO/DB |
-| Note.Content | string, mặc định rỗng | Chưa có format/type hoặc giới hạn nghiệp vụ được chốt |
-| Note.UserId | Guid FK | Owner server-side cần áp dụng mọi query |
-| Note.IsPinned / PinnedAt | bool / DateTimeOffset? | Trạng thái ghim; thời gian server quản lý đề xuất |
-| Note.Priority | int mặc định 1 | Chưa có enum/range/nghĩa được chốt, Q-016 |
-| Note.BackgroundColor | string? | Cần whitelist/format thay nhận tùy ý |
-| Note.SortOrder | double | Xếp trong nhóm ghim/không ghim; cần rebalance/concurrency |
-| Tag.Name | string, required, max 50 | Quy tắc trùng tên theo owner chưa chốt |
-| Reminder.ReminderAt | DateTimeOffset | Lần đầu; không có bằng chứng worker gửi đúng |
-| Reminder.RepeatType | enum 0–4 | None, Daily, Weekly, Monthly, Yearly |
-| Reminder.RepeatInterval | int mặc định 1 | Cần >0 và giới hạn hợp lý |
-| Reminder.RepeatDays | WeekDays flags nullable | Monday=1 … Sunday=64; tuần cần ngày hợp lệ |
-| Reminder.RepeatUntil / RepeatCount | DateTimeOffset? / int? | Service cấm hai điều kiện kết thúc đồng thời |
-| Reminder.IsActive | bool mặc định true | Tách khỏi DeletedTime; query phải xét cả note |
-| BaseEntity audit | CreatedTime, LastUpdatedTime, DeletedTime và người thao tác | Audit hiện dùng CoreHelper UTC+7 |
-| UserInfo | GivenName max 25, FamilyName, Picture, Email, Locale max 10, Address, BirthDate, Gender | Dữ liệu cá nhân, chỉ thu trường cần dùng |
+| SQL Server | DatabaseContext; lịch sử `20260731153548_InitialCreate` giữ nguyên; mới `20261017044024_CompleteNoteBackend` | Migrate dữ liệu giả cũ trên LocalDB, giữ hash/ID/content/instant, stale version và duplicate-email preflight |
+| PostgreSQL | PostgreSqlDatabaseContext; `20261017044034_InitialPostgreSql`, schema và history `ntc` | Model/DDL/history checks PASS; runtime PostgreSQL chưa chạy local |
 
-## Invariant đích đề xuất
+SQL migration thêm metadata/session/OTP/inbox/delivery; cấp NEWID cho Version trên các record cũ để v1 sửa được. Nếu trùng NormalizedEmail thì dừng trước DDL, không merge/xóa tài khoản. Không cắt ngắn background color hoặc nội dung cũ. Record cũ quá limit phải được báo cáo và xử lý khi sửa, không âm thầm truncate.
 
-1. Note, Tag và mọi quan hệ được kiểm tra cùng owner. Reminder chỉ thao tác nếu owner của Note trùng subject.
-2. NoteTag unique theo composite PK; transaction xử lý gán/gỡ/xóa note/tag.
-3. Soft delete giữ dữ liệu để restore; hard delete và purge phải có policy Q-006, không chỉ xóa record chính.
-4. UTC storage và offset API, không cộng/trừ 7 giờ hai lần khi chuyển dữ liệu hiện tại.
-5. Không sửa migration baseline đang được DB dùng nếu chưa đối chiếu `__EFMigrationsHistory` và backup (Q-010).
+PostgreSQL: Guid→uuid, DateTimeOffset→timestamptz, BirthDate→timestamp without time zone; document giữ text JSON đã validate. Baseline không chuyển dữ liệu SQL Server. Không đưa schema `ntc` vào exposed schemas; quyền DB/RLS xem [16](16-security-privacy.md). SQLite UTC-ticks chỉ fixture test, không phải provider production.
 
-## Thay đổi schema có điều kiện
+Không chạy migration DB thật trong đợt code. Kiểm actual history/backup/duplicate/orphan/purge candidates bằng [runbook migration](23-data-migration.md), không mặc định DB thật khớp baseline repo.
 
-| Phạm vi nghiệp vụ | Đề xuất bổ sung, chưa tạo migration | Quyết định / phần còn cần chốt |
-| --- | --- | --- |
-| Unified editor có checklist | Canonical versioned document với checklist node; bảng ChecklistItem chỉ nếu có nhu cầu query độc lập | Q-020 đã chốt một editor; tránh hai nguồn chuẩn |
-| Rich text/Markdown/màu/emoji | Document schema/renderer, plain search projection, Note.IconEmoji; Markdown export có cảnh báo | Q-020/021 đã chốt; chưa chọn thư viện/schema cụ thể |
-| Archive | ArchivedAt hoặc trạng thái rõ với trash | Q-004, reminder lúc archive |
-| Notification/job | Occurrence, delivery attempt/dedup/outbox, timezone | In-app/email/lặp, timezone user/catch-up 24h đã chốt |
-| Autosave + Save | Version field portable, conflict response | Q-023 đã chốt; SQL rowversion không tự dùng nguyên trạng ở Postgres |
-| Sharing/team/file | Không thêm schema bản đầu | Q-001/004 đã chọn riêng tư, chưa attachments |
+## Rà soát entities tiếp theo
 
-## PostgreSQL đích và bảo toàn dữ liệu
+Đã củng cố17 entities theo [ENTITY-REVIEW](ENTITY-REVIEW.md). NoteTag thêm UserId với2 composite FK; Notification/ReminderDelivery cùng note owner và parent reminder; Note/Tag/Reminder có alternate principal key. UserInfo PK=FK user được khai báo tường minh, Title C# non-null/rỗng.
 
-Supabase PostgreSQL chỉ làm DB, giữ .NET Identity đã chốt Q-019. Đề xuất EF provider Npgsql và bộ migration phù hợp; Guid→uuid, timestamp UTC, rich document JSON/text theo schema chốt khi triển khai. Dữ liệu account/note/ID/hash cần giữ (Q-022), không reset hoặc tự biến Supabase auth.users thành nguồn user. [Supabase kết nối Postgres](https://supabase.com/docs/guides/database/connecting-to-postgres), kiểm tra 2026-10-16; mapping chi tiết/dry run ở file 23.
+Thêm AdministrativeAuditEvent chỉ metadata, không nội dung note; application append-only, ghi cùng transaction và GET admin-only. Delivery thêm LastAttemptAt/AbandonedAt, không dựng lại timestamp không biết của lịch sử. IAuditableEntity áp dụng cả7 lớp Identity; bảo vệ creation metadata. CHECK/expiry indexes bảo vệ recurrence/auth/lease, không đặt unique Tag.Name.
 
-Index đề xuất để đo: Note(UserId, DeletedTime, IsPinned, SortOrder, Id); Tag(UserId, DeletedTime, Name); Reminder(IsActive, ReminderAt) và truy vấn join owner. Chưa tạo/benchmark; SQL execution plan và selectivity quyết định index cuối.
+Migration SQLServer20261017122802_EnforceEntityIntegrity; PostgreSQL20261017122809_EnforceEntityIntegrity. Hai migration trước giữ nguyên. Preflight/backfill và ranh giới legacy ở ENTITY-REVIEW; chưa apply DB thật.
 
-Seed dùng tài khoản A/B và note giả, không admin password cố định. Chưa có quyền reset DB; backup/migration tại [22](22-backup-recovery.md)/[23](23-data-migration.md).
+## Account reactivation
+
+Migration nối tiếp SQLServer20261017160312 / PostgreSQL20261017160333_SupportAccountReactivation mở CK_AdminAudit_Action tới12. Không thêm bảng hoặc thay nội dung note. Histories hiện4SQL/3PG, provider checks không pending model. AccountReactivated chỉ metadata; restore không xóa lock/verification hoặc phục hồi token. Xem [services/controllers](SERVICE-CONTROLLER-REVIEW.md).

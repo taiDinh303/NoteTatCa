@@ -1,6 +1,10 @@
 # 33 — Analytics và thống kê
 
-> 2026-10-16 | DRAFT | Áp dụng: YES cho thống kê admin; NO cho pipeline phân tích nội dung
+> Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
+
+## Hiện trạng và hướng dẫn hiện hành
+
+CURRENT admin statistics aggregate và account metadata đã triển khai/test; không title/content/preview hoặc content analytics. Không tracking frontend/warehouse/BI/PII event pipeline trong scope. Alert vận hành khác với analytics sản phẩm; xem20.
 
 Q-007 đã chọn admin quản lý user và xem thống kê, không đọc note. Chưa có data warehouse, click tracking, session replay hoặc phân tích nội dung/AI. Thống kê đích phải lấy aggregate metadata và không trả title/content/document/search term cho admin.
 

@@ -1,39 +1,30 @@
 # Prompt tiếp tục NoteTatCa
 
-> DRAFT | 2026-10-16 | Áp dụng: YES
-
-Khối dưới dùng khi chủ dự án giao nhiệm vụ API tiếp theo. Đọc prompt này không tự cấp quyền thực hiện code.
+> 2026-10-17 | Hướng dẫn tiếp quản theo nhiệm vụ người dùng mới giao.
 
 ```text
-Tiếp tục NoteTatCa trong D:\My Project\NTC.
-Đọc docs/AGENTS.md, docs/00-README.md, docs/PROJECT-INTAKE.md,
-docs/01-plan.md, docs/15-api-contract.md, docs/16-security-privacy.md,
-docs/06-testing.md và docs/worklog.md; kiểm tra hướng dẫn repo mới nếu có.
+Workspace và Git root D:\My Project\NTC; backend ở ntc_aspnet/.
+Đọc root AGENTS.md/ARCHITECTURE.md, docs/AGENTS.md, 00-README,
+PROJECT-INTAKE, BACKEND-IMPLEMENTATION, API, testing và worklog mới nhất.
+Backend .NET8 đã triển khai legacy adapters + /api/v1, owner/self/admin scope,
+rich JSON, autosave/version, reminders/inbox/SMTP lease, refresh/session,
+SQL additive migration và PostgreSQL baseline. Kiểm source/status lại trước sửa.
+Đừng coi snapshot docs-only 2026-10-16 là hiện trạng mới.
 
-Backend Git repo hiện ở D:\My Project\NTC\NoteTatCa.
-Frontend sẽ chuyển sang React trong workspace NTC; giữ nguyên NTC.VIEW.
-Docs soạn thảo ở NTC/docs, bản đồng bộ GitHub ở NoteTatCa/docs.
-Đồng bộ hai bản khi cập nhật trong workspace này. Không tự di chuyển .git.
+Giữ NTC.VIEW; React TS/Vite hiện ở NTC/ntc_react; đọc FRONTEND-IMPLEMENTATION, UI English.
+Supabase chỉ PostgreSQL; Identity .NET; API Render; React Vercel.
+Giữ account/hash/ID/note/audit; không apply/migrate/reset database thật tự động.
+Note private; admin không đọc content; untitled và duplicate label hợp lệ.
+Text100k/title150/tag50/rich1MiB/20tag/5active reminder mỗi note.
+Editor rich/checklist/Markdown shortcuts/màu/emoji, autosave+Save.
+Trash7ngày; reminder timezone user Việt Nam, catch-up1lần gần nhất/24h,
+month clamp giữ anchor, restore tương lai. Worker mặc định tắt.
 
-Quyết định đã chốt: React TS/Vite ở frontend, UI tiếng Anh, public nhỏ;
-Supabase chỉ PostgreSQL, giữ .NET Identity; API Render, React Vercel;
-giữ account/note cũ; editor unified rich/checklist/Markdown shortcuts,
-màu chữ/emoji/emoji đại diện; autosave+Save; trash 7 ngày; nhắc in-app/email
-có lặp, timezone user mặc định Việt Nam, catch-up một lần trong 24h;
-admin quản lý/khóa user và thống kê, không đọc nội dung note người khác.
-Kế hoạch gom Git root NTC khi bắt đầu React đã được chọn nhưng chưa làm.
-
-Hãy dùng câu trả lời đã ghi trong hồ sơ làm yêu cầu; câu chưa trả lời vẫn
-là PROPOSED. Hỏi Yes/No hoặc A/B/C/D cho phần chặn công việc được giao.
-Khảo sát lại source và git status, bảo toàn cấu hình/thay đổi local.
-
-Nếu tôi giao hoàn thiện API: chốt phạm vi đợt API, contract và acceptance
-criteria trước khi sửa; ưu tiên auth/ownership đồng nhất, validation,
-transaction, migration an toàn và API phù hợp React. Kiểm thử hai tài khoản
-với mọi đường truy cập note/tag/reminder/profile và thao tác bulk/reorder.
-Không coi việc ẩn menu hoặc có JWT là đã bảo đảm quyền dữ liệu.
-
-Hoàn thành phần đã giao, chạy kiểm tra phù hợp, ghi lệnh/môi trường/kết quả
-vào docs/worklog.md và cập nhật tài liệu liên quan. Không tự deploy, reset
-database hoặc thêm các tính năng ngoài phạm vi từ backlog.
+Docs duy nhất NTC/docs; không tạo lại ntc_aspnet/docs hoặc nested .git.
+.config/.github/scripts/Dockerfile/render.yaml/AGENTS/README ở root.
+Chạy lệnh từ root, dùng ntc_aspnet/ prefix cho .NET project/solution.
+Bảo toàn appsettings local pre-existing; không stage secret; giữ root NTC đã chọn.
+Hỏi yes/no hoặc ABCD chỉ cho nghiệp vụ còn mở cần cho việc được giao.
+Tiếp tục hoàn thành công việc đã giao, chạy focused checks, ghi evidence thực tế.
+Không tuyên bố PostgreSQL/cloud/Docker/Google/SMTP/browser đã pass nếu chưa chạy.
 ```

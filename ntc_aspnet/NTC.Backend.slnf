@@ -1,0 +1,15 @@
+{
+  "solution": {
+    "path": "NTC.sln",
+    "projects": [
+      "NTC.API\\NTC.API.csproj",
+      "NTC.Contract.Repositories\\NTC.Contract.Repositories.csproj",
+      "NTC.Contract.Services\\NTC.Contract.Services.csproj",
+      "NTC.Core\\NTC.Core.csproj",
+      "NTC.ModelViews\\NTC.ModelViews.csproj",
+      "NTC.Repositories\\NTC.Repositories.csproj",
+      "NTC.Services\\NTC.Services.csproj",
+      "NTC.Tests\\NTC.Tests.csproj"
+    ]
+  }
+}
