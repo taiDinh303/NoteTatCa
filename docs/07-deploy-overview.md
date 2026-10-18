@@ -1,5 +1,7 @@
 # 07 — Tổng quan triển khai
 
+> Bổ sung2026-10-18: Supabase schema/sample đã provision theo yêu cầu; Render/Vercel dashboard đã cấu hình, source mới chưa rollout. Tài nguyên/URL/evidence tại [Render/Vercel setup](RENDER-VERCEL-SETUP.md) vàworklog. Snapshot2026-10-17 bên dưới là mốc trước khi chủ dự án cung cấp tài nguyên.
+
 > Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
 
 ## Hiện trạng và hướng dẫn hiện hành

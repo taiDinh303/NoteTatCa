@@ -1,5 +1,7 @@
 # NoteTatCa — Tài liệu dự án
 
+> Chuẩn cấu hình hiện hành: [CONFIGURATION-STANDARD](CONFIGURATION-STANDARD.md) — JSON Production sạch, sáu biến triển khai cơ bản, kiểm cấu hình không chạm DB và script chung cho NTC/Marixa.
+
 > Cập nhật: 2026-10-18 (Asia/Bangkok) | Trạng thái: DRAFT | Áp dụng: YES
 
 NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa từ `D:\My Project\docs_mau`, dựa trên khảo sát mã nguồn tại commit `d8f854b` và yêu cầu của chủ dự án. Bộ docs đã cập nhật theo Marixa và backend 2026-10-17; React triển khai 2026-10-18, cloud còn giai đoạn sau. Source mới ở working tree trên HEAD 176a968, không dùng khảo sát d8f854b làm hiện trạng mới.
@@ -47,6 +49,9 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [02-business-analysis](02-business-analysis.md) | YES | Yêu cầu và acceptance criteria |
 | [03-architecture](03-architecture.md) | YES | Kiến trúc .NET và React |
 | [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md) | YES | React modules, route mapping, UX và evidence |
+| [SUPABASE-SETUP](SUPABASE-SETUP.md) | YES | Project ntc, lệnh cấu hình password ẩn và5test accounts |
+| [SUPABASE-DOTNET-COMMANDS](SUPABASE-DOTNET-COMMANDS.md) | YES | Lệnh User Secrets chung và ví dụ NTC/Marixa, mẫu cho project mới |
+| [RENDER-VERCEL-SETUP](RENDER-VERCEL-SETUP.md) | YES | Dashboard NTC, Docker/CA, env Production và giới hạn trước rollout |
 | [04-database-design](04-database-design.md) | YES | Identity, Note, Tag, NoteTag, Reminder |
 | [05-workflow](05-workflow.md) | YES | Auth, ghi chú, thùng rác, nhắc lịch |
 | [06-testing](06-testing.md) | YES | Kịch bản nghiệm thu và bằng chứng |
@@ -100,6 +105,8 @@ Ma trận này là nguồn chuẩn về phạm vi áp dụng; hồ sơ dẫn l�
 
 ## Snapshot hiện hành
 
-44 file Markdown tại root docs duy nhất. Backend .NET8 legacy/v1 đã triển khai owner/auth/editor/version/reminder/jobs/admin và provider migrations. Release strict/PASS80 tests +1PostgreSQLskip/publishAPI; migration SQL thật chỉ trên fixture riêng, không apply dữ liệu chủ dự án. Google/SMTP thật, Docker/GitHub/cloud/restore và SQL→PG data transfer chưa chạy. Đọc06/worklog để biết giới hạn.
+47 file Markdown tại root docs duy nhất. Backend .NET8 legacy/v1 đã triển khai owner/auth/editor/version/reminder/jobs/admin và provider migrations. Mốc trước cloud: Release strict/PASS80 tests +1PostgreSQLskip/publishAPI; các đợt Supabase/schema/sample vàhosting config mới được ghi ở worklog. Google/SMTP thật, Docker image runtime/restore và SQL→PG data transfer chưa chạy. Không coi dashboard Save only là triển khai thành công.
 
 React local:14unit/12Chromium E2E và type/lint/build PASS; runbook/route mapping/evidence tại [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md).
+
+Supabase provisioning theo yêu cầu trực tiếp2026-10-18:3migrations đã apply, pending0;5Identity accounts,25notes và15labels mẫu. HTTP login/read của5accounts và admin owner boundary PASS; không chuyển dữ liệu SQLServer hoặc deploy. Backend mới nhất95PASS/1SKIP,total96 và Release strict sạch; xem [worklog](worklog.md) và [setup](SUPABASE-SETUP.md). Các số80/81 ở snapshot trên là mốc trước bổ sung seeder.

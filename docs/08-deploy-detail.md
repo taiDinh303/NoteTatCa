@@ -1,5 +1,11 @@
 # 08 — Runbook triển khai dự thảo
 
+> Quyết định mới 2026-10-18: job Production mặc định true theo chủ dự án, Storage NTC dự phòng; các đoạn jobs-off bên dưới là quy trình cũ trước quyết định này. Trạng thái/source/rollout xem [chuẩn cấu hình](CONFIGURATION-STANDARD.md).
+
+> Chuẩn cấu hình hiện hành: [CONFIGURATION-STANDARD](CONFIGURATION-STANDARD.md) — JSON Production sạch, sáu biến triển khai cơ bản, kiểm cấu hình không chạm DB và script chung cho NTC/Marixa.
+
+> Hosting2026-10-18: đã lưu cấu hình dashboard Render/Vercel NTC, chưa rollout source mới. Xem [runbook cụ thể](RENDER-VERCEL-SETUP.md) vàworklog; Save only không phải deployment thành công. Các bước bên dưới vẫn là checklist cho rollout sau.
+
 > Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
 
 ## Hiện trạng và hướng dẫn hiện hành

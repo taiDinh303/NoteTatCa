@@ -1,5 +1,7 @@
 # NoteTatCa
 
+Cấu hình local/Production và quy ước dùng chung NTC/Marixa: [CONFIGURATION-STANDARD](docs/CONFIGURATION-STANDARD.md). Public deployment targets: [deploy/project.json](deploy/project.json).
+
 Private note web app with an ASP.NET Core 8 API and .NET Identity.
 Read [project docs](docs/00-README.md) and [architecture](ARCHITECTURE.md).
 
@@ -95,3 +97,20 @@ npm --prefix ntc_react run dev
 
 Open http://127.0.0.1:5173; development proxy targets API HTTP5032.
 See [React setup, architecture and synthetic browser tests](ntc_react/README.md).
+
+## Shared Supabase configuration commands
+
+For the same dotnet user-secrets workflow as Marixa and future .NET projects,
+see [shared commands and concrete examples](docs/SUPABASE-DOTNET-COMMANDS.md).
+NTC.API now has its own UserSecretsId. Development secrets override local JSON;
+remove the provider/connection secret keys to return to the existing SQL Server
+configuration. Schema setup and test-account provisioning remain explicit NTC
+operator commands documented in [Supabase setup](docs/SUPABASE-SETUP.md).
+
+## Render and Vercel
+
+See [dashboard configuration and rollout limits](docs/RENDER-VERCEL-SETUP.md).
+Render uses the root Dockerfile/context and a public Supabase CA; Vercel uses
+ntc_react, Node24 and the production API endpoint ending in /api/v1.
+Export private values with scripts/Export-CloudEnvironment.ps1; outputs stay
+under ignored artifacts/deployment. Saving settings does not deploy new source.

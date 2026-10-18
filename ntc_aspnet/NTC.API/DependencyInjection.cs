@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<INoteTagService, NoteTagService>(); services.AddScoped<IReminderService, ReminderService>();
         services.AddScoped<IAdminService, AdminService>(); services.AddScoped<IInboxService, InboxService>();
         services.AddScoped<ISessionService, SessionService>();
+        services.AddScoped<Operations.DemoAccountSeeder>();
         services.AddScoped<IBackgroundMaintenanceService, BackgroundMaintenanceService>();
         services.AddScoped<IGoogleIdentityValidator, GoogleIdentityValidator>();
         services.AddScoped<IOtpService, OtpService>(); services.AddScoped<EmailTemplateRenderer>();
@@ -37,6 +38,6 @@ public static class DependencyInjection
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { Type = SecuritySchemeType.Http, Scheme = "bearer", BearerFormat = "JWT" });
             options.AddSecurityRequirement(new OpenApiSecurityRequirement { { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, Array.Empty<string>() } });
         });
-        if (config.GetValue<bool>("BackgroundJobs:Enabled")) services.AddHostedService<MaintenanceWorker>();
+        if (bool.TryParse(config["BackgroundJobs:Enabled"], out var jobsEnabled) && jobsEnabled) services.AddHostedService<MaintenanceWorker>();
     }
 }

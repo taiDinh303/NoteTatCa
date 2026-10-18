@@ -1,5 +1,7 @@
 # 10 — Chạy local và kiểm tra backend
 
+> Chuẩn cấu hình hiện hành: [CONFIGURATION-STANDARD](CONFIGURATION-STANDARD.md) — JSON Production sạch, sáu biến triển khai cơ bản, kiểm cấu hình không chạm DB và script chung cho NTC/Marixa.
+
 > 2026-10-17 | Lệnh đã kiểm ở [worklog](worklog.md); không apply DB của chủ dự án.
 
 ## Build/test biệt lập
@@ -43,3 +45,11 @@ Mở workspace/Git tại NTC. Solution đầy đủ ntc_aspnet/NTC.sln và filte
 Từ root chạy `npm --prefix ntc_react ci`, copy ntc_react/.env.example thành .env.local nếu cần, rồi `npm --prefix ntc_react run dev`. Mở http://127.0.0.1:5173. API chạy terminal riêng HTTP5032 trên DB local đã chuẩn bị; React không tự migrate/seed. Proxy /api tránh cấu hình CORS riêng ở dev. Email-link client origin phải trỏ frontend.
 
 Kiểm `npm --prefix ntc_react run typecheck`, `npm --prefix ntc_react run lint`, `npm --prefix ntc_react test`, `npm --prefix ntc_react run build`. Browser: từ ntc_react chạy `npx playwright install chromium` và `npm run test:e2e`; fixture host .NET loopback tự khởi động, SQLite/email/clock giả, không dùng DB thật. Xem [frontend runbook](../ntc_react/README.md).
+
+## Chọn Supabase riêng mà giữ SQL Server local
+
+Dùng [SUPABASE-SETUP](SUPABASE-SETUP.md): scripts/Use-Supabase.ps1 giữ profile private riêng, không sửa appsettings đang dùng. Lệnh Configure hỏi password ẩn, Initialize/SeedTestAccounts chỉ chạy khi explicit. Sau setup dùng script không switch để start API5032/Supabase; lệnh dotnet run với launch profile https thông thường vẫn theo SQLServer local đã có.
+
+## Chuẩn cấu hình Supabase theo User Secrets — 2026-10-18
+
+Ưu tiên [lệnh chung .NET/Supabase](SUPABASE-DOTNET-COMMANDS.md) theo yêu cầu đồng bộ với Marixa. API NTC đã có UserSecretsId; Development tự nạp secrets. Provider/connection ở User Secrets ưu tiên hơn appsettings local; remove hai key khi muốn trở về SQL Server. scripts/Use-Supabase.ps1 vẫn là tùy chọn riêng, environment của script ưu tiên hơn secrets; tránh dùng lẫn hai nguồn trong cùng lần chạy.

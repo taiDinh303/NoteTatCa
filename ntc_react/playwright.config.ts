@@ -25,7 +25,7 @@ export default defineConfig({
       url: "http://127.0.0.1:5173",
       timeout: 60_000,
       reuseExistingServer: !process.env.CI,
-      env: { NTC_API_PROXY_TARGET: "http://127.0.0.1:5199" },
+      env: { API_PROXY_TARGET: "http://127.0.0.1:5199", VITE_API_BASE_URL: "/api/v1", VERCEL: "0" },
     },
   ],
 });

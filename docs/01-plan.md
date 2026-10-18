@@ -13,10 +13,14 @@
 | DEC-005 | React TS/Vite ở frontend; .NET API Render, DB Supabase PostgreSQL tương lai, React Vercel; giữ Identity | TARGET Q-008/019 | ADR-002/003; SQL Server hiện tại chưa đổi |
 | DEC-006 | Note riêng từng tài khoản; admin quản lý/khóa user và thống kê, không đọc nội dung note | TARGET Q-001/007 | Ownership, không chia sẻ/team |
 | DEC-007 | Git root NTC, một docs tại root; backend giữ ntc_aspnet | IMPLEMENTED theo yêu cầu trực tiếp 2026-10-17, nối tiếp Q-025 | Giữ HEAD/history/remote và thay đổi đang làm; cập nhật CI/Docker/scripts |
-| DEC-008 | Unified rich editor: plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; conversion cảnh báo | TARGET Q-003/020/021 | Schema version/renderer; không upload ảnh |
+| DEC-008 | Unified rich editor: plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; conversion cảnh báo | TARGET Q-003/020/021 | Schema version/renderer; bản hiện tại chưa upload ảnh, xem DEC-016 |
 | DEC-009 | Autosave + Save, trạng thái lưu rõ | TARGET Q-023 | Version/conflict/idempotency |
 | DEC-010 | Trash 7 ngày, restore/xóa hẳn sớm; reminder in-app/email có lặp, timezone user, catch-up 24 giờ | TARGET Q-005/006/024 | Jobs/retention/notifications |
 | DEC-011 | Giữ tài khoản/note cũ; UI tiếng Anh; hướng public nhỏ | TARGET Q-022/025 | Migration an toàn, nội dung UI và vận hành |
+
+## Quyết định bổ sung 2026-10-18
+
+DEC-016: chủ dự án yêu cầu chuẩn bị SUPABASE__URL/SUPABASE__SERVICE_KEY cho ảnh note tương lai; mới cấu hình dự phòng, chưa giao triển khai upload trong lượt này. Giữ private owner/bucket; không dùng ảnh public như attendance Marixa. JWT issuer/audience/TTL và Swagger/demo lấy JSON Production; BackgroundJobs true ở cả hai project. Source/template/docs cập nhật, dashboard/deploy chưa thao tác trong lượt này.
 
 ## Backlog theo thứ tự
 

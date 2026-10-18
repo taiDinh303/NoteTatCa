@@ -1,33 +1,32 @@
-# Deployment blueprint only; no resource has been created by this change.
-# Select plan/region/budget before applying. TLS terminates at Render's ingress.
+# Reference for the existing service; this file does not bind a manually created service.
+# Do not create another service or deploy automatically. See docs/CONFIGURATION-STANDARD.md.
 services:
   - type: web
-    name: notetatca-api
+    name: NoteTatCa
     runtime: docker
-    # Free demo/staging baseline; review uptime/plan before enabling reminder jobs.
     plan: free
+    region: singapore
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health/ready
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
-      - key: Database__Provider
+      - key: DATABASE__PROVIDER
         value: PostgreSQL
-      - key: BackgroundJobs__Enabled
-        value: "false"
-      - key: Swagger__Enabled
-        value: "false"
-      - key: ConnectionStrings__MyCnn
+      - key: CONNECTIONSTRINGS__MYCNN
         sync: false
-      - key: Jwtsettings__Key
+      - key: JWTSETTINGS__KEY
         sync: false
-      - key: Jwtsettings__Issuer
-        sync: false
-      - key: Jwtsettings__Audience
-        sync: false
-      - key: Cors__AllowedOrigins__0
-        sync: false
-      - key: AppSettings__ClientUrl
+      - key: CORS__ALLOWEDORIGINS__0
+        value: https://note-tat-ca.vercel.app
+      - key: APPSETTINGS__CLIENTURL
+        value: https://note-tat-ca.vercel.app
+      - key: BACKGROUNDJOBS__ENABLED
+        value: "true"
+      - key: SUPABASE__URL
+        value: https://nxqupzwqawujtgeuvvcj.supabase.co
+      # Reserved server credential; upload endpoints/bucket are not implemented yet.
+      - key: SUPABASE__SERVICE_KEY
         sync: false

@@ -26,3 +26,5 @@ The human user's current instruction takes precedence.
 - Do not recreate ntc_aspnet/docs or a nested Git repository. Use root docs/ directly.
 - Run build/test/tool commands from the root using ntc_aspnet/ project paths.
   Preserve Git history, working changes and local configuration when reorganizing files.
+
+- Configuration changes follow docs/CONFIGURATION-STANDARD.md and deploy/project.json. Keep safe Production JSON separate from local secrets; maintain configuration checks and update worklog with actual verification.

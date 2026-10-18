@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using NTC.Contract.Repositories.Entities.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+NTC.API.Configuration.StartupConfiguration.Validate(builder.Configuration, builder.Environment,
+    NTC.API.Configuration.DatabaseConfiguration.NormalizePostgres);
 // The framework's informational request logs include the raw query string.
 // Recovery links contain proof tokens; our telemetry logs only endpoint metadata.
 builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
@@ -17,6 +19,32 @@ if (!string.IsNullOrWhiteSpace(keysDirectory))
     builder.Services.AddDataProtection().SetApplicationName("NoteTatCa").PersistKeysToFileSystem(new DirectoryInfo(keysDirectory));
 builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 8 * 1024 * 1024);
 var app = builder.Build();
+NTC.API.Configuration.StartupConfiguration.ReportWarnings(app.Configuration, app.Environment, app.Logger);
+app.Services.GetService<Microsoft.Extensions.Options.IStartupValidator>()?.Validate();
+if (args.Contains("--check-config", StringComparer.Ordinal))
+{
+    Console.WriteLine("CONFIGURATION_OK: configuration validated; no database, migration, seed or email operation was performed.");
+    return;
+}
+var supabaseOperation = args.Contains("--check-supabase", StringComparer.Ordinal)
+    || args.Contains("--initialize-supabase", StringComparer.Ordinal);
+if (supabaseOperation || args.Contains("--seed-test-accounts", StringComparer.Ordinal))
+{
+    using var scope = app.Services.CreateScope();
+    var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+    NTC.API.Operations.SupabaseSetup.ValidateTarget(builder.Configuration, database);
+    if (args.Contains("--initialize-supabase", StringComparer.Ordinal))
+        await NTC.API.Operations.SupabaseSetup.InitializeAsync(database);
+    if (supabaseOperation) await NTC.API.Operations.SupabaseSetup.CheckAsync(database);
+    if (args.Contains("--seed-test-accounts", StringComparer.Ordinal))
+    {
+        if ((await database.Database.GetPendingMigrationsAsync()).Any())
+            throw new InvalidOperationException("Initialize the schema before provisioning test accounts.");
+        var count = await scope.ServiceProvider.GetRequiredService<NTC.API.Operations.DemoAccountSeeder>().SeedAsync();
+        Console.WriteLine($"Demo accounts created: {count}; total configured accounts:5. No passwords were logged.");
+    }
+    return;
+}
 if (args.Contains("--bootstrap-roles", StringComparer.Ordinal))
 {
     using var scope = app.Services.CreateScope();

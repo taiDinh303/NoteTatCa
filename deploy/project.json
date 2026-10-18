@@ -1,0 +1,14 @@
+{
+  "name": "NoteTatCa",
+  "apiProject": "ntc_aspnet/NTC.API/NTC.API.csproj",
+  "frontendDirectory": "ntc_react",
+  "apiBaseUrl": "https://notetatca.onrender.com/api/v1",
+  "clientUrl": "https://note-tat-ca.vercel.app",
+  "renderServiceId": "srv-dba6j3nbtjjs73e08dm0",
+  "vercelTeam": "kunheo-team",
+  "vercelProject": "note-tat-ca",
+  "supabaseProjectRef": "nxqupzwqawujtgeuvvcj",
+  "sessionPoolerHost": "aws-0-ap-northeast-1.pooler.supabase.com",
+  "supabaseStorage": false,
+  "reserveSupabaseStorage": true
+}

@@ -2,6 +2,7 @@
 .env
 .env.*
 **/appsettings*.json
+!ntc_aspnet/NTC.API/appsettings.Production.json
 **/bin
 **/obj
 **/.vs

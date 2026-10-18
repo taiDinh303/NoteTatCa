@@ -1,5 +1,7 @@
 # 11 — Thiết lập cloud tương lai
 
+> Quyết định mới 2026-10-18: job Production mặc định true theo chủ dự án, Storage NTC dự phòng; các đoạn jobs-off bên dưới là quy trình cũ trước quyết định này. Trạng thái/source/rollout xem [chuẩn cấu hình](CONFIGURATION-STANDARD.md).
+
 > Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.
 
 ## Hiện trạng và hướng dẫn hiện hành
@@ -29,3 +31,9 @@ Chưa có giá/plan/region cụ thể; không lấy ngân sách của dự án k
 7. Setup logs/health/backup/cảnh báo; smoke hai user/admin và restore drill trước production.
 
 Nguồn kiểm tra 2026-10-16: [Render Docker](https://render.com/docs/docker), [Background workers](https://render.com/docs/background-workers), [Cron jobs](https://render.com/docs/cronjobs), [Vite trên Vercel](https://vercel.com/docs/frameworks/frontend/vite). Uptime/sleep, quota, cron accuracy, pricing và backup retention phải kiểm ở plan thực tế lúc triển khai; chưa có evidence live account.
+
+## Project ntc được người dùng cung cấp — 2026-10-18
+
+Supabase project reference nxqupzwqawujtgeuvvcj đã kết nối trực tiếp Npgsql/VerifyFull, áp dụng3migrations/pending0 vàtạo5Identity accounts/25notes/15labels theo yêu cầu riêng. Xem [setup/giới hạn](SUPABASE-SETUP.md). Connector permission cũ không phủ định kết nối DB trực tiếp. Giữ .NET Identity, không dùng publishable key làm Npgsql password hoặc chuyển/xóa SQLServer data.
+
+Render/Vercel đã có tài nguyên từ chủ dự án vàđã lưu dashboard2026-10-18: Render NoteTatCa Free/Singapore, Vercel kunheo-team/note-tat-ca. Source Docker/CA/SPA mới chưa publish/rollout; đọc [mapping/runbook](RENDER-VERCEL-SETUP.md), không áp nguyên cấu hình Marixa hoặc bật jobs trên Free chưa review uptime.

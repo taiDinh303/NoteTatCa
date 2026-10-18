@@ -13,7 +13,13 @@ public static class DatabaseConfiguration
             Password = split.Length > 1 ? Uri.UnescapeDataString(split[1]) : "", SslMode = SslMode.Require };
         var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
         foreach (var item in query)
-            if (item.Key.Equals("sslmode", StringComparison.OrdinalIgnoreCase)) builder.SslMode = Enum.Parse<SslMode>(item.Value.ToString(), true);
+            if (item.Key.Equals("sslmode", StringComparison.OrdinalIgnoreCase))
+            {
+                // PostgreSQL URI uses verify-full/verify-ca; Npgsql enums use VerifyFull/VerifyCA.
+                if (!Enum.TryParse<SslMode>(item.Value.ToString().Replace("-", ""), true, out var mode)
+                    || !Enum.IsDefined(mode)) throw new InvalidOperationException("Unsupported PostgreSQL sslmode.");
+                builder.SslMode = mode;
+            }
             else if (item.Key.Equals("application_name", StringComparison.OrdinalIgnoreCase)) builder.ApplicationName = item.Value.ToString();
             else throw new InvalidOperationException("Unsupported PostgreSQL URI option. Use a reviewed keyword connection string.");
         return builder.ConnectionString;

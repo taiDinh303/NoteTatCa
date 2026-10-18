@@ -1,9 +1,9 @@
 name: NoteTatCa backend verification
 on:
   push:
-    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
+    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", "render.yaml", "deploy/**", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
   pull_request:
-    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
+    paths: ["ntc_aspnet/**", "docs/**", "scripts/**", "Dockerfile", "render.yaml", "deploy/**", ".dockerignore", ".config/**", ".github/workflows/backend.yml"]
   workflow_dispatch:
 permissions:
   contents: read
@@ -37,7 +37,8 @@ jobs:
       - run: dotnet build ntc_aspnet/NTC.Backend.slnf -c Release --no-restore -warnaserror
       - run: dotnet test ntc_aspnet/NTC.Tests/NTC.Tests.csproj -c Release --no-build --logger trx --results-directory TestResults
       - run: python3 scripts/verify_docs.py
-      - run: dotnet publish ntc_aspnet/NTC.API/NTC.API.csproj -c Release --no-build -o artifacts/publish
+      - run: pwsh -NoProfile -File scripts/Test-CloudEnvironmentExport.ps1
+      - run: pwsh -NoProfile -File scripts/Test-ProductionConfiguration.ps1
       - run: docker build -t notetatca-verify .
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()

@@ -33,6 +33,7 @@ Desktop.ini
 .env.*
 !.env.example
 **/appsettings.Local.json
+**/appsettings.*.Local.json
 **/.keys/
 TestResults/
 artifacts/

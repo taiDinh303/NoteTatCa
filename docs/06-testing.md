@@ -76,3 +76,9 @@ PowerShell cwd NTC: dotnet restore/build ntc_aspnet/NTC.Backend.slnf PASS, Relea
 ## React local — 2026-10-18
 
 14unit và12Chromium E2E PASS; focused conflict chạy lại sau copy/save fix PASS. Scope từng luồng/giới hạn tại [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md). Không coi SQLite E2E là Supabase/SQL Server deployment proof. Backend được chạy lại80PASS/1PostgreSQLskip,total81; TRX mới trong worklog.
+
+## Supabase provisioning và mẫu — 2026-10-18
+
+Explicit yêu cầu người dùng apply migrations và seed data: cloud project ntc đã apply3histories PostgreSQL, pending0;5Identity accounts,25notes/15labels/25owner links. Read-only transaction kiểm roles/password hashes/verified state/rich projection/counts/anon-authenticated grants PASS. HTTP thật local API→Supabase:5login, mỗi account4active notes/1trash/3labels, admin đọc note user01 trả404; thu hồi các phiên verification và dừng server kiểm tra. Đây là operator acceptance trên dữ liệu mẫu mới, không chạy regression tests vào owner DB.
+
+Regression riêng SQLite/synthetic:7DemoAccountTests PASS gồm content validation/owner graph/idempotence sau chỉnh sửa hoặc xóa mẫu, no email và account collisions. Fullsuite95PASS/0FAIL/1SKIP,total96,33s; PostgreSQL fixture test vẫn SKIP vì không cấu hình test DB biệt lập, không đổi thành owner connection. TRX artifacts/test-results/Admin_DESKTOP-DVT_2026-10-18_15_58_37.trx. Build backend Release -warnaserror0warnings/0errors PASS. Browser React→Supabase, SMTP/Google thật, deploy, restore/SQL→PG transfer NOT RUN.
