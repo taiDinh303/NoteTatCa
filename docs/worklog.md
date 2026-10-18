@@ -9,6 +9,7 @@
 - Kiểm tra lại trước commit: Release build **0 warning/0 error**; backend **111 PASS / 0 FAIL / 1 SKIP / 112 total** (PostgreSQL fixture không cấu hình; không dùng owner DB). TRX: artifacts/test-results/Admin_DESKTOP-DVT_2026-10-18_23_01_08.trx. Frontend **4 config tests + 14 Vitest PASS**, lint max-warnings0 và Production typecheck/Vite build PASS với API URL NTC/VERCEL=1.
 - Synthetic cloud exporter PowerShell5.1 PASS; clean Production publish và static checks SQL Server/PostgreSQL/invalid sanitized config PASS. Docs **48 Markdown / 176 local links / 0 errors**; diff --check PASS, chỉ có cảnh báo line ending hai file cũ. Không lặp lại E2E/Docker image build/cloud DB checks đã ghi ở các mốc trước.
 - Fetch origin/main trước publication: local/remote cùng 1fc2cda, không divergence. Sau push phải đối chiếu SHA main trên remote. Không chạy migration/seed/email thật hoặc bấm deploy; Git push có thể kích hoạt CI/hosting integration đang cấu hình, chưa xác minh rollout cloud trong tác vụ này.
+- Publication hoàn tất: commit **3ea2b8db17f287de0390977cbad0a221147c2e5f** (55 files) đã push bằng fast-forward lên origin/main; git ls-remote xác nhận main trên GitHub trùng SHA local. Entry xác nhận này được lưu bằng commit tài liệu tiếp theo; ba appsettings local vẫn ngoài commit.
 
 ## Tiếp cấu hình Marixa sau đổi tài khoản — 2026-10-18
 
