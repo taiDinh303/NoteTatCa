@@ -2,11 +2,11 @@
 
 > 2026-10-18 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
-## Chuẩn bị publish main theo yêu cầu người dùng — 2026-10-18 (CURRENT)
+## Publish main theo yêu cầu người dùng — 2026-10-18 (CURRENT)
 
 Người dùng yêu cầu push main sau khi hoàn thành React/backend/docs. Remote origin/main đã kiểm ở176a968, trùng HEAD trước commit; không cần force push. Đưa toàn bộ phạm vi đã giao lên cùng cấu trúc root NTC: ntc_aspnet, ntc_react, docs, scripts, CI và deploy assets. Các evidence14unit/12Chromium/80backend+1PGskip của đợt triển khai được giữ ở entry dưới; kiểm docs44Markdown/136links/0errors và staged whitespace PASS trước publish.
 
-Giữ nguyên byte4appsettings local qua đối chiếu SHA256; chỉ stage bản cấu hình sạch trong Git index, bỏ JWT/Google/SMTP secret, email SMTP riêng và connection string local. Ba file config có giá trị riêng sẽ còn modified ngoài commit; không reset hoặc ghi đè chúng. Snapshot index/status/worktree patch và config hashes trước stage ở .git/push-backup-20261018, không publish thư mục backup. Kiểm484indexed files:0credential-pattern findings, không có node_modules/bin/obj/artifacts/test reports/keyring trong index. Remote SHA sẽ được kiểm sau push trước khi báo thành công; entry này ghi phạm vi chuẩn bị, không tự coi push đã hoàn tất.
+Giữ nguyên byte4appsettings local qua đối chiếu SHA256; chỉ stage bản cấu hình sạch trong Git index, bỏ JWT/Google/SMTP secret, email SMTP riêng và connection string local. Ba file config có giá trị riêng sẽ còn modified ngoài commit; không reset hoặc ghi đè chúng. Snapshot index/status/worktree patch và config hashes trước stage ở .git/push-backup-20261018, không publish thư mục backup. Kiểm484indexed files:0credential-pattern findings, không có node_modules/bin/obj/artifacts/test reports/keyring trong index. Publish code PASS: commit c2f4fe178f737d8abf167868e6d5d42dc842372e đã push origin/main; git ls-remote xác nhận SHA remote trùng HEAD local. Đối chiếu4config hashes sau push PASS; chỉ3appsettings riêng còn modified local. Entry kết quả này được commit tài liệu nối tiếp; không amend/force-push lịch sử đã publish.
 
 Theo câu hỏi về việc nhớ cập nhật worklog, bổ sung quy tắc kết thúc task/commit rõ trong root AGENTS.md, bên cạnh quy tắc đã có ở docs/AGENTS.md. Phiên sau đọc AGENTS và latest worklog từ repo; không chỉ dựa vào lịch sử chat. Không deploy, chạy migration hoặc sửa dữ liệu thật trong nhiệm vụ publish.
 
