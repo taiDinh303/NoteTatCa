@@ -9,7 +9,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin,User")]
+    [Authorize(Policy = NTC.API.Configuration.AuthConfiguration.WorkspacePolicy)]
     public class TagController : NTC.API.Controllers.Shared.BaseApiController
     {
         private readonly ITagService _tagService;

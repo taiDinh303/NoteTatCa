@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
@@ -10,6 +10,7 @@ import {
   LockKeyhole,
   Pencil,
   Plus,
+  RefreshCw,
   RotateCcw,
   Search,
   ShieldCheck,
@@ -35,28 +36,19 @@ import {
   Spinner,
 } from "../../shared/ui";
 import { dateTime, initials } from "../../shared/utils";
-function AdminNav() {
-  return (
-    <nav className="settings-tabs" aria-label="Admin pages">
-      <NavLink to="/admin/overview">Overview</NavLink>
-      <NavLink to="/admin/users">Accounts</NavLink>
-      <NavLink to="/admin/roles">Roles</NavLink>
-      <NavLink to="/admin/audit">Audit trail</NavLink>
-    </nav>
-  );
-}
 export default function AdminPage({
   section,
 }: {
   section: "overview" | "users" | "roles" | "audit";
 }) {
+  const [refreshing, setRefreshing] = useState(false);
   return (
     <>
       <PageHeading
         eyebrow="ADMINISTRATION"
         title={
           section === "overview"
-            ? "Workspace overview"
+            ? "System overview"
             : section === "users"
               ? "Accounts"
               : section === "roles"
@@ -64,8 +56,27 @@ export default function AdminPage({
                 : "Audit trail"
         }
         description="Manage accounts and access. Everyone’s note content stays private."
-      />
-      <AdminNav />
+      >
+        <Button
+          variant="secondary"
+          busy={refreshing}
+          onClick={() => {
+            setRefreshing(true);
+            const resource = {
+              overview: "admin-stats",
+              users: "admin-users",
+              roles: "admin-roles",
+              audit: "admin-audit",
+            }[section];
+            void cache
+              .invalidateQueries({ queryKey: workspace.key(resource) })
+              .finally(() => setRefreshing(false));
+          }}
+        >
+          <RefreshCw size={16} />
+          Refresh
+        </Button>
+      </PageHeading>
       {section === "overview" ? (
         <Overview />
       ) : section === "users" ? (
@@ -114,6 +125,23 @@ function Overview() {
             <small>Current system total</small>
           </div>
         ))}
+      </div>
+      <div className="admin-quick-links">
+        <Link to="/admin/users">
+          <Users size={21} />
+          <strong>Manage accounts</strong>
+          <span>Create, review, lock or restore accounts.</span>
+        </Link>
+        <Link to="/admin/roles">
+          <ShieldCheck size={21} />
+          <strong>Roles & access</strong>
+          <span>Manage roles and account memberships.</span>
+        </Link>
+        <Link to="/admin/audit">
+          <Activity size={21} />
+          <strong>Review activity</strong>
+          <span>Trace administrative changes and their actors.</span>
+        </Link>
       </div>
       <div className="privacy-callout">
         <ShieldCheck size={30} />
@@ -167,6 +195,7 @@ function Accounts() {
   const [page, setPage] = useState(1);
   const [inactive, setInactive] = useState(false);
   const [create, setCreate] = useState(false);
+  const [detailsFor, setDetailsFor] = useState<Account>();
   const [rolesFor, setRolesFor] = useState<Account>();
   const [target, setTarget] = useState<{
     account: Account;
@@ -212,7 +241,12 @@ function Accounts() {
           />
           Include deactivated
         </label>
-        <Button onClick={() => setCreate(true)}>
+        <Button
+          onClick={() => {
+            setError(undefined);
+            setCreate(true);
+          }}
+        >
           <Plus size={16} />
           Create account
         </Button>
@@ -272,6 +306,11 @@ function Accounts() {
                       <ActionMenu
                         label={`Manage ${user.userName}`}
                         items={[
+                          {
+                            label: "View account details",
+                            icon: Users,
+                            action: () => setDetailsFor(user),
+                          },
                           {
                             label: "Manage roles",
                             icon: ShieldCheck,
@@ -392,6 +431,12 @@ function Accounts() {
       {rolesFor ? (
         <Memberships user={rolesFor} onClose={() => setRolesFor(undefined)} />
       ) : null}
+      {detailsFor ? (
+        <AccountDetails
+          user={detailsFor}
+          onClose={() => setDetailsFor(undefined)}
+        />
+      ) : null}
       {target ? (
         <ConfirmDialog
           title={
@@ -425,6 +470,117 @@ function Accounts() {
     </>
   );
 }
+function AccountDetails({
+  user,
+  onClose,
+}: {
+  user: Account;
+  onClose: () => void;
+}) {
+  const details = useQuery({
+    queryKey: workspace.key("admin-user", user.id),
+    queryFn: () => admin.user(user.id),
+  });
+  const memberships = useQuery({
+    queryKey: workspace.key("memberships", user.id),
+    queryFn: () => admin.memberships(user.id),
+  });
+  const account = details.data;
+  const isAdmin = memberships.data?.some((role) => role.name === "Admin");
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title="Account details"
+      description={user.email}
+    >
+      <div className="modal-body">
+        {details.isPending || memberships.isPending ? (
+          <Spinner />
+        ) : details.isError || memberships.isError ? (
+          <ErrorPanel
+            error={details.error ?? memberships.error}
+            retry={() => {
+              void details.refetch();
+              void memberships.refetch();
+            }}
+          />
+        ) : account ? (
+          <>
+            <dl className="admin-account-details">
+              <div>
+                <dt>Account ID</dt>
+                <dd>
+                  <code>{account.id}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>Username</dt>
+                <dd>{account.userName}</dd>
+              </div>
+              <div>
+                <dt>Account area</dt>
+                <dd>{isAdmin ? "Administration only" : "Personal notes"}</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  {account.deactivatedAt
+                    ? "Deactivated"
+                    : account.isLocked
+                      ? "Locked"
+                      : "Active"}
+                </dd>
+              </div>
+              <div>
+                <dt>Email</dt>
+                <dd>
+                  {account.email} ·{" "}
+                  {account.emailConfirmed ? "Verified" : "Not verified"}
+                </dd>
+              </div>
+              <div>
+                <dt>Phone</dt>
+                <dd>{account.phoneNumber || "Not provided"}</dd>
+              </div>
+              <div>
+                <dt>Timezone</dt>
+                <dd>{account.timeZoneId}</dd>
+              </div>
+              <div>
+                <dt>Password sign-in</dt>
+                <dd>{account.hasPassword ? "Available" : "Not set"}</dd>
+              </div>
+              <div>
+                <dt>Created</dt>
+                <dd>{dateTime(account.createdTime)}</dd>
+              </div>
+              <div>
+                <dt>Roles</dt>
+                <dd>
+                  {memberships.data?.map((role) => role.name).join(", ") ||
+                    "No assigned roles"}
+                </dd>
+              </div>
+            </dl>
+            <Link
+              className="button secondary"
+              to={`/admin/audit?targetUserId=${encodeURIComponent(account.id)}`}
+              onClick={onClose}
+            >
+              View account activity
+            </Link>
+          </>
+        ) : null}
+      </div>
+      <div className="modal-footer">
+        <Button variant="secondary" onClick={onClose}>
+          Done
+        </Button>
+      </div>
+    </Modal>
+  );
+}
 function Memberships({
   user,
   onClose,
@@ -452,6 +608,10 @@ function Memberships({
       description={user.email}
     >
       <div className="modal-body">
+        <p className="field-hint">
+          Admin accounts use administration only, even if User is also assigned.
+          Role changes end the account’s active sessions.
+        </p>
         <ErrorBanner error={error} />
         {roles.isPending || memberships.isPending ? (
           <Spinner />
@@ -488,6 +648,14 @@ function Memberships({
                         .membership(user.id, role.id, !active)
                         .then(async () => {
                           await memberships.refetch();
+                          await Promise.all([
+                            cache.invalidateQueries({
+                              queryKey: workspace.key("admin-audit"),
+                            }),
+                            cache.invalidateQueries({
+                              queryKey: workspace.key("admin-users"),
+                            }),
+                          ]);
                           toast.success("Role membership updated");
                         })
                         .catch(setError)
@@ -678,10 +846,11 @@ const auditActions = [
   "Account restored",
 ];
 function Audit() {
+  const [params, setParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [action, setAction] = useState(0);
-  const [target, setTarget] = useState("");
-  const [targetInput, setTargetInput] = useState("");
+  const target = params.get("targetUserId") ?? "";
+  const [targetInput, setTargetInput] = useState(target);
   const query = useQuery({
     queryKey: workspace.key("admin-audit", page, target, action),
     queryFn: () => admin.audit(page, target || undefined, action || undefined),
@@ -693,7 +862,11 @@ function Audit() {
           className="table-search"
           onSubmit={(e) => {
             e.preventDefault();
-            setTarget(targetInput.trim());
+            const next = new URLSearchParams(params);
+            if (targetInput.trim())
+              next.set("targetUserId", targetInput.trim());
+            else next.delete("targetUserId");
+            setParams(next);
             setPage(1);
           }}
         >
@@ -701,10 +874,23 @@ function Audit() {
           <input
             aria-label="Filter target account ID"
             placeholder="Target account ID…"
+            pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+            title="Enter a complete account ID (UUID)."
             value={targetInput}
             onChange={(e) => setTargetInput(e.target.value)}
           />
         </form>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setParams({});
+            setTargetInput("");
+            setAction(0);
+            setPage(1);
+          }}
+        >
+          Clear filters
+        </Button>
         <select
           aria-label="Audit action filter"
           value={action}

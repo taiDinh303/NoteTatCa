@@ -407,6 +407,84 @@ strong {
 .app-shell {
   min-height: 100dvh;
 }
+.admin-topbar {
+  justify-content: space-between;
+}
+.admin-console-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  min-width: 0;
+}
+.admin-identity .workspace-glyph {
+  background: var(--canvas);
+  color: var(--text);
+}
+.admin-sidebar-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.admin-quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.admin-quick-links > a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.admin-quick-links > a:hover {
+  border-color: var(--muted);
+}
+.admin-quick-links span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.admin-account-details {
+  margin: 0 0 24px;
+}
+.admin-account-details > div {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) minmax(0, 2fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.admin-account-details dt {
+  color: var(--muted);
+}
+.admin-account-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .admin-console-title {
+    font-size: 12px;
+    gap: 6px;
+  }
+  .admin-console-title svg {
+    width: 16px;
+  }
+  .admin-topbar {
+    gap: 8px;
+  }
+}
 .sidebar {
   width: 242px;
   position: fixed;

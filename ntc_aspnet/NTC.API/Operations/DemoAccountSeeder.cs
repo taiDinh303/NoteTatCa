@@ -58,8 +58,7 @@ public sealed class DemoAccountSeeder(DatabaseContext database, UserManager<Appl
                 EmailConfirmed = true, CreatedBy = Marker, TimeZoneId = "Asia/Ho_Chi_Minh" };
             Require(await users.CreateAsync(user, password));
             Require(await users.AddClaimAsync(user, new Claim("ntc:demo-seed", Marker)));
-            Require(await users.AddToRoleAsync(user, "User"));
-            if (admin) Require(await users.AddToRoleAsync(user, "Admin"));
+            Require(await users.AddToRoleAsync(user, admin ? "Admin" : "User"));
             database.UserInfos.Add(new() { Id = user.Id, GivenName = admin ? "Demo Admin" : "Demo User",
                 FamilyName = admin ? null : email.Substring(4, 2), Locale = "en", CreatedBy = Marker });
             database.AdministrativeAuditEvents.Add(new() { TargetUserId = user.Id, Action = AdministrativeAction.AccountCreated });
@@ -75,6 +74,8 @@ public sealed class DemoAccountSeeder(DatabaseContext database, UserManager<Appl
 
     private async Task SeedNotesAsync(ApplicationUser user)
     {
+        // Preserve old administrator content, but never create more personal content for admins.
+        if (await users.IsInRoleAsync(user, "Admin")) return;
         const string contentMarker = "ntc-demo-notes-v1";
         if ((await users.GetClaimsAsync(user)).Any(x => x.Type == "ntc:demo-content" && x.Value == contentMarker)) return;
         DemoNotes.Add(database, user.Id, clock.GetUtcNow());

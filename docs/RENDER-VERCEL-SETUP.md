@@ -1,6 +1,6 @@
 # Render và Vercel — cấu hình NoteTatCa
 
-> 2026-10-18 | CURRENT: dashboard đã lưu; source Docker/CA/SPA mới chưa push/deploy. Save only không phải rollout thành công.
+> 2026-10-18 | CURRENT: commit 1e427ba đã Live trên Render sau khi sửa MyCnn thành VerifyFull/CA Linux; health live/ready200 và CORS frontend204. Các snapshot dashboard cũ bên dưới được giữ làm lịch sử; chi tiết hiện hành xem worklog.
 
 ## Tài nguyên đã đối chiếu trực tiếp
 
@@ -51,6 +51,16 @@ Dashboard đã có đúng Vite/root ntc_react/Node24.x; giữ mặc định fram
 [Dockerfile](../Dockerfile) copy7API projects với restore layer cache; .dockerignore chỉ nhận appsettings.Production.json đã review, loại JSON local/base/Development và env/artifacts/private files. Runtime nonroot, Production, listen PORT hoặc8080. [Public CA](../deploy/certificates/supabase-prod-ca-2021.crt) được copy đến đường dẫn Linux trong MyCnn, không dùng đường dẫn Windows của máy local.
 
 Nguồn CA: https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt. Supabase Root2021CA, hạn2031-04-26; DER SHA256807025AD50D4ED219D2C9C7D299C004F824EB00CF7F65AFEF607D07B72E6CAFA; PEM file SHA256700723581420DD1AC98FD7E9AC529F0EF210EADCAF87FC868A3AD7D114C2F3B7. Không nhầm hai kiểu hash. Đây là CA public, không phải private key. Giữ VerifyFull, không tắt kiểm chứng.
+
+## Lỗi startup yêu cầu VerifyFull
+
+Log Render 2026-10-18T16:30:42Z của commit 1e427ba báo `CONFIGURATION_INVALID` / `CONNECTIONSTRINGS__MYCNN must use SSL Mode=VerifyFull for Supabase in Production`. Image build thành công; lỗi xảy ra ở bước kiểm cấu hình trước khi mở DB, không phải migration hoặc Vercel. Cấu hình đã lưu ở dashboard có thể khác private export trên máy; không suy ra giá trị đang chạy từ file export.
+
+Đã sửa trực tiếp biến MyCnn trên service NTC sau khi user đổi tài khoản: URI sslmode=require được chuyển thành keyword VerifyFull/CA Linux, giữ password cloud. Deployment [dep-dbafergm7kps738lf0h0](https://dashboard.render.com/web/srv-dba6j3nbtjjs73e08dm0/deploys/dep-dbafergm7kps738lf0h0) báo Live; GET live/ready200 và preflight từ frontend204. Đây là kết quả xử lý sự cố này; các trạng thái chưa rollout phía dưới là snapshot trước đó.
+
+Mở đúng [Environment của NTC](https://dashboard.render.com/web/srv-dba6j3nbtjjs73e08dm0/env), sửa biến hiện có `CONNECTIONSTRINGS__MYCNN`: dùng keyword Npgsql, giữ đúng host/user/database/password đang có và đặt `SSL Mode=VerifyFull;Root Certificate=/app/certificates/supabase-prod-ca-2021.crt`. Với URI cũ, chuyển sang keyword syntax để khai báo CA rõ ràng; phải decode password từ URI một lần, không dán password còn percent-encoded vào keyword syntax. Không tạo biến trùng khác casing, không thay password bằng placeholder hoặc lấy credential Marixa.
+
+CA public đã có trong image mới. Giữ xác minh chứng chỉ/hostname, không sửa validator để chấp nhận Require/Disable. Save only lưu cấu hình nhưng chưa kiểm runtime; khi được giao triển khai, deploy lại và kiểm `/health/live`, `/health/ready` cùng log. Không tự apply migrations/seed để chữa lỗi cấu hình TLS. Trạng thái sửa dashboard thực tế xem entry mới nhất trong worklog.
 
 ## Xuất file private cho lần sau
 

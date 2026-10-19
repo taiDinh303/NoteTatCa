@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { api, auth } from "../../app/runtime";
+import { homePath } from "../../application/access";
 import { useAuth } from "../../shared/hooks";
 import { Button, ErrorBanner, Field, Logo, Spinner } from "../../shared/ui";
 import { GoogleButton } from "./GoogleButton";
@@ -92,7 +93,7 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
   );
 }
 const copy: Record<Mode, [string, string]> = {
-  login: ["Welcome back.", "Your ideas are right where you left them."],
+  login: ["Welcome back.", "Sign in to continue to your account."],
   register: [
     "Make room for your ideas.",
     "Create your private space. It starts with one note.",
@@ -163,7 +164,8 @@ export default function AuthPage({ mode }: { mode: Mode }) {
       .catch(setError)
       .finally(() => setBusy(false));
   }, [mode, navigate, params]);
-  const done = () => navigate("/notes", { replace: true });
+  const done = () =>
+    navigate(homePath(auth.getSnapshot().session), { replace: true });
   async function sendCode() {
     setCodeBusy(true);
     setError(undefined);
@@ -256,6 +258,8 @@ export default function AuthPage({ mode }: { mode: Mode }) {
       setBusy(false);
     }
   }
+  if (mode === "login" && state.status === "authenticated")
+    return <Navigate to={homePath(state.session)} replace />;
   return (
     <div className="auth-page">
       <section className="auth-main">

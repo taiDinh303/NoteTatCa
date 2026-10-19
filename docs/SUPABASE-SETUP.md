@@ -2,6 +2,8 @@
 
 > 2026-10-18 | CURRENT: Supabase đã áp dụng đủ3EF migrations, pending0; đã tạo5Identity accounts,25notes và15labels. Kết nối VerifyFull giữ CA local; chi tiết bằng chứng ở worklog.
 
+Thay đổi source 2026-10-19/DEC-017: seed mới tạo admin chỉ role Admin, không note/label mẫu; bốn User có tổng20notes/12labels. Dữ liệu live25notes/15labels phía trên là mốc provisioning cũ, không tự xóa/sửa. Admin+User cũ vẫn chỉ vào quản trị nhờ policy mới; chạy lại seed không xóa role/note cũ hoặc bổ sung note admin. Chưa apply thay đổi này vào cloud trong tác vụ tách admin.
+
 ## Project và kiến trúc
 
 Organization kunheo, project ntc, reference nxqupzwqawujtgeuvvcj; URL https://nxqupzwqawujtgeuvvcj.supabase.co theo người dùng cung cấp. Giữ .NET Identity, API .NET truy cập PostgreSQL bằng Npgsql; không chuyển auth sang Supabase Auth, không dùng publishable key cho DB connection. Publishable key người dùng cung cấp không cần đưa vào React cho kiến trúc này.

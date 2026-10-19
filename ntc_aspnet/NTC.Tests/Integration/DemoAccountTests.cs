@@ -33,7 +33,7 @@ public sealed class DemoAccountTests
             var session = await ApiFactory.Data(await client.PostAsJsonAsync("/api/v1/auth/login", new { email, password = Password }));
             var roles = session.GetProperty("roles").EnumerateArray().Select(x => x.GetString()).ToArray();
             Assert.Equal(email.StartsWith("admin@"), roles.Contains("Admin"));
-            Assert.Contains("User", roles);
+            Assert.Equal(!email.StartsWith("admin@"), roles.Contains("User"));
         }
         using var a = factory.CreateClient(); using var b = factory.CreateClient();
         async Task SignIn(HttpClient target, string email)
@@ -43,7 +43,7 @@ public sealed class DemoAccountTests
         }
         await SignIn(a, DemoAccountSeeder.Emails[1]); await SignIn(b, DemoAccountSeeder.Emails[0]);
         var note = await ApiFactory.Note(a);
-        Assert.Equal(System.Net.HttpStatusCode.NotFound, (await b.GetAsync("/api/v1/notes/" + note.GetProperty("id").GetGuid())).StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, (await b.GetAsync("/api/v1/notes/" + note.GetProperty("id").GetGuid())).StatusCode);
         Assert.Empty(factory.Email.Messages);
     }
 
@@ -61,8 +61,10 @@ public sealed class DemoAccountTests
         Assert.Contains(notes, x => x.Title == "");
         foreach (var note in notes)
             Assert.Equal(note.Content, NTC.Services.Notes.ContentRules.PlainText(note.DocumentJson, note.Content));
-        Assert.Equal(15, await db.Tags.CountAsync());
-        Assert.Equal(25, await db.NoteTags.CountAsync());
+        Assert.Equal(12, await db.Tags.CountAsync());
+        Assert.Equal(20, await db.NoteTags.CountAsync());
+        var admin = (await services.GetRequiredService<UserManager<ApplicationUser>>().FindByEmailAsync(DemoAccountSeeder.Emails[0]))!.Id;
+        Assert.False(await db.Notes.AnyAsync(x => x.UserId == admin));
         Assert.All(await db.NoteTags.Include(x => x.Note).Include(x => x.Tag).ToListAsync(),
             link => { Assert.Equal(link.UserId, link.Note.UserId); Assert.Equal(link.UserId, link.Tag.UserId); });
         var edited = notes.Single(x => x.IsPinned); edited.Title = "My own title";

@@ -101,7 +101,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Supabase operation failed. Check database password, TLS certificate and network; no success was recorded.' }
         if ($SeedTestAccounts) {
             $taskAccounts = @('admin@ntc.example.test','user01@ntc.example.test','user02@ntc.example.test','user03@ntc.example.test','user04@ntc.example.test') | ForEach-Object {
-                [ordered]@{ Email=$_; Role=$(if ($_ -like 'admin@*') {'Admin + User'} else {'User'}); Password=$taskSettings.DemoAccounts.Password }
+                [ordered]@{ Email=$_; Role=$(if ($_ -like 'admin@*') {'Admin'} else {'User'}); Password=$taskSettings.DemoAccounts.Password }
             }
             $taskOutputDirectory = Join-Path $taskRoot 'artifacts/supabase'
             [IO.Directory]::CreateDirectory($taskOutputDirectory) | Out-Null

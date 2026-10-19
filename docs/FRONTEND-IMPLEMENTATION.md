@@ -4,6 +4,14 @@
 
 ## Phạm vi và kiến trúc
 
+### Khu quản trị độc lập — 2026-10-19
+
+Theo DEC-017, `/login` dùng chung; `homePath` chọn `/admin/overview` khi có role Admin, còn lại `/notes`. Admin+User lịch sử vẫn là quản trị. Router có hai layout/guards riêng: AdminShell chỉ tải metadata account/admin modules, AppShell chỉ dành non-Admin. Direct links `/notes`, `/trash`, `/labels/*`, `/reminders`, `/notifications` của admin chuyển về overview; non-admin vào `/admin/*` chuyển về notes. `/admin` có index, deep-link reload dùng session refresh; `/settings/*` cũ của admin chuyển sang `/admin/settings/*` giữ query.
+
+Admin có overview/tổng hợp + shortcuts, accounts tìm kiếm/phân trang/create/detail/lock/unlock/deactivate/restore, role/membership CRUD theo API, audit filter/action/target link, hồ sơ/bảo mật/phiên tại `/admin/settings/{profile,account,sessions}`. Không có sidebar nhãn, tìm note, inbox, nút tạo note hay polling dữ liệu cá nhân trong AdminShell. Layout mobile có drawer riêng, dark theme/account menu/reauth dialog dùng thành phần chung. Admin không thể tự khóa/deactivate hoặc bỏ role Admin của mình; built-in roles/audit giữ bảo vệ phía API.
+
+Khi cùng user thay đổi nhóm Admin/non-Admin qua login/refresh, AuthService clear cache và đổi request identity để bỏ response cũ đang bay; quyền server vẫn đọc role hiện tại từ DB mỗi request. Frontend guard không thay authorization: API workspace v1/legacy áp dụng CustomerWorkspace policy, từ chối Admin403 kể cả có thêm User; self profile/security/sessions và admin metadata vẫn dùng được. Dữ liệu note cũ được bảo toàn, chưa triển khai lên cloud trong tác vụ này. Kết quả kiểm mới ghi trong worklog.
+
 User chỉ đường dẫn Razor cũ NoteTatCa/NTC.VIEW; thư mục đã được user đổi tên nên nguồn thực tế ntc_aspnet/NTC.VIEW. Giữ toàn bộ Razor, local config và database thật. React tại ntc_react theo yêu cầu mới, thay hướng NTC/ntc_react cũ. UI English. Không deploy, commit/push hoặc tự migrate dữ liệu thật.
 
 React/TypeScript/Vite; React Router SPA; TanStack Query cache theo user, invalidation có mục tiêu; Tiptap schema tương thích backend; dnd-kit pointer/keyboard; Radix dialogs/menu. Domain model/types → HTTP repositories → application services → hooks/components/pages. Class/OOP cho session store, API client, repositories và autosave coordinator; React function components/hooks cho rendering, không dùng inheritance để chia sẻ UI.

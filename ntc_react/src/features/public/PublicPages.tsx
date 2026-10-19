@@ -12,10 +12,12 @@ import {
   Tag,
 } from "lucide-react";
 import { useAuth } from "../../shared/hooks";
+import { homePath } from "../../application/access";
 import { Logo, Spinner } from "../../shared/ui";
 export function Landing() {
   const auth = useAuth();
-  if (auth.status === "authenticated") return <Navigate to="/notes" replace />;
+  if (auth.status === "authenticated")
+    return <Navigate to={homePath(auth.session)} replace />;
   if (auth.status === "loading") return <Spinner label="Opening your space…" />;
   return (
     <div className="landing">
@@ -208,8 +210,8 @@ export function Privacy() {
         applicable privacy notice before a public release. This page describes
         current app behavior and does not replace that notice.
       </p>
-      <Link className="button secondary" to="/notes">
-        Back to your space
+      <Link className="button secondary" to="/">
+        Back to the app
       </Link>
     </main>
   );
@@ -220,9 +222,9 @@ export function NotFound() {
       <Logo />
       <span className="eyebrow">404 · A LITTLE LOST</span>
       <h1>This page wandered off.</h1>
-      <p>Your ideas are still right where you left them.</p>
-      <Link className="button primary" to="/notes">
-        Back to notes
+      <p>Check the address or return to your account.</p>
+      <Link className="button primary" to="/">
+        Back to the app
       </Link>
     </main>
   );

@@ -218,6 +218,9 @@ export class InboxRepository {
 }
 export class AdminRepository {
   constructor(readonly api: ApiClient) {}
+  user(id: string) {
+    return this.api.request<Account>(`/admin/users/${id}`);
+  }
   users(pageNumber = 1, q = "", includeDeactivated = false) {
     return this.api.request<Page<Account>>(
       "/admin/users" +

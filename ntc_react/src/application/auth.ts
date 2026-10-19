@@ -1,5 +1,6 @@
 import type { Session } from "../domain/models";
 import { ApiClient } from "../infrastructure/http";
+import { isAdministrator } from "./access";
 export interface SessionStoragePort {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
@@ -96,10 +97,17 @@ export class AuthService {
       : undefined;
   }
   identity() {
-    return this.snapshot.session?.userId;
+    const session = this.snapshot.session;
+    return session
+      ? `${session.userId}:${isAdministrator(session) ? "admin" : "member"}`
+      : undefined;
   }
   private accept(session: Session) {
-    if (this.snapshot.session?.userId !== session.userId) this.clearPrivate();
+    if (
+      this.snapshot.session?.userId !== session.userId ||
+      isAdministrator(this.snapshot.session) !== isAdministrator(session)
+    )
+      this.clearPrivate();
     this.vault.write(session);
     this.emit({ status: "authenticated", session });
   }

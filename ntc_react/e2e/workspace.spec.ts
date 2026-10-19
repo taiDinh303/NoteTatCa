@@ -9,7 +9,10 @@ async function login(page: Page, email = "a@example.test") {
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Your notes", exact: true }),
+    page.getByRole("heading", {
+      name: email === "admin@example.test" ? "System overview" : "Your notes",
+      exact: true,
+    }),
   ).toBeVisible();
 }
 async function createNote(
@@ -399,6 +402,266 @@ test("admin can manage accounts and roles without note content access", async ({
     .click();
   await expect(
     page.getByRole("cell", { name: "Account locked", exact: true }),
+  ).toBeVisible();
+});
+
+test("administrator has a separate responsive area with no personal workspace requests", async ({
+  page,
+}) => {
+  const personalRequests: string[] = [];
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("request", (request) => {
+    if (
+      /\/api\/v1\/(notes|tags|reminders|notifications)(?:[/?]|$)/.test(
+        request.url(),
+      )
+    )
+      personalRequests.push(request.url());
+  });
+  // The isolated fixture administrator deliberately has both Admin and User.
+  await login(page, "admin@example.test");
+  await expect(page).toHaveURL(/\/admin\/overview$/);
+  await expect(
+    page.getByRole("navigation", { name: "Administration", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "New note", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByLabel("Search your notes", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("navigation", { name: "Labels", exact: true }),
+  ).toHaveCount(0);
+  await page.evaluate(() => {
+    (window as Window & { fixtureMarker?: string }).fixtureMarker = "admin-spa";
+  });
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Accounts", exact: true })
+    .click();
+  expect(
+    await page.evaluate(
+      () => (window as Window & { fixtureMarker?: string }).fixtureMarker,
+    ),
+  ).toBe("admin-spa");
+  for (const path of [
+    "/notes",
+    "/trash",
+    "/reminders",
+    "/notifications",
+    "/labels/synthetic",
+  ]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/admin\/overview$/);
+    await expect(
+      page.getByRole("heading", { name: "System overview", exact: true }),
+    ).toBeVisible();
+  }
+  await page.goto("/settings/account?edit=password");
+  await expect(page).toHaveURL(/\/admin\/settings\/account\?edit=password$/);
+  await expect(
+    page.getByRole("heading", { name: "Settings", exact: true }),
+  ).toBeVisible();
+  await page.goto("/login");
+  await expect(page).toHaveURL(/\/admin\/overview$/);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "System overview", exact: true }),
+  ).toBeVisible();
+  await mkdir("../artifacts/frontend", { recursive: true });
+  await page.screenshot({
+    path: "../artifacts/frontend/admin-desktop.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+  await page.screenshot({
+    path: "../artifacts/frontend/admin-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  const drawer = page.getByRole("dialog", {
+    name: "Administration navigation",
+    exact: true,
+  });
+  await drawer.getByRole("link", { name: "Accounts", exact: true }).click();
+  await expect(drawer).not.toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Accounts", exact: true }),
+  ).toBeVisible();
+  expect(personalRequests).toEqual([]);
+  expect(errors).toEqual([]);
+});
+
+test("admin completes account lifecycle, details, memberships and custom role maintenance", async ({
+  page,
+}) => {
+  await login(page, "admin@example.test");
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Accounts", exact: true })
+    .click();
+  for (const [email, roleName] of [
+    ["new-user@example.test", "User"],
+    ["new-admin@example.test", "Admin"],
+  ]) {
+    await page
+      .getByRole("button", { name: "Create account", exact: true })
+      .click();
+    const modal = page.getByRole("dialog", {
+      name: "Create account",
+      exact: true,
+    });
+    await modal.getByLabel("Email", { exact: true }).fill(email);
+    await modal
+      .getByLabel("Temporary password", { exact: true })
+      .fill(password);
+    await modal
+      .getByLabel("Initial role", { exact: true })
+      .selectOption(roleName);
+    await modal
+      .getByRole("button", { name: "Create account", exact: true })
+      .click();
+    await expect(modal).not.toBeVisible();
+  }
+  await page
+    .getByRole("button", { name: "Manage new-admin@example.test", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "View account details", exact: true })
+    .click();
+  const details = page.getByRole("dialog", {
+    name: "Account details",
+    exact: true,
+  });
+  await expect(
+    details.getByText("Administration only", { exact: true }),
+  ).toBeVisible();
+  await details
+    .getByRole("link", { name: "View account activity", exact: true })
+    .click();
+  await expect(
+    page.getByRole("cell", { name: "Account created", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Accounts", exact: true })
+    .click();
+  for (const [action, title] of [
+    ["Lock account", "Lock this account?"],
+    ["Unlock account", "Unlock this account?"],
+    ["Deactivate account", "Deactivate this account?"],
+  ]) {
+    await page
+      .getByRole("button", {
+        name: "Manage new-user@example.test",
+        exact: true,
+      })
+      .click();
+    await page.getByRole("menuitem", { name: action, exact: true }).click();
+    const confirm = page.getByRole("dialog", { name: title, exact: true });
+    await confirm.getByRole("button", { name: "Confirm", exact: true }).click();
+    await expect(confirm).not.toBeVisible();
+  }
+  await expect(
+    page.getByRole("button", {
+      name: "Manage new-user@example.test",
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page.getByLabel("Include deactivated", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Manage new-user@example.test", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Restore account", exact: true })
+    .click();
+  const restore = page.getByRole("dialog", {
+    name: "Restore this account?",
+    exact: true,
+  });
+  await restore.getByRole("button", { name: "Confirm", exact: true }).click();
+  await expect(restore).not.toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Roles", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Create role", exact: true }).click();
+  const role = page.getByRole("dialog", { name: "Create role", exact: true });
+  await role.getByLabel("Role name", { exact: true }).fill("AccountReviewer");
+  await role.getByRole("button", { name: "Save role", exact: true }).click();
+  await expect(role).not.toBeVisible();
+  const roleCard = page
+    .getByRole("article")
+    .filter({
+      has: page.getByRole("heading", { name: "AccountReviewer", exact: true }),
+    });
+  await roleCard.getByRole("button", { name: "Edit", exact: true }).click();
+  const edit = page.getByRole("dialog", { name: "Edit role", exact: true });
+  await edit
+    .getByLabel("Description", { exact: true })
+    .fill("Review account metadata");
+  await edit.getByRole("button", { name: "Save role", exact: true }).click();
+  await expect(edit).not.toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Accounts", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Manage new-user@example.test", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Manage roles", exact: true })
+    .click();
+  const memberships = page.getByRole("dialog", {
+    name: "Account roles",
+    exact: true,
+  });
+  const checkbox = memberships.getByRole("checkbox", {
+    name: /AccountReviewer/,
+  });
+  await checkbox.click();
+  await expect(checkbox).toBeEnabled();
+  await expect(checkbox).toBeChecked();
+  await checkbox.click();
+  await expect(checkbox).toBeEnabled();
+  await expect(checkbox).not.toBeChecked();
+  await memberships.getByRole("button", { name: "Done", exact: true }).click();
+  await page
+    .getByRole("navigation", { name: "Administration", exact: true })
+    .getByRole("link", { name: "Roles", exact: true })
+    .click();
+  await roleCard.getByRole("button", { name: "Delete", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Delete this role?", exact: true })
+    .getByRole("button", { name: "Delete role", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "AccountReviewer", exact: true }),
+  ).toHaveCount(0);
+});
+
+test("ordinary accounts cannot open the administration area", async ({
+  page,
+}) => {
+  await login(page);
+  await expect(
+    page.getByRole("navigation", { name: "Administration", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/admin/users");
+  await expect(page).toHaveURL(/\/notes$/);
+  await expect(
+    page.getByRole("heading", { name: "Your notes", exact: true }),
   ).toBeVisible();
 });
 

@@ -2,6 +2,8 @@
 
 English SPA for the .NET 8 API in `../ntc_aspnet`. Retained Razor remains unchanged. The maintained project specification is [root docs](../docs/FRONTEND-IMPLEMENTATION.md).
 
+One login serves two separate areas. Administrators open `/admin/overview` with accounts, roles, audit, statistics and their own profile/security/session settings. The Admin role takes precedence over User; administrators have no personal notes workspace, labels, reminders or inbox. Ordinary accounts use `/notes`. Matching API policies enforce this boundary; update the backend alongside this frontend. Existing data is retained.
+
 ## Run locally
 
 Node.js 24 and .NET 8 SDK are used for verification. From repository root in PowerShell:

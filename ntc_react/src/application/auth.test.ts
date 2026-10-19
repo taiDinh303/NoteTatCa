@@ -37,6 +37,39 @@ const ok = (data: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 describe("session security", () => {
+  it("clears private caches and rejects in-flight responses when the same account changes area", async () => {
+    let roles = ["User"];
+    let release!: (response: Response) => void;
+    const transport = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).endsWith("/notes"))
+        return new Promise<Response>((resolve) => {
+          release = resolve;
+        });
+      return ok({ ...session(), roles });
+    });
+    const clearPrivate = vi.fn();
+    const api = new ApiClient("/api/v1", transport);
+    const auth = new AuthService(
+      api,
+      new SessionVault(storage()),
+      clearPrivate,
+    );
+    api.setAuth(auth);
+    await auth.login("a@example.test", "synthetic");
+    clearPrivate.mockClear();
+    const pending = api.request("/notes");
+    roles = ["Admin", "User"];
+    await auth.refresh();
+    expect(clearPrivate).toHaveBeenCalledOnce();
+    release(ok({ content: "old personal response" }));
+    await expect(pending).rejects.toMatchObject({ code: "SESSION_CHANGED" });
+    clearPrivate.mockClear();
+    await auth.refresh();
+    expect(clearPrivate).not.toHaveBeenCalled();
+    roles = ["User"];
+    await auth.refresh();
+    expect(clearPrivate).toHaveBeenCalledOnce();
+  });
   it("stores only a versioned refresh session, never the access token or private cache", () => {
     const port = storage();
     const vault = new SessionVault(port);

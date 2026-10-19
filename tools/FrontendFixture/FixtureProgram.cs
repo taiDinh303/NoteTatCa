@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using NTC.Contract.Repositories.Entities;
 using NTC.Repositories.Context;
 using NTC.Tests.Infrastructure;
 
@@ -66,6 +68,14 @@ public static class FixtureProgram
     }
     private static async Task SeedAsync(ApiFactory factory)
     {
+        // Exercise historical mixed-role accounts without touching a live database.
+        using (var scope = factory.Services.CreateScope())
+        {
+            var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var administrator = await users.FindByIdAsync(factory.Admin.ToString());
+            if (!(await users.AddToRoleAsync(administrator!, "User")).Succeeded)
+                throw new InvalidOperationException("Synthetic administrator setup failed.");
+        }
         var (client, _) = await factory.LoginAsync(); using var authenticated = client;
         var labels = new List<Guid>();
         foreach (var label in new[] { ("Personal", "#8eaa95"), ("Ideas", "#be9bd2"), ("Work", "#8eabc1") })

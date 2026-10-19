@@ -10,6 +10,7 @@ using NTC.Repositories.Context;
 namespace NTC.API.Configuration;
 public static class AuthConfiguration
 {
+    public const string WorkspacePolicy = "CustomerWorkspace";
     public static void AddIdentityAndBearer(this IServiceCollection services)
     {
         services.AddIdentityCore<ApplicationUser>(options =>
@@ -65,6 +66,12 @@ public static class AuthConfiguration
                 }
             };
         }).ValidateOnStart();
-        services.AddAuthorization(options => options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+        services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+            // Existing accounts may have both Admin and User. Admin always remains administration-only.
+            options.AddPolicy(WorkspacePolicy, policy => policy.RequireAuthenticatedUser()
+                .RequireAssertion(context => !context.User.IsInRole("Admin")));
+        });
     }
 }

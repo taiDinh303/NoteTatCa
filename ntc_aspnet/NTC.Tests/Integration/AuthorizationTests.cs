@@ -20,13 +20,16 @@ public sealed class AuthorizationTests
         foreach (var email in new[] { "b@example.test", "admin@example.test" })
         {
             var (other, _) = await f.LoginAsync(email); using var c = other;
+            var denied = email.StartsWith("admin@") ? HttpStatusCode.Forbidden : HttpStatusCode.NotFound;
             foreach (var path in new[] { $"/api/note/get-by-id/{id}", $"/api/v1/notes/{id}" })
-                Assert.Equal(HttpStatusCode.NotFound, (await c.GetAsync(path)).StatusCode);
-            Assert.Equal(HttpStatusCode.NotFound, (await c.PutAsJsonAsync("/api/note/update", new { id, title = "Stolen", content = "changed" })).StatusCode);
+                Assert.Equal(denied, (await c.GetAsync(path)).StatusCode);
+            Assert.Equal(denied, (await c.PutAsJsonAsync("/api/note/update", new { id, title = "Stolen", content = "changed" })).StatusCode);
             foreach (var operation in new[] { "soft-delete", "restore", "delete" })
-                Assert.Equal(HttpStatusCode.NotFound, (await c.DeleteAsync($"/api/note/{operation}/{id}")).StatusCode);
-            Assert.Equal(HttpStatusCode.NotFound, (await c.PostAsync($"/api/v1/notes/{id}/trash", null)).StatusCode);
-            Assert.Empty((await ApiFactory.Data(await c.GetAsync("/api/v1/notes"))).GetProperty("items").EnumerateArray());
+                Assert.Equal(denied, (await c.DeleteAsync($"/api/note/{operation}/{id}")).StatusCode);
+            Assert.Equal(denied, (await c.PostAsync($"/api/v1/notes/{id}/trash", null)).StatusCode);
+            if (denied == HttpStatusCode.Forbidden)
+                Assert.Equal(HttpStatusCode.Forbidden, (await c.GetAsync("/api/v1/notes")).StatusCode);
+            else Assert.Empty((await ApiFactory.Data(await c.GetAsync("/api/v1/notes"))).GetProperty("items").EnumerateArray());
         }
         Assert.Equal("Private synthetic note", (await ApiFactory.Data(await a.GetAsync($"/api/v1/notes/{id}"))).GetProperty("content").GetString());
     }

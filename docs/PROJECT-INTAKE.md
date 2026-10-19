@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-19: chủ dự án chốt admin là tài khoản quản trị riêng, không dùng chức năng tạo/quản lý ghi chú như khách. Dùng chung login, tự điều hướng theo role; khu admin đầy đủ quản trị account/role/access/statistics/audit và bảo mật account của chính admin. Quyền Admin ưu tiên với dữ liệu role lịch sử hỗn hợp; không sửa account/note cloud tự động. Quyết định DEC-017 ở01-plan; privacy nội dung note vẫn giữ.
+
 TARGET đã chốt: docs trước rồi hoàn thiện backend (giao 2026-10-17); giữ Razor và định hướng React. Backend source đã triển khai, evidence tại06/worklog.
 
 TARGET bản đầu đã chốt: nhiều user, note riêng; email/mật khẩu + Google và xác minh email; nhãn, màu, ghim, kéo thả, tìm kiếm; editor rich text thống nhất có plain text/checklist/Markdown shortcuts/màu chữ/emoji và emoji đại diện note; autosave + nút Save; trash tự xóa sau 7 ngày; reminder trong app/email có lặp; admin quản lý/khóa user và thống kê nhưng không đọc nội dung note người khác.

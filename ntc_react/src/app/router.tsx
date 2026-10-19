@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 import {
   createBrowserRouter,
-  Link,
   Navigate,
   Outlet,
   useLocation,
@@ -9,12 +8,13 @@ import {
   useParams,
 } from "react-router-dom";
 import { auth } from "./runtime";
+import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
-import { EmptyState, Spinner } from "../shared/ui";
-import { ShieldCheck } from "lucide-react";
+import { Spinner } from "../shared/ui";
 import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
 const AuthPage = lazy(() => import("../features/auth/AuthPage"));
 const AppShell = lazy(() => import("./AppShell"));
+const AdminShell = lazy(() => import("./AdminShell"));
 const NotesPage = lazy(() => import("../features/notes/NotesPage"));
 const RemindersPage = lazy(() => import("../features/reminders/RemindersPage"));
 const InboxPage = lazy(() => import("../features/inbox/InboxPage"));
@@ -43,20 +43,29 @@ function Authenticated() {
     </div>
   );
 }
+function WorkspaceMember() {
+  const state = useAuth();
+  return isAdministrator(state.session) ? (
+    <Navigate to="/admin/overview" replace />
+  ) : (
+    <Outlet />
+  );
+}
 function Administrator() {
   const state = useAuth();
-  return state.session?.roles.includes("Admin") ? (
+  return isAdministrator(state.session) ? (
     <Outlet />
   ) : (
-    <EmptyState
-      icon={ShieldCheck}
-      title="This area is for administrators"
-      description="Your private notes are available in your workspace."
-    >
-      <Link to="/notes" className="button secondary">
-        Back to notes
-      </Link>
-    </EmptyState>
+    <Navigate to={homePath(state.session)} replace />
+  );
+}
+function SettingsArea() {
+  const state = useAuth();
+  const location = useLocation();
+  return isAdministrator(state.session) ? (
+    <Navigate replace to={"/admin" + location.pathname + location.search} />
+  ) : (
+    <AppShell />
   );
 }
 function LegacyRedirect({ to }: { to: string }) {
@@ -153,14 +162,24 @@ export const router = createBrowserRouter([
             element: <AuthPage key="password" mode="password" />,
           },
           {
-            element: <AppShell />,
+            element: <WorkspaceMember />,
             children: [
-              { path: "/notes", element: <NotesPage /> },
-              { path: "/notes/:id", element: <NoteRoute /> },
-              { path: "/labels/:tagId", element: <NotesPage /> },
-              { path: "/trash", element: <NotesPage trash /> },
-              { path: "/reminders", element: <RemindersPage /> },
-              { path: "/notifications", element: <InboxPage /> },
+              {
+                element: <AppShell />,
+                children: [
+                  { path: "/notes", element: <NotesPage /> },
+                  { path: "/notes/:id", element: <NoteRoute /> },
+                  { path: "/labels/:tagId", element: <NotesPage /> },
+                  { path: "/trash", element: <NotesPage trash /> },
+                  { path: "/reminders", element: <RemindersPage /> },
+                  { path: "/notifications", element: <InboxPage /> },
+                ],
+              },
+            ],
+          },
+          {
+            element: <SettingsArea />,
+            children: [
               {
                 path: "/settings",
                 element: <Navigate to="/settings/profile" replace />,
@@ -177,9 +196,19 @@ export const router = createBrowserRouter([
                 path: "/settings/sessions",
                 element: <SettingsPage section="sessions" />,
               },
+              { path: "/settings/*", element: <NotFound /> },
+            ],
+          },
+          {
+            element: <Administrator />,
+            children: [
               {
-                element: <Administrator />,
+                element: <AdminShell />,
                 children: [
+                  {
+                    path: "/admin",
+                    element: <Navigate to="/admin/overview" replace />,
+                  },
                   {
                     path: "/admin/overview",
                     element: <AdminPage section="overview" />,
@@ -196,6 +225,23 @@ export const router = createBrowserRouter([
                     path: "/admin/audit",
                     element: <AdminPage section="audit" />,
                   },
+                  {
+                    path: "/admin/settings",
+                    element: <Navigate to="/admin/settings/profile" replace />,
+                  },
+                  {
+                    path: "/admin/settings/profile",
+                    element: <SettingsPage section="profile" administration />,
+                  },
+                  {
+                    path: "/admin/settings/account",
+                    element: <SettingsPage section="account" administration />,
+                  },
+                  {
+                    path: "/admin/settings/sessions",
+                    element: <SettingsPage section="sessions" administration />,
+                  },
+                  { path: "/admin/*", element: <NotFound /> },
                 ],
               },
             ],

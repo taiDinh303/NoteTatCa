@@ -4,6 +4,8 @@
 
 ## Điểm vào và envelope
 
+DEC-017 (2026-10-19): mọi endpoint thuộc Notes/Tags/Reminders/Notifications v1 và Note/Tag/NoteTag/Reminder legacy áp dụng policy CustomerWorkspace: authenticated non-Admin. Admin nhận403 kể cả có thêm role User và không thể dùng API tạo/đọc/sửa note cá nhân. Non-admin vẫn404 khi khác owner. `/me`, auth/session và `/admin/*` giữ self/admin policies riêng. Role được đọc từ DB mỗi request, không tin role JWT cũ. Không thay payload/route hoặc migrate dữ liệu để tách hai khu.
+
 API v1: `/api/v1`. [Inventory](api-inventory.md) có **131 operations** v1 + legacy, body schema, query/header và quyền từ OpenAPI export. `/health/live` trả200 khi process sống; `/health/ready` trả200 nếu kết nối DB được,503 nếu không. Readiness chưa xác minh schema hay SMTP. Swagger bật Development/Testing hoặc `Swagger:Enabled`.
 
 Success: `{"statusCode":200,"code":"SUCCESS","message":"...","data":{},"traceId":"..."}`. POST note trả201 và Location, kể cả replay cùng create key. Page có items,totalItems,currentPage,totalPages,pageSize,hasPreviousPage,hasNextPage. Query pageNumber≥1, pageSize1–100, note list mặc định20. JSON camelCase; enum số theo DTO; Guid string; thời gian ISO8601 UTC/offset.

@@ -8,7 +8,7 @@ namespace NTC.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin,User")]
+    [Authorize(Policy = NTC.API.Configuration.AuthConfiguration.WorkspacePolicy)]
     public class NoteTagController : NTC.API.Controllers.Shared.BaseApiController
     {
         private readonly INoteTagService _noteTagService;

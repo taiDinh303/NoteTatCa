@@ -22,6 +22,10 @@
 
 DEC-016: chủ dự án yêu cầu chuẩn bị SUPABASE__URL/SUPABASE__SERVICE_KEY cho ảnh note tương lai; mới cấu hình dự phòng, chưa giao triển khai upload trong lượt này. Giữ private owner/bucket; không dùng ảnh public như attendance Marixa. JWT issuer/audience/TTL và Swagger/demo lấy JSON Production; BackgroundJobs true ở cả hai project. Source/template/docs cập nhật, dashboard/deploy chưa thao tác trong lượt này.
 
+## DEC-017 — Quản trị độc lập (2026-10-19)
+
+Chủ dự án yêu cầu admin chỉ làm quản trị, đăng nhập từ cùng form ứng dụng nhưng mở khu `/admin`; không dùng như khách tạo note. Quyền Admin ưu tiên ngay cả account lịch sử có cả Admin/User. React có layout/sidebar/settings riêng, không query note/tag/reminder/inbox. API áp dụng policy non-Admin trên toàn bộ controller workspace v1 và legacy; admin nhận403, người dùng khác owner vẫn404. Admin quản lý tài khoản, role/membership, lock/unlock/deactivate/restore, thống kê tổng và audit; không đọc nội dung note, không sửa/xóa nhật ký audit hoặc tự vô hiệu hóa tài khoản hiện tại. Giữ nội dung/account cũ, không migration/live-data rewrite hoặc deploy trong tác vụ code này.
+
 ## Backlog theo thứ tự
 
 | ID | Ưu tiên | Kết quả | REQ / phụ thuộc | Tiêu chí chấp nhận | Trạng thái |

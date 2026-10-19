@@ -19,6 +19,8 @@ Giữ solution .NET 8/Identity, routes legacy và payload đang dùng ở Razor 
 
 ## Thiết kế triển khai
 
+Thay đổi 2026-10-19/DEC-017: Admin là nhóm quản trị riêng. Policy `CustomerWorkspace` yêu cầu xác thực và không có Admin, gắn trên Notes/Tags/Reminders/Notifications v1 và Note/Tag/NoteTag/Reminder legacy. Admin+User cũ cũng bị403 trước model binding; private ownership non-admin vẫn404. AuthConfiguration kiểm role DB hiện tại nên JWT role cũ không vượt policy. Profile/account/sessions self và các API quản trị không bị policy workspace. Không migration hoặc sửa role/note live. Seed demo mới tạo admin chỉ role Admin và không note mẫu; rerun không tự loại role hoặc xóa note cũ của admin.
+
 - Auth: Identity + JWT access ngắn hạn; refresh token opaque, chỉ lưu hash trong DB, rotation và phát hiện reuse; logout/revoke/đổi mật khẩu/khóa user làm phiên mất hiệu lực. Bearer API không tự phụ thuộc cross-site cookie. React đã có ở ntc_react; storage/token/tests xem FRONTEND-IMPLEMENTATION, không mặc định localStorage an toàn.
 - Google: kiểm audience bằng client ID cấu hình, email verified và subject; đăng nhập qua link đã xác minh. Không tự nối account hiện có chỉ dựa vào trùng email; user đang đăng nhập phải link bằng Google ID token. OTP RNG mật mã, hash DB, hết hạn/attempt limit/use-once và throttle.
 - Ownership: note/tag/reminder/notification/profile là self-scope, admin không bypass để đọc note. Anonymous 401, dữ liệu khác owner 404, thiếu role 403. Legacy user management chỉ admin ở action quản trị; profile/account action kiểm self hoặc proof token.

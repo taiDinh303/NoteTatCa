@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using NTC.API.Configuration;
 using NTC.ModelViews.TagModelView;
 using NTC.ModelViews.ReminderModelView;
 using NTC.ModelViews.AuthModelView;
@@ -11,6 +13,7 @@ using NTC.Core.Base;
 using NTC.ModelViews.NoteModelView;
 using NTC.ModelViews.Notes;
 namespace NTC.API.Controllers.V1;
+[Authorize(Policy = AuthConfiguration.WorkspacePolicy)]
 [ApiController, Route("api/v1/notes")]
 public sealed class NotesController(INoteService notes, INoteTagService labels) : BaseApiController
 {

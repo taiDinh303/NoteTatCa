@@ -29,29 +29,37 @@ import {
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 import { GoogleButton } from "../auth/GoogleButton";
-function SettingsNav() {
+function SettingsNav({ base }: { base: string }) {
   return (
     <nav className="settings-tabs" aria-label="Settings">
-      <NavLink to="/settings/profile">Profile</NavLink>
-      <NavLink to="/settings/account">Account & security</NavLink>
-      <NavLink to="/settings/sessions">Active sessions</NavLink>
+      <NavLink to={base + "/profile"}>Profile</NavLink>
+      <NavLink to={base + "/account"}>Account & security</NavLink>
+      <NavLink to={base + "/sessions"}>Active sessions</NavLink>
     </nav>
   );
 }
 export default function SettingsPage({
   section,
+  administration = false,
 }: {
   section: "profile" | "account" | "sessions";
+  administration?: boolean;
 }) {
   const me = useMe();
   return (
     <>
       <PageHeading
-        eyebrow="MAKE YOURSELF AT HOME"
+        eyebrow={
+          administration ? "YOUR ADMIN ACCOUNT" : "MAKE YOURSELF AT HOME"
+        }
         title="Settings"
-        description="A few details that make this space yours."
+        description={
+          administration
+            ? "Manage your administrator profile, security and active sessions."
+            : "A few details that make this space yours."
+        }
       />
-      <SettingsNav />
+      <SettingsNav base={administration ? "/admin/settings" : "/settings"} />
       {section === "sessions" ? (
         <Sessions />
       ) : me.isPending ? (
@@ -584,7 +592,7 @@ function Sessions() {
           title={
             target === "all" ? "Sign out everywhere?" : "Revoke this session?"
           }
-          description="The selected session will stop working immediately. Your saved notes will be kept."
+          description="The selected session will stop working immediately. Your account data will be kept."
           confirmLabel="Sign out"
           danger
           onClose={() => setTarget(undefined)}

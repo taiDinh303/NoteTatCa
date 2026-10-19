@@ -1,6 +1,12 @@
 # 06 — Kiểm thử và bằng chứng
 
-> 2026-10-17 | CURRENT:80 PASS,0 FAIL,1 SKIP trong 81 tests. Không thay thế production verification.
+> 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
+
+## Tách admin — 2026-10-19
+
+Release strict0warnings/0errors; fullbackend114PASS/1PGfixtureSKIP. Tests xác thực admin-only và Admin+User đều bị403 tại workspace v1/legacy nhưng dùng được admin/self-account; DB role mới ưu tiên JWT cũ, non-admin owner404 và account/note được giữ. Seeder mới không cấp User/tạo content admin. Auth frontend có regression cache/response isolation khi cùng account chuyển nhóm quyền.
+
+Frontend4config+17VitestPASS, lint/typecheck/Production buildPASS. Browser15ca được kiểm qua hai lượt: run toàn bộ14PASS/1FAIL assertion checkbox đợi ACK, sửa test và rerun đúng ca1PASS. Admin flows: login/refresh/deep link, SPA/mobile390/no workspace requests, create/detail/lock/unlock/deactivate/restore account, role edit/delete/membership, audit và non-admin denied. Customer note/drag/editor/settings/auth các ca cũ vẫnPASS. Ảnh desktop/mobile đã xem; fixture SQLite/email captured, không dùng owner DB/SMTP/cloud. TRX/screenshots/giới hạn tại [worklog](worklog.md).
 
 ## Kết quả và môi trường
 

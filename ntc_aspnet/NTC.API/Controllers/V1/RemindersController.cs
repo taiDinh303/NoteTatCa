@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using NTC.API.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using NTC.API.Controllers.Shared;
 using NTC.Contract.Services.Interface;
@@ -6,6 +8,7 @@ using NTC.ModelViews.ReminderModelView;
 
 namespace NTC.API.Controllers.V1;
 
+[Authorize(Policy = AuthConfiguration.WorkspacePolicy)]
 [ApiController, Route("api/v1")]
 public sealed class RemindersController(IReminderService reminders) : BaseApiController
 {
