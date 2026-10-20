@@ -372,7 +372,7 @@ export default function NotesPage({
     <>
       <h1
         className={
-          trash || tagId || reminderView || q
+          !trash && !tagId && (reminderView || q)
             ? "notes-context-title"
             : "sr-only"
         }

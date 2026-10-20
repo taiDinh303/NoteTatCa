@@ -62,6 +62,36 @@ test("renders responsive workspace without console errors or navigation reloads"
     .click();
   await expect(
     page.getByRole("heading", { name: "Reminders", exact: true }),
+  ).toHaveClass("sr-only");
+  await expect(page.getByText("RIGHT ON TIME", { exact: true })).toHaveCount(0);
+  await expect(
+    page.getByText("A gentle nudge for the things you don’t want to forget.", {
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "Inbox", exact: true }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "Your inbox", exact: true }),
+  ).toHaveClass("sr-only");
+  await expect(page.getByText("A GENTLE NUDGE", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByText("Small reminders for the things that matter.", {
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Mark all as read", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("navigation", { name: "Labels", exact: true })
+    .getByRole("link")
+    .first()
+    .click();
+  await expect(page.locator("#workspace-main h1")).toHaveClass("sr-only");
+  await expect(
+    page.getByRole("button", { name: "Take a note", exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "All notes", exact: true }).click();
   await expect(
@@ -91,6 +121,12 @@ test("renders responsive workspace without console errors or navigation reloads"
     .click();
   await expect(
     page.getByRole("heading", { name: "Trash", exact: true }),
+  ).toHaveClass("sr-only");
+  await expect(
+    page.getByText(
+      "Deleted notes are permanently removed after the seven-day retention period.",
+      { exact: true },
+    ),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "A clean slate", exact: true }),
@@ -142,6 +178,11 @@ test("offers a compact workspace with persistent sidebar control and one labels 
       "sidebar-kept";
   });
   const before = (await page.locator("#workspace-main").boundingBox())!.width;
+  await expect(
+    page
+      .getByRole("button", { name: "Hide sidebar", exact: true })
+      .locator("svg"),
+  ).toHaveClass(/lucide-menu/);
   await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
   await expect(page.locator("#workspace-navigation")).not.toBeVisible();
   expect(
@@ -156,6 +197,11 @@ test("offers a compact workspace with persistent sidebar control and one labels 
   await expect(
     page.getByRole("button", { name: "Show sidebar", exact: true }),
   ).toBeVisible();
+  await expect(
+    page
+      .getByRole("button", { name: "Show sidebar", exact: true })
+      .locator("svg"),
+  ).toHaveClass(/lucide-menu/);
   await page.getByRole("button", { name: "Show sidebar", exact: true }).click();
   await expect(page.locator("#workspace-navigation")).toBeVisible();
   const pinned = page.waitForResponse(
@@ -206,6 +252,26 @@ test("edits content in a full viewport with an optional title and fixed characte
     exact: true,
   });
   await content.fill("contentonly");
+  await editor
+    .getByRole("button", { name: "Exit full screen", exact: true })
+    .click();
+  const compact = (await editor.boundingBox())!;
+  expect(compact.width).toBeLessThan(viewport.width);
+  expect(compact.height).toBeLessThan(viewport.height);
+  expect(compact.x).toBeCloseTo((viewport.width - compact.width) / 2);
+  expect(compact.y).toBeCloseTo((viewport.height - compact.height) / 2);
+  await expect(content).toContainText("contentonly");
+  await expect(
+    editor.getByRole("button", { name: "Enter full screen", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await editor
+    .getByRole("button", { name: "Enter full screen", exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    editor.getByRole("button", { name: "Exit full screen", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  expect((await editor.boundingBox())!.width).toBeCloseTo(viewport.width);
   await expect(
     editor.getByLabel("Character count", { exact: true }),
   ).toHaveText("11 / 100,000 characters");
@@ -229,6 +295,19 @@ test("edits content in a full viewport with an optional title and fixed characte
     fullPage: false,
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  await editor
+    .getByRole("button", { name: "Exit full screen", exact: true })
+    .click();
+  const compactMobile = (await editor.boundingBox())!;
+  expect(compactMobile.width).toBeLessThan(390);
+  expect(compactMobile.height).toBeLessThan(844);
+  await expect(content).toContainText("contentonly");
+  await expect(
+    editor.getByRole("button", { name: "Close", exact: true }),
+  ).toBeInViewport();
+  await editor
+    .getByRole("button", { name: "Enter full screen", exact: true })
+    .click();
   const mobile = (await editor.boundingBox())!;
   expect(mobile.width).toBeCloseTo(390);
   expect(mobile.height).toBeCloseTo(844);

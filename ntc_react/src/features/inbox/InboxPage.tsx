@@ -5,13 +5,7 @@ import { ArrowUpRight, Bell, CheckCheck, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { cache, inbox, workspace } from "../../app/runtime";
 import { useAuth } from "../../shared/hooks";
-import {
-  Button,
-  EmptyState,
-  ErrorPanel,
-  PageHeading,
-  Spinner,
-} from "../../shared/ui";
+import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 export default function InboxPage() {
   const state = useAuth();
@@ -37,11 +31,8 @@ export default function InboxPage() {
   }
   return (
     <>
-      <PageHeading
-        eyebrow="A GENTLE NUDGE"
-        title="Your inbox"
-        description="Small reminders for the things that matter."
-      >
+      <h1 className="sr-only">Your inbox</h1>
+      <div className="inbox-actions">
         <Button
           variant="secondary"
           busy={busy}
@@ -64,7 +55,7 @@ export default function InboxPage() {
           <CheckCheck size={17} />
           Mark all as read
         </Button>
-      </PageHeading>
+      </div>
       <div className="inbox-tabs">
         <button
           className={!unreadOnly ? "active" : ""}

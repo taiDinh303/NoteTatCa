@@ -4,6 +4,10 @@
 
 ## Tối giản workspace/editor — 2026-10-20
 
+Bổ sung bỏ heading/mô tả đầu trang Reminders/Inbox và heading nhìn thấy của Trash/label, icon Menu chung desktop/mobile: focused browser **3/3 PASS (50.1 giây)**. Kiểm semantic heading sr-only, không copy cũ, action Mark all as read/cảnh báo Trash còn hiển thị, navigation SPA/label, sidebar hai trạng thái/persistence và reminder→inbox. Không thêm hoặc chạy lại toàn bộ suite cho chỉnh sửa trình bày này.
+
+Bổ sung theo yêu cầu khôi phục nút thu/phóng: mặc định fullscreen, chuyển sang modal căn giữa rồi trở lại bằng click/bàn phím, giữ content và kiểm mobile390. Focused browser **3/3 PASS** gồm toggle/layout, lazy title focus và network retry; lint/typecheck/Production build PASS, backend Release0warnings/0errors. Không chạy lại full suites trong lượt bổ sung; evidence 18/18 dưới là lượt trước khi thêm lại toggle.
+
 Frontend: **4 configuration + 17 Vitest PASS**, lint max-warnings0, TypeScript/Production build PASS. Browser Chromium **18/18 PASS trong một lượt** sau sửa lỗi fullscreen animation và lazy editor giành focus từ title. Thêm kiểm tra xóa/thêm lại title ở note đã lưu; chạy lại đúng regression này **1/1 PASS** sau chỉnh autofocus theo draft hiện tại, lint/build chạy lại PASS. Backend Release0warnings/0errors; không chạy lại full backend suite vì không đổi backend.
 
 Các ca kiểm: editor phủ viewport desktop/mobile, title tùy chọn, counter/Close cố định khi cuộn nội dung dài, Close chờ autosave, lỗi mạng/retry không tạo trùng, conflict giữ draft, Markdown, sidebar ẩn/hiện nhớ lựa chọn và không reload, một điểm tạo note/labels, không toast thành công thường. Ca tải editor chậm giữ request module để mở title trước khi editor sẵn sàng và xác nhận focus được giữ. Luồng account/admin cũ cùng đạt. Đã xem ảnh desktop1280/mobile390; dùng fixture SQLite/captured email biệt lập, không DB/email/cloud thật. Chi tiết lượt thất bại trước khi sửa và giới hạn ở [worklog](worklog.md); chưa push/deploy.

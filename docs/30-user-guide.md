@@ -12,7 +12,7 @@ React hiện ở ntc_react; route/chức năng thực tế xem FRONTEND-IMPLEMEN
 
 ## Tạo và tổ chức note
 
-1. Chọn **Take a note…** để mở editor toàn màn hình và nhập nội dung. Tiêu đề không bắt buộc; chọn **Add title** khi muốn thêm.
+1. Chọn **Take a note…** để mở editor toàn màn hình và nhập nội dung. Nút góc trên **Exit full screen / Enter full screen** chuyển giữa modal và toàn màn hình, giữ nguyên bản đang nhập. Tiêu đề không bắt buộc; chọn **Add title** khi muốn thêm.
 2. Dùng thanh công cụ để định dạng, chọn màu chữ, chèn emoji hoặc checklist; chọn emoji đại diện nếu muốn.
 3. Nội dung tự lưu; chỉ tin **All changes saved** sau ACK. Khi lỗi, dùng **Retry save** hoặc sao chép bản nhập. **Close** chờ lưu xong; nếu chưa lưu được, bạn có thể giữ cửa sổ hoặc xác nhận bỏ bản nháp. Bộ đếm ký tự nằm cố định ở dưới.
 4. Gán **Labels**, đổi **Note color**, **Pin** hoặc di chuyển thứ tự. Dùng **Search notes** để tìm nội dung của mình.

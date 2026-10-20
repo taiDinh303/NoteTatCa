@@ -14,6 +14,8 @@ import {
   Copy,
   Download,
   LoaderCircle,
+  Maximize2,
+  Minimize2,
   Pin,
   RotateCcw,
   Type,
@@ -109,6 +111,7 @@ function EditorSession({
     coordinator.getSnapshot,
   );
   const labels = useLabels();
+  const [fullscreen, setFullscreen] = useState(true);
   const [showTitle, setShowTitle] = useState(() => !!initial?.title?.trim());
   const [characterCount, setCharacterCount] = useState(
     initial?.content.length ?? 0,
@@ -201,7 +204,7 @@ function EditorSession({
         onClose={requestClose}
         title={initial ? "Edit note" : "New note"}
         hideTitle
-        className="note-editor-modal fullscreen"
+        className={`note-editor-modal ${fullscreen ? "fullscreen" : ""}`}
       >
         <div
           className="editor-heading"
@@ -246,6 +249,12 @@ function EditorSession({
               label={draft.isPinned ? "Unpin note" : "Pin note"}
               active={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
+            />
+            <IconButton
+              icon={fullscreen ? Minimize2 : Maximize2}
+              label={fullscreen ? "Exit full screen" : "Enter full screen"}
+              aria-pressed={fullscreen}
+              onClick={() => setFullscreen((current) => !current)}
             />
           </div>
         </div>

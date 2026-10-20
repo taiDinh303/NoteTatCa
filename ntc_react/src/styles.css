@@ -1892,6 +1892,11 @@ strong {
   opacity: 0;
   width: 0;
 }
+.inbox-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
 .inbox-tabs {
   display: flex;
   gap: 20px;
@@ -3957,6 +3962,10 @@ td {
 .labels-heading:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: -3px;
+}
+.modal.note-editor-modal {
+  height: 90dvh;
+  animation: fade-in 0.12s ease-out;
 }
 .modal.note-editor-modal.fullscreen {
   inset: 0;

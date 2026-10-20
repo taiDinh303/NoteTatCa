@@ -2,6 +2,26 @@
 
 > 2026-10-20 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Công bố nút thu/phóng và giao diện gọn lên main — 2026-10-20
+
+- Theo yêu cầu “push lên luôn để tôi xem”, phạm vi commit gồm 14 file React/docs: khôi phục nút thu/phóng editor, bỏ heading/mô tả đầu trang Reminders/Inbox/Trash/label, icon Menu sidebar chung desktop/mobile, regressions và các quyết định/tài liệu liên quan. Không đưa ba appsettings local sửa sẵn, credentials hoặc artifacts vào Git; bốn cấu hình local đúng hash baseline.
+- Fetch trước publication: main/HEAD và origin/main cùng 73d45a6, divergence 0/0. Docs 48 Markdown / 178 local links / 0 errors. Dùng lại evidence hai lượt triển khai bên dưới: focused browser 3/3 cho editor/toggle/focus/network và 3/3 cho header/sidebar/reminder→inbox; lint/typecheck/Production build PASS sau thay đổi cuối, backend Release0warnings/0errors ở lượt thu/phóng. Không chạy lại suite vì lượt này chỉ publication.
+- Chỉ commit/push source lên main, đối chiếu SHA remote sau push; không manual deploy hoặc thay dữ liệu cloud. Hosting/CI integration có thể tự chạy từ push; chưa xác minh bản production đã cập nhật.
+
+## Bỏ heading lặp và thống nhất icon sidebar — 2026-10-20
+
+- Theo yêu cầu bổ sung, bỏ phần nhìn thấy của RIGHT ON TIME/Reminders/mô tả, A GENTLE NUDGE/Your inbox/mô tả và heading Trash/từng label. Giữ h1 dạng sr-only cho screen reader; không xóa tiêu đề note hoặc reminder item. Inbox giữ Mark all as read trong hàng actions riêng, Trash giữ cảnh báo bảy ngày, Reminders giữ banner hướng dẫn hiện có. Không mở rộng sang nội dung/empty states hoặc admin.
+- Sidebar desktop dùng cùng icon Menu ba gạch ngang với mobile; giữ tên Hide/Show sidebar, aria-expanded/controls, preference và mobile drawer. React review: hooks/cache/requests không đổi, không thêm dependency hoặc sửa dữ liệu/backend/config; nút và heading giữ accessibility.
+- Mở rộng các browser regression hiện có để kiểm heading sr-only/các copy đã bỏ, action/cảnh báo còn dùng được, label navigation, icon Menu ở cả hai trạng thái desktop. Focused Chromium **3/3 PASS (50.1 giây gồm startup)**: responsive/SPA/navigation, sidebar persistence/labels, reminder→inbox. ESLint max-warnings0, TypeScript/Production Vite build PASS; docs **48 Markdown / 178 local links / 0 errors**, git diff --check PASS. Không chạy lại backend/unit/full browser suite vì chỉ đổi trình bày; backend Release gần nhất đạt ở entry khôi phục nút thu/phóng bên dưới. Dùng SQLite/captured-email fixture riêng, không owner DB/SMTP/cloud; bốn cấu hình local nguyên byte theo baseline.
+- Giữ thay đổi nút phóng to/thu nhỏ từ lượt trước; chưa commit/push/deploy các thay đổi bổ sung. Không sửa ba appsettings local đang có thay đổi sẵn.
+
+## Khôi phục nút phóng to/thu nhỏ editor — 2026-10-20
+
+- Theo yêu cầu bổ sung của chủ dự án, cập nhật DEC-018: editor vẫn mặc định toàn màn hình nhưng có nút Enter full screen/Exit full screen ở góc trên. Dùng state trong cùng EditorSession và đổi CSS class, không remount rich editor/coordinator, không reload hay bỏ draft khi đổi kích thước. Modal thu nhỏ có chiều cao 90dvh, content cuộn riêng và footer vẫn cố định.
+- Giữ việc bỏ Save thường và dấu×, chỉ Close để đóng; Retry save/error/conflict và bảo vệ draft giữ nguyên. Nút có tên truy cập được, tooltip, aria-pressed, hỗ trợ bàn phím. Không thêm dependency hoặc sửa backend/data/config.
+- Mở rộng regression editor hiện có để kiểm modal căn giữa nhỏ hơn viewport, đổi lại fullscreen bằng Enter, giữ content/counter và kiểm cả mobile390. Focused Playwright **3/3 PASS (3.0 phút gồm startup)**: editor/layout/toggle, lazy title focus và network failure/retry không tạo trùng. ESLint max-warnings0, TypeScript/Production Vite build PASS; backend Release **0 warning/0 error**. Không chạy lại toàn bộ browser/backend/unit suites cho thay đổi state/CSS này. Các ca browser dùng fixture SQLite/captured email riêng, không owner DB/SMTP/cloud.
+- Cập nhật intake/plan/UI/frontend/user-guide/testing; docs **48 Markdown / 178 local links / 0 errors**, git diff --check PASS (thông báo chuẩn hóa LF/CRLF). Bốn appsettings local đúng hash baseline. Chưa commit/push/deploy trong lượt bổ sung này.
+
 ## Công bố giao diện tập trung nội dung lên main — 2026-10-20
 
 - Theo yêu cầu “push lên main luôn đi”, phạm vi commit gồm 19 file React/docs: workspace/sidebar, notes/editor/labels/reminders, browser regressions và tài liệu DEC-018/testing/worklog. Không đưa ba appsettings local đang sửa sẵn, secret, ảnh hoặc artifacts vào commit; bốn cấu hình local API/Razor vẫn đúng hash baseline.

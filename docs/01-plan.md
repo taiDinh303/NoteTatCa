@@ -28,7 +28,7 @@ Chủ dự án yêu cầu admin chỉ làm quản trị, đăng nhập từ cùn
 
 ## DEC-018 — Không gian tập trung vào nội dung (2026-10-20)
 
-User yêu cầu bỏ toast thành công kiểu Note pinned, editor toàn viewport, bỏ Save và dấu× đóng trùng Close; title rỗng không hiện Untitled/input, có Add title khi cần; đếm ký tự nằm cố định góc dưới. Trang notes bỏ header giải thích/New note, chỉ dùng Take a note; user xác nhận bỏ luôn Create your first note ở empty state. Sidebar có nút ẩn/hiện desktop nhớ lựa chọn trên máy, mobile vẫn drawer; YOUR LABELS+icon thành một nút chung, bỏ Create a label trùng. Giữ trạng thái autosave/error/conflict, Retry save khi lỗi và bảo vệ draft khi Close/điều hướng. Không thay API, dữ liệu, admin hoặc quyền riêng tư.
+User yêu cầu bỏ toast thành công kiểu Note pinned, editor mặc định toàn viewport và có nút phóng to/thu nhỏ theo yêu cầu bổ sung cùng ngày, bỏ Save và dấu× đóng trùng Close; title rỗng không hiện Untitled/input, có Add title khi cần; đếm ký tự nằm cố định góc dưới. Trang notes bỏ header giải thích/New note, chỉ dùng Take a note; user xác nhận bỏ luôn Create your first note ở empty state. Bổ sung cùng ngày: bỏ tiêu đề/mô tả đầu trang Reminders/Inbox và heading nhìn thấy của Trash/label, giữ thao tác/cảnh báo và heading cho screen reader. Sidebar có nút ẩn/hiện desktop nhớ lựa chọn trên máy, mobile vẫn drawer, cùng icon ba gạch ngang; YOUR LABELS+icon thành một nút chung, bỏ Create a label trùng. Giữ trạng thái autosave/error/conflict, Retry save khi lỗi và bảo vệ draft khi Close/điều hướng. Không thay API, dữ liệu, admin hoặc quyền riêng tư.
 
 ## Backlog theo thứ tự
 

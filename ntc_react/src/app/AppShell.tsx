@@ -15,8 +15,6 @@ import {
   Hash,
   Menu,
   Moon,
-  PanelLeftClose,
-  PanelLeftOpen,
   Search,
   Settings,
   ShieldCheck,
@@ -187,7 +185,7 @@ export default function AppShell() {
         <header className="topbar">
           <IconButton
             className="desktop-sidebar-toggle"
-            icon={sidebarHidden ? PanelLeftOpen : PanelLeftClose}
+            icon={Menu}
             label={sidebarHidden ? "Show sidebar" : "Hide sidebar"}
             aria-controls="workspace-navigation"
             aria-expanded={!sidebarHidden}

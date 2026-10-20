@@ -23,7 +23,6 @@ import {
   EmptyState,
   ErrorPanel,
   Modal,
-  PageHeading,
   Spinner,
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
@@ -63,11 +62,7 @@ export default function RemindersPage() {
   }
   return (
     <>
-      <PageHeading
-        eyebrow="RIGHT ON TIME"
-        title="Reminders"
-        description="A gentle nudge for the things you don’t want to forget."
-      />
+      <h1 className="sr-only">Reminders</h1>
       <div className="feature-banner">
         <div className="feature-icon">
           <CalendarDays size={27} />
