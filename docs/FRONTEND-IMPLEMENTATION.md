@@ -20,9 +20,13 @@ React/TypeScript/Vite; React Router SPA; TanStack Query cache theo user, invalid
 
 ## UX và an toàn dữ liệu
 
+DEC-018/2026-10-20: editor luôn phủ viewport, không nút mở rộng/thu nhỏ hoặc×đóng trùng Close. Title rỗng không hiện ô nhập/Untitled; Add title mở và focus ô nhập, xóa title rồi blur sẽ thu lại mà không mất content. Cards không in Untitled khi title rỗng (nút mở vẫn có accessible name). Counter ở footer cố định góc dưới, không chạy theo content scroll. Save thường được bỏ; lỗi mới hiện Retry save; Close chờ flush bản đang sửa, nếu lỗi/conflict giữ draft và hỏi tiếp. Không hạ guard409/idempotency/unsaved navigation.
+
+Notes chỉ có Take a note, không Your personal space/Your notes/câu mô tả/New note/Create your first note; heading Notes giữ dạng screen-reader-only, ngữ cảnh Trash/search/label vẫn ngắn rõ. Desktop sidebar ẩn/hiện bằng nút topbar và nhớ ntc.sidebar.hidden.v1; mobile có drawer riêng. YOUR LABELS/icon là cùng một button/cursor quản lý labels, không Create a label trong sidebar. Bỏ routine success toasts của note/editor/label/reminder; lỗi/info hướng dẫn, self-security/admin acknowledgements giữ nguyên. Lưu preferences không chứa nội dung note/token.
+
 Sidebar desktop/mobile drawer, workspace search/grid/list, labels/filter/pinned, modal rich editor, label/reminder/confirmation dialogs, skeleton/empty/error/retry, toast và reduced-motion. Cache memory giữ dữ liệu khi chuyển trang; tải phân trang, không ép tải toàn bộ database trước khi dùng. Drag chỉ khi có toàn bộ nhóm và không filter làm sai neighbors; có phương án bàn phím/move controls. Optimistic actions rollback và xác nhận ACK; version409 giữ draft, không overwrite tự động.
 
-Autosave single writer, debounce; serialize saves với version mới nhất, giữ snapshot create/idempotency key khi retry mất ACK. Save thủ công, trạng thái dirty/saving/saved/error/conflict; close/navigation bảo vệ draft. Markdown shortcuts/import/export có cảnh báo mất định dạng. Content cũ plain luôn chuyển bằng text nodes, không parse HTML tùy ý.
+Autosave single writer, debounce; serialize saves với version mới nhất, giữ snapshot create/idempotency key khi retry mất ACK. Trạng thái dirty/saving/saved/error/conflict; Retry save chỉ khi lỗi, close/navigation bảo vệ draft. Markdown shortcuts/import/export có cảnh báo mất định dạng. Content cũ plain luôn chuyển bằng text nodes, không parse HTML tùy ý.
 
 Access token memory; refresh token trong sessionStorage theo tab, không localStorage mặc định; một refresh request đang chạy được chia sẻ. Remember tab chỉ thay lifetime server, không hứa giữ phiên sau khi đóng browser. Cache không persist notes; clear khi logout/user đổi. Session expired vẫn giữ draft trong editor cho reauthentication, không mở note cached của account cũ cho account mới. Google client ID từ public env, không fake login khi thiếu config. Browser tabs không tự chia sẻ refresh family.
 
@@ -45,7 +49,7 @@ Nguồn kiểm: toàn bộ Pages/*.cshtml và partials trong ntc_aspnet/NTC.VIEW
 | Auth/ConfirmChangeEmail | /auth/confirm-change-email | Xác thực link đổi email, loại token khỏi URL sau thành công |
 | Auth/VerifyPassword, Logout | /verify-password, /logout | Xác minh đúng tài khoản hiện tại, thu hồi phiên/clear cache |
 | Auth/External/GoogleCallback | Alias /login | React GIS nhận credential rồi gọi API; không giả OAuth callback của Razor |
-| Note/Index + create/edit/list/sidebar partials | /notes, /notes/:id | Note modal, rich editor, auto/manual save, pin, màu/icon, search, list/grid và reorder |
+| Note/Index + create/edit/list/sidebar partials | /notes, /notes/:id | Editor toàn viewport, title tùy chọn, autosave/Retry save khi lỗi, pin, màu/icon, search, list/grid và reorder |
 | Note tags/manage-tag partials | /labels/:tagId + label dialogs | CRUD nhãn, nhãn trùng theo ID, gán tối đa20/note |
 | Reminder partial | Editor reminder dialog, /reminders | Tạo/sửa/xóa/pause/resume, lặp ngày/tuần/tháng/năm, kết thúc/count/timezone/email |
 | Note/Trash + trash partial | /trash | Đọc nội dung riêng đã xóa, restore, xóa hẳn, hạn7ngày |

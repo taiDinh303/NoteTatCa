@@ -1357,11 +1357,6 @@ strong {
   overflow: hidden;
   max-height: 90dvh;
 }
-.note-editor-modal.fullscreen {
-  max-width: calc(100vw - 35px);
-  height: calc(100dvh - 35px);
-  max-height: none;
-}
 .editor-heading {
   display: flex;
   align-items: center;
@@ -1420,12 +1415,6 @@ strong {
 }
 .editor-title::placeholder {
   color: #b4b9c0;
-}
-.editor-subtitle {
-  font-size: 11px;
-  color: #b0b5bb;
-  display: block;
-  margin-top: 8px;
 }
 .editor-scroll {
   overflow-y: auto;
@@ -3933,4 +3922,92 @@ td {
 }
 .button.primary {
   color: #3e2d15;
+}
+
+/* Content-first notes: one capture entry, optional title, fixed editor footer. */
+.customer-shell.sidebar-hidden > .sidebar {
+  display: none;
+}
+.customer-shell.sidebar-hidden > .main-column {
+  margin-left: 0;
+}
+.customer-shell .workspace-main {
+  max-width: none;
+  padding-top: 24px;
+}
+.customer-shell .quick-capture {
+  padding: 12px 18px;
+  margin-bottom: 22px;
+}
+.notes-context-title {
+  font-size: 21px;
+  margin: 0 0 20px;
+}
+.labels-heading {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 7px;
+}
+.labels-heading:hover {
+  color: var(--text);
+}
+.labels-heading:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -3px;
+}
+.modal.note-editor-modal.fullscreen {
+  inset: 0;
+  transform: none;
+  animation: fade-in 0.12s ease-out;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+}
+.note-editor-modal .editor-scroll {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.editor-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.editor-content .rich-editor {
+  flex: 1;
+}
+.note-editor-modal .editor-title-wrap {
+  padding-bottom: 15px;
+}
+.note-editor-modal .editor-footer {
+  padding: 10px 22px;
+}
+.note-editor-modal .editor-count {
+  padding: 0;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-right: 12px;
+}
+.note-editor-modal .add-title-button {
+  font-size: 12px;
+}
+@media (max-width: 800px) {
+  .desktop-sidebar-toggle {
+    display: none;
+  }
+}
+@media (max-width: 480px) {
+  .note-editor-modal .editor-footer {
+    padding: 9px 12px;
+  }
+  .note-editor-modal .editor-count {
+    margin-right: auto;
+    font-size: 10px;
+  }
 }

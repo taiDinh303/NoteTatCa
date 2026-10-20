@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { cache, reminders, workspace } from "../../app/runtime";
 import type { Reminder, ReminderInput } from "../../domain/models";
 import { REPEAT_NAMES, WEEKDAYS } from "../../domain/models";
@@ -71,7 +70,6 @@ export function ReminderForm({
             : reminders.create(noteId, body)
         )
           .then(async () => {
-            toast.success(initial ? "Reminder updated" : "Reminder set");
             await onDone();
           })
           .catch(setError)

@@ -14,7 +14,7 @@
 | DEC-006 | Note riêng từng tài khoản; admin quản lý/khóa user và thống kê, không đọc nội dung note | TARGET Q-001/007 | Ownership, không chia sẻ/team |
 | DEC-007 | Git root NTC, một docs tại root; backend giữ ntc_aspnet | IMPLEMENTED theo yêu cầu trực tiếp 2026-10-17, nối tiếp Q-025 | Giữ HEAD/history/remote và thay đổi đang làm; cập nhật CI/Docker/scripts |
 | DEC-008 | Unified rich editor: plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; conversion cảnh báo | TARGET Q-003/020/021 | Schema version/renderer; bản hiện tại chưa upload ảnh, xem DEC-016 |
-| DEC-009 | Autosave + Save, trạng thái lưu rõ | TARGET Q-023 | Version/conflict/idempotency |
+| DEC-009 | Autosave, trạng thái lưu rõ; bỏ Save thường theo DEC-018 | Q-023 cập nhật bởi user2026-10-20 | Version/conflict/idempotency, Retry save khi lỗi |
 | DEC-010 | Trash 7 ngày, restore/xóa hẳn sớm; reminder in-app/email có lặp, timezone user, catch-up 24 giờ | TARGET Q-005/006/024 | Jobs/retention/notifications |
 | DEC-011 | Giữ tài khoản/note cũ; UI tiếng Anh; hướng public nhỏ | TARGET Q-022/025 | Migration an toàn, nội dung UI và vận hành |
 
@@ -25,6 +25,10 @@ DEC-016: chủ dự án yêu cầu chuẩn bị SUPABASE__URL/SUPABASE__SERVICE_
 ## DEC-017 — Quản trị độc lập (2026-10-19)
 
 Chủ dự án yêu cầu admin chỉ làm quản trị, đăng nhập từ cùng form ứng dụng nhưng mở khu `/admin`; không dùng như khách tạo note. Quyền Admin ưu tiên ngay cả account lịch sử có cả Admin/User. React có layout/sidebar/settings riêng, không query note/tag/reminder/inbox. API áp dụng policy non-Admin trên toàn bộ controller workspace v1 và legacy; admin nhận403, người dùng khác owner vẫn404. Admin quản lý tài khoản, role/membership, lock/unlock/deactivate/restore, thống kê tổng và audit; không đọc nội dung note, không sửa/xóa nhật ký audit hoặc tự vô hiệu hóa tài khoản hiện tại. Giữ nội dung/account cũ, không migration/live-data rewrite hoặc deploy trong tác vụ code này.
+
+## DEC-018 — Không gian tập trung vào nội dung (2026-10-20)
+
+User yêu cầu bỏ toast thành công kiểu Note pinned, editor toàn viewport, bỏ Save và dấu× đóng trùng Close; title rỗng không hiện Untitled/input, có Add title khi cần; đếm ký tự nằm cố định góc dưới. Trang notes bỏ header giải thích/New note, chỉ dùng Take a note; user xác nhận bỏ luôn Create your first note ở empty state. Sidebar có nút ẩn/hiện desktop nhớ lựa chọn trên máy, mobile vẫn drawer; YOUR LABELS+icon thành một nút chung, bỏ Create a label trùng. Giữ trạng thái autosave/error/conflict, Retry save khi lỗi và bảo vệ draft khi Close/điều hướng. Không thay API, dữ liệu, admin hoặc quyền riêng tư.
 
 ## Backlog theo thứ tự
 

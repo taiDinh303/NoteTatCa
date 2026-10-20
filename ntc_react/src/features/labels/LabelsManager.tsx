@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import { labels, cache, workspace } from "../../app/runtime";
 import { useLabels } from "../../shared/hooks";
 import type { Label } from "../../domain/models";
@@ -50,7 +49,6 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
             };
             void (editing ? labels.patch(editing, body) : labels.create(body))
               .then(async () => {
-                toast.success(editing ? "Label updated" : "Label created");
                 setEditing(null);
                 setFormKey((k) => k + 1);
                 await refresh();

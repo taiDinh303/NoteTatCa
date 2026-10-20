@@ -15,6 +15,8 @@ import {
   Hash,
   Menu,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Search,
   Settings,
   ShieldCheck,
@@ -69,17 +71,18 @@ function Sidebar({
           Trash
         </NavLink>
       </nav>
-      <div className="sidebar-section-heading">
+      <button
+        className="sidebar-section-heading labels-heading"
+        type="button"
+        aria-label="Manage labels"
+        onClick={() => {
+          onLabels();
+          onNavigate();
+        }}
+      >
         <span>YOUR LABELS</span>
-        <IconButton
-          icon={Tag}
-          label="Manage labels"
-          onClick={() => {
-            onLabels();
-            onNavigate();
-          }}
-        />
-      </div>
+        <Tag size={14} />
+      </button>
       <nav className="label-nav" aria-label="Labels">
         {allLabels.map((label) => (
           <NavLink
@@ -102,15 +105,6 @@ function Sidebar({
             Load more labels
           </button>
         ) : null}
-        <button
-          className="manage-labels"
-          onClick={() => {
-            onLabels();
-            onNavigate();
-          }}
-        >
-          <span>+</span>Create a label
-        </button>
       </nav>
       <div className="sidebar-bottom">
         <div className="sidebar-tip">
@@ -142,10 +136,24 @@ export default function AppShell() {
   const location = useLocation();
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
+  const [sidebarHidden, setSidebarHidden] = useState(() => {
+    try {
+      return localStorage.getItem("ntc.sidebar.hidden.v1") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [manageLabels, setManageLabels] = useState(false);
   const [search, setSearch] = useState(params.get("q") ?? "");
   const input = useRef<HTMLInputElement>(null);
   const { theme, toggleTheme } = useTheme();
+  useEffect(() => {
+    try {
+      localStorage.setItem("ntc.sidebar.hidden.v1", String(sidebarHidden));
+    } catch {
+      /* Layout preference storage is optional. */
+    }
+  }, [sidebarHidden]);
   const unread = useQuery({
     queryKey: workspace.key("unread"),
     queryFn: () => inbox.count(),
@@ -166,15 +174,25 @@ export default function AppShell() {
   const displaySearch =
     location.pathname === "/notes" ? (params.get("q") ?? "") : search;
   return (
-    <div className="app-shell">
+    <div
+      className={`app-shell customer-shell ${sidebarHidden ? "sidebar-hidden" : ""}`}
+    >
       <a href="#workspace-main" className="skip-link">
         Skip to content
       </a>
-      <aside className="sidebar">
+      <aside className="sidebar" id="workspace-navigation">
         <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
       </aside>
       <div className="main-column">
         <header className="topbar">
+          <IconButton
+            className="desktop-sidebar-toggle"
+            icon={sidebarHidden ? PanelLeftOpen : PanelLeftClose}
+            label={sidebarHidden ? "Show sidebar" : "Hide sidebar"}
+            aria-controls="workspace-navigation"
+            aria-expanded={!sidebarHidden}
+            onClick={() => setSidebarHidden((hidden) => !hidden)}
+          />
           <IconButton
             className="mobile-menu-button"
             icon={Menu}

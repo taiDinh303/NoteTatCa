@@ -60,10 +60,12 @@ export default function RichEditor({
   initial,
   onChange,
   onReady,
+  onCharacterCount,
 }: {
   initial: string;
   onChange: (json: string) => void;
   onReady: (commands: EditorCommands) => void;
+  onCharacterCount: (count: number) => void;
 }) {
   const [link, setLink] = useState(false);
   const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
@@ -81,6 +83,7 @@ export default function RichEditor({
       },
     },
     onUpdate: ({ editor }) => {
+      onCharacterCount(editor.getText().length);
       const json = JSON.stringify(
         canonicalDocument(editor.getJSON() as RichNode),
       );
@@ -94,13 +97,16 @@ export default function RichEditor({
         setError(error);
       }
     },
-    onCreate: ({ editor }) =>
+    onCreate: ({ editor }) => {
+      onCharacterCount(editor.getText().length);
       onReady({
-        focus: () => editor.commands.focus(),
+        // Focus synchronously; a queued frame could run after the user opens the title input.
+        focus: () => editor.view.dom.focus({ preventScroll: true }),
         exportMarkdown: () => setMarkdown("export"),
         importMarkdown: () => setMarkdown("import"),
         plainText: () => editor.getText(),
-      }),
+      });
+    },
   });
   const state = useEditorState({
     editor,
@@ -223,10 +229,7 @@ export default function RichEditor({
         />
       </div>
       <ErrorBanner error={error} />
-      <EditorContent editor={editor} />
-      <span className="editor-count">
-        {editor.getText().length.toLocaleString()} / 100,000 characters
-      </span>
+      <EditorContent className="editor-content" editor={editor} />
       {link ? (
         <Modal open onClose={() => setLink(false)} title="Add a link">
           <form

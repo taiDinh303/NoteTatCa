@@ -55,7 +55,6 @@ export default function RemindersPage() {
     try {
       await reminders.patch(reminder, { isActive: !reminder.isActive });
       await refresh();
-      toast.success(reminder.isActive ? "Reminder paused" : "Reminder enabled");
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {

@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-20/DEC-018: yêu cầu mới thay phần Save thủ công của Q-023: editor chỉ autosave bình thường, Retry save khi lỗi. Toàn viewport, title rỗng ẩn với Add title tùy chọn, chỉ Close, counter góc dưới; notes không header giải thích/nút tạo trùng, sidebar thu gọn, một điểm quản lý labels. Chủ dự án đã xác nhận bỏ cả Create your first note để chỉ giữ Take a note. Giữ báo lỗi/xung đột và draft protections; nội dung/ownership/API không đổi.
+
 2026-10-19: chủ dự án chốt admin là tài khoản quản trị riêng, không dùng chức năng tạo/quản lý ghi chú như khách. Dùng chung login, tự điều hướng theo role; khu admin đầy đủ quản trị account/role/access/statistics/audit và bảo mật account của chính admin. Quyền Admin ưu tiên với dữ liệu role lịch sử hỗn hợp; không sửa account/note cloud tự động. Quyết định DEC-017 ở01-plan; privacy nội dung note vẫn giữ.
 
 TARGET đã chốt: docs trước rồi hoàn thiện backend (giao 2026-10-17); giữ Razor và định hướng React. Backend source đã triển khai, evidence tại06/worklog.

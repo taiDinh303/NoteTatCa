@@ -2,6 +2,12 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Tối giản workspace/editor — 2026-10-20
+
+Frontend: **4 configuration + 17 Vitest PASS**, lint max-warnings0, TypeScript/Production build PASS. Browser Chromium **18/18 PASS trong một lượt** sau sửa lỗi fullscreen animation và lazy editor giành focus từ title. Thêm kiểm tra xóa/thêm lại title ở note đã lưu; chạy lại đúng regression này **1/1 PASS** sau chỉnh autofocus theo draft hiện tại, lint/build chạy lại PASS. Backend Release0warnings/0errors; không chạy lại full backend suite vì không đổi backend.
+
+Các ca kiểm: editor phủ viewport desktop/mobile, title tùy chọn, counter/Close cố định khi cuộn nội dung dài, Close chờ autosave, lỗi mạng/retry không tạo trùng, conflict giữ draft, Markdown, sidebar ẩn/hiện nhớ lựa chọn và không reload, một điểm tạo note/labels, không toast thành công thường. Ca tải editor chậm giữ request module để mở title trước khi editor sẵn sàng và xác nhận focus được giữ. Luồng account/admin cũ cùng đạt. Đã xem ảnh desktop1280/mobile390; dùng fixture SQLite/captured email biệt lập, không DB/email/cloud thật. Chi tiết lượt thất bại trước khi sửa và giới hạn ở [worklog](worklog.md); chưa push/deploy.
+
 ## Tách admin — 2026-10-19
 
 Release strict0warnings/0errors; fullbackend114PASS/1PGfixtureSKIP. Tests xác thực admin-only và Admin+User đều bị403 tại workspace v1/legacy nhưng dùng được admin/self-account; DB role mới ưu tiên JWT cũ, non-admin owner404 và account/note được giữ. Seeder mới không cấp User/tạo content admin. Auth frontend có regression cache/response isolation khi cùng account chuyển nhóm quyền.

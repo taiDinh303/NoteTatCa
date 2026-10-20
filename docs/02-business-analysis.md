@@ -29,7 +29,7 @@ Giúp nhiều user lưu/tìm/tổ chức note riêng, ghim/nhãn, khôi phục k
 | --- | --- | --- | --- |
 | RULE-001 | Owner do server suy ra từ subject đã xác thực | Bỏ/không tin UserId truyền từ UI; owner sai trả 404 để không lộ tồn tại | REQ-002; Q-001 |
 | RULE-002 | Note hoạt động có DeletedTime null; trash tự xóa sau 7 ngày | Restore/xóa sớm bởi owner; note trash không chỉnh/sắp xếp/nhắc; cutoff UTC đề xuất | REQ-006; Q-006 đã chốt |
-| RULE-003 | Title ≤150, tag name ≤50 theo model hiện tại | Title lưu chuỗi rỗng, UI Untitled; plain100.000/rich1 MiB | Q-003/016; ISSUE-005 |
+| RULE-003 | Title ≤150, tag name ≤50 theo model hiện tại | Title lưu chuỗi rỗng; DEC-018 ẩn title rỗng, Add title tùy chọn; plain100.000/rich1 MiB | Q-003/016; DEC-018; ISSUE-005 |
 | RULE-004 | Ghim và không ghim là hai nhóm sắp xếp | Không chấp nhận neighbor khác owner/nhóm hoặc chính draggedId | REQ-005 |
 | RULE-005 | Gán tag phải cùng owner, tag chưa bị xóa | Composite PK tránh trùng; thao tác nhiều bước có transaction | REQ-004 |
 | RULE-006 | Nhắc lịch cần note hoạt động; interval >0 | Until/Count không đồng thời, max5 active, month clamp/catch-up đã chốt | Q-005 |

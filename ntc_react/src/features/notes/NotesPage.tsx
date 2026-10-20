@@ -47,7 +47,6 @@ import {
   EmptyState,
   ErrorPanel,
   IconButton,
-  PageHeading,
   Select,
   SkeletonCards,
   Spinner,
@@ -134,7 +133,7 @@ function NoteCard({
         onClick={onOpen}
         aria-label={`Open ${title}`}
       >
-        <h3>{title}</h3>
+        {note.title?.trim() ? <h3>{note.title}</h3> : null}
         {note.content ? (
           <p
             className={`note-preview ${note.documentJson?.includes("taskList") ? "checklist-preview" : ""}`}
@@ -292,13 +291,6 @@ export default function NotesPage({
     try {
       if (action === "pin") await workspace.pin(note);
       else await workspace.restore(note);
-      toast.success(
-        action === "pin"
-          ? note.isPinned
-            ? "Note unpinned"
-            : "Note pinned"
-          : "Note restored",
-      );
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
@@ -310,7 +302,6 @@ export default function NotesPage({
     setPending(group[from].id);
     try {
       await workspace.reorder(group, from, to);
-      toast.success("Note moved");
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
@@ -379,40 +370,23 @@ export default function NotesPage({
     ) : null;
   return (
     <>
-      <PageHeading
-        eyebrow={
-          trash
-            ? "A SECOND CHANCE"
-            : tagId
-              ? "A LITTLE MORE ORGANIZED"
-              : "YOUR PERSONAL SPACE"
-        }
-        title={
-          trash
-            ? "Trash"
-            : tagId
-              ? (label?.name ?? "Label")
-              : reminderView
-                ? "Notes with reminders"
-                : q
-                  ? "Search results"
-                  : "Your notes"
-        }
-        description={
-          trash
-            ? "Notes stay here for seven days. Restore what you still need."
-            : q
-              ? `Looking for “${q}” in your private notes.`
-              : "A little space for everything on your mind."
+      <h1
+        className={
+          trash || tagId || reminderView || q
+            ? "notes-context-title"
+            : "sr-only"
         }
       >
-        {!trash ? (
-          <Button onClick={() => setEditor({})}>
-            <Plus size={18} />
-            New note
-          </Button>
-        ) : null}
-      </PageHeading>
+        {trash
+          ? "Trash"
+          : tagId
+            ? (label?.name ?? "Label")
+            : reminderView
+              ? "Notes with reminders"
+              : q
+                ? "Search results"
+                : "Notes"}
+      </h1>
       {trash ? (
         <div className="notice-strip">
           <Trash2 size={16} />
@@ -420,13 +394,15 @@ export default function NotesPage({
           period.
         </div>
       ) : (
-        <button className="quick-capture" onClick={() => setEditor({})}>
+        <button
+          className="quick-capture"
+          aria-label="Take a note"
+          onClick={() => setEditor({})}
+        >
           <span className="quick-capture-icon">
             <Plus size={20} />
           </span>
-          <span>
-            Take a note…<small>Capture a thought before it gets away.</small>
-          </span>
+          <span>Take a note…</span>
           <span className="capture-decoration">
             <Check size={17} />
           </span>
@@ -504,14 +480,7 @@ export default function NotesPage({
                 ? "Try another phrase or remove a filter."
                 : "A thought, a list, a plan. Give it a home in your first note."
           }
-        >
-          {!trash && !q ? (
-            <Button onClick={() => setEditor({})}>
-              <Plus size={16} />
-              Create your first note
-            </Button>
-          ) : null}
-        </EmptyState>
+        />
       ) : (
         <DndContext
           sensors={sensors}
@@ -583,11 +552,6 @@ export default function NotesPage({
               if (confirm.action === "trash")
                 await workspace.trash(confirm.note);
               else await workspace.delete(confirm.note);
-              toast.success(
-                confirm.action === "trash"
-                  ? "Note moved to trash"
-                  : "Note deleted",
-              );
             } finally {
               setPending(undefined);
             }
@@ -630,7 +594,6 @@ function TrashViewer({ id, onClose }: { id: string; onClose: () => void }) {
                 setRestoring(true);
                 try {
                   await workspace.restore(query.data);
-                  toast.success("Note restored");
                   onClose();
                 } catch (error) {
                   setRestoreError(error);

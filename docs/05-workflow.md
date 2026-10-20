@@ -10,7 +10,7 @@ Access ngắn hạn + refresh rotation/reuse/family expiry. Refresh có điều 
 
 ## WF-002 — Tạo, xem, sửa và tìm note
 
-REQ-002/003/007/011. Editor unified rich/checklist/màu/emoji/Markdown shortcuts là UX đích; API nhận document schema 1 hoặc plain, owner từ phiên. Title rỗng hợp lệ, UI Untitled. Create key scoped user tránh tạo trùng khi ACK mất; Save/autosave dùng version từ response, lỗi409 phải giữ bản nhập và cho user giải quyết. UI chỉ báo Saved sau ACK; không tự retry ghi đè với version mới.
+REQ-002/003/007/011. Editor unified rich/checklist/màu/emoji/Markdown shortcuts là UX đích; API nhận document schema1 hoặc plain, owner từ phiên. Title rỗng hợp lệ; DEC-018/2026-10-20 ẩn title rỗng, Add title mở input khi cần. Create key scoped user tránh tạo trùng khi ACK mất; autosave/Retry save khi lỗi dùng version từ response, lỗi409 phải giữ bản nhập và cho user giải quyết. UI chỉ báo Saved sau ACK; không tự retry ghi đè với version mới. Close chờ flush khi chưa ACK; lỗi/conflict không âm thầm đóng hoặc mất draft.
 
 Plain note cũ giữ nguyên text; rich document có projection tìm kiếm. Bỏ trường PATCH giữ giá trị, convertToPlainText cần xác nhận; Markdown export sau này cảnh báo mất định dạng. Tìm title/content trong owner, có filter tag/pin/trash/reminder và pagination. Không có attachment/share/archive trong đợt đầu.
 

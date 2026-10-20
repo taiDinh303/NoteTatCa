@@ -10,7 +10,7 @@ async function login(page: Page, email = "a@example.test") {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(
     page.getByRole("heading", {
-      name: email === "admin@example.test" ? "System overview" : "Your notes",
+      name: email === "admin@example.test" ? "System overview" : "Notes",
       exact: true,
     }),
   ).toBeVisible();
@@ -20,8 +20,9 @@ async function createNote(
   title: string,
   content = "A private thought worth keeping.",
 ) {
-  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await editor.getByRole("button", { name: "Add title", exact: true }).click();
   await editor.getByLabel("Note title").fill(title);
   await editor.getByRole("textbox", { name: "Note content" }).fill(content);
   await expect(
@@ -106,6 +107,250 @@ test("renders responsive workspace without console errors or navigation reloads"
   expect(errors).toEqual([]);
 });
 
+test("offers a compact workspace with persistent sidebar control and one labels entry", async ({
+  page,
+}) => {
+  await login(page);
+  await expect(
+    page.getByText("YOUR PERSONAL SPACE", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Your notes", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "New note", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Take a note", exact: true }),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Create a label", exact: true }),
+  ).toHaveCount(0);
+  const manageLabels = page.getByRole("button", {
+    name: "Manage labels",
+    exact: true,
+  });
+  await expect(manageLabels).toHaveText("YOUR LABELS");
+  await expect(manageLabels).toHaveCSS("cursor", "pointer");
+  await manageLabels.getByText("YOUR LABELS", { exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Your labels", exact: true })
+    .getByRole("button", { name: "Done", exact: true })
+    .click();
+  await page.evaluate(() => {
+    (window as Window & { fixtureMarker?: string }).fixtureMarker =
+      "sidebar-kept";
+  });
+  const before = (await page.locator("#workspace-main").boundingBox())!.width;
+  await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
+  await expect(page.locator("#workspace-navigation")).not.toBeVisible();
+  expect(
+    (await page.locator("#workspace-main").boundingBox())!.width,
+  ).toBeGreaterThan(before);
+  expect(
+    await page.evaluate(
+      () => (window as Window & { fixtureMarker?: string }).fixtureMarker,
+    ),
+  ).toBe("sidebar-kept");
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Show sidebar", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Show sidebar", exact: true }).click();
+  await expect(page.locator("#workspace-navigation")).toBeVisible();
+  const pinned = page.waitForResponse(
+    (response) =>
+      /\/notes\/[^/]+\/pin$/.test(response.url()) &&
+      response.request().method() === "PATCH",
+  );
+  await page
+    .getByRole("button", { name: "Pin Project notes", exact: true })
+    .click();
+  expect((await pinned).ok()).toBeTruthy();
+  await expect(
+    page.getByRole("button", { name: "Unpin Project notes", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.locator('[data-sonner-toast][data-type="success"]'),
+  ).toHaveCount(0);
+  await page.screenshot({
+    path: "../artifacts/frontend/notes-content-first.png",
+    fullPage: true,
+  });
+});
+
+test("edits content in a full viewport with an optional title and fixed character count", async ({
+  page,
+}) => {
+  await login(page);
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await expect(editor.getByLabel("Note title", { exact: true })).toHaveCount(0);
+  await expect(
+    editor.getByRole("button", { name: "Save", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    editor.getByRole("button", { name: "Close note", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    editor.getByRole("button", { name: "Close", exact: true }),
+  ).toHaveCount(1);
+  const bounds = (await editor.boundingBox())!;
+  const viewport = page.viewportSize()!;
+  expect(bounds.x).toBeCloseTo(0);
+  expect(bounds.y).toBeCloseTo(0);
+  expect(bounds.width).toBeCloseTo(viewport.width);
+  expect(bounds.height).toBeCloseTo(viewport.height);
+  const content = editor.getByRole("textbox", {
+    name: "Note content",
+    exact: true,
+  });
+  await content.fill("contentonly");
+  await expect(
+    editor.getByLabel("Character count", { exact: true }),
+  ).toHaveText("11 / 100,000 characters");
+  await expect(
+    editor.getByText("All changes saved", { exact: true }),
+  ).toBeVisible();
+  await editor.getByRole("button", { name: "Add title", exact: true }).click();
+  const title = editor.getByLabel("Note title", { exact: true });
+  await expect(title).toBeFocused();
+  await title.fill("Optional title");
+  await title.fill("");
+  await content.click();
+  await expect(title).toHaveCount(0);
+  await expect(content).toContainText("contentonly");
+  const counter = (await editor
+    .getByLabel("Character count", { exact: true })
+    .boundingBox())!;
+  expect(counter.y).toBeGreaterThan(viewport.height - 85);
+  await page.screenshot({
+    path: "../artifacts/frontend/editor-content-first-desktop.png",
+    fullPage: false,
+  });
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobile = (await editor.boundingBox())!;
+  expect(mobile.width).toBeCloseTo(390);
+  expect(mobile.height).toBeCloseTo(844);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+  await expect(
+    editor.getByRole("button", { name: "Close", exact: true }),
+  ).toBeInViewport();
+  await expect(
+    editor.getByLabel("Character count", { exact: true }),
+  ).toBeInViewport();
+  await page.screenshot({
+    path: "../artifacts/frontend/editor-content-first-mobile.png",
+    fullPage: false,
+  });
+  await content.fill("Long content line.\n".repeat(150));
+  await editor.locator(".editor-scroll").evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+  });
+  await expect(
+    editor.getByLabel("Character count", { exact: true }),
+  ).toBeInViewport();
+  await expect(
+    editor.getByRole("button", { name: "Close", exact: true }),
+  ).toBeInViewport();
+  await content.fill("Final content");
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(editor).not.toBeVisible();
+  await expect(
+    page.getByRole("dialog", { name: "Keep your changes?", exact: true }),
+  ).toHaveCount(0);
+  const card = page.getByRole("article").filter({
+    has: page.getByRole("button", { name: "Open Untitled", exact: true }),
+  });
+  await expect(card.getByRole("heading")).toHaveCount(0);
+  await card
+    .getByRole("button", { name: "Open Untitled", exact: true })
+    .click();
+  const reopened = page.getByRole("dialog", { name: "Edit note", exact: true });
+  await expect(reopened.getByLabel("Note title", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(
+    reopened.getByRole("textbox", { name: "Note content", exact: true }),
+  ).toContainText("Final content");
+});
+
+test("keeps the optional title focused when the rich editor loads slowly", async ({
+  page,
+}) => {
+  let releaseEditor!: () => void;
+  const editorGate = new Promise<void>((resolve) => {
+    releaseEditor = resolve;
+  });
+  await page.route("**/src/features/editor/RichEditor.tsx*", async (route) => {
+    await editorGate;
+    await route.continue();
+  });
+  try {
+    await login(page);
+    await page
+      .getByRole("button", { name: "Take a note", exact: true })
+      .click();
+    const dialog = page.getByRole("dialog", { name: "New note", exact: true });
+    await expect(
+      dialog.getByText("Loading editor…", { exact: true }),
+    ).toBeVisible();
+    await dialog
+      .getByRole("button", { name: "Add title", exact: true })
+      .click();
+    const title = dialog.getByLabel("Note title");
+    await expect(title).toBeFocused();
+    releaseEditor();
+    await expect(
+      dialog.getByRole("textbox", { name: "Note content" }),
+    ).toBeVisible();
+    await expect(title).toBeFocused();
+    await title.fill("Title survives lazy startup");
+    await dialog
+      .getByRole("textbox", { name: "Note content" })
+      .fill("Content stays editable.");
+    await dialog.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(
+      page.getByRole("button", {
+        name: "Open Title survives lazy startup",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", {
+        name: "Open Title survives lazy startup",
+        exact: true,
+      })
+      .click();
+    const reopened = page.getByRole("dialog", {
+      name: "Edit note",
+      exact: true,
+    });
+    await reopened.getByLabel("Note title").fill("");
+    await reopened.getByRole("textbox", { name: "Note content" }).click();
+    await reopened
+      .getByRole("button", { name: "Add title", exact: true })
+      .click();
+    await expect(reopened.getByLabel("Note title")).toBeFocused();
+    await reopened.getByLabel("Note title").fill("A title added again");
+    await reopened.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(
+      page.getByRole("button", {
+        name: "Open A title added again",
+        exact: true,
+      }),
+    ).toBeVisible();
+  } finally {
+    releaseEditor();
+  }
+});
+
 test("creates rich notes, autosaves updates, assigns labels and restores from trash", async ({
   page,
 }) => {
@@ -126,7 +371,7 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();
-  await editor.getByRole("button", { name: "Close note", exact: true }).click();
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Open Browser note", exact: true }),
   ).toBeVisible();
@@ -222,7 +467,7 @@ test("manages labels and reorders notes through keyboard-friendly controls", asy
     .getByRole("menuitem", { name: "Move earlier", exact: true })
     .click();
   expect((await response).ok()).toBeTruthy();
-  await expect(page.getByText("Note moved", { exact: true })).toBeVisible();
+  await expect(page.getByText("Note moved", { exact: true })).toHaveCount(0);
 });
 
 test("creates reminders and reads the resulting inbox notification", async ({
@@ -257,7 +502,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
     .getByRole("button", { name: "Close dialog", exact: true })
     .click();
   editor = page.getByRole("dialog", { name: "Edit note", exact: true });
-  await editor.getByRole("button", { name: "Close note", exact: true }).click();
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
   await request.post(fixture + "/__fixture/advance?minutes=3");
   expect(
     (await request.post(fixture + "/__fixture/dispatch")).ok(),
@@ -326,7 +571,7 @@ test("registers using the emailed fixture code and supports password recovery", 
     .getByRole("button", { name: "Create my space", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Your notes", exact: true }),
+    page.getByRole("heading", { name: "Notes", exact: true }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -334,6 +579,12 @@ test("registers using the emailed fixture code and supports password recovery", 
       exact: true,
     }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Create your first note", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Take a note", exact: true }),
+  ).toHaveCount(1);
   await page.goto("/forgot-password");
   await page.getByLabel("Email address", { exact: true }).fill(email);
   await page
@@ -601,11 +852,9 @@ test("admin completes account lifecycle, details, memberships and custom role ma
   await role.getByLabel("Role name", { exact: true }).fill("AccountReviewer");
   await role.getByRole("button", { name: "Save role", exact: true }).click();
   await expect(role).not.toBeVisible();
-  const roleCard = page
-    .getByRole("article")
-    .filter({
-      has: page.getByRole("heading", { name: "AccountReviewer", exact: true }),
-    });
+  const roleCard = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "AccountReviewer", exact: true }),
+  });
   await roleCard.getByRole("button", { name: "Edit", exact: true }).click();
   const edit = page.getByRole("dialog", { name: "Edit role", exact: true });
   await edit
@@ -661,7 +910,7 @@ test("ordinary accounts cannot open the administration area", async ({
   await page.goto("/admin/users");
   await expect(page).toHaveURL(/\/notes$/);
   await expect(
-    page.getByRole("heading", { name: "Your notes", exact: true }),
+    page.getByRole("heading", { name: "Notes", exact: true }),
   ).toBeVisible();
 });
 
@@ -692,7 +941,7 @@ test("reorders the pinned group with pointer and keyboard dragging", async ({
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 12 });
   await page.mouse.up();
   expect((await moved).ok()).toBeTruthy();
-  await expect(page.getByText("Note moved", { exact: true })).toBeVisible();
+  await expect(page.getByText("Note moved", { exact: true })).toHaveCount(0);
   const pinned = page.locator(".notes-section").first();
   await expect(pinned.locator("h3").first()).toHaveText(
     "Little things, lately",
@@ -701,9 +950,17 @@ test("reorders the pinned group with pointer and keyboard dragging", async ({
     (r) =>
       r.url().endsWith("/notes/reorder") && r.request().method() === "POST",
   );
+  const targetId = (await pinned
+    .locator("article")
+    .nth(1)
+    .getAttribute("data-testid"))!.slice("note-".length);
   await second.focus();
   await page.keyboard.press("Space");
+  await expect(second).toHaveAttribute("aria-pressed", "true");
   await page.keyboard.press("ArrowRight");
+  await expect(
+    page.getByRole("status").filter({ hasText: "was moved over" }),
+  ).toContainText(targetId);
   await page.keyboard.press("Space");
   expect((await keyboard).ok()).toBeTruthy();
   await expect(pinned.locator("h3").first()).toHaveText(
@@ -760,8 +1017,9 @@ test("keeps an unsaved draft after a network failure and retries without duplica
     if (route.request().method() === "POST") await route.abort("failed");
     else await route.continue();
   });
-  await page.getByRole("button", { name: "New note", exact: true }).click();
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await editor.getByRole("button", { name: "Add title", exact: true }).click();
   await editor.getByLabel("Note title").fill("Kept after a network error");
   await editor
     .getByRole("textbox", { name: "Note content" })
@@ -770,7 +1028,7 @@ test("keeps an unsaved draft after a network failure and retries without duplica
   await expect(
     editor.getByRole("textbox", { name: "Note content" }),
   ).toContainText("My words are still here.");
-  await editor.getByRole("button", { name: "Close note", exact: true }).click();
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
   const prompt = page.getByRole("dialog", {
     name: "Keep your changes?",
     exact: true,
@@ -779,11 +1037,11 @@ test("keeps an unsaved draft after a network failure and retries without duplica
     .getByRole("button", { name: "Keep editing", exact: true })
     .click();
   await page.unroute("**/api/v1/notes");
-  await editor.getByRole("button", { name: "Save", exact: true }).click();
+  await editor.getByRole("button", { name: "Retry save", exact: true }).click();
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();
-  await editor.getByRole("button", { name: "Close note", exact: true }).click();
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("button", {
       name: "Open Kept after a network error",

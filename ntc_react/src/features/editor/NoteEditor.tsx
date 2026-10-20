@@ -13,11 +13,10 @@ import {
   Check,
   Copy,
   Download,
-  Expand,
   LoaderCircle,
   Pin,
-  Save,
-  Shrink,
+  RotateCcw,
+  Type,
   Tag,
   Trash2,
   Upload,
@@ -58,12 +57,24 @@ export default function NoteEditor({
   });
   if (noteId && !query.data)
     return (
-      <Modal open wide onClose={onClose} title="Open note">
+      <Modal
+        open
+        wide
+        hideTitle
+        className="note-editor-modal fullscreen"
+        onClose={onClose}
+        title="Open note"
+      >
         {query.isError ? (
           <ErrorPanel error={query.error} retry={() => void query.refetch()} />
         ) : (
           <Spinner label="Opening your note…" />
         )}
+        <footer className="editor-footer">
+          <Button variant="ghost" onClick={onClose}>
+            Close
+          </Button>
+        </footer>
       </Modal>
     );
   return (
@@ -98,7 +109,11 @@ function EditorSession({
     coordinator.getSnapshot,
   );
   const labels = useLabels();
-  const [wide, setWide] = useState(false);
+  const [showTitle, setShowTitle] = useState(() => !!initial?.title?.trim());
+  const [characterCount, setCharacterCount] = useState(
+    initial?.content.length ?? 0,
+  );
+  const [closing, setClosing] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -144,8 +159,16 @@ function EditorSession({
     }
   }
   function requestClose() {
+    if (closing) return;
     if (snapshot.dirty) {
-      setClosePrompt(true);
+      if (snapshot.status === "error" || snapshot.status === "conflict") {
+        setClosePrompt(true);
+      } else {
+        setClosing(true);
+        void closeSaved()
+          .catch(() => setClosePrompt(true))
+          .finally(() => setClosing(false));
+      }
       return;
     }
     onClose();
@@ -178,7 +201,7 @@ function EditorSession({
         onClose={requestClose}
         title={initial ? "Edit note" : "New note"}
         hideTitle
-        className={`note-editor-modal ${wide ? "fullscreen" : ""}`}
+        className="note-editor-modal fullscreen"
       >
         <div
           className="editor-heading"
@@ -208,18 +231,22 @@ function EditorSession({
             </span>
           </div>
           <div className="row-actions">
+            {!showTitle ? (
+              <Button
+                className="add-title-button"
+                variant="ghost"
+                onClick={() => setShowTitle(true)}
+              >
+                <Type size={15} />
+                Add title
+              </Button>
+            ) : null}
             <IconButton
               icon={Pin}
               label={draft.isPinned ? "Unpin note" : "Pin note"}
               active={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
             />
-            <IconButton
-              icon={wide ? Shrink : Expand}
-              label={wide ? "Exit full screen" : "Full screen"}
-              onClick={() => setWide(!wide)}
-            />
-            <IconButton icon={X} label="Close note" onClick={requestClose} />
           </div>
         </div>
         {emojiOpen ? (
@@ -245,17 +272,22 @@ function EditorSession({
             />
           </div>
         ) : null}
-        <div className="editor-title-wrap">
-          <input
-            className="editor-title"
-            aria-label="Note title"
-            placeholder="Untitled"
-            value={draft.title}
-            maxLength={150}
-            onChange={(e) => update({ title: e.target.value })}
-          />
-          <span className="editor-subtitle">A thought worth keeping.</span>
-        </div>
+        {showTitle ? (
+          <div className="editor-title-wrap">
+            <input
+              className="editor-title"
+              aria-label="Note title"
+              placeholder="Title"
+              autoFocus={!draft.title.trim()}
+              value={draft.title}
+              maxLength={150}
+              onChange={(e) => update({ title: e.target.value })}
+              onBlur={() => {
+                if (!draftRef.current.title.trim()) setShowTitle(false);
+              }}
+            />
+          </div>
+        ) : null}
         <ErrorBanner error={otherError ?? snapshot.error} />
         {snapshot.status === "conflict" ? (
           <div className="conflict-panel">
@@ -272,7 +304,6 @@ function EditorSession({
                     .writeText(
                       `${draft.title}\n\n${editor.current?.plainText() ?? draft.documentJson}`,
                     )
-                    .then(() => toast.success("Draft copied"))
                     .catch(() =>
                       toast.error(
                         "Clipboard is unavailable. Select and copy the text manually.",
@@ -303,7 +334,6 @@ function EditorSession({
                       coordinator.dispose();
                       fork.current?.dispose();
                       onClose();
-                      toast.success("Saved as a new note");
                     })
                     .catch(setOtherError)
                     .finally(() => setCopyBusy(false));
@@ -326,9 +356,17 @@ function EditorSession({
           <Suspense fallback={<Spinner label="Loading editor…" />}>
             <RichEditor
               initial={draft.documentJson}
+              onCharacterCount={setCharacterCount}
               onChange={(documentJson) => update({ documentJson })}
               onReady={(commands) => {
                 editor.current = commands;
+                // Lazy editor startup must not steal focus from an optional title or another input.
+                if (
+                  !document.activeElement?.matches(
+                    "input, textarea, select, [contenteditable='true']",
+                  )
+                )
+                  commands.focus();
               }}
             />
           </Suspense>
@@ -474,7 +512,6 @@ function EditorSession({
                   action: () => {
                     void navigator.clipboard
                       .writeText(editor.current?.plainText() ?? "")
-                      .then(() => toast.success("Copied to clipboard"))
                       .catch(() => toast.error("Clipboard is unavailable."));
                   },
                 },
@@ -490,21 +527,23 @@ function EditorSession({
             />
           </div>
           <div className="row-actions">
-            <Button variant="ghost" onClick={requestClose}>
+            <span className="editor-count" aria-label="Character count">
+              {characterCount.toLocaleString("en-US")} / 100,000 characters
+            </span>
+            {snapshot.status === "error" ? (
+              <Button
+                variant="secondary"
+                disabled={state.status !== "authenticated"}
+                onClick={() => {
+                  void save().catch(() => {});
+                }}
+              >
+                <RotateCcw size={15} />
+                Retry save
+              </Button>
+            ) : null}
+            <Button variant="ghost" busy={closing} onClick={requestClose}>
               Close
-            </Button>
-            <Button
-              busy={snapshot.status === "saving"}
-              disabled={
-                snapshot.status === "conflict" ||
-                state.status !== "authenticated"
-              }
-              onClick={() => {
-                void save().catch(() => {});
-              }}
-            >
-              <Save size={15} />
-              Save
             </Button>
           </div>
         </footer>
@@ -559,7 +598,6 @@ function EditorSession({
               await workspace.trash(note);
               coordinator.dispose();
               onClose();
-              toast.success("Note moved to trash");
             }
           }}
         />
