@@ -26,6 +26,7 @@ Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; b
 
 ## Trạng thái bắt buộc
 
+- DEC-019: sau login/restore có animation chuẩn bị workspace và progress collection/trang thực tế; lỗi có Try again/Sign out. API chậm có trạng thái Connecting, offline có Reconnect; bootstrap lỗi mạng không xóa phiên đang lưu. Giữ layout/editor/draft khi kết nối gián đoạn trong lúc dùng. Chỉ retry GET/probe tự động; Retry save do user chọn khi lưu lỗi. Cache trong memory giúp chuyển notes/labels/trash/reminders/inbox không chờ tải lần đầu sau preparation; không hứa offline đầy đủ hoặc không có background refresh.
 - Danh sách: loading, rỗng lần đầu, không có kết quả search, lỗi có retry, trang ngoài giới hạn.
 - Editor: sạch/đang sửa/đang lưu/đã lưu/lưu lỗi/conflict. DEC-018 thay Save thường của Q-023 bằng autosave + Retry save chỉ khi lỗi; giữ bản nhập khi401, mất mạng hoặc server lỗi; không báo Saved trước ACK.
 - Notes: một điểm Take a note kể cả empty state; bỏ header giải thích/nút New note/Create your first note trùng. Reminders/Inbox bỏ heading và mô tả đầu trang; Trash/label bỏ heading nhìn thấy, giữ semantic heading cho screen reader và các thao tác/cảnh báo. Sidebar có ẩn/hiện desktop nhớ lựa chọn, mobile drawer, cùng icon ba gạch ngang; YOUR LABELS/icon dùng chung một button, không Create a label trùng. Không routine success toast cho note/label/reminder; lỗi và các xác nhận bảo mật/quản trị giữ nguyên.

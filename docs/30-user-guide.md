@@ -10,6 +10,12 @@ React hiện ở ntc_react; route/chức năng thực tế xem FRONTEND-IMPLEMEN
 
 Đăng ký bằng email/mật khẩu, nhập mã xác minh email, hoặc chọn **Continue with Google**. Sau đăng nhập, **Notes** hiển thị ghi chú của bạn. Tài khoản khác và quản trị viên ứng dụng không được xem nội dung ghi chú riêng qua chức năng app.
 
+## Tải dữ liệu và kết nối
+
+Sau đăng nhập, **Preparing your workspace** tải notes, labels, Trash, Reminders và Inbox để chuyển trang nhanh. Thanh tiến trình hiển thị các collection/trang đã tải; nhiều note có thể mất lâu hơn. Nếu báo **Connecting to NoteTatCa…**, hãy đợi API phản hồi. Khi thất bại dùng **Try again**, **Reconnect** hoặc **Retry connection** theo màn hình; không cần nhập lại mật khẩu chỉ vì phiên chưa khôi phục được do mất mạng.
+
+Khi đang soạn mà mất kết nối, giữ tab mở; bản nháp ở trong bộ nhớ. Sau khi có mạng, kiểm trạng thái lưu và dùng **Retry save** nếu còn lỗi. Kết nối lại không tự gửi lại thao tác ghi. Tải lại/đóng tab có thể mất nội dung chưa lưu; ứng dụng chưa có lưu offline bền vững. Sign out xóa cache riêng của tài khoản khỏi tab.
+
 ## Tạo và tổ chức note
 
 1. Chọn **Take a note…** để mở editor toàn màn hình và nhập nội dung. Nút góc trên **Exit full screen / Enter full screen** chuyển giữa modal và toàn màn hình, giữ nguyên bản đang nhập. Tiêu đề không bắt buộc; chọn **Add title** khi muốn thêm.

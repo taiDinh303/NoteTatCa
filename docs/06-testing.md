@@ -2,6 +2,14 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Preparation/cache/kết nối — 2026-10-20
+
+**22/22 Playwright Chromium PASS trong một lượt**, **27 Vitest + 4 configuration PASS**, ESLint max-warnings0/TypeScript/Production Vite build PASS; backend Release strict0warnings/0errors. Không chạy lại full backend suite vì không đổi backend runtime/schema; browser fixture bridge bổ sung health forwarding và serialization cho connection SQLite dùng chung. Lượt full trước21PASS/1FAIL phát hiện Inbox giữ snapshot rỗng; đã sửa revalidate nền khi mount và xác nhận thông báo dispatch mới xuất hiện.
+
+Ca mới: health503/HTML→JSONlive trước một login POST, tải đủ3pages note và tái dùng notes/label cache khi điều hướng, giữ GET Inbox/Reminders đang chờ mà UI cached vẫn hiển thị, progress desktop/mobile390, lỗi collection retry không login lại, offline bootstrap giữ refresh session rồi restore. Unit kiểm đủ pages, admin không personal calls, bỏ kết quả sau account/reset, nguồn partial/invalidated không suy diễn cache, shared/bounded health probes, không idle keep-alive hoặc replay write, refresh outage không expire và bootstrap cũ không xóa phiên mới. Các luồng editor/draft/network retry/role/admin cũ cùng đạt.
+
+Đã xem ảnh connecting/preparing desktop/mobile trong artifacts. Mọi API/DB/mail là fixture loopback/synthetic; không đo cold start Render thật, account lớn, SQLServer/PostgreSQL concurrency mới hoặc cloud deployment. Test bridge serialize SQLite, production requests vẫn song song. Chi tiết phạm vi/giới hạn ở worklog; các mốc frontend17/18 và backend cũ dưới đây được giữ làm lịch sử.
+
 ## Tối giản workspace/editor — 2026-10-20
 
 Bổ sung bỏ heading/mô tả đầu trang Reminders/Inbox và heading nhìn thấy của Trash/label, icon Menu chung desktop/mobile: focused browser **3/3 PASS (50.1 giây)**. Kiểm semantic heading sr-only, không copy cũ, action Mark all as read/cảnh báo Trash còn hiển thị, navigation SPA/label, sidebar hai trạng thái/persistence và reminder→inbox. Không thêm hoặc chạy lại toàn bộ suite cho chỉnh sửa trình bày này.

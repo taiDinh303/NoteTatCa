@@ -1,6 +1,6 @@
 import { useSyncExternalStore, useState, useEffect } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { auth, workspace, notes, labels, account } from "../app/runtime";
+import { auth, workspace, notes, labels, account, cache } from "../app/runtime";
 import type { NoteFilter } from "../domain/models";
 export const useAuth = () =>
   useSyncExternalStore(auth.subscribe, auth.getSnapshot);
@@ -17,6 +17,11 @@ export function useNotes(filter: NoteFilter) {
   return useInfiniteQuery({
     queryKey: workspace.key("notes", filter),
     queryFn: ({ pageParam, signal }) => notes.list(filter, pageParam, signal),
+    initialData: () => workspace.cachedNotes(filter),
+    initialDataUpdatedAt: () =>
+      cache.getQueryState(
+        workspace.key("notes", filter.trash ? { trash: true } : {}),
+      )?.dataUpdatedAt,
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,

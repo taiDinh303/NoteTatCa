@@ -8,6 +8,8 @@ REQ-001/009, RULE-009. Password: gửi mã email → nhập mã còn hạn → r
 
 Access ngắn hạn + refresh rotation/reuse/family expiry. Refresh có điều phối một request ở client; logout/revoke/lock/password change làm phiên cũ mất hiệu lực. Email/Google/SMTP thật và UI login/forgot/reset/link cần E2E khi xây React; backend đã có fake-provider HTTP tests. Xem [15](15-api-contract.md).
 
+DEC-019/2026-10-20: trước login/Google/restore, kiểm health GET hữu hạn để chờ API; không retry tự động POST auth hoặc lưu note. Sau auth, preparation tải đủ pages của workspace account hiện tại và modules chính, hiển thị animation/progress thực rồi mở layout. Admin chỉ me/statistics/module quản trị. Outage khi restore giữ refresh session để Retry connection; mất mạng khi soạn giữ editor/draft, reconnect chỉ revalidate đọc. Cached lists hiển thị ngay khi chuyển trang; Inbox/Reminders làm mới nền khi mount để nhận dữ liệu mới. Logout/đổi account/nhóm quyền hủy tải và xóa cache riêng.
+
 ## WF-002 — Tạo, xem, sửa và tìm note
 
 REQ-002/003/007/011. Editor unified rich/checklist/màu/emoji/Markdown shortcuts là UX đích; API nhận document schema1 hoặc plain, owner từ phiên. Title rỗng hợp lệ; DEC-018/2026-10-20 ẩn title rỗng, Add title mở input khi cần. Create key scoped user tránh tạo trùng khi ACK mất; autosave/Retry save khi lỗi dùng version từ response, lỗi409 phải giữ bản nhập và cho user giải quyết. UI chỉ báo Saved sau ACK; không tự retry ghi đè với version mới. Close chờ flush khi chưa ACK; lỗi/conflict không âm thầm đóng hoặc mất draft.

@@ -1,5 +1,5 @@
 import type { Session } from "../domain/models";
-import { ApiClient } from "../infrastructure/http";
+import { ApiClient, ApiError } from "../infrastructure/http";
 import { isAdministrator } from "./access";
 export interface SessionStoragePort {
   getItem(key: string): string | null;
@@ -63,7 +63,7 @@ export class SessionVault {
   }
 }
 export interface AuthSnapshot {
-  status: "loading" | "anonymous" | "authenticated" | "expired";
+  status: "loading" | "unavailable" | "anonymous" | "authenticated" | "expired";
   session?: Session;
 }
 export class AuthService {
@@ -75,7 +75,12 @@ export class AuthService {
   private readonly api: ApiClient;
   private readonly vault: SessionVault;
   private readonly clearPrivate: () => void;
-  constructor(api: ApiClient, vault: SessionVault, clearPrivate: () => void) {
+  constructor(
+    api: ApiClient,
+    vault: SessionVault,
+    clearPrivate: () => void,
+    private readonly beforeAuthentication: () => Promise<void> = async () => {},
+  ) {
     this.api = api;
     this.vault = vault;
     this.clearPrivate = clearPrivate;
@@ -111,15 +116,27 @@ export class AuthService {
     this.vault.write(session);
     this.emit({ status: "authenticated", session });
   }
-  bootstrap() {
+  bootstrap(retry = false) {
+    if (retry && this.snapshot.status === "unavailable") {
+      this.boot = undefined;
+      this.emit({ status: "loading" });
+    }
     return (this.boot ??= (async () => {
       if (!this.vault.read()) {
         this.emit({ status: "anonymous" });
         return;
       }
+      const generation = this.generation;
       try {
         await this.refresh();
-      } catch {
+      } catch (error) {
+        if (generation !== this.generation) return;
+        if (!(
+          error instanceof ApiError && [400, 401, 403].includes(error.status)
+        )) {
+          this.emit({ status: "unavailable" });
+          return;
+        }
         this.vault.clear();
         this.emit({ status: "anonymous" });
       }
@@ -131,6 +148,9 @@ export class AuthService {
     this.refreshInFlight = (async () => {
       const saved = this.vault.read();
       if (!saved) throw new Error("No refresh session");
+      await this.beforeAuthentication();
+      if (generation !== this.generation)
+        throw new Error("The session changed while connecting.");
       const value = await this.api.request<Session>("/auth/refresh", {
         method: "POST",
         body: { refreshToken: saved.refreshToken },
@@ -152,6 +172,8 @@ export class AuthService {
   }
   async login(email: string, password: string, rememberMe = false) {
     const generation = ++this.generation;
+    await this.beforeAuthentication();
+    if (generation !== this.generation) return;
     const session = await this.api.request<Session>("/auth/login", {
       method: "POST",
       body: { email, password, rememberMe },
@@ -161,6 +183,8 @@ export class AuthService {
   }
   async google(idToken: string) {
     const generation = ++this.generation;
+    await this.beforeAuthentication();
+    if (generation !== this.generation) return;
     const session = await this.api.request<Session>("/auth/google", {
       method: "POST",
       body: { idToken },

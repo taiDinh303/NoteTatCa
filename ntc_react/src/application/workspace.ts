@@ -11,6 +11,36 @@ export class WorkspaceService {
   key(resource: string, ...parts: unknown[]) {
     return ["private", this.identity() ?? "none", resource, ...parts];
   }
+  cachedNotes(filter: NoteFilter): InfiniteData<Page<Note>, number> | undefined {
+    const key = this.key("notes", filter.trash ? { trash: true } : {});
+    const state = this.cache.getQueryState<InfiniteData<Page<Note>>>(key);
+    const data = state?.data;
+    if (
+      !state ||
+      !data ||
+      state.isInvalidated ||
+      data.pages.at(-1)?.hasNextPage
+    )
+      return;
+    const items = sortNotes(
+      data.pages
+        .flatMap((page) => page.items)
+        .filter((note) => matchesNote(note, filter)),
+    );
+    const totalPages = Math.max(1, Math.ceil(items.length / 100));
+    return {
+      pages: Array.from({ length: totalPages }, (_, index) => ({
+        items: items.slice(index * 100, (index + 1) * 100),
+        currentPage: index + 1,
+        totalPages,
+        totalItems: items.length,
+        pageSize: 100,
+        hasNextPage: index + 1 < totalPages,
+        hasPreviousPage: index > 0,
+      })),
+      pageParams: Array.from({ length: totalPages }, (_, index) => index + 1),
+    };
+  }
   commit = (note: Note) => {
     if (note.userId !== this.identity()) return;
     const detail = note.deletedTime ? "trash-note" : "note";

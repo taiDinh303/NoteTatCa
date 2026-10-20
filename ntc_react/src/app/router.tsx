@@ -12,6 +12,8 @@ import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
 import { Spinner } from "../shared/ui";
 import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
+import { ConnectionNotice, StartupScreen, WorkspaceReady } from "./Startup";
+import { Button } from "../shared/ui";
 const AuthPage = lazy(() => import("../features/auth/AuthPage"));
 const AppShell = lazy(() => import("./AppShell"));
 const AdminShell = lazy(() => import("./AdminShell"));
@@ -25,21 +27,41 @@ function Root() {
     void auth.bootstrap();
   }, []);
   return (
-    <Suspense fallback={<Spinner label="Opening your space…" />}>
-      <Outlet />
-    </Suspense>
+    <>
+      <ConnectionNotice />
+      <Suspense fallback={<StartupScreen title="Opening your space…" />}>
+        <Outlet />
+      </Suspense>
+    </>
   );
 }
 function Authenticated() {
   const state = useAuth();
   const location = useLocation();
-  if (state.status === "loading")
-    return <Spinner label="Restoring your session…" />;
+  if (state.status === "loading" || state.status === "unavailable")
+    return (
+      <StartupScreen
+        busy={state.status === "loading"}
+        title={
+          state.status === "loading"
+            ? "Restoring your session…"
+            : "Unable to restore your session yet"
+        }
+      >
+        {state.status === "unavailable" ? (
+          <Button onClick={() => void auth.bootstrap(true)}>
+            Retry connection
+          </Button>
+        ) : null}
+      </StartupScreen>
+    );
   if (!state.session || state.status === "anonymous")
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   return (
-    <div key={state.session.userId}>
-      <Outlet />
+    <div key={auth.identity()}>
+      <WorkspaceReady>
+        <Outlet />
+      </WorkspaceReady>
     </div>
   );
 }

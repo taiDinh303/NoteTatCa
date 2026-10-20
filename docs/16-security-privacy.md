@@ -4,6 +4,8 @@
 
 ## Quyền dữ liệu
 
+2026-10-20/DEC-019: preparation chỉ tải workspace account hiện tại và giữ memory riêng trong tab; Admin không preload note/label/reminder/inbox. Reset/cancel khi logout/đổi account/nhóm quyền và guard trước khi ghi cache/detail; không persist nội dung note hoặc credentials mới. Health GET anonymous không mang cookie/token, retry hữu hạn; không replay mutation khi mất mạng. Outage lúc refresh/bootstrap giữ session/draft, không coi lỗi mạng là xác thực sai; response auth400/401/403 vẫn kết thúc phiên bootstrap không hợp lệ.
+
 2026-10-19/DEC-017: tài khoản có Admin chỉ làm quản trị. Policy CustomerWorkspace chặn Admin trên toàn bộ workspace controller v1/legacy, bao gồm admin lịch sử có cả User. Không chỉ ẩn nút trong React; server trả403 trước thao tác dữ liệu. Self profile/security/sessions được giữ. Nội dung note/account cũ không bị xóa hoặc đổi owner; admin metadata/statistics/audit không có nội dung note. Frontend clear cache và bỏ response đang bay khi chuyển nhóm quyền cùng user.
 
 Fallback authenticated toàn controller trừ các action AllowAnonymous auth/proof/health. Note/tag/reminder/notification là owner scope tại service; biết ID người khác trả404, không chỉ ẩn menu. Admin không có bypass nội dung note, chỉ metadata account/aggregate. Profile/account tự sửa; role quản trị hoặc proof token cho recovery. DTO không cấp quyền qua UserId client; SaveChanges chặn chuyển owner ở dữ liệu chính.

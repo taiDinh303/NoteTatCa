@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { AuthService, SessionVault } from "./auth";
-import { ApiClient } from "../infrastructure/http";
+import { ApiClient, ApiError } from "../infrastructure/http";
 import type { Session } from "../domain/models";
 const session = (
   token = "access-old",
@@ -37,6 +37,74 @@ const ok = (data: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 describe("session security", () => {
+  it("does not clear a newer sign-in when an older bootstrap finishes late", async () => {
+    const port = storage();
+    const vault = new SessionVault(port);
+    vault.write(session());
+    let release!: (response: Response) => void;
+    const transport = vi.fn(async (url: string | URL | Request) => {
+      if (String(url).endsWith("/auth/refresh"))
+        return new Promise<Response>((resolve) => {
+          release = resolve;
+        });
+      return ok({ ...session("b-access", "b-refresh"), userId: "owner-b" });
+    });
+    const auth = new AuthService(
+      new ApiClient("/api/v1", transport),
+      vault,
+      vi.fn(),
+    );
+    const restoring = auth.bootstrap();
+    await vi.waitFor(() => expect(transport).toHaveBeenCalledOnce());
+    await auth.login("b@example.test", "synthetic");
+    release(ok(session()));
+    await restoring;
+    expect(auth.getSnapshot()).toMatchObject({
+      status: "authenticated",
+      session: { userId: "owner-b" },
+    });
+    expect(vault.read()?.userId).toBe("owner-b");
+  });
+  it("keeps a refresh session during an outage and restores it on explicit retry", async () => {
+    const port = storage();
+    const vault = new SessionVault(port);
+    vault.write(session());
+    let offline = true;
+    const transport = vi.fn(async () => ok(session("fresh", "rotated")));
+    const auth = new AuthService(
+      new ApiClient("/api/v1", transport),
+      vault,
+      vi.fn(),
+      async () => {
+        if (offline) throw new ApiError(0);
+      },
+    );
+    await auth.bootstrap();
+    expect(auth.getSnapshot().status).toBe("unavailable");
+    expect(vault.read()?.refreshToken).toBe("refresh-old");
+    expect(transport).not.toHaveBeenCalled();
+    offline = false;
+    await auth.bootstrap(true);
+    expect(auth.getSnapshot().status).toBe("authenticated");
+    expect(transport).toHaveBeenCalledOnce();
+  });
+  it("does not expire the account when a token refresh fails because of connectivity", async () => {
+    const expire = vi.fn();
+    const api = new ApiClient(
+      "/api/v1",
+      async () => new Response("{}", { status: 401 }),
+    );
+    api.setAuth({
+      accessToken: () => "old",
+      identity: () => "a",
+      refresh: async () => {
+        throw new ApiError(0);
+      },
+      expire,
+    });
+    await expect(api.request("/notes")).rejects.toMatchObject({ status: 0 });
+    expect(expire).not.toHaveBeenCalled();
+  });
   it("clears private caches and rejects in-flight responses when the same account changes area", async () => {
     let roles = ["User"];
     let release!: (response: Response) => void;

@@ -22,6 +22,9 @@ public static class FixtureProgram
         await factory.InitializeAsync();
         await SeedAsync(factory);
         using var client = factory.CreateClient();
+        // ApiFactory owns a single in-memory SQLite connection. Serialize access in
+        // this test bridge only; production SQL Server/PostgreSQL use pooled connections.
+        using var databaseGate = new SemaphoreSlim(1, 1);
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, EnvironmentName = "Testing" });
         builder.WebHost.UseUrls("http://127.0.0.1:5199");
         builder.Logging.ClearProviders();
@@ -30,38 +33,53 @@ public static class FixtureProgram
         app.MapGet("/__fixture/mail", (string email) => Results.Json(factory.Email.Messages.Where(x => x.To == email).ToArray()));
         app.MapPost("/__fixture/reset", async () =>
         {
-            using (var scope = factory.Services.CreateScope())
-                await scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.EnsureDeletedAsync();
-            factory.Email.Messages.Clear(); factory.Email.Fail = false; factory.Email.Timeout = false;
-            factory.Clock.Advance(DateTimeOffset.UtcNow - factory.Clock.GetUtcNow());
-            await factory.InitializeAsync(); await SeedAsync(factory);
-            return Results.Ok(new { ready = true });
+            await databaseGate.WaitAsync();
+            try
+            {
+                using (var scope = factory.Services.CreateScope())
+                    await scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.EnsureDeletedAsync();
+                factory.Email.Messages.Clear(); factory.Email.Fail = false; factory.Email.Timeout = false;
+                factory.Clock.Advance(DateTimeOffset.UtcNow - factory.Clock.GetUtcNow());
+                await factory.InitializeAsync(); await SeedAsync(factory);
+                return Results.Ok(new { ready = true });
+            }
+            finally { databaseGate.Release(); }
         });
         app.MapPost("/__fixture/dispatch", async () =>
         {
-            using var scope = factory.Services.CreateScope();
-            var job = scope.ServiceProvider.GetRequiredService<NTC.Contract.Services.Interface.IBackgroundMaintenanceService>();
-            return Results.Ok(new { count = await job.DispatchRemindersAsync() });
+            await databaseGate.WaitAsync();
+            try
+            {
+                using var scope = factory.Services.CreateScope();
+                var job = scope.ServiceProvider.GetRequiredService<NTC.Contract.Services.Interface.IBackgroundMaintenanceService>();
+                return Results.Ok(new { count = await job.DispatchRemindersAsync() });
+            }
+            finally { databaseGate.Release(); }
         });
         app.MapPost("/__fixture/advance", (int minutes) => { factory.Clock.Advance(TimeSpan.FromMinutes(minutes)); return Results.Ok(); });
         app.MapFallback(async context =>
         {
-            if (!context.Request.Path.StartsWithSegments("/api")) { context.Response.StatusCode = 404; return; }
-            using var message = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
-            if (context.Request.ContentLength > 0 || context.Request.Headers.ContainsKey("Transfer-Encoding"))
+            if (!context.Request.Path.StartsWithSegments("/api") && !context.Request.Path.StartsWithSegments("/health")) { context.Response.StatusCode = 404; return; }
+            await databaseGate.WaitAsync(context.RequestAborted);
+            try
             {
-                using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-                message.Content = new StringContent(await reader.ReadToEndAsync(), Encoding.UTF8, "application/json");
+                using var message = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Path + context.Request.QueryString);
+                if (context.Request.ContentLength > 0 || context.Request.Headers.ContainsKey("Transfer-Encoding"))
+                {
+                    using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
+                    message.Content = new StringContent(await reader.ReadToEndAsync(), Encoding.UTF8, "application/json");
+                }
+                foreach (var header in context.Request.Headers)
+                    if (header.Key is not ("Host" or "Content-Length" or "Content-Type" or "Connection"))
+                        message.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                using var response = await client.SendAsync(message, context.RequestAborted);
+                context.Response.StatusCode = (int)response.StatusCode;
+                context.Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? "application/json";
+                foreach (var header in response.Headers)
+                    if (header.Key is not ("Transfer-Encoding" or "Connection")) context.Response.Headers[header.Key] = header.Value.ToArray();
+                await response.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
             }
-            foreach (var header in context.Request.Headers)
-                if (header.Key is not ("Host" or "Content-Length" or "Content-Type" or "Connection"))
-                    message.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
-            using var response = await client.SendAsync(message, context.RequestAborted);
-            context.Response.StatusCode = (int)response.StatusCode;
-            context.Response.ContentType = response.Content.Headers.ContentType?.ToString() ?? "application/json";
-            foreach (var header in response.Headers)
-                if (header.Key is not ("Transfer-Encoding" or "Connection")) context.Response.Headers[header.Key] = header.Value.ToArray();
-            await response.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
+            finally { databaseGate.Release(); }
         });
         Console.WriteLine("Synthetic NoteTatCa browser fixture: http://127.0.0.1:5199");
         await app.RunAsync();

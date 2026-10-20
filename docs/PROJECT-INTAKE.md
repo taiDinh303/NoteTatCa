@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-20/DEC-019: user yêu cầu tải đầy đủ notes/labels và dữ liệu workspace ngay khi đăng nhập để chuyển trang mượt; thêm animation khi đăng nhập/mất kết nối/chờ API Render khởi động. Chốt tải các trang trước khi mở workspace, cache memory riêng theo account, giữ draft khi lỗi và retry đọc có giới hạn; admin tiếp tục chỉ quản trị. Thiết kế chi tiết/giới hạn tại01-plan và FRONTEND-IMPLEMENTATION.
+
 2026-10-20/DEC-018: yêu cầu mới thay phần Save thủ công của Q-023: editor chỉ autosave bình thường, Retry save khi lỗi. Mặc định toàn viewport, có nút phóng to/thu nhỏ theo yêu cầu bổ sung cùng ngày; title rỗng ẩn với Add title tùy chọn, chỉ Close để đóng, counter góc dưới; notes không header giải thích/nút tạo trùng, sidebar thu gọn, một điểm quản lý labels. Bổ sung: Reminders/Inbox không heading/mô tả đầu trang, Trash/label không heading nhìn thấy; nút sidebar desktop/mobile cùng icon ba gạch ngang, giữ cảnh báo và chức năng. Chủ dự án đã xác nhận bỏ cả Create your first note để chỉ giữ Take a note. Giữ báo lỗi/xung đột và draft protections; nội dung/ownership/API không đổi.
 
 2026-10-19: chủ dự án chốt admin là tài khoản quản trị riêng, không dùng chức năng tạo/quản lý ghi chú như khách. Dùng chung login, tự điều hướng theo role; khu admin đầy đủ quản trị account/role/access/statistics/audit và bảo mật account của chính admin. Quyền Admin ưu tiên với dữ liệu role lịch sử hỗn hợp; không sửa account/note cloud tự động. Quyết định DEC-017 ở01-plan; privacy nội dung note vẫn giữ.

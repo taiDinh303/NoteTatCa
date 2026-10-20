@@ -1,13 +1,17 @@
 import { test, expect } from "@playwright/test";
 import type { Page, APIRequestContext } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
+import type { Note, Page as DataPage } from "../src/domain/models";
 const fixture = "http://127.0.0.1:5199";
 const password = "Synthetic-password-123!";
-async function login(page: Page, email = "a@example.test") {
+async function submitLogin(page: Page, email = "a@example.test") {
   await page.goto("/login");
   await page.getByLabel("Email address", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
+}
+async function login(page: Page, email = "a@example.test") {
+  await submitLogin(page, email);
   await expect(
     page.getByRole("heading", {
       name: email === "admin@example.test" ? "System overview" : "Notes",
@@ -39,6 +43,251 @@ async function apiSession(request: APIRequestContext) {
 test.beforeEach(async ({ request }) => {
   const response = await request.post(fixture + "/__fixture/reset");
   expect(response.ok()).toBeTruthy();
+});
+
+test("waits for a waking server before sending credentials and shows connection animation", async ({
+  page,
+}) => {
+  let healthRequests = 0;
+  let signIns = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/auth/login")) signIns++;
+  });
+  await page.route("**/health/live", async (route) => {
+    healthRequests++;
+    if (healthRequests < 3)
+      await route.fulfill({
+        status: healthRequests === 1 ? 503 : 200,
+        contentType: "text/html",
+        body: "Starting up",
+      });
+    else await route.continue();
+  });
+  await submitLogin(page);
+  await expect(
+    page.getByRole("complementary", { name: "Connection status" }),
+  ).toBeVisible();
+  expect(signIns).toBe(0);
+  await page.screenshot({
+    path: "../artifacts/frontend/connecting-server.png",
+    fullPage: true,
+  });
+  await expect(
+    page.getByRole("heading", { name: "Notes", exact: true }),
+  ).toBeVisible();
+  expect(healthRequests).toBe(3);
+  expect(signIns).toBe(1);
+});
+
+test("preloads all note pages and switches cached workspace collections without loading again", async ({
+  page,
+}) => {
+  let release!: () => void;
+  const wait = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let releaseRevalidation!: () => void;
+  const revalidationGate = new Promise<void>((resolve) => {
+    releaseRevalidation = resolve;
+  });
+  let source: { data: DataPage<Note> } | undefined;
+  const pages: number[] = [];
+  await page.route("**/api/v1/notes?**", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.searchParams.get("trash") === "true") {
+      await route.continue();
+      return;
+    }
+    const number = Number(url.searchParams.get("pageNumber"));
+    pages.push(number);
+    if (!source) {
+      source = await (await route.fetch()).json();
+      await wait;
+    }
+    const all = source!.data.items;
+    await route.fulfill({
+      json: {
+        ...source,
+        data: {
+          ...source!.data,
+          items: all.slice((number - 1) * 2, number * 2),
+          pageSize: 2,
+          currentPage: number,
+          totalPages: Math.ceil(all.length / 2),
+          hasNextPage: number * 2 < all.length,
+          hasPreviousPage: number > 1,
+        },
+      },
+    });
+  });
+  try {
+    await submitLogin(page);
+    await expect(
+      page.getByRole("heading", {
+        name: "Preparing your workspace",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("progressbar", { name: "Workspace loading" }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: "../artifacts/frontend/preparing-workspace.png",
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(
+      page.getByRole("progressbar", { name: "Workspace loading" }),
+    ).toBeInViewport();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: "../artifacts/frontend/preparing-workspace-mobile.png",
+      fullPage: true,
+    });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    release();
+    await expect(
+      page.getByRole("heading", { name: "Notes", exact: true }),
+    ).toBeVisible();
+    expect(pages).toEqual([1, 2, 3]);
+    await page.route(
+      /\/api\/v1\/(reminders|notifications)\?/,
+      async (route) => {
+        await revalidationGate;
+        await route.continue().catch(() => {});
+      },
+    );
+    let laterReads = 0;
+    page.on("request", (request) => {
+      if (
+        request.method() === "GET" &&
+        /\/api\/v1\/(notes|tags)(?:\?|$)/.test(request.url())
+      )
+        laterReads++;
+    });
+    await page
+      .getByRole("navigation", { name: "Labels", exact: true })
+      .getByRole("link")
+      .first()
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Take a note", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Reminders", exact: true })
+      .first()
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Reminders", exact: true }),
+    ).toHaveClass("sr-only");
+    await expect(
+      page.getByRole("heading", {
+        name: "Nothing to remember just yet",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Inbox", exact: true })
+      .first()
+      .click();
+    await page.getByRole("button", { name: "Unread", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Your inbox", exact: true }),
+    ).toHaveClass("sr-only");
+    await expect(
+      page.getByRole("heading", { name: "You’re all caught up", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "Trash", exact: true })
+      .first()
+      .click();
+    await expect(
+      page.getByText(
+        "Deleted notes are permanently removed after the seven-day retention period.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await page
+      .getByRole("link", { name: "All notes", exact: true })
+      .first()
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Open Project notes", exact: true }),
+    ).toBeVisible();
+    expect(laterReads).toBe(0);
+  } finally {
+    release();
+    releaseRevalidation();
+  }
+});
+
+test("keeps the saved session when offline during restore and reconnects on request", async ({
+  page,
+}) => {
+  await login(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "onLine", {
+      configurable: true,
+      get: () => false,
+    });
+  });
+  await page.reload();
+  await expect(
+    page.getByRole("heading", {
+      name: "Unable to restore your session yet",
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() => !!sessionStorage.getItem("ntc.session.v1")),
+  ).toBe(true);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, "onLine", {
+      configurable: true,
+      get: () => true,
+    });
+  });
+  await page
+    .getByRole("button", { name: "Retry connection", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Notes", exact: true }),
+  ).toBeVisible();
+});
+
+test("retries a failed initial collection without signing in a second time", async ({
+  page,
+}) => {
+  let fail = true;
+  let signIns = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/auth/login")) signIns++;
+  });
+  await page.route("**/api/v1/tags?**", async (route) => {
+    if (fail)
+      await route.fulfill({
+        status: 503,
+        json: { message: "Temporarily unavailable" },
+      });
+    else await route.continue();
+  });
+  await submitLogin(page);
+  await expect(
+    page.getByRole("heading", {
+      name: "Your workspace couldn’t finish loading",
+      exact: true,
+    }),
+  ).toBeVisible();
+  fail = false;
+  await page.getByRole("button", { name: "Try again", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Notes", exact: true }),
+  ).toBeVisible();
+  expect(signIns).toBe(1);
 });
 
 test("renders responsive workspace without console errors or navigation reloads", async ({

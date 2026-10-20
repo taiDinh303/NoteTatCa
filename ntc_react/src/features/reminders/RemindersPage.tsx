@@ -37,6 +37,7 @@ export default function RemindersPage() {
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
     enabled: state.status === "authenticated",
+    refetchOnMount: "always",
   });
   const [editing, setEditing] = useState<Reminder>();
   const [deleting, setDeleting] = useState<Reminder>();

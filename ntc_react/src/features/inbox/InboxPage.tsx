@@ -19,6 +19,7 @@ export default function InboxPage() {
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
     enabled: state.status === "authenticated",
+    refetchOnMount: "always",
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
   });

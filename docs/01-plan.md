@@ -30,6 +30,12 @@ Chủ dự án yêu cầu admin chỉ làm quản trị, đăng nhập từ cùn
 
 User yêu cầu bỏ toast thành công kiểu Note pinned, editor mặc định toàn viewport và có nút phóng to/thu nhỏ theo yêu cầu bổ sung cùng ngày, bỏ Save và dấu× đóng trùng Close; title rỗng không hiện Untitled/input, có Add title khi cần; đếm ký tự nằm cố định góc dưới. Trang notes bỏ header giải thích/New note, chỉ dùng Take a note; user xác nhận bỏ luôn Create your first note ở empty state. Bổ sung cùng ngày: bỏ tiêu đề/mô tả đầu trang Reminders/Inbox và heading nhìn thấy của Trash/label, giữ thao tác/cảnh báo và heading cho screen reader. Sidebar có nút ẩn/hiện desktop nhớ lựa chọn trên máy, mobile vẫn drawer, cùng icon ba gạch ngang; YOUR LABELS+icon thành một nút chung, bỏ Create a label trùng. Giữ trạng thái autosave/error/conflict, Retry save khi lỗi và bảo vệ draft khi Close/điều hướng. Không thay API, dữ liệu, admin hoặc quyền riêng tư.
 
+## DEC-019 — Chuẩn bị dữ liệu và trạng thái kết nối (2026-10-20)
+
+Theo yêu cầu chủ dự án, sau login/khôi phục phiên tải đủ các trang notes active/trash, labels, reminders, inbox, unread count và hồ sơ trước khi mở workspace. Tối đa bốn luồng tải, tuần tự từng trang trong mỗi collection; tiến trình dựa trên collection/trang hoàn tất. Cache chỉ trong memory của tab đến logout/đổi account/nhóm quyền; labels/pin/search lấy danh sách ban đầu từ notes đã tải đủ, không gọi một API cho từng label. Cache được làm mới nền và invalidation khi sửa; không cam kết dữ liệu là một snapshot transaction hoặc truy cập offline bền vững. Account có nhiều note/nội dung lớn sẽ mất nhiều thời gian/bộ nhớ ở bước đầu.
+
+Login/Google/refresh kiểm tra GET health trước khi gửi credentials/token: một probe dùng chung, timeout/backoff hữu hạn, không tự retry POST/ghi chú. Có animation khi chuẩn bị/chờ kết nối, thông báo offline/API chậm và nút retry khi thất bại; không khẳng định server chắc chắn ngủ chỉ từ lỗi mạng. Giữ editor/draft khi outage, chỉ hết phiên khi server xác nhận auth không hợp lệ. Không thêm keep-alive định kỳ để chống sleep; polling chức năng inbox/unread hiện có vẫn giữ. Admin chỉ preload me/statistics và module quản trị, không note/label/reminder/inbox. Không migrate/deploy hoặc đổi dữ liệu cloud.
+
 ## Backlog theo thứ tự
 
 | ID | Ưu tiên | Kết quả | REQ / phụ thuộc | Tiêu chí chấp nhận | Trạng thái |

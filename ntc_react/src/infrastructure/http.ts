@@ -1,3 +1,4 @@
+import { isConnectionError } from "../application/connection";
 export class ApiError extends Error {
   readonly status: number;
   readonly code: string;
@@ -40,6 +41,7 @@ export interface RequestOptions {
 }
 export class ApiClient {
   private auth?: AccessProvider;
+  private connection?: { begin(): (error?: unknown) => void };
   readonly baseUrl: string;
   constructor(
     baseUrl: string,
@@ -52,7 +54,21 @@ export class ApiClient {
   setAuth(auth: AccessProvider) {
     this.auth = auth;
   }
+  setConnection(connection: { begin(): (error?: unknown) => void }) {
+    this.connection = connection;
+  }
   async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+    const finish = this.connection?.begin();
+    try {
+      const value = await this.perform<T>(path, options);
+      finish?.();
+      return value;
+    } catch (error) {
+      finish?.(error);
+      throw error;
+    }
+  }
+  private async perform<T>(path: string, options: RequestOptions): Promise<T> {
     const authenticated = options.authenticated !== false;
     const owner = authenticated ? this.auth?.identity() : undefined;
     let lastSentToken: string | undefined;
@@ -108,13 +124,14 @@ export class ApiClient {
         )
           await this.auth.refresh();
         response = await send();
-      } catch {
+      } catch (error) {
         if (owner !== this.auth.identity())
           throw new ApiError(401, {
             code: "SESSION_CHANGED",
             message:
               "The signed-in account changed. This request was discarded.",
           });
+        if (isConnectionError(error)) throw error;
         this.auth.expire();
         throw new ApiError(401, {
           message: "Your session expired. Sign in again to continue.",

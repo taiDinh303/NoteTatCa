@@ -197,9 +197,10 @@ export class AccountRepository {
 }
 export class InboxRepository {
   constructor(readonly api: ApiClient) {}
-  list(pageNumber = 1, unreadOnly = false) {
+  list(pageNumber = 1, unreadOnly = false, signal?: AbortSignal) {
     return this.api.request<Page<InboxItem>>(
       "/notifications" + query({ pageNumber, pageSize: 50, unreadOnly }),
+      { signal },
     );
   }
   count() {
