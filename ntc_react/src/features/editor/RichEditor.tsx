@@ -266,9 +266,6 @@ export default function RichEditor({
                     key={value}
                     value={value}
                   >
-                    <Dropdown.ItemIndicator>
-                      <Check size={16} />
-                    </Dropdown.ItemIndicator>
                     <span>{label}</span>
                   </Dropdown.RadioItem>
                 ))}

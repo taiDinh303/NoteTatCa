@@ -2,6 +2,11 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ dấu chọn trực quan trong menu cỡ chữ — 2026-10-21
+
+- Bỏ ItemIndicator/check icon riêng menu Font size, giữ nhãn Default và các mức px. Radio state/aria-checked/lựa chọn/căn lề và autosave không đổi.
+- ESLint max-warnings0 và TypeScript/Production Vite build PASS; không chạy lại browser/unit/backend cho thay đổi3 dòng markup. .NET Release0warning/0error là evidence lượt font-size trước, không coi là rerun. Không cloud/data/deploy. Publication scope RichEditor/worklog, giữ hai appsettings local ngoài commit; kiểm docs/diff rồi push main và đối chiếu remote SHA.
+
 ## Menu cỡ chữ thay H2/Heading — 2026-10-21
 
 - Toolbar bỏ nút Heading2, thay Font size dropdown radio Default và12/14/16/18/20/24/28/32/40/48px. Hiển thị cỡ tại con trỏ/vùng chọn, set/unsetFontSize giữ màu/in đậm/marks khác; menu có giới hạn chiều cao và scroll trên mobile. Dùng FontSize export sẵn của Tiptap text-style3.32.0, không dependency mới. Giữ heading nodes/Markdown shortcut để đọc/sửa note cũ an toàn.
