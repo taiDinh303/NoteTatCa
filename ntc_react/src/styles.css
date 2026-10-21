@@ -4366,9 +4366,26 @@ td {
 .customer-shell > .topbar .global-search > svg { flex-shrink: 0; }
 .customer-shell > .topbar .global-search input { min-width: 0; }
 .drawer-account-controls { display: grid; gap: 12px; margin-bottom: 16px; }
-.drawer-account-controls .avatar-menu { width: 100%; padding: 8px 11px; min-height: 44px; }
-.drawer-account-controls .account-name,
-.drawer-account-controls .avatar-menu > svg { display: inline; }
+.drawer-account-controls > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+.drawer-account-controls > button:hover { background: var(--hover); }
+.drawer-unread {
+  margin-left: auto;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--text);
+}
 
 .customer-shell > .sidebar { top: 77px; padding-top: 18px; }
 .customer-shell > .main-column {
@@ -4390,7 +4407,7 @@ td {
   }
   .customer-shell > .topbar .topbar-actions { grid-column: 3; grid-row: 1; margin-left: 0; }
   .customer-shell > .topbar .header-theme-toggle,
-  .customer-shell > .topbar .header-account-menu,
+  .customer-shell > .topbar .notification-button,
   .customer-shell > .topbar .topbar-divider,
   .customer-shell > .topbar .private-badge { display: none; }
   .customer-shell .header-brand .brand > span:last-child:not(.brand-mark) { display: none; }

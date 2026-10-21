@@ -276,7 +276,19 @@ export default function AppShell() {
             onNavigate={() => setMobile(false)}
             accountControls={
               <div className="drawer-account-controls">
-                <ShellAccountMenu onNavigate={() => setMobile(false)} />
+                <button
+                  type="button"
+                  className="settings-link drawer-inbox"
+                  aria-label="Open inbox"
+                  onClick={() => {
+                    navigate("/notifications");
+                    setMobile(false);
+                  }}
+                >
+                  <Bell size={18} />
+                  Notifications
+                  {(unread.data ?? 0) > 0 ? <span className="drawer-unread">{unread.data! > 9 ? "9+" : unread.data}</span> : null}
+                </button>
                 <button type="button" className="settings-link" onClick={toggleTheme}>
                   {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
                   {theme === "dark" ? "Use light theme" : "Use dark theme"}
