@@ -19,6 +19,13 @@ async function login(page: Page, email = "a@example.test") {
     }),
   ).toBeVisible();
 }
+async function openAccountMenu(page: Page) {
+  const account = page.getByRole("button", { name: "Account menu", exact: true });
+  if (!(await account.isVisible())) {
+    await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+  }
+  await account.click();
+}
 async function ctrlWheel(page: Page, deltaY: number) {
   const viewport = page.viewportSize()!;
   await page.mouse.move(viewport.width / 2, viewport.height / 2);
@@ -600,7 +607,7 @@ test("scales the interface without reloads, preserves notes and fits desktop and
       ).toBeVisible();
     }
   }
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await openAccountMenu(page);
   await inViewport(".dropdown");
   await page
     .getByRole("menuitem", { name: "Your profile", exact: true })
@@ -671,6 +678,7 @@ test("opens account-menu zoom with numeric input, increment buttons and shared g
     path: "../artifacts/frontend/account-zoom-mobile.png",
     animations: "disabled",
   });
+  await page.setViewportSize({ width: 1440, height: 900 });
   await panel
     .getByRole("button", { name: "Reset to 100%", exact: true })
     .click();
@@ -861,7 +869,7 @@ test.describe("pinch zoom", () => {
       animations: "disabled",
     });
     await editor.getByRole("button", { name: "Close", exact: true }).tap();
-    await page.getByRole("button", { name: "Account menu", exact: true }).tap();
+    await openAccountMenu(page);
     await page
       .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
       .tap();
@@ -906,7 +914,7 @@ test("administrator can change interface zoom without personal content requests"
   await login(page, "admin@example.test");
   await page.setViewportSize({ width: 390, height: 844 });
   await setZoom(page, 150);
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await openAccountMenu(page);
   await page
     .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
     .click();
@@ -2040,7 +2048,7 @@ test("supports search, pinning, theme and an empty private workspace for another
     path: "../artifacts/frontend/workspace-dark.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await openAccountMenu(page);
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Welcome back.", exact: true }),

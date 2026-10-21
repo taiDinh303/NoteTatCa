@@ -4353,7 +4353,23 @@ td {
   max-width: 600px;
   justify-self: center;
   min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 12px;
+  min-height: 42px;
+  background: var(--canvas);
 }
+.customer-shell > .topbar .global-search:focus-within {
+  border-color: var(--accent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.customer-shell > .topbar .global-search > svg { flex-shrink: 0; }
+.customer-shell > .topbar .global-search input { min-width: 0; }
+.drawer-account-controls { display: grid; gap: 12px; margin-bottom: 16px; }
+.drawer-account-controls .avatar-menu { width: 100%; padding: 8px 11px; min-height: 44px; }
+.drawer-account-controls .account-name,
+.drawer-account-controls .avatar-menu > svg { display: inline; }
+
 .customer-shell > .sidebar { top: 77px; padding-top: 18px; }
 .customer-shell > .main-column {
   min-height: calc(100dvh / var(--interface-scale) - 77px);
@@ -4365,16 +4381,26 @@ td {
 }
 @container viewport (max-width: 800px) {
   .customer-shell > .topbar {
-    grid-template-columns: minmax(0, 1fr) auto;
-    height: auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    height: 66px;
     min-height: 66px;
-    padding-block: 12px;
-    row-gap: 12px;
+    padding: 0 12px;
+    gap: 10px;
+    flex-wrap: nowrap;
   }
-  .customer-shell > .topbar .topbar-actions { grid-column: 2; grid-row: 1; }
+  .customer-shell > .topbar .topbar-actions { grid-column: 3; grid-row: 1; margin-left: 0; }
+  .customer-shell > .topbar .header-theme-toggle,
+  .customer-shell > .topbar .header-account-menu,
+  .customer-shell > .topbar .topbar-divider,
+  .customer-shell > .topbar .private-badge { display: none; }
+  .customer-shell .header-brand .brand > span:last-child:not(.brand-mark) { display: none; }
+  .customer-shell .header-brand .brand-mark { width: 32px; height: 32px; }
+  .customer-shell .topbar-brand { gap: 6px; }
   .customer-shell > .topbar .global-search {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    grid-column: 2;
+    grid-row: 1;
+    gap: 7px;
+    padding-inline: 9px;
   }
-  .customer-shell > .main-column { min-height: calc(100dvh / var(--interface-scale) - 110px); }
+  .customer-shell > .main-column { min-height: calc(100dvh / var(--interface-scale) - 66px); }
 }

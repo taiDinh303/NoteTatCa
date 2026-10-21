@@ -17,11 +17,15 @@ import { LoginForm } from "../features/auth/AuthPage";
 import { useDisplayZoom } from "../shared/displayZoom";
 import { ZoomDialog } from "../shared/ZoomDialog";
 
-export function ShellAccountMenu() {
+export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
   const state = useAuth();
   const me = useMe();
   const navigate = useNavigate();
   const base = settingsPath(state.session);
+  function navigateTo(path: string) {
+    void navigate(path);
+    onNavigate?.();
+  }
   const [zoomOpen, setZoomOpen] = useState(false);
   const zoom = useDisplayZoom();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -39,22 +43,22 @@ export function ShellAccountMenu() {
           {
             label: "Home",
             icon: Home,
-            action: () => navigate("/Home"),
+            action: () => navigateTo("/Home"),
           },
           {
             label: "Your profile",
             icon: Users,
-            action: () => navigate(base + "/profile"),
+            action: () => navigateTo(base + "/profile"),
           },
           {
             label: "Account & security",
             icon: Settings,
-            action: () => navigate(base + "/account"),
+            action: () => navigateTo(base + "/account"),
           },
           {
             label: "Sessions",
             icon: ShieldCheck,
-            action: () => navigate(base + "/sessions"),
+            action: () => navigateTo(base + "/sessions"),
           },
           {
             label: `Zoom (${zoom.percent}%)`,
@@ -65,7 +69,7 @@ export function ShellAccountMenu() {
             label: "Sign out",
             icon: LogOut,
             separator: true,
-            action: () => navigate("/logout"),
+            action: () => navigateTo("/logout"),
           },
         ]}
       >

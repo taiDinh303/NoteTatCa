@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -32,9 +33,11 @@ const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 function Sidebar({
   onLabels,
   onNavigate,
+  accountControls,
 }: {
   onLabels: () => void;
   onNavigate: () => void;
+  accountControls?: ReactNode;
 }) {
   const query = useLabels();
   const { pathname } = useLocation();
@@ -95,6 +98,7 @@ function Sidebar({
         ) : null}
       </nav>
       <div className="sidebar-bottom">
+        {accountControls}
         <NavLink
           className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
           to="/settings/profile"
@@ -230,6 +234,7 @@ export default function AppShell() {
               Private workspace
             </span>
             <IconButton
+              className="header-theme-toggle"
               icon={theme === "dark" ? Sun : Moon}
               label={theme === "dark" ? "Use light theme" : "Use dark theme"}
               onClick={toggleTheme}
@@ -245,7 +250,7 @@ export default function AppShell() {
               ) : null}
             </div>
             <div className="topbar-divider" />
-            <ShellAccountMenu />
+            <div className="header-account-menu"><ShellAccountMenu /></div>
           </div>
         </header>
       <aside className="sidebar" id="workspace-navigation">
@@ -267,6 +272,15 @@ export default function AppShell() {
           <Sidebar
             onLabels={() => setManageLabels(true)}
             onNavigate={() => setMobile(false)}
+            accountControls={
+              <div className="drawer-account-controls">
+                <ShellAccountMenu onNavigate={() => setMobile(false)} />
+                <button type="button" className="settings-link" onClick={toggleTheme}>
+                  {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                  {theme === "dark" ? "Use light theme" : "Use dark theme"}
+                </button>
+              </div>
+            }
           />
         </Modal>
       ) : null}
