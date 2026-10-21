@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -416,10 +416,6 @@ export default function AuthPage({ mode }: { mode: Mode }) {
             Private notes. Just for you.
           </p>
         </div>
-        <footer>
-          <Link to="/privacy">Privacy & data</Link>
-          <span>© {new Date().getFullYear()} NoteTatCa</span>
-        </footer>
       </section>
       <aside className="auth-art">
         <div className="art-spark">

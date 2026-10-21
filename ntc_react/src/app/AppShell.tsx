@@ -253,10 +253,6 @@ export default function AppShell() {
         <main className="workspace-main" id="workspace-main">
           <Outlet />
         </main>
-        <footer className="workspace-footer">
-          <span>Keep what matters.</span>
-          <Link to="/privacy">Privacy & data</Link>
-        </footer>
       </div>
       {mobile ? (
         <Modal

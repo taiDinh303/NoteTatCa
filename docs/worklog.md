@@ -1,6 +1,11 @@
-# WORKLOG — NoteTatCa
+﻿# WORKLOG — NoteTatCa
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+
+## Xóa footer “Keep what matters.” và “Privacy & data” — 2026-10-21 (đã mở rộng phạm vi)
+
+- Theo yêu cầu mới nhất (2026-10-21): xóa 2 dòng chữ “Keep what matters.” và link “Privacy & data” ở trang /notes (và các trang workspace dùng chung AppShell). Thay đổi 1 file: ntc_react/src/app/AppShell.tsx (gỡ `<footer class="workspace-footer">`); import Link vẫn dùng cho sidebar brand. Không đụng AdminShell (/admin), AuthPage, PublicPages; không đổi CSS, auth, cache, API, schema hay dữ liệu. Chưa tự deploy; hosting/CI tự triển khai khi push.
+- Validation: `npm run typecheck` PASS (tsc -b, 0 error), `npm run lint` PASS (eslint ., 0 issue) chạy từ ntc_react/. Chưa chạy HTTP/Chromium suite vì thay đổi thuần view.
 
 ## Công bố gesture zoom50–150% và sidebar gọn lên main — 2026-10-21
 
@@ -442,3 +447,8 @@ Người dùng yêu cầu push bộ docs. Giữ Git root hiện tại, cập nh�
 ## Rà soát và triển khai 2026-10-17
 
 Bắt đầu 2026-10-17: Git HEAD 176a968, chỉ hai appsettings có thay đổi pre-existing. Baseline API build PASS, 4 warnings; runtime .NET 8.0.30. Đã đọc reference Marixa/docs/source, chốt 3 câu nghiệp vụ và viết BACKEND-IMPLEMENTATION trước code. Chưa chạy test/migration/provider/cloud ở thời điểm ghi entry này.
+
+## Mở rộng: xóa thêm footer “Keep what matters.” và “Privacy & data” ở admin/auth/public — 2026-10-21
+
+- Theo yêu cầu “xóa luôn ở chỗ khác luôn để mở rộng diện tích”: xóa thêm 3 footer còn lại. Thay đổi thêm 3 file: ntc_react/src/app/AdminShell.tsx (gỡ footer workspace-footer admin), ntc_react/src/features/public/PublicPages.tsx (gỡ footer Landing), ntc_react/src/features/auth/AuthPage.tsx (gỡ footer auth section, giữ </section>). import Link/Logo vẫn dùng; không đổi CSS/auth/API/schema/dữ liệu.
+- Validation: `npm run typecheck` PASS (0 error), `npm run lint` PASS (0 issue) từ ntc_react/. Chưa commit/push/deploy.

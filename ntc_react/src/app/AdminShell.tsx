@@ -120,10 +120,6 @@ export default function AdminShell() {
         <main className="workspace-main" id="admin-main">
           <Outlet />
         </main>
-        <footer className="workspace-footer">
-          <span>Account administration. Private notes stay private.</span>
-          <Link to="/privacy">Privacy & data</Link>
-        </footer>
       </div>
       {mobile ? (
         <Modal

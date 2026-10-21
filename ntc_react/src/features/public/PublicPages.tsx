@@ -156,11 +156,6 @@ export function Landing() {
           </Link>
         </section>
       </main>
-      <footer>
-        <Logo />
-        <span>Keep what matters.</span>
-        <Link to="/privacy">Privacy & data</Link>
-      </footer>
     </div>
   );
 }
