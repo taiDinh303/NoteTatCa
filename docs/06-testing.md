@@ -2,6 +2,12 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Thanh kéo và nhập zoom25–150% — 2026-10-21
+
+Focused Chromium **3/3 PASS (1.6phút gồm startup)**: range kéo chuột, keyboard Home/ArrowRight, nhập73% và commit Enter/blur, clamp ngoài biên/ô trống/reset, persistence/layout25–150% và admin isolation. Ca mobile isMobile/hasTouch dùng CDP touch events **1/1 PASS (25.6giây gồm startup)**: vuốt150%, nhập42%, reload vẫn42 và hai control đồng bộ. Đã xem ảnh bảng zoom ở25%/42% trong viewport390×844; trigger/dialog vẫn đọc và bấm được.
+
+29Vitest+4configuration, lint/typecheck/Production build và .NET Release0warning/0error PASS. Không full26browser/backend rerun trong tác vụ control này; các mốc full24/focused3 bên dưới là lịch sử trước thay đổi control. Fixture SQLite/captured email riêng, chưa điện thoại vật lý/Safari/Firefox hoặc production rollout; xem worklog.
+
 ## Thu phóng và scrollbar — 2026-10-21
 
 Full Chromium **24/24 PASS (3.3phút gồm startup)** sau sửa menu ngoài viewport khi zoom; kiểm preset75–150%, persistence/reload, SPA không reload, sidebar copy removal, Ctrl+K, scrollbar light/dark, drawer/editor và admin isolation. Sau rà ảnh, bổ sung CSS xuống hàng dải màu/thao tác footer ở mobile150%; focused **3/3 PASS (55.9giây gồm startup)** sau thay đổi cuối, thêm bounds từng nút ở320/390px, Close trong viewport và giữ nội dung. Không cộng rerun thành ca mới; full24 là mốc ngay trước CSS footer, focused3 là mốc cuối.

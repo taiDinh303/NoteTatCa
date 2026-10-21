@@ -4255,13 +4255,13 @@ td {
   justify-content: center;
   gap: 5px;
   min-height: max(36px, calc(44px / var(--interface-scale)));
-  min-width: 66px;
+  min-width: max(66px, calc(54px / var(--interface-scale)));
   padding: 6px 8px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
   color: var(--muted);
-  font-size: 11px;
+  font-size: max(11px, calc(12px / var(--interface-scale)));
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -4270,19 +4270,9 @@ td {
   background: var(--hover);
   color: var(--text);
 }
-.zoom-menu {
-  min-width: 172px;
-  max-height: var(--radix-dropdown-menu-content-available-height);
-  overflow-y: auto;
-}
-.zoom-menu-label {
-  padding: 9px 11px;
-  font-size: 11px;
-  color: var(--muted);
-}
-.zoom-option {
-  justify-content: space-between;
-  min-height: max(36px, calc(44px / var(--interface-scale)));
+.zoom-trigger > svg {
+  width: max(16px, calc(16px / var(--interface-scale)));
+  height: max(16px, calc(16px / var(--interface-scale)));
 }
 /* Floating UI positions portals in screen pixels; keep that coordinate space
    unscaled, then scale the menu contents along with the interface. */
@@ -4291,10 +4281,6 @@ td {
 }
 [data-radix-popper-content-wrapper] > * {
   zoom: var(--interface-scale);
-}
-.zoom-option[data-state="checked"] {
-  background: var(--accent-soft);
-  color: var(--text);
 }
 @container viewport (max-width: 800px) {
   .zoom-trigger {
@@ -4305,6 +4291,49 @@ td {
   .zoom-trigger > svg {
     display: none;
   }
+}
+.topbar {
+  min-height: max(66px, calc(56px / var(--interface-scale)));
+}
+/* Keep the recovery controls readable independently of the chosen app scale. */
+.modal.zoom-panel {
+  zoom: calc(1 / var(--interface-scale));
+  width: min(360px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+}
+.zoom-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+}
+.zoom-number-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+}
+.zoom-number-wrap input {
+  width: 82px;
+  min-height: 44px;
+  font-size: 16px;
+}
+.zoom-slider {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  accent-color: var(--accent);
+  touch-action: pan-y;
+}
+.zoom-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
 }
 @container viewport (max-width: 480px) {
   .topbar {

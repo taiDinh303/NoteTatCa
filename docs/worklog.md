@@ -2,6 +2,20 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Công bố thanh kéo và nhập zoom25–150% lên main — 2026-10-21
+
+- Theo yêu cầu “push luôn”, phạm vi9file React/docs/test: thay preset bằng slider25–150% và ô nhập phần trăm, reset/persistence, dialog/trigger dễ đọc ở25%, các regression chuột/keyboard/touch và tài liệu tương ứng. Không commit hai appsettings API local, credentials hoặc artifacts.
+- Fetch trước publication: main/HEAD và origin/main cùng5bc3e52, divergence0/0. Dùng evidence đã hoàn tất ở entry dưới: focused3/3 và mobile touch1/1,29Vitest+4configuration, lint/typecheck/Production build và .NET Release0warning/0error PASS. Docs48Markdown/178local links/0errors; lượt này chỉ publication, không sửa runtime/chạy lại suites.
+- Kiểm staged diff và hash cấu hình local trước commit; push source lên main rồi đối chiếu HEAD với refs/heads/main trên remote. Không manual deploy/migration hoặc thay dashboard/dữ liệu cloud; hosting/CI có thể tự triển khai từ push. Chưa xác minh production rollout trong lượt này.
+
+## Thanh kéo và nhập phần trăm thu phóng25–150% — 2026-10-21
+
+- Theo yêu cầu bổ sung, cập nhật DEC-021: thay preset menu bằng dialog có native range25–150%, bước1%, đổi ngay khi kéo/nhấn phím; thêm ô number giữ bản đang nhập đến Enter/blur. Số vượt biên được clamp, số thập phân được làm tròn; rỗng/không hữu hạn giữ mức đang dùng. Reset to 100% đồng bộ slider/input. Preference vẫn cùng localStorage key, chấp nhận mọi số nguyên25–150 thay whitelist preset; giữ tương thích các mức cũ và nhớ sau reload.
+- Dialog chỉnh zoom dùng inverse scale để vẫn đọc/bấm được ở25%; trigger giữ chữ/kích thước chạm và topbar có min-height vật lý để nút không bị cắt khi thu nhỏ. Reuse Modal/Button, không thêm dependency hoặc đặt input tương tác trong dropdown menu. Giữ auth/cache/draft/API/database/config, không replay request/reload khi chỉnh zoom. Rà React Best Practices/Verification: state input riêng, context không remount workspace/editor, native slider/number có label, dialog focus/Escape/Done và không ghi dữ liệu tài khoản vào preference.
+- Focused Chromium **3/3 PASS (1.6phút gồm startup)**: numeric Enter/blur, kéo chuột thực từ25đến150, Home/ArrowRight, clamp999→150 và1→25, ô trống, reset, resize320/390/768/1024, admin isolation và cùng các layout/note checks hiện có. Thêm một ca mobile có isMobile/hasTouch và CDP touchStart/touchMove/touchEnd: **1/1 PASS (25.6giây gồm startup)**; vuốt đến150 và nhập42 rồi Done/blur, reload vẫn42, slider/input đồng bộ. Không cộng rerun; tổng4ca khác nhau cho thay đổi này. Đã xem ảnh zoom-slider-mobile.png ở25% và zoom-slider-touch.png ở42%: bảng chỉnh vẫn đủ đọc, trong viewport390×844.
+- **29 Vitest + 4 configuration PASS**, ESLint max-warnings0/TypeScript/Production Vite build PASS; solution .NET Release strict **0warning/0error**. Không chạy lại full26browser/backend suite vì phạm vi đổi control/preference/CSS tối thiểu; full24ca và focused footer ở entry trước vẫn là mốc trước thay đổi control. Fixture SQLite/captured email riêng, không owner DB/mail/cloud thật. Chưa kiểm Safari/Firefox hoặc điện thoại vật lý; touch ở đây là Chromium giả lập.
+- Cập nhật plan/UI/frontend/user-guide/testing/worklog; docs48Markdown/178local links/0errors, git diff --check PASS (thông báo LF/CRLF). Hai appsettings API local đúng hash baseline; không tạo lại Razor, không commit/push/deploy trong lượt này.
+
 ## Công bố loading, thu phóng và gỡ Razor lên main — 2026-10-21
 
 - Theo yêu cầu “push luôn”, gom các thay đổi đã hoàn tất đang chờ: tiến trình/task loading và vòng xoay; sidebar gọn/scrollbar/Interface zoom75–150% cho customer/admin và responsive; gỡ166file Razor, project NTC.Razor/solution folder RAZOR; cập nhật docs/AGENTS/README/Docker ignore và regression tests. Không commit hai appsettings API local sửa sẵn, credentials, bản khôi phục Razor hoặc artifacts.
