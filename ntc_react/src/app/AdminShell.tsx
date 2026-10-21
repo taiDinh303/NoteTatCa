@@ -126,6 +126,8 @@ export default function AdminShell() {
           open
           onClose={() => setMobile(false)}
           title="Administration navigation"
+          hideCloseButton
+          dismissOnOutside
           className="navigation-drawer"
         >
           <AdminNavigation onNavigate={() => setMobile(false)} />

@@ -263,6 +263,8 @@ export function Modal({
   wide = false,
   className = "",
   hideTitle = false,
+  hideCloseButton = false,
+  dismissOnOutside = false,
 }: {
   open: boolean;
   onClose: () => void;
@@ -272,6 +274,8 @@ export function Modal({
   wide?: boolean;
   className?: string;
   hideTitle?: boolean;
+  hideCloseButton?: boolean;
+  dismissOnOutside?: boolean;
 }) {
   return (
     <Dialog.Root
@@ -284,7 +288,9 @@ export function Modal({
         <Dialog.Overlay className="modal-overlay" />
         <Dialog.Content
           className={`modal ${wide ? "wide" : ""} ${className}`}
-          onPointerDownOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => {
+            if (!dismissOnOutside) e.preventDefault();
+          }}
         >
           <div className={hideTitle ? "modal-title-hidden" : "modal-header"}>
             <div>
@@ -295,7 +301,7 @@ export function Modal({
                 {description ?? title}
               </Dialog.Description>
             </div>
-            {!hideTitle ? (
+            {!hideTitle && !hideCloseButton ? (
               <IconButton icon={X} label="Close dialog" onClick={onClose} />
             ) : null}
           </div>

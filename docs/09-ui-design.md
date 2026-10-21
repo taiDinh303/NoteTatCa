@@ -55,3 +55,7 @@ Theo ảnh/yêu cầu chủ dự án, editor hiển thị Pin khi chưa ghim và
 ## Editor: nút đồng nhất và căn giữa — 2026-10-21
 
 Add title, Pin/Unpin và fullscreen dùng chung nền trong suốt, hover nhẹ theo foreground và focus outline; vẫn giữ trạng thái ghim qua icon/aria-pressed. Toolbar có một nút Text alignment, mở menu radio4 lựa chọn Align left/Align center/Align right/Justify. Icon phản ánh căn lề hiện tại; menu đánh dấu lựa chọn, hỗ trợ bàn phím, đóng trả focus editor/giữ vùng chọn. Áp dụng cho paragraph/heading trong vùng chọn. TextAlign cùng phiên bản Tiptap3.32.0; canonical document và API chỉ nhận textAlign left/center/right/justify trên paragraph/heading, không nhận CSS tùy ý. Dữ liệu cũ không có thuộc tính vẫn giữ nguyên. Markdown export cảnh báo mất alignment. Bộ đếm cuối editor hiển thị x / 100,000, giữ nhãn trợ năng Character count. Không cần migration. Evidence thực tế ở worklog.
+
+## Sidebar drawer — 2026-10-21
+
+Sidebar mobile customer/admin không hiện nút X. Chạm/click vùng ngoài drawer đóng, chạm bên trong giữ mở; Escape hoặc chọn link đóng, hamburger mở lại. Chỉ drawer bật dismissOnOutside/hideCloseButton; dialog editor/form/confirmation giữ quy tắc hiện hành.

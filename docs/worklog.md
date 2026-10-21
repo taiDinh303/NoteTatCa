@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar đóng khi chạm bên ngoài, bỏ nút X — 2026-10-21
+
+- Modal thêm hideCloseButton/dismissOnOutside opt-in, mặc định giữ hành vi cũ. Drawer customer/admin bật cả hai: bỏ X, click/touch vùng ngoài đóng qua Radix, click bên trong không đóng; Escape và chọn link vẫn đóng, hamburger mở lại. Giữ dialog title/focus trap. Không đổi note editor/form/confirmation khác.
+- Focused Chromium2/2PASS (38.5s) ở393x852 cho customer/admin: không nút Close dialog, click trong giữ mở, ngoài đóng, mở lại/Escape/link đóng. ESLint max-warnings0, TypeScript/Production build PASS; .NET Release strict tuần tự0warning/0error. Fixture SQLite/captured email riêng, không DB/SMTP thật. Không chạy lại unit/fullbrowser/backend suite, chưa kiểm điện thoại vật lý hoặc production.
+- Publication scope: Modal props, hai drawer opt-in, sidebar-dismiss.spec.ts, UI/worklog. Stage riêng hunk drawer AppShell; giữ các thay đổi header/account controls/header.spec.ts/CSS song song và hai appsettings API local ngoài commit. Fetch main cùngdf0b1d0/divergence0/0; kiểm docs/staged diff/local config hash trước commit. Push main theo quyền đã cấp rồi đối chiếu remote; không manual deploy.
+
 ## Một nút căn lề4 lựa chọn — 2026-10-21
 
 - Thay Center text toggle bằng Text alignment dropdown radio4 lựa chọn: Align left, Align center, Align right, Justify. Icon trigger theo alignment tại vùng chọn; đánh dấu lựa chọn hiện tại. Dùng Radix đã có, giữ selection và trả focus editor khi đóng. Mở rộng Tiptap/canonical/API allowlist đúng4 giá trị trên paragraph/heading; CSS tùy ý/null/node khác vẫn bị từ chối. Không migration, không đổi ownership hoặc plain projection. Cập nhật UI/frontend/user guide/testing.

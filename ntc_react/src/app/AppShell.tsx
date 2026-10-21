@@ -267,6 +267,8 @@ export default function AppShell() {
           open
           onClose={() => setMobile(false)}
           title="Your workspace"
+          hideCloseButton
+          dismissOnOutside
           className="navigation-drawer"
         >
           <Sidebar
