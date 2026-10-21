@@ -93,10 +93,12 @@ function NoteCard({
       ref={setNodeRef}
       style={{
         ...notePalette(note.backgroundColor),
-        transform: CSS.Transform.toString(transform),
+        // Rect sorting also supplies scale factors for differently sized cards.
+        // Move cards without stretching their text, icons or height.
+        transform: CSS.Translate.toString(transform),
         transition: transition,
         backgroundColor: note.backgroundColor || undefined,
-        opacity: isDragging ? 0.35 : 1,
+        opacity: isDragging ? 0.95 : 1,
       }}
       className={`note-card ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}

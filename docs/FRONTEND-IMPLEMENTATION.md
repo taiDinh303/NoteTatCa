@@ -158,6 +158,10 @@ Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default c
 
 EditorSession khởi tạo fullscreen=false cho cả note mới và note đã lưu; modal chờ tải note cũng không fullscreen. Autosave lần đầu không tự phóng to vì không khởi tạo lại state từ snapshot. Giữ các nút chuyển kích thước và toàn bộ autosave/draft protections.
 
+### Kéo thẻ khác chiều cao không co giãn — 2026-10-21
+
+NoteCard chỉ áp dụng translate từ sortable transform, bỏ scaleX/scaleY khi rectSortingStrategy đổi chỗ thẻ có chiều cao khác nhau. Giữ kích thước/chữ/icon của cả thẻ đang kéo và các thẻ đang nhường chỗ; opacity thẻ đang kéo0.95 để đọc rõ. Không thay reorder/ownership/pinned-group/keyboard hoặc API.
+
 ## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
 
 Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.
