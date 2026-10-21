@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Card title một dòng có dấu ba chấm — 2026-10-21
+
+- Note-card-identity h3 dùng nowrap/ellipsis/flex1/min-width0 thay wrap dài; thêm title tooltip đầy đủ, không đổi giá trị note hoặc editor.
+- Focused Chromium2/2PASS393/1280px: title dài tràn scrollWidth nhưng chỉ1dòng, tooltip đủ text, mở lại input giữ nguyên đầy đủ. ESLint max-warnings0/TypeScript/Production build PASS; .NET Release strict tuần tự0warning/0error. Không unit/fullbrowser/backend suites hoặc thiết bị thật/cloud; fixture loopback SQLite/captured email.
+- Publication scope NotesPage/CSS/title-ellipsis.spec.ts và UI/worklog; fetch main cùnga3194ae/divergence0/0. Kiểm docs/diff/local API config hash, không stage hai appsettings local. Push main theo quyền đã cấp và đối chiếu remote SHA; chưa xác minh production deployment, không manual deploy.
+
 ## Tiêu đề cạnh icon trên card, background toàn editor — 2026-10-21
 
 - Card chuyển heading từ vùng preview lên cạnh icon trong identity button (Edit title), giữ Open title ở content và các action pin/drag độc lập; không title/icon không tạo placeholder hiển thị. CSS flex cho wrap dài/min-width0/foreground inherit. Modal thêm style tùy chọn; NoteEditor truyền notePalette/backgroundColor/surface toàn khung, toolbar/body/footer theo cùng màu. Default bỏ override về theme. Không đổi rich marks màu chữ, API/data/schema/autosave.

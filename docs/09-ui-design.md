@@ -79,3 +79,7 @@ Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default c
 ## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
 
 Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.
+
+## Tiêu đề card dài — 2026-10-21
+
+Tiêu đề trong note-card-identity hiển thị một dòng, overflow hidden/text-overflow ellipsis, co theo khoảng còn lại cạnh icon/action. Native title tooltip chứa đầy đủ tiêu đề; input editor và dữ liệu150ký tự giữ nguyên. Không cắt chuỗi đã lưu.

@@ -4486,6 +4486,6 @@ td {
 
 .note-card-identity { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; background: none; border: 0; padding: 0; text-align: left; color: inherit; }
 .note-card-identity .note-emoji { flex-shrink: 0; }
-.note-card-identity h3 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.55; letter-spacing: -0.1px; overflow-wrap: anywhere; min-width: 0; }
+.note-card-identity h3 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.55; letter-spacing: -0.1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
 .note-card-top > .row-actions { margin-left: auto; flex-shrink: 0; }
 .note-card-identity:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }

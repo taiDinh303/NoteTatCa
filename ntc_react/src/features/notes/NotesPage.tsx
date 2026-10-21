@@ -107,7 +107,7 @@ function NoteCard({
         {note.iconEmoji || note.title?.trim() ? (
           <button type="button" className="note-card-identity" onClick={onOpen} aria-label={`Edit ${title}`}>
             {note.iconEmoji ? <span className="note-emoji">{note.iconEmoji}</span> : null}
-            {note.title?.trim() ? <h3>{note.title}</h3> : null}
+            {note.title?.trim() ? <h3 title={note.title}>{note.title}</h3> : null}
           </button>
         ) : null}
         <div className="row-actions">
