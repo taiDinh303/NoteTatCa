@@ -1037,6 +1037,11 @@ test("edits content in a full viewport with an optional title and fixed characte
   await login(page);
   await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await expect(editor).not.toHaveClass(/fullscreen/);
+  const initialBounds = (await editor.boundingBox())!;
+  expect(initialBounds.width).toBeLessThan(page.viewportSize()!.width);
+  expect(initialBounds.height).toBeLessThan(page.viewportSize()!.height);
+  await editor.getByRole("button", { name: "Enter full screen", exact: true }).click();
   await expect(editor.getByLabel("Note title", { exact: true })).toBeVisible();
   await expect(
     editor.getByRole("button", { name: "Save", exact: true }),
@@ -2104,7 +2109,7 @@ for (const mobile of [false, true]) {
       path: `../artifacts/frontend/editor-alignment-${mobile ? "mobile" : "desktop"}.png`,
       animations: "disabled",
     });
-    for (const name of ["Pin note", "Exit full screen"]) {
+    for (const name of ["Pin note", "Enter full screen"]) {
       const button = editor.getByRole("button", { name, exact: true });
       await page.mouse.move(0, 0);
       await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

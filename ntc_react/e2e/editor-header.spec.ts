@@ -37,7 +37,7 @@ for (const width of [393, 1280]) {
         editor.getByRole("button", { name: "Choose note icon" }),
         editor.getByLabel("Note title"),
         editor.getByRole("button", { name: "Pin note", exact: true }),
-        editor.getByRole("button", { name: "Exit full screen" }),
+        editor.getByRole("button", { name: "Enter full screen" }),
       ].map((element) => element.boundingBox()),
     );
     const center = boxes[0]!.y + boxes[0]!.height / 2;
@@ -71,6 +71,8 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Open Compact header title", exact: true })
       .click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+    await expect(editor).not.toHaveClass(/fullscreen/);
+    await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toBeVisible();
     await expect(
       editor.getByRole("button", { name: "Choose note icon" }),
     ).toHaveText("💡");

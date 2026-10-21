@@ -20,7 +20,7 @@ React/TypeScript/Vite; React Router SPA; TanStack Query cache theo user, invalid
 
 ## UX và an toàn dữ liệu
 
-DEC-018/2026-10-20: editor mặc định phủ viewport; theo yêu cầu bổ sung cùng ngày có nút Enter full screen/Exit full screen để chuyển sang modal và trở lại, giữ nguyên draft/editor khi đổi kích thước. Không có dấu×đóng trùng Close. Title rỗng không hiện ô nhập/Untitled; Add title mở và focus ô nhập, xóa title rồi blur sẽ thu lại mà không mất content. Cards không in Untitled khi title rỗng (nút mở vẫn có accessible name). Counter ở footer cố định góc dưới, không chạy theo content scroll. Save thường được bỏ; lỗi mới hiện Retry save; Close chờ flush bản đang sửa, nếu lỗi/conflict giữ draft và hỏi tiếp. Không hạ guard409/idempotency/unsaved navigation.
+DEC-018/2026-10-20: editor mặc định khung nhỏ theo yêu cầu2026-10-21 cho cả tạo/mở note; có nút Enter full screen/Exit full screen để chuyển sang fullscreen và trở lại, giữ nguyên draft/editor khi đổi kích thước. Không có dấu×đóng trùng Close. Title rỗng không hiện ô nhập/Untitled; Add title mở và focus ô nhập, xóa title rồi blur sẽ thu lại mà không mất content. Cards không in Untitled khi title rỗng (nút mở vẫn có accessible name). Counter ở footer cố định góc dưới, không chạy theo content scroll. Save thường được bỏ; lỗi mới hiện Retry save; Close chờ flush bản đang sửa, nếu lỗi/conflict giữ draft và hỏi tiếp. Không hạ guard409/idempotency/unsaved navigation.
 
 Notes chỉ có Take a note, không Your personal space/Your notes/câu mô tả/New note/Create your first note; heading Notes/Trash/label/Reminders/Your inbox giữ dạng screen-reader-only; các tiêu đề/mô tả đầu trang lặp với sidebar không hiển thị. Search/reminder-filter vẫn có ngữ cảnh ngắn. Desktop sidebar ẩn/hiện bằng nút topbar và nhớ ntc.sidebar.hidden.v1; mobile có drawer riêng; cả desktop và mobile dùng icon Menu ba gạch ngang. Nút Mark all as read và cảnh báo giữ note trong Trash bảy ngày vẫn hiển thị. YOUR LABELS/icon là cùng một button/cursor quản lý labels, không Create a label trong sidebar. Bỏ routine success toasts của note/editor/label/reminder; lỗi/info hướng dẫn, self-security/admin acknowledgements giữ nguyên. Lưu preferences không chứa nội dung note/token.
 
@@ -153,3 +153,7 @@ Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sa
 ## Cỡ chữ thay nút Heading — 2026-10-21
 
 Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default cùng12/14/16/18/20/24/28/32/40/48px; trigger hiện cỡ tại con trỏ/vùng chọn. Chọn cỡ áp dụng textStyle.fontSize trên văn bản đang chọn hoặc nội dung gõ tiếp, Default bỏ fontSize và giữ marks khác. Dùng FontSize từ package Tiptap text-style3.32.0 sẵn có; không thêm dependency. Canonical/API cùng allowlist preset px, từ chối giá trị CSS tùy ý. Heading cũ và Markdown headings vẫn tương thích, không migrate. Export Markdown cảnh báo mất font size.
+
+### Note editor compact default — 2026-10-21
+
+EditorSession khởi tạo fullscreen=false cho cả note mới và note đã lưu; modal chờ tải note cũng không fullscreen. Autosave lần đầu không tự phóng to vì không khởi tạo lại state từ snapshot. Giữ các nút chuyển kích thước và toàn bộ autosave/draft protections.

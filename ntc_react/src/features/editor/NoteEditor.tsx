@@ -63,7 +63,7 @@ export default function NoteEditor({
         open
         wide
         hideTitle
-        className="note-editor-modal fullscreen"
+        className="note-editor-modal"
         onClose={onClose}
         title="Open note"
       >
@@ -111,7 +111,7 @@ function EditorSession({
     coordinator.getSnapshot,
   );
   const labels = useLabels();
-  const [fullscreen, setFullscreen] = useState(true);
+  const [fullscreen, setFullscreen] = useState(false);
   const [characterCount, setCharacterCount] = useState(
     initial?.content.length ?? 0,
   );

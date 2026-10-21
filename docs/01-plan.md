@@ -101,3 +101,7 @@ Theo yêu cầu chủ dự án, bỏ badge phím tắt ⌘ K khỏi ô tìm ki�
 ## DEC-022 — Ghi nhớ đăng nhập không tự hết hạn (2026-10-21)
 
 Theo yêu cầu chủ dự án, browser lưu refresh credential lâu dài để quay lại notes nhanh; bỏ checkbox Remember this tab, không lưu access token hoặc nội dung notes vào localStorage. Login/Google/refresh cấp phiên không hết hạn theo thời gian (sentinel9999-12-31 UTC giữ schema/DTO cũ); phiên cũ còn hợp lệ được nâng policy khi refresh. Access vẫn ngắn hạn/rotation/replay detection, logout/revoke/password/role/lock vẫn vô hiệu hóa phiên. Storage event đồng bộ logout/đổi user, Web Locks và BroadcastChannel tránh token rotation chéo tab. Phải đăng nhập lại nếu credential cũ đã hết hạn/thu hồi, xóa dữ liệu browser hoặc không thể lưu persistent. Không migrate data/schema hoặc tự deploy cloud.
+
+### Mặc định khung ghi chú — 2026-10-21
+
+Theo yêu cầu mới, Take a note mở note mới ở khung nhỏ, thay mặc định fullscreen của DEC-018. Nút Enter full screen/Exit full screen vẫn chuyển kích thước, giữ draft/autosave. Theo bổ sung cùng lượt, mở note đã lưu cũng bắt đầu ở khung nhỏ, kể cả trạng thái chờ tải note.

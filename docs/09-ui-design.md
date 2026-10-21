@@ -4,7 +4,7 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
-UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/evidence xem FRONTEND-IMPLEMENTATION. Backend đã có v1, version409, idempotency, documentJSON schema1, inbox/admin no-content. DEC-018/2026-10-20: editor mặc định toàn viewport, có nút phóng to/thu nhỏ theo yêu cầu bổ sung; autosave/status/error, không Save thường; Retry save khi lỗi, Close bảo vệ draft. Title rỗng ẩn, Add title mở ô nhập tùy chọn; counter cố định góc dưới. Duplicate labels phân biệt ID;100k text/1MiB document. Cảnh báo convert rich→plain/Markdown, giữ bản nhập khi conflict; không tự retry overwrite. Storage refresh/multi-tab/XSS và accessibility cần test khi làm React.
+UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/evidence xem FRONTEND-IMPLEMENTATION. Backend đã có v1, version409, idempotency, documentJSON schema1, inbox/admin no-content. DEC-018/2026-10-20: editor mặc định khung nhỏ cho cả tạo/mở note theo yêu cầu2026-10-21, có nút phóng to/thu nhỏ; autosave/status/error, không Save thường; Retry save khi lỗi, Close bảo vệ draft. Title rỗng ẩn, Add title mở ô nhập tùy chọn; counter cố định góc dưới. Duplicate labels phân biệt ID;100k text/1MiB document. Cảnh báo convert rich→plain/Markdown, giữ bản nhập khi conflict; không tự retry overwrite. Storage refresh/multi-tab/XSS và accessibility cần test khi làm React.
 
 ## Phạm vi đã chốt
 
