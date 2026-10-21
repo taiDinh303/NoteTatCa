@@ -118,7 +118,8 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
     public async Task<int> PruneIdentityStateAsync(CancellationToken cancellationToken = default)
     {
         var cutoff = clock.GetUtcNow().AddDays(-1);
-        var sessions = await unitOfWork.GetRepository<RefreshSession>().Entities.Where(x => x.ExpiresAt < cutoff).OrderBy(x => x.ExpiresAt).Take(500).ToListAsync(cancellationToken);
+        var revokedCutoff = clock.GetUtcNow().AddDays(-30);
+        var sessions = await unitOfWork.GetRepository<RefreshSession>().Entities.Where(x => x.ExpiresAt < cutoff || x.RevokedAt < revokedCutoff).OrderBy(x => x.ExpiresAt).Take(500).ToListAsync(cancellationToken);
         var challenges = await unitOfWork.GetRepository<EmailChallenge>().Entities.Where(x => x.ExpiresAt < cutoff).OrderBy(x => x.ExpiresAt).Take(500).ToListAsync(cancellationToken);
         foreach (var session in sessions) await unitOfWork.GetRepository<RefreshSession>().DeleteAsync(session);
         foreach (var challenge in challenges) await unitOfWork.GetRepository<EmailChallenge>().DeleteAsync(challenge);

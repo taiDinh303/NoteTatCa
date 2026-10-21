@@ -4,7 +4,7 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
-Bổ sung: Version là Guid concurrency token; Idempotency-Key scoped owner/payload; occurrence là một mốc lịch; delivery là lần email có lease/retry; refresh family có hạn tuyệt đối7/30 ngày; schema `ntc` là namespace DB private, không Supabase Auth tenant. CURRENT và TARGET luôn phân biệt bằng evidence06/worklog.
+Bổ sung: Version là Guid concurrency token; Idempotency-Key scoped owner/payload; occurrence là một mốc lịch; delivery là lần email có lease/retry; refresh family không hết hạn tự động theo DEC-022 (sentinel9999-12-31 UTC), vẫn thu hồi được; schema `ntc` là namespace DB private, không Supabase Auth tenant. CURRENT và TARGET luôn phân biệt bằng evidence06/worklog.
 
 | Thuật ngữ | Nghĩa trong NoteTatCa | Tên / phân biệt |
 | --- | --- | --- |

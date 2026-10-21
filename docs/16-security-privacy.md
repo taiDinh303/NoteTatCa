@@ -20,7 +20,7 @@ Fallback authenticated toàn controller trừ các action AllowAnonymous auth/pr
 | SEC-004 | Google audience/link proof | FIXED code: client audience/verified email/subject; link có token proof; tests fake adapter, Google thật NOT RUN |
 | SEC-005 | OTP Random/cache/không cap | FIXED: RNG, HMAC DB hash,10min/5attempts/60sresend, auth rate limit |
 | SEC-006 | Login không lockout/unique email | FIXED: Identity unique normalized email,5sai/5phút; migration dừng nếu duplicate |
-| SEC-007 | JWT dài không revoke | FIXED: access ngắn, refresh rotation/reuse/family expiry, DB stamp/session/role check |
+| SEC-007 | JWT dài không revoke | FIXED: access ngắn, refresh rotation/reuse/session revocation, DB stamp/session/role check |
 | SEC-008 | Response ex.Message | FIXED: envelope/traceId, internal error đã che |
 | SEC-009 | Secret local/lịch sử cũ | Local config giữ nguyên ngoài đợt code; không audit toàn lịch sử hoặc rotate credential trong phiên |
 
@@ -28,7 +28,7 @@ FIXED ở đây là source + kiểm thử biệt lập, không chứng minh bả
 
 ## Các lớp bảo vệ đã có
 
-JWT HMAC SHA256, key≥32 bytes, issuer/audience/lifetime, skew30 giây. Every access kiểm DB active/verified/notlocked, session/security stamp và active role; user lock/revoke có hiệu lực ngay. Refresh chỉ DB hash, family rotation7/30 ngày tuyệt đối; role/password/email change làm phiên cũ mất hiệu lực. Login sai chung; link Google account cùng email phải rõ proof. Recovery dùng Identity token; Data Protection keyring phải bền vững/giữ kín khi deploy nhiều instance/restart.
+JWT HMAC SHA256, key≥32 bytes, issuer/audience/lifetime, skew30 giây. Every access kiểm DB active/verified/notlocked, session/security stamp và active role; user lock/revoke có hiệu lực ngay. Refresh chỉ DB hash, family rotation không hết hạn tự động theo DEC-022; refresh cũ còn hợp lệ được nâng policy khi đổi token; role/password/email change làm phiên cũ mất hiệu lực. Login sai chung; link Google account cùng email phải rõ proof. Recovery dùng Identity token; Data Protection keyring phải bền vững/giữ kín khi deploy nhiều instance/restart.
 
 CORS allowlist origin cụ thể, không wildcard/AllowCredentials. API bearer chưa refresh cookie. Auth limiter20/IP/phút, global600/user hoặc IP/phút mặc định, fixed window in-process; không thay DDoS/distributed limit. Không trust X-Forwarded-For từ client; cần cấu hình proxy/network tin cậy sau khi biết Render topology, nếu không nhiều user có thể chung IP hạn mức.
 

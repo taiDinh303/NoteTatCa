@@ -80,6 +80,10 @@ export class AuthService {
     vault: SessionVault,
     clearPrivate: () => void,
     private readonly beforeAuthentication: () => Promise<void> = async () => {},
+    private readonly withSessionLock: (
+      action: () => Promise<void>,
+    ) => Promise<void> = async (action) => action(),
+    private readonly publishSession: (session: Session) => void = () => {},
   ) {
     this.api = api;
     this.vault = vault;
@@ -107,7 +111,7 @@ export class AuthService {
       ? `${session.userId}:${isAdministrator(session) ? "admin" : "member"}`
       : undefined;
   }
-  private accept(session: Session) {
+  private accept(session: Session, publish = true) {
     if (
       this.snapshot.session?.userId !== session.userId ||
       isAdministrator(this.snapshot.session) !== isAdministrator(session)
@@ -115,6 +119,7 @@ export class AuthService {
       this.clearPrivate();
     this.vault.write(session);
     this.emit({ status: "authenticated", session });
+    if (publish) this.publishSession(session);
   }
   bootstrap(retry = false) {
     if (retry && this.snapshot.status === "unavailable") {
@@ -145,7 +150,7 @@ export class AuthService {
   refresh(): Promise<void> {
     if (this.refreshInFlight) return this.refreshInFlight;
     const generation = this.generation;
-    this.refreshInFlight = (async () => {
+    this.refreshInFlight = this.withSessionLock(async () => {
       const saved = this.vault.read();
       if (!saved) throw new Error("No refresh session");
       await this.beforeAuthentication();
@@ -159,7 +164,7 @@ export class AuthService {
       if (generation !== this.generation)
         throw new Error("The session changed while refreshing.");
       this.accept(value);
-    })().finally(() => {
+    }).finally(() => {
       this.refreshInFlight = undefined;
     });
     return this.refreshInFlight;
@@ -170,37 +175,83 @@ export class AuthService {
     const session = this.snapshot.session;
     this.emit({ status: session ? "expired" : "anonymous", session });
   }
-  async login(email: string, password: string, rememberMe = false) {
+  async login(email: string, password: string, rememberMe = true) {
     const generation = ++this.generation;
     await this.beforeAuthentication();
     if (generation !== this.generation) return;
-    const session = await this.api.request<Session>("/auth/login", {
-      method: "POST",
-      body: { email, password, rememberMe },
-      authenticated: false,
+    await this.withSessionLock(async () => {
+      if (generation !== this.generation) return;
+      const session = await this.api.request<Session>("/auth/login", {
+        method: "POST",
+        body: { email, password, rememberMe },
+        authenticated: false,
+      });
+      if (generation === this.generation) this.accept(session);
     });
-    if (generation === this.generation) this.accept(session);
   }
   async google(idToken: string) {
     const generation = ++this.generation;
     await this.beforeAuthentication();
     if (generation !== this.generation) return;
-    const session = await this.api.request<Session>("/auth/google", {
-      method: "POST",
-      body: { idToken },
-      authenticated: false,
+    await this.withSessionLock(async () => {
+      if (generation !== this.generation) return;
+      const session = await this.api.request<Session>("/auth/google", {
+        method: "POST",
+        body: { idToken },
+        authenticated: false,
+      });
+      if (generation === this.generation) this.accept(session);
     });
-    if (generation === this.generation) this.accept(session);
+  }
+  adoptSharedSession(session: Session) {
+    const saved = this.vault.read();
+    if (
+      !saved ||
+      !session ||
+      typeof session.token !== "string" ||
+      !Array.isArray(session.roles) ||
+      saved.userId !== session.userId ||
+      saved.refreshToken !== session.refreshToken
+    )
+      return;
+    this.accept(session, false);
+  }
+  savedSessionChanged(userId?: string) {
+    if (
+      userId &&
+      (this.snapshot.session?.userId === userId ||
+        this.snapshot.status === "loading")
+    )
+      return;
+    this.generation++;
+    this.clearPrivate();
+    this.boot = undefined;
+    this.emit({ status: "anonymous" });
+    if (userId) {
+      this.emit({ status: "loading" });
+      void this.bootstrap();
+    }
   }
   async logout() {
     const generation = ++this.generation;
-    const saved = this.vault.read();
     try {
-      if (saved && this.accessToken())
-        await this.api.request("/auth/logout", {
+      await this.withSessionLock(async () => {
+        const saved = this.vault.read();
+        if (!saved || generation !== this.generation) return;
+        // Rotate the latest shared token, then revoke it without recursive auth retries.
+        const current = await this.api.request<Session>("/auth/refresh", {
           method: "POST",
           body: { refreshToken: saved.refreshToken },
+          authenticated: false,
         });
+        if (generation !== this.generation) return;
+        await this.api.request("/auth/logout", {
+          method: "POST",
+          body: { refreshToken: current.refreshToken },
+          authenticated: false,
+          headers: { Authorization: `Bearer ${current.token}` },
+        });
+      });
     } catch {
       // Local sign-out must also work after server-side revocation or an outage.
     } finally {

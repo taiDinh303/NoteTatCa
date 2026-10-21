@@ -670,8 +670,10 @@ function Sessions() {
                   ) : null}
                 </strong>
                 <span>
-                  Signed in {dateTime(session.createdAt)} · Expires{" "}
-                  {dateTime(session.expiresAt)}
+                  Signed in {dateTime(session.createdAt)} ·{" "}
+                  {new Date(session.expiresAt).getUTCFullYear() >= 9999
+                    ? "No expiration"
+                    : `Expires ${dateTime(session.expiresAt)}`}
                 </span>
               </div>
               <IconButton

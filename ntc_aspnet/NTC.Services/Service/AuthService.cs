@@ -65,7 +65,7 @@ public sealed class AuthService(IUnitOfWork work, ICurrentUser actor, TimeProvid
         }
         RequireActive(user);
         SessionSecurity.RequireSuccess(await users.ResetAccessFailedCountAsync(user));
-        return await InTransactionAsync(() => IssueSession(user, model.RememberMe));
+        return await InTransactionAsync(() => IssueSession(user));
     }
     public async Task SendEmailConfirmationAsync(string email)
     {
@@ -107,7 +107,7 @@ public sealed class AuthService(IUnitOfWork work, ICurrentUser actor, TimeProvid
                     FamilyName = identity.FamilyName, Picture = identity.Picture });
                 await UnitOfWork.SaveAsync();
             }
-            RequireActive(user); return await IssueSession(user, false);
+            RequireActive(user); return await IssueSession(user);
         });
     }
     public async Task<bool> VerifyPassword(VerifyPasswordModelView model)
@@ -117,12 +117,12 @@ public sealed class AuthService(IUnitOfWork work, ICurrentUser actor, TimeProvid
         if (!await users.CheckPasswordAsync(user, model.Password)) throw DomainErrors.Unauthorized();
         return true;
     }
-    private async Task<AuthResponseModelView> IssueSession(ApplicationUser user, bool remember, Guid? family = null, DateTimeOffset? familyExpiresAt = null)
+    private async Task<AuthResponseModelView> IssueSession(ApplicationUser user, Guid? family = null)
     {
         RequireActive(user); var now = UtcNow;
         var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
         var session = new RefreshSession { UserId = user.Id, FamilyId = family ?? Guid.NewGuid(), TokenHash = Hash(token),
-            SecurityStamp = user.SecurityStamp ?? "", CreatedAt = now, ExpiresAt = familyExpiresAt ?? now.AddDays(remember ? 30 : 7) };
+            SecurityStamp = user.SecurityStamp ?? "", CreatedAt = now, ExpiresAt = new DateTimeOffset(9999, 12, 31, 0, 0, 0, TimeSpan.Zero) };
         await Repository<RefreshSession>().InsertAsync(session); await UnitOfWork.SaveAsync();
         var roleNames = await users.GetRolesAsync(user); var profile = await Repository<UserInfo>().Entities.FirstOrDefaultAsync(x => x.Id == user.Id);
         var expires = now.AddMinutes(Math.Clamp(config.GetValue<int?>("Jwtsettings:ExpirationMinutes") ?? 15, 1, 60));
@@ -154,7 +154,7 @@ public sealed class AuthService(IUnitOfWork work, ICurrentUser actor, TimeProvid
             var user = await users.FindByIdAsync(session.UserId.ToString()) ?? throw DomainErrors.Unauthorized();
             RequireActive(user); if (session.SecurityStamp != user.SecurityStamp) throw DomainErrors.Unauthorized();
             session.RevokedAt = UtcNow;
-            var response = await IssueSession(user, false, session.FamilyId, session.ExpiresAt);
+            var response = await IssueSession(user, session.FamilyId);
             var replacementHash = Hash(response.RefreshToken);
             session.ReplacedById = await Repository<RefreshSession>().Entities.Where(x => x.TokenHash == replacementHash).Select(x => x.Id).SingleAsync();
             await UnitOfWork.SaveAsync();

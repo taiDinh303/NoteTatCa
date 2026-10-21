@@ -28,7 +28,7 @@ Sidebar desktop/mobile drawer, workspace search/grid/list, labels/filter/pinned,
 
 Autosave single writer, debounce; serialize saves với version mới nhất, giữ snapshot create/idempotency key khi retry mất ACK. Trạng thái dirty/saving/saved/error/conflict; Retry save chỉ khi lỗi, close/navigation bảo vệ draft. Markdown shortcuts/import/export có cảnh báo mất định dạng. Content cũ plain luôn chuyển bằng text nodes, không parse HTML tùy ý.
 
-Access token memory; refresh token trong sessionStorage theo tab, không localStorage mặc định; một refresh request đang chạy được chia sẻ. Remember tab chỉ thay lifetime server, không hứa giữ phiên sau khi đóng browser. Cache không persist notes; clear khi logout/user đổi. Session expired vẫn giữ draft trong editor cho reauthentication, không mở note cached của account cũ cho account mới. Google client ID từ public env, không fake login khi thiếu config. Browser tabs không tự chia sẻ refresh family.
+Access token memory; refresh token lưu localStorage để mở lại browser vẫn đăng nhập (DEC-022). Có fallback sessionStorage nếu persistent storage bị chặn; chuyển phiên tab cũ còn hợp lệ khi đọc. Web Locks tuần tự refresh/logout giữa tabs; một refresh request trong tab được chia sẻ. Cache không persist notes; clear khi logout/user đổi. Session expired vẫn giữ draft trong editor cho reauthentication, không mở note cached của account cũ cho account mới. Google client ID từ public env, không fake login khi thiếu config. Browser tabs chia sẻ phiên đã lưu; storage event xóa private cache khi logout/đổi account. Web Locks cần browser hỗ trợ; fallback không bảo đảm đồng bộ rotation liên tab trên browser không có Web Locks.
 
 ## Kiểm thử và ranh giới
 
@@ -147,3 +147,5 @@ Icon note, input tiêu đề tùy chọn, ghim và fullscreen nằm cùng một 
 ## Tiêu đề luôn hiện, không placeholder — 2026-10-21
 
 Bỏ Add title và cơ chế ẩn input khi blur rỗng. Luôn hiện input Note title trên hàng icon/ghim/fullscreen, không có placeholder, giữ aria-label trợ năng; cho để trống và giới hạn150 ký tự như cũ. Mở note vẫn ưu tiên focus content; người dùng bấm ô title để nhập. Không đổi API/dữ liệu/autosave.
+
+Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sau rotation, không persist vào localStorage. Chỉ nhận message nếu userId/refreshToken khớp credential đang lưu. Web Locks tuần tự login/Google/refresh/logout; chưa kiểm browser thiếu Web Locks/BroadcastChannel.

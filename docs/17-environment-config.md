@@ -28,7 +28,7 @@ WebApplication.CreateBuilder dùng cấu hình .NET mặc định: JSON → JSON
 | PORT | Hosting port; Docker bind qua entrypoint |
 | ApiSettings__BaseUrl | Cấu hình Razor lịch sử; không còn dùng sau DEC-020, không cần khai báo cho API/React |
 
-OTP10phút/5lần/60s, refresh7/30 ngày tuyệt đối, trash7 ngày, catch-up24 giờ và quota là policy hiện trong code; không có biến giả `Trash:RetentionDays`/`Reminder:CatchUpHours`. Đổi policy phải cập nhật test/docs.
+OTP10phút/5lần/60s, refresh không hết hạn tự động (DEC-022; sentinel9999-12-31 UTC), trash7 ngày, catch-up24 giờ và quota là policy hiện trong code; không có biến giả `Trash:RetentionDays`/`Reminder:CatchUpHours`. Đổi policy phải cập nhật test/docs.
 
 Frontend ở ntc_react; `VITE_API_BASE_URL` mặc định /api/v1, `VITE_GOOGLE_CLIENT_ID` tùy chọn; `API_PROXY_TARGET` server-only (NTC_API_PROXY_TARGET là alias cũ) mặc định http://localhost:5032, không đưa DB password/JWT key/SMTP secret vào đó. API/client Google OAuth configuration phải đồng bộ audience khi làm React.
 

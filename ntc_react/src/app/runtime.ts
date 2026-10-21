@@ -32,12 +32,43 @@ export const api = new ApiClient(
 );
 export const connection = new ServerConnection(healthUrl(api.baseUrl));
 api.setConnection(connection);
+const sessionChannel =
+  typeof BroadcastChannel === "undefined"
+    ? undefined
+    : new BroadcastChannel("ntc.session.memory.v1");
 export const auth = new AuthService(
   api,
   new SessionVault({
-    getItem: (key) => window.sessionStorage.getItem(key),
-    setItem: (key, value) => window.sessionStorage.setItem(key, value),
-    removeItem: (key) => window.sessionStorage.removeItem(key),
+    getItem: (key) => {
+      const legacy = window.sessionStorage.getItem(key);
+      try {
+        const saved = window.localStorage.getItem(key);
+        if (saved) return saved;
+        if (legacy) {
+          window.localStorage.setItem(key, legacy);
+          window.sessionStorage.removeItem(key);
+        }
+      } catch {
+        /* Fall back to this tab when persistent storage is unavailable. */
+      }
+      return legacy;
+    },
+    setItem: (key, value) => {
+      try {
+        window.localStorage.setItem(key, value);
+        window.sessionStorage.removeItem(key);
+      } catch {
+        window.sessionStorage.setItem(key, value);
+      }
+    },
+    removeItem: (key) => {
+      try {
+        window.localStorage.removeItem(key);
+      } catch {
+        /* Storage may be blocked. */
+      }
+      window.sessionStorage.removeItem(key);
+    },
   }),
   () => {
     preparation.reset();
@@ -45,6 +76,12 @@ export const auth = new AuthService(
     cache.clear();
   },
   connection.ensureReady,
+  async (action) => {
+    if (navigator.locks)
+      await navigator.locks.request("ntc.session.refresh.v1", action);
+    else await action();
+  },
+  (session) => sessionChannel?.postMessage(session),
 );
 api.setAuth(auth);
 export const notes = new NotesRepository(api);
@@ -63,3 +100,18 @@ export const preparation = new WorkspacePreparation(
   { notes, labels, reminders, inbox, account, admin },
   () => auth.identity(),
 );
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== "ntc.session.v1" && event.key !== null) return;
+  if (event.storageArea !== window.localStorage) return;
+  let userId: string | undefined;
+  try {
+    userId = event.newValue ? JSON.parse(event.newValue).userId : undefined;
+  } catch {
+    /* Invalid shared session. */
+  }
+  auth.savedSessionChanged(userId);
+});
+
+if (sessionChannel)
+  sessionChannel.onmessage = (event) => auth.adoptSharedSession(event.data);

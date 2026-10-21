@@ -196,10 +196,10 @@ export function Privacy() {
       </p>
       <h2>This browser</h2>
       <p>
-        Your refresh session is kept in tab storage. Note caches stay in memory
-        and are cleared on sign-out or account changes. Theme and layout
-        preferences may be saved locally. Avoid using shared browser profiles
-        for private notes.
+        Your refresh session is saved in this browser until you sign out or it
+        is revoked. Note caches stay in memory and are cleared on sign-out or
+        account changes. Theme and layout preferences may be saved locally.
+        Avoid using shared browser profiles for private notes.
       </p>
       <h2>Service-specific details</h2>
       <p>

@@ -335,7 +335,7 @@ test("keeps the saved session when offline during restore and reconnects on requ
     }),
   ).toBeVisible();
   expect(
-    await page.evaluate(() => !!sessionStorage.getItem("ntc.session.v1")),
+    await page.evaluate(() => !!localStorage.getItem("ntc.session.v1")),
   ).toBe(true);
   await page.evaluate(() => {
     Object.defineProperty(navigator, "onLine", {

@@ -42,7 +42,7 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
             .login(
               String(data.get("email")),
               String(data.get("password")),
-              data.get("remember") === "on",
+              true,
             )
             .then(onDone)
             .catch(setError)
@@ -80,9 +80,7 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
           </div>
         </Field>
         <div className="auth-options">
-          <label className="check-label">
-            <input type="checkbox" name="remember" /> Remember this tab
-          </label>
+          <span className="field-hint">Stay signed in on this device</span>
           <Link to="/forgot-password">Forgot password?</Link>
         </div>
         <Button className="full-width" busy={busy} type="submit">

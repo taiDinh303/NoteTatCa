@@ -65,5 +65,9 @@ Profile mặc định hiển thị thông tin dạng văn bản, giá trị tr�
 
 Nhấn icon góc trên để chọn icon từ menu hoặc dán emoji riêng; **Remove icon** bỏ icon tùy chọn. Icon, tiêu đề, ghim và thu phóng nằm trên một hàng. Note vẫn tự lưu; thông báo lưu thành công không hiện trên giao diện, lỗi lưu vẫn hiện để xử lý.
 
-
 Ô tiêu đề luôn nằm trên hàng icon/ghim/thu phóng, không có nút Add title hoặc chữ gợi ý. Bạn có thể bấm trực tiếp để nhập hoặc để trống nếu chỉ cần nội dung.
+
+
+## Ghi nhớ đăng nhập — 2026-10-21
+
+Đăng nhập mặc định được lưu trên trình duyệt, không tự hết hạn sau7/30ngày; mở lại cùng trình duyệt/profile có thể tiếp tục dùng notes. Active sessions hiển thị No expiration. Sign out, thu hồi phiên, đổi mật khẩu/quyền hoặc khóa account vẫn chấm dứt phiên; xóa dữ liệu trang/private browsing cũng có thể làm mất phiên đã lưu. Phiên cũ còn hợp lệ được nâng thời hạn khi làm mới; phiên đã hết hạn cần đăng nhập lại một lần. Notes cache vẫn ở memory, không phải offline storage.

@@ -138,6 +138,36 @@ describe("session security", () => {
     await auth.refresh();
     expect(clearPrivate).toHaveBeenCalledOnce();
   });
+  it("adopts shared access only for the currently saved refresh credential without persisting access", async () => {
+    const port = storage();
+    const vault = new SessionVault(port);
+    const publish = vi.fn();
+    const api = new ApiClient(
+      "/api/v1",
+      vi.fn(async () => ok(session())),
+    );
+    const auth = new AuthService(
+      api,
+      vault,
+      vi.fn(),
+      async () => {},
+      async (action) => action(),
+      publish,
+    );
+    await auth.login("a@example.test", "synthetic");
+    publish.mockClear();
+    auth.adoptSharedSession({
+      ...session("injected", "other-refresh"),
+      userId: "owner-b",
+    });
+    expect(auth.accessToken()).toBe("access-old");
+    auth.adoptSharedSession(session("shared-access"));
+    expect(auth.accessToken()).toBe("shared-access");
+    expect(publish).not.toHaveBeenCalled();
+    expect(port.getItem("ntc.session.v1")).not.toContain("shared-access");
+    auth.savedSessionChanged();
+    expect(auth.getSnapshot().status).toBe("anonymous");
+  });
   it("stores only a versioned refresh session, never the access token or private cache", () => {
     const port = storage();
     const vault = new SessionVault(port);

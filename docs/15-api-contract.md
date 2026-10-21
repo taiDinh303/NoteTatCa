@@ -26,11 +26,11 @@ Thông báo cụ thể có thể đổi; client dựa HTTP/code. X-Correlation-I
 
 POST auth/email-code `{email}` → register `{username,email,password,confirmPassword,confirmationCode}`. OTP 6 chữ số,10 phút, tối đa5 lần sai, resend tối thiểu60 giây; challenge DB hash và dùng một lần. `verify-email` `{email,code}` dành cho tài khoản chưa xác minh. Login `{email,password,rememberMe}`; v1 bắt buộc email. Google `{idToken}` phải đúng audience/subject/email verified; account email trùng chưa link trả conflict, user đăng nhập link có proof ở me.
 
-Login/google/refresh trả AuthResponseModelView: `token` (access), `expiredAt`, `refreshToken`, `refreshExpiresAt`, user/profile,roles,timeZoneId. Access mặc định15 phút, cấu hình1–60; refresh opaque rotation, lifetime **tuyệt đối theo family**7 ngày hoặc30 ngày RememberMe. POST refresh `{refreshToken}` public nhưng token là proof; token cũ dùng lại thu hồi family. Logout (authenticated) `{refreshToken}`; revoke-all authenticated, không body. Mỗi access kiểm DB session/user/stamp và role hiện tại; lock/logout/password/role changes có hiệu lực với phiên cũ.
+Login/google/refresh trả AuthResponseModelView: `token` (access), `expiredAt`, `refreshToken`, `refreshExpiresAt`, user/profile,roles,timeZoneId. Access mặc định15 phút, cấu hình1–60; refresh opaque rotation, không có thời hạn tự động theo DEC-022; refreshExpiresAt dùng sentinel9999-12-31T00:00:00Z để giữ contract/schema. RememberMe được nhận để tương thích, không còn quyết định lifetime. POST refresh `{refreshToken}` public nhưng token là proof; token cũ dùng lại thu hồi family. Logout (authenticated) `{refreshToken}`; revoke-all authenticated, không body. Mỗi access kiểm DB session/user/stamp và role hiện tại; lock/logout/password/role changes có hiệu lực với phiên cũ.
 
 Recovery: forgot-password `{email}` thông báo chung; reset-password `{userId,token,newPassword}` có Identity proof; confirm-email-change qua GET với userId/token/newEmail. Reset token nhận dạng raw Identity hoặc Base64URL từ email link. Không log query token. Me profile/account/password/email/Google routes lấy user từ phiên, xem inventory. Hard delete tài khoản trả409 vì policy export/retention tài khoản chưa chốt.
 
-API dùng bearer, chưa dùng refresh cookie; React dùng access memory + refresh sessionStorage theo tab, shared refresh flight; release vẫn cần đánh giá XSS trên môi trường thật. Không mặc định localStorage an toàn.
+API dùng bearer, chưa dùng refresh cookie; React dùng access memory + refresh localStorage theo browser, Web Locks chia sẻ tuần tự rotation giữa các tab; sessionStorage cũ được chuyển khi đọc nếu localStorage chưa có; release vẫn cần đánh giá XSS trên môi trường thật. Không mặc định localStorage an toàn.
 
 ## Note/editor/autosave — API-003/004/006/007
 
@@ -107,3 +107,5 @@ GET admin/users có q≤200, includeDeactivated=false mặc định. POST users/
 GET notifications/unread-count trả int; PATCH notifications/read-all không body, trả số vừa đánh dấu. Chỉ notifications của owner có note active; lần lặp trả0. Legacy và v1 success envelope cùng traceId; OpenAPI success typed, errors schema ApiErrorResponse với errors nullable. Password mới8–1024; email đầu vào được trim/validate mailbox, không nhận display-name mailbox. Link email encode proof/query và HTML.
 
 Source/evidence: [SERVICE-CONTROLLER-REVIEW](SERVICE-CONTROLLER-REVIEW.md). Các quy tắc null-clear ở đây không thay đổi Note PATCH đã mô tả phía trên.
+
+Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sau rotation, không persist vào localStorage. Chỉ nhận message nếu userId/refreshToken khớp credential đang lưu. Web Locks tuần tự login/Google/refresh/logout; chưa kiểm browser thiếu Web Locks/BroadcastChannel.

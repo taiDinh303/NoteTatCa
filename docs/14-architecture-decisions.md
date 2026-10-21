@@ -58,7 +58,7 @@ Giữ nguyên HEAD/branch/refs/remote, không rewrite lịch sử; Git index chu
 
 ## ADR-018 — React frontend 2026-10-18
 
-ACCEPTED: người dùng giao xây SPA đầy đủ từ Razor, đặt ntc_react tại root NTC. IMPLEMENTED local theo FRONTEND-IMPLEMENTATION. React function components/hooks cho UI; class services/repositories/session/autosave cho phân tầng/OOP. Server state cache theo user trong memory, không tải toàn bộ DB trước khi dùng; access token memory, refresh theo tab sessionStorage, shared rotation flight, clear cache theo identity. Tiptap JSON canonical theo whitelist backend, Markdown là import/export có cảnh báo. Dnd pointer/keyboard chỉ khi nhóm đã tải đủ và không filter. Không triển khai Supabase Auth, service worker/offline hoặc cloud trong nhiệm vụ này.
+ACCEPTED: người dùng giao xây SPA đầy đủ từ Razor, đặt ntc_react tại root NTC. IMPLEMENTED local theo FRONTEND-IMPLEMENTATION. React function components/hooks cho UI; class services/repositories/session/autosave cho phân tầng/OOP. Server state cache theo user trong memory, không tải toàn bộ DB trước khi dùng; access token memory, refresh persistent localStorage theo DEC-022, rotation qua Web Locks và access memory đồng bộ qua BroadcastChannel, clear cache theo identity. Tiptap JSON canonical theo whitelist backend, Markdown là import/export có cảnh báo. Dnd pointer/keyboard chỉ khi nhóm đã tải đủ và không filter. Không triển khai Supabase Auth, service worker/offline hoặc cloud trong nhiệm vụ này.
 
 ## Gỡ Razor theo DEC-020 — 2026-10-21
 
