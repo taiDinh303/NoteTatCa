@@ -161,7 +161,8 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <NotFound />,
     children: [
-      { path: "/", element: <Landing /> },
+      { path: "/", element: <Landing redirectAuthenticated /> },
+      { path: "/Home", element: <Landing /> },
       { path: "/privacy", element: <Privacy /> },
       { path: "/login", element: <AuthPage key="login" mode="login" /> },
       {

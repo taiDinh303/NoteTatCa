@@ -41,9 +41,6 @@ function Sidebar({
   const allLabels = query.data?.pages.flatMap((p) => p.items) ?? [];
   return (
     <>
-      <Link to="/notes" className="sidebar-brand" onClick={onNavigate}>
-        <Logo />
-      </Link>
       <nav className="primary-nav" aria-label="Workspace">
         <NavLink to="/notes" onClick={onNavigate}>
           <FileText size={19} />
@@ -163,11 +160,8 @@ export default function AppShell() {
       <a href="#workspace-main" className="skip-link">
         Skip to content
       </a>
-      <aside className="sidebar" id="workspace-navigation">
-        <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
-      </aside>
-      <div className="main-column">
         <header className="topbar">
+          <div className="topbar-brand">
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}
@@ -182,6 +176,10 @@ export default function AppShell() {
             label="Open navigation"
             onClick={() => setMobile(true)}
           />
+          <Link to="/Home" className="header-brand" aria-label="NoteTatCa home">
+            <Logo />
+          </Link>
+          </div>
           <form
             className="global-search"
             role="search"
@@ -250,6 +248,11 @@ export default function AppShell() {
             <ShellAccountMenu />
           </div>
         </header>
+      <aside className="sidebar" id="workspace-navigation">
+        <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
+      </aside>
+      <div className="main-column">
+
         <main className="workspace-main" id="workspace-main">
           <Outlet />
         </main>

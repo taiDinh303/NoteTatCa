@@ -14,22 +14,24 @@ import {
 import { useAuth } from "../../shared/hooks";
 import { homePath } from "../../application/access";
 import { Logo, Spinner } from "../../shared/ui";
-export function Landing() {
+export function Landing({ redirectAuthenticated = false }: { redirectAuthenticated?: boolean }) {
   const auth = useAuth();
-  if (auth.status === "authenticated")
+  if (redirectAuthenticated && auth.status === "authenticated")
     return <Navigate to={homePath(auth.session)} replace />;
-  if (auth.status === "loading") return <Spinner label="Opening your space…" />;
+  if (redirectAuthenticated && auth.status === "loading") return <Spinner label="Opening your space…" />;
+  const signedIn = auth.status === "authenticated";
+  const destination = homePath(auth.session);
   return (
     <div className="landing">
       <header>
-        <Link to="/">
+        <Link to="/Home">
           <Logo />
         </Link>
         <nav>
           <Link to="/privacy">Your privacy</Link>
-          <Link to="/login">Sign in</Link>
-          <Link className="button primary" to="/register">
-            Get started
+          {!signedIn && <Link to="/login">Sign in</Link>}
+          <Link className="button primary" to={signedIn ? destination : "/register"}>
+            {signedIn ? "Open workspace" : "Get started"}
             <ArrowRight size={15} />
           </Link>
         </nav>
@@ -50,12 +52,12 @@ export function Landing() {
               the little details worth keeping.
             </p>
             <div className="hero-actions">
-              <Link className="button primary large" to="/register">
-                Find your little space
+              <Link className="button primary large" to={signedIn ? destination : "/register"}>
+                {signedIn ? "Open your workspace" : "Find your little space"}
                 <ArrowRight size={18} />
               </Link>
-              <Link className="button secondary large" to="/login">
-                Welcome back
+              <Link className="button secondary large" to={signedIn ? destination : "/login"}>
+                {signedIn ? "Back to the app" : "Welcome back"}
               </Link>
             </div>
             <span className="hero-reassurance">
@@ -150,8 +152,8 @@ export function Landing() {
           <span>✧</span>
           <h2>Your next idea is waiting.</h2>
           <p>Give it somewhere to live.</p>
-          <Link className="button primary" to="/register">
-            Create your space
+          <Link className="button primary" to={signedIn ? destination : "/register"}>
+            {signedIn ? "Open your workspace" : "Create your space"}
             <ArrowRight size={16} />
           </Link>
         </section>

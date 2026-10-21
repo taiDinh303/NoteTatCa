@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
+  Home,
   LogOut,
   Settings,
   ShieldCheck,
@@ -35,6 +36,11 @@ export function ShellAccountMenu() {
       <ActionMenu
         label="Account menu"
         items={[
+          {
+            label: "Home",
+            icon: Home,
+            action: () => navigate("/Home"),
+          },
           {
             label: "Your profile",
             icon: Users,

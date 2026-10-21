@@ -492,3 +492,16 @@ Bắt đầu 2026-10-17: Git HEAD 176a968, chỉ hai appsettings có thay đổi
 - Theo yêu cầu “xóa luôn ở chỗ khác luôn để mở rộng diện tích”: xóa thêm 3 footer còn lại. Thay đổi thêm 3 file: ntc_react/src/app/AdminShell.tsx (gỡ footer workspace-footer admin), ntc_react/src/features/public/PublicPages.tsx (gỡ footer Landing), ntc_react/src/features/auth/AuthPage.tsx (gỡ footer auth section, giữ </section>). import Link/Logo vẫn dùng; không đổi CSS/auth/API/schema/dữ liệu.
 - Validation: `npm run typecheck` PASS (0 error), `npm run lint` PASS (0 issue) từ ntc_react/.
 - Publication 2026-10-21: commit `1c9f995` push lên origin/main (scope 5 file: AppShell/AdminShell/AuthPage/PublicPages + worklog). Không include hai appsettings NTC.API (đang giữ cho local/Codex). Đối chiếu HEAD local = origin/main = 1c9f995.
+
+## Home luôn truy cập được và căn giữa mobile — 2026-10-21
+
+- Theo yêu cầu chủ dự án: thêm route public `/Home` (React Router cũng nhận `/home`), không tự đẩy người đã đăng nhập sang workspace tại route này. `/` giữ điều hướng theo session như trước. Menu tài khoản dùng chung customer/admin thêm Home; CTA khi authenticated đưa về workspace theo role.
+- Sửa grid mobile thành minmax(0,1fr) để khung minh họa450px không nới cột; căn khung đã scale theo tâm và font heading co theo viewport. Giữ mọi thay đổi editor/config có sẵn của tác vụ khác.
+- Validation thực tế: ESLint PASS; TypeScript + Vite Production build PASS; .NET solution Release strict tuần tự PASS,0warnings/0errors. Focused Chromium home.spec.ts5/5 PASS:320/393/430/768px kiểm tâm heading và không overflow ngang; login synthetic→menu Home→reload→workspace PASS. Đã xem screenshot393px. Chỉ fixture local, không DB/SMTP thật; chưa điện thoại vật lý hoặc production.
+- Phạm vi riêng lượt này: PublicPages.tsx, router.tsx, ShellControls.tsx, các hunk landing trong styles.css, home.spec.ts và entry worklog. Chưa commit/push; working tree đồng thời có thay đổi editor/backend/docs khác, không gộp vào phạm vi này. Không deploy hoặc migrate dữ liệu.
+
+## Header toàn chiều rộng, logo cạnh menu và search giữa — 2026-10-21
+
+- Theo ảnh/yêu cầu: chuyển header customer ra trên sidebar/main-column, logo+tên cạnh nút ẩn/hiện; logo dẫn /Home. Sidebar bắt đầu dưới header77px. Grid ba cột cân hai bên giữ search giữa viewport, không phụ thuộc sidebar đang mở/đóng. Mobile dùng hàng logo/actions và hàng search riêng; giữ drawer và tìm kiếm hiện có. Admin layout không đổi.
+- Validation: typecheck/ESLint PASS; Chromium header.spec.ts3/3 PASS tại1440/1024/393px, kiểm header fullwidth, search giữa, sidebar bên dưới, toggle/drawer và query tìm kiếm; đã xem screenshots desktop/mobile. Production Vite build PASS. Không đổi backend; Release strict0warning/0error đã PASS ở lượt Home trước. Không kiểm thiết bị thật/production.
+- Publication scope: AppShell, styles (Home + header), PublicPages, router, ShellControls, home.spec.ts, header.spec.ts, worklog. Home đã có5/5Chromium PASS ở lượt trước. Fetch main trước commit: HEAD=origin/main=2e07060, divergence0/0. Giữ hai appsettings local ngoài commit. Push source theo quyền đã cấp; không manual deploy/migrate. Remote sẽ được đối chiếu sau push; chưa xác minh production rollout.
