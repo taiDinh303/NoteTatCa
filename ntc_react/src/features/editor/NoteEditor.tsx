@@ -204,6 +204,13 @@ function EditorSession({
         title={initial ? "Edit note" : "New note"}
         hideTitle
         className={`note-editor-modal ${fullscreen ? "fullscreen" : ""}`}
+        style={{
+          ...notePalette(draft.backgroundColor),
+          backgroundColor: draft.backgroundColor || undefined,
+          ...(draft.backgroundColor
+            ? { "--surface": draft.backgroundColor }
+            : {}),
+        }}
       >
         <div
           className="editor-heading"

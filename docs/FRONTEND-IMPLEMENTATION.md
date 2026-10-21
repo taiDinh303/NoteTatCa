@@ -157,3 +157,7 @@ Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default c
 ### Note editor compact default — 2026-10-21
 
 EditorSession khởi tạo fullscreen=false cho cả note mới và note đã lưu; modal chờ tải note cũng không fullscreen. Autosave lần đầu không tự phóng to vì không khởi tạo lại state từ snapshot. Giữ các nút chuyển kích thước và toàn bộ autosave/draft protections.
+
+## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
+
+Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.

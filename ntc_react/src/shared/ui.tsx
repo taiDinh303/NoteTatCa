@@ -6,7 +6,12 @@ import {
   useId,
   useState,
 } from "react";
-import type { ButtonHTMLAttributes, ErrorInfo, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  CSSProperties,
+  ErrorInfo,
+  ReactNode,
+} from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import {
@@ -265,6 +270,7 @@ export function Modal({
   hideTitle = false,
   hideCloseButton = false,
   dismissOnOutside = false,
+  style,
 }: {
   open: boolean;
   onClose: () => void;
@@ -276,6 +282,7 @@ export function Modal({
   hideTitle?: boolean;
   hideCloseButton?: boolean;
   dismissOnOutside?: boolean;
+  style?: CSSProperties;
 }) {
   return (
     <Dialog.Root
@@ -288,6 +295,7 @@ export function Modal({
         <Dialog.Overlay className="modal-overlay" />
         <Dialog.Content
           className={`modal ${wide ? "wide" : ""} ${className}`}
+          style={style}
           onPointerDownOutside={(e) => {
             if (!dismissOnOutside) e.preventDefault();
           }}

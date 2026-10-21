@@ -102,7 +102,12 @@ function NoteCard({
       data-testid={`note-${note.id}`}
     >
       <div className="note-card-top">
-        <span className="note-emoji">{note.iconEmoji || ""}</span>
+        {note.iconEmoji || note.title?.trim() ? (
+          <button type="button" className="note-card-identity" onClick={onOpen} aria-label={`Edit ${title}`}>
+            {note.iconEmoji ? <span className="note-emoji">{note.iconEmoji}</span> : null}
+            {note.title?.trim() ? <h3>{note.title}</h3> : null}
+          </button>
+        ) : null}
         <div className="row-actions">
           {draggable ? (
             <button
@@ -133,7 +138,6 @@ function NoteCard({
         onClick={onOpen}
         aria-label={`Open ${title}`}
       >
-        {note.title?.trim() ? <h3>{note.title}</h3> : null}
         {note.content ? (
           <p
             className={`note-preview ${note.documentJson?.includes("taskList") ? "checklist-preview" : ""}`}

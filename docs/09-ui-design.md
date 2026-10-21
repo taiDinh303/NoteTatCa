@@ -75,3 +75,7 @@ Bỏ Add title và cơ chế ẩn input khi blur rỗng. Luôn hiện input Note
 ## Cỡ chữ thay nút Heading — 2026-10-21
 
 Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default cùng12/14/16/18/20/24/28/32/40/48px; trigger hiện cỡ tại con trỏ/vùng chọn. Chọn cỡ áp dụng textStyle.fontSize trên văn bản đang chọn hoặc nội dung gõ tiếp, Default bỏ fontSize và giữ marks khác. Dùng FontSize từ package Tiptap text-style3.32.0 sẵn có; không thêm dependency. Canonical/API cùng allowlist preset px, từ chối giá trị CSS tùy ý. Heading cũ và Markdown headings vẫn tương thích, không migrate. Export Markdown cảnh báo mất font size.
+
+## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
+
+Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.

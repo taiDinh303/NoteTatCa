@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Tiêu đề cạnh icon trên card, background toàn editor — 2026-10-21
+
+- Card chuyển heading từ vùng preview lên cạnh icon trong identity button (Edit title), giữ Open title ở content và các action pin/drag độc lập; không title/icon không tạo placeholder hiển thị. CSS flex cho wrap dài/min-width0/foreground inherit. Modal thêm style tùy chọn; NoteEditor truyền notePalette/backgroundColor/surface toàn khung, toolbar/body/footer theo cùng màu. Default bỏ override về theme. Không đổi rich marks màu chữ, API/data/schema/autosave.
+- Focused Chromium4/4PASS(34.8s): light desktop1280/dark mobile393 kiểm preset vàng/custom tối trên root/toolbar và foreground trắng, default về theme, save/reopen, title/icon cùng tâm hàng/duy nhất1heading/click title mở note; rich autosave/labels/trash/restore và pointer/keyboard pinned reorder PASS. Đã xem ảnh editor dark mobile và card title cạnh icon. ESLint max-warnings0/TypeScript/Production build PASS; .NET Release strict tuần tự0warning/0error. Custom color đặt bằng native setter/events, không kiểm OS picker.
+- Không chạy lại unit/fullbrowser/backend suites; fixture loopback SQLite/captured email, không DB/SMTP/cloud thật. Thiết bị thật/Safari/production CHƯA XÁC MINH. Publication scope NoteEditor/Modal style/card identity/CSS/tests và docs liên quan; giữ hunk drag translate/opacity, drag-shape.spec.ts và entry frontend drag đang làm song song ngoài commit. Fetch main cùng34f0564/divergence0/0; kiểm docs/diff/local config hash, push main theo quyền đã cấp rồi đối chiếu remote SHA, không manual deploy/migration.
+
 ## Bỏ dấu chọn trực quan trong menu cỡ chữ — 2026-10-21
 
 - Bỏ ItemIndicator/check icon riêng menu Font size, giữ nhãn Default và các mức px. Radio state/aria-checked/lựa chọn/căn lề và autosave không đổi.
