@@ -451,4 +451,5 @@ Bắt đầu 2026-10-17: Git HEAD 176a968, chỉ hai appsettings có thay đổi
 ## Mở rộng: xóa thêm footer “Keep what matters.” và “Privacy & data” ở admin/auth/public — 2026-10-21
 
 - Theo yêu cầu “xóa luôn ở chỗ khác luôn để mở rộng diện tích”: xóa thêm 3 footer còn lại. Thay đổi thêm 3 file: ntc_react/src/app/AdminShell.tsx (gỡ footer workspace-footer admin), ntc_react/src/features/public/PublicPages.tsx (gỡ footer Landing), ntc_react/src/features/auth/AuthPage.tsx (gỡ footer auth section, giữ </section>). import Link/Logo vẫn dùng; không đổi CSS/auth/API/schema/dữ liệu.
-- Validation: `npm run typecheck` PASS (0 error), `npm run lint` PASS (0 issue) từ ntc_react/. Chưa commit/push/deploy.
+- Validation: `npm run typecheck` PASS (0 error), `npm run lint` PASS (0 issue) từ ntc_react/.
+- Publication 2026-10-21: commit `1c9f995` push lên origin/main (scope 5 file: AppShell/AdminShell/AuthPage/PublicPages + worklog). Không include hai appsettings NTC.API (đang giữ cho local/Codex). Đối chiếu HEAD local = origin/main = 1c9f995.
