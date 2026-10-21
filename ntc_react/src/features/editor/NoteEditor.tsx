@@ -6,14 +6,13 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import * as Popover from "@radix-ui/react-popover";
 import { useBlocker } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
-  Check,
   Copy,
   Download,
-  LoaderCircle,
   Maximize2,
   Minimize2,
   Pin,
@@ -216,25 +215,77 @@ function EditorSession({
           }}
         >
           <div className="editor-identity">
-            <button
-              type="button"
-              className="emoji-trigger"
-              aria-label="Choose note icon"
-              onClick={() => setEmojiOpen(!emojiOpen)}
+            <Popover.Root open={emojiOpen} onOpenChange={setEmojiOpen}>
+              <Popover.Trigger asChild>
+                <button
+                  type="button"
+                  className="emoji-trigger"
+                  aria-label="Choose note icon"
+                >
+                  {draft.iconEmoji || "📝"}
+                </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  className="note-icon-menu"
+                  side="bottom"
+                  align="start"
+                  sideOffset={10}
+                  collisionPadding={12}
+                  aria-label="Note icons"
+                >
+                  <div className="note-icon-grid">
+                    {EMOJIS.map((emoji) => (
+                      <button
+                        key={emoji || "none"}
+                        type="button"
+                        aria-label={emoji || "Remove icon"}
+                        aria-pressed={draft.iconEmoji === emoji}
+                        onClick={() => {
+                          update({ iconEmoji: emoji });
+                          setEmojiOpen(false);
+                        }}
+                      >
+                        {emoji || "×"}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    aria-label="Custom note emoji"
+                    placeholder="Or paste an emoji"
+                    value={draft.iconEmoji}
+                    maxLength={32}
+                    onChange={(event) =>
+                      update({ iconEmoji: event.target.value })
+                    }
+                  />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+            <span
+              className="sr-only"
+              role="status"
+              data-save-state={snapshot.status}
             >
-              {draft.iconEmoji || "📝"}
-            </button>
-            <span className={`save-indicator ${snapshot.status}`} role="status">
-              {snapshot.status === "saving" ? (
-                <LoaderCircle size={13} className="spin" />
-              ) : snapshot.status === "saved" ? (
-                <Check size={13} />
-              ) : (
-                <span className="status-dot" />
-              )}
               {status}
             </span>
           </div>
+          {showTitle ? (
+            <div className="editor-title-wrap">
+              <input
+                className="editor-title"
+                aria-label="Note title"
+                placeholder="Title"
+                autoFocus={!draft.title.trim()}
+                value={draft.title}
+                maxLength={150}
+                onChange={(e) => update({ title: e.target.value })}
+                onBlur={() => {
+                  if (!draftRef.current.title.trim()) setShowTitle(false);
+                }}
+              />
+            </div>
+          ) : null}
           <div className="row-actions">
             {!showTitle ? (
               <Button
@@ -262,45 +313,6 @@ function EditorSession({
             />
           </div>
         </div>
-        {emojiOpen ? (
-          <div className="emoji-picker">
-            {EMOJIS.map((emoji) => (
-              <button
-                key={emoji || "none"}
-                aria-label={emoji || "Remove icon"}
-                onClick={() => {
-                  update({ iconEmoji: emoji });
-                  setEmojiOpen(false);
-                }}
-              >
-                {emoji || "×"}
-              </button>
-            ))}
-            <input
-              aria-label="Custom note emoji"
-              placeholder="Or paste an emoji"
-              value={draft.iconEmoji}
-              maxLength={32}
-              onChange={(e) => update({ iconEmoji: e.target.value })}
-            />
-          </div>
-        ) : null}
-        {showTitle ? (
-          <div className="editor-title-wrap">
-            <input
-              className="editor-title"
-              aria-label="Note title"
-              placeholder="Title"
-              autoFocus={!draft.title.trim()}
-              value={draft.title}
-              maxLength={150}
-              onChange={(e) => update({ title: e.target.value })}
-              onBlur={() => {
-                if (!draftRef.current.title.trim()) setShowTitle(false);
-              }}
-            />
-          </div>
-        ) : null}
         <ErrorBanner error={otherError ?? snapshot.error} />
         {snapshot.status === "conflict" ? (
           <div className="conflict-panel">
@@ -376,7 +388,7 @@ function EditorSession({
                 // Lazy editor startup must not steal focus from an optional title or another input.
                 if (
                   !document.activeElement?.matches(
-                    "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, [role='menuitem'], [role='menuitemradio']",
+                    "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, .note-icon-menu *, [role='menuitem'], [role='menuitemradio']",
                   )
                 )
                   commands.focus();

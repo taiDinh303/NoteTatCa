@@ -139,3 +139,7 @@ Thanh editor chỉ có một nút cọ vẽ Note background color. Radix Popover
 ## Settings xem trước, Edit mới mở form (2026-10-21)
 
 SettingsPage dùng read view cho profile/contact/password, không render input/select khi vào trang (kể cả query legacy edit). Edit là thao tác rõ ràng; Cancel unmount form, reset picture draft và error; Save thành công đóng edit, thất bại giữ form. Profile tiếp tục dùng version/cache update; email confirmation, phone update, password sign-out và connected provider/session flows giữ nguyên API. Chung component cho admin/customer, CSS riêng settings.css tránh thay style editor/workspace.
+
+## Header editor một hàng, menu icon — 2026-10-21
+
+Icon note, input tiêu đề tùy chọn, ghim và fullscreen nằm cùng một hàng; input co theo chiều ngang, tiêu đề vẫn tối đa150 ký tự. Chọn icon mở Radix Popover (preset/Remove icon/custom emoji), không thêm hàng vào editor; chọn preset đóng bảng, Escape/click ngoài đóng. Trạng thái autosave thường chỉ thông báo trợ năng, không hiển thị dòng All changes saved; lỗi/409/Retry save vẫn hiện và giữ draft theo quy tắc cũ. Không đổi API/schema.

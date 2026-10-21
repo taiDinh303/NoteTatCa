@@ -4465,3 +4465,17 @@ td {
   outline: 2px solid var(--text);
   border-radius: 8px;
 }
+
+.note-editor-modal .editor-heading { gap: 12px; flex-wrap: nowrap; }
+.note-editor-modal .editor-heading .editor-title-wrap { padding: 0; flex: 1; min-width: 0; }
+.note-editor-modal .editor-heading .editor-title { font-size: clamp(16px, 2.4vw, 24px) !important; letter-spacing: -0.3px; color: inherit; min-width: 0; }
+.note-editor-modal .editor-heading .editor-identity,
+.note-editor-modal .editor-heading .row-actions { flex-shrink: 0; }
+.note-editor-modal .editor-heading .row-actions { margin-left: auto; flex-wrap: nowrap; }
+.note-icon-menu { z-index: 160; width: min(300px, calc(100vw / var(--interface-scale) - 24px)); padding: 12px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 30px #0003; }
+.note-icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); justify-items: center; gap: 6px; margin-bottom: 10px; }
+.note-icon-grid button { width: 44px; height: 44px; background: transparent; border: 1px solid transparent; border-radius: 8px; font-size: 22px; color: inherit; }
+.note-icon-grid button:hover,
+.note-icon-grid button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--border); }
+.note-icon-grid button:focus-visible { outline: 2px solid var(--text); }
+.note-icon-menu input { width: 100%; }

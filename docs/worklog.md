@@ -2,6 +2,13 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Header editor gọn, icon dropdown và ẩn trạng thái lưu thường — 2026-10-21
+
+- Bỏ hiển thị dòng All changes saved/normal save status; giữ role status ở sr-only cho trợ năng và data-save-state cho hồi quy. ErrorBanner/409/Retry save/close guard/autosave không đổi. Icon note mở Radix Popover preset/Remove icon/custom emoji thay hàng emoji inline; chọn preset đóng, Escape đóng riêng bảng, lưu icon như cũ. Focus guard giữ custom/menu đang tương tác.
+- Chuyển input title vào editor-heading giữa icon và ghim/fullscreen, flex co nội dung một hàng trên mobile/desktop. Title vẫn tùy chọn/150ký tự/Add title và blur rỗng như cũ. Icon menu tự chia cột theo diện tích, ô44px, không đẩy toolbar/content xuống. Không đổi API/schema/data/ownership.
+- Focused Chromium4/4PASS(1.7phút): header393/1280px kiểm các control cùng tâm hàng/không overflow, menu không tăng chiều cao header, status sr-only, chọn emoji/save/reload/Escape; optional title/fullscreen/count và rich autosave/labels/trash/restore. Đã xem ảnh393px đúng hàng và không save status. ESLint max-warnings0, TypeScript/Production Vite build PASS; .NET Release strict tuần tự0warning/0error. Không chạy lại unit/fullbrowser/backend suites, không DB/SMTP/cloud thật; fixture SQLite/captured email. Thiết bị thật/Safari/production CHƯA XÁC MINH.
+- Publication scope NoteEditor/CSS/header regression và UI/frontend/user guide/worklog; fetch main cùngf4ae27c/divergence0/0, không gộp công việc settings đã commit riêng. Docs48Markdown/178links/0errors và diff PASS, local API config giữ nguyên hash/ngoài commit. Push main theo quyền đã cấp rồi đối chiếu remote SHA, không manual deploy/migration.
+
 ## Một nút cọ vẽ mở bảng màu note — 2026-10-21
 
 - Thay dãy swatches ở footer bằng NoteColorPicker, một nút Paintbrush. Radix Popover1.3.1 mở phía trên, collision padding/width theo viewport và interface scale; grid4 cột/ô44px, check màu hiện tại, preset/default đóng bảng, custom dùng color input native và autosave hiện hành. Giữ nguyên palette/API/ownership/dữ liệu. Thêm CSS scope riêng, không đổi bố cục ngoài editor.

@@ -60,3 +60,7 @@ Nhấn biểu tượng **cọ vẽ** ở thanh dưới để mở bảng màu. C
 ## Xem trước khi sửa hồ sơ/tài khoản — 2026-10-21
 
 Profile mặc định hiển thị thông tin dạng văn bản, giá trị trống là Not provided; chọn Edit profile mới mở form. Save profile thành công trở về chế độ xem; Cancel bỏ thay đổi chưa lưu. Account & security có Edit email, Edit phone number và Edit password riêng; chỉ mục đang sửa có input. Cancel xóa bản nhập của mục đó; khi API lỗi, form và dữ liệu đang nhập vẫn giữ để sửa/thử lại. Gửi đổi email vẫn cần xác nhận ở email mới, thay mật khẩu vẫn đăng xuất theo luồng bảo mật hiện có. Áp dụng cho customer và admin; Active sessions/Connected accounts giữ hành động hiện có.
+
+## Icon và tiêu đề note
+
+Nhấn icon góc trên để chọn icon từ menu hoặc dán emoji riêng; **Remove icon** bỏ icon tùy chọn. Icon, tiêu đề, ghim và thu phóng nằm trên một hàng. Note vẫn tự lưu; thông báo lưu thành công không hiện trên giao diện, lỗi lưu vẫn hiện để xử lý.

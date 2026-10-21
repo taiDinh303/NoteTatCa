@@ -63,3 +63,7 @@ Sidebar mobile customer/admin không hiện nút X. Chạm/click vùng ngoài dr
 ## Bảng màu note thu gọn — 2026-10-21
 
 Thanh editor chỉ có một nút cọ vẽ Note background color. Radix Popover mở lên phía trên, tránh mép viewport; bảng4 cột, ô44px, đánh dấu màu hiện tại. Chọn preset hoặc Default note color đóng bảng; Custom color mở bộ pha màu native và cập nhật autosave. Escape/click ngoài đóng bảng, trả focus trigger. Lazy editor không lấy focus từ bảng màu/menu đang mở. Không thêm hình nền hoặc đổi API/dữ liệu màu.
+
+## Header editor một hàng, menu icon — 2026-10-21
+
+Icon note, input tiêu đề tùy chọn, ghim và fullscreen nằm cùng một hàng; input co theo chiều ngang, tiêu đề vẫn tối đa150 ký tự. Chọn icon mở Radix Popover (preset/Remove icon/custom emoji), không thêm hàng vào editor; chọn preset đóng bảng, Escape/click ngoài đóng. Trạng thái autosave thường chỉ thông báo trợ năng, không hiển thị dòng All changes saved; lỗi/409/Retry save vẫn hiện và giữ draft theo quy tắc cũ. Không đổi API/schema.
