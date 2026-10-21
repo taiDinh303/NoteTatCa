@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { IconButton, Logo, Modal } from "../shared/ui";
 import { useTheme } from "../shared/useTheme";
-import { InterfaceZoom } from "../shared/DisplayPreferences";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 
 function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
@@ -114,7 +113,6 @@ export default function AdminShell() {
               label={theme === "dark" ? "Use light theme" : "Use dark theme"}
               onClick={toggleTheme}
             />
-            <InterfaceZoom />
             <div className="topbar-divider" />
             <ShellAccountMenu />
           </div>

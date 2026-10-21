@@ -639,26 +639,6 @@ strong {
   margin-top: auto;
   padding-top: 35px;
 }
-.sidebar-tip {
-  background: linear-gradient(135deg, #faf8f3, #f6f7f2);
-  padding: 18px;
-  border-radius: 10px;
-  margin: 0 8px 19px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.sidebar-tip > span {
-  font-size: 30px;
-  line-height: 1;
-  color: #c3b68d;
-}
-.sidebar-tip p {
-  font-size: 11px;
-  line-height: 1.8;
-  color: #a5a18f;
-  margin: 0;
-}
 .settings-link {
   font-size: 11px;
   padding: 12px 17px;
@@ -2999,9 +2979,6 @@ td {
 .navigation-drawer .sidebar-bottom {
   padding-top: 20px;
 }
-.navigation-drawer .sidebar-tip {
-  display: none;
-}
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -3048,9 +3025,6 @@ td {
 }
 [data-theme="dark"] .note-card.colored {
   border-color: #ffffff20;
-}
-[data-theme="dark"] .sidebar-tip {
-  background: #2a3027;
 }
 [data-theme="dark"] .workspace-glyph,
 [data-theme="dark"] .avatar,
@@ -4249,31 +4223,6 @@ td {
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
 }
-.zoom-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  min-height: max(36px, calc(44px / var(--interface-scale)));
-  min-width: max(66px, calc(54px / var(--interface-scale)));
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--muted);
-  font-size: max(11px, calc(12px / var(--interface-scale)));
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.zoom-trigger:hover,
-.zoom-trigger[data-state="open"] {
-  background: var(--hover);
-  color: var(--text);
-}
-.zoom-trigger > svg {
-  width: max(16px, calc(16px / var(--interface-scale)));
-  height: max(16px, calc(16px / var(--interface-scale)));
-}
 /* Floating UI positions portals in screen pixels; keep that coordinate space
    unscaled, then scale the menu contents along with the interface. */
 [data-radix-popper-content-wrapper] {
@@ -4282,58 +4231,26 @@ td {
 [data-radix-popper-content-wrapper] > * {
   zoom: var(--interface-scale);
 }
-@container viewport (max-width: 800px) {
-  .zoom-trigger {
-    min-height: max(40px, calc(44px / var(--interface-scale)));
-    min-width: max(48px, calc(44px / var(--interface-scale)));
-    padding: 6px;
-  }
-  .zoom-trigger > svg {
-    display: none;
-  }
-}
-.topbar {
-  min-height: max(66px, calc(56px / var(--interface-scale)));
-}
-/* Keep the recovery controls readable independently of the chosen app scale. */
-.modal.zoom-panel {
+.zoom-indicator {
+  position: fixed;
   zoom: calc(1 / var(--interface-scale));
-  width: min(360px, calc(100vw - 32px));
-  max-width: none;
-  max-height: calc(100dvh - 32px);
-}
-.zoom-input-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  font-size: 13px;
-}
-.zoom-number-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--muted);
-}
-.zoom-number-wrap input {
-  width: 82px;
-  min-height: 44px;
-  font-size: 16px;
-}
-.zoom-slider {
-  width: 100%;
-  min-height: 44px;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  accent-color: var(--accent);
-  touch-action: pan-y;
-}
-.zoom-range-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--muted);
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 200;
+  pointer-events: none;
+  min-width: 84px;
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 32px #0003;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  animation: fade-in 0.12s ease-out;
 }
 @container viewport (max-width: 480px) {
   .topbar {

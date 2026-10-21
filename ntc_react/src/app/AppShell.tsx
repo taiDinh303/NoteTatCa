@@ -28,7 +28,6 @@ import { useAuth, useLabels } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 import { useTheme } from "../shared/useTheme";
-import { InterfaceZoom } from "../shared/DisplayPreferences";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 function Sidebar({
   onLabels,
@@ -99,14 +98,6 @@ function Sidebar({
         ) : null}
       </nav>
       <div className="sidebar-bottom">
-        <div className="sidebar-tip">
-          <span>✧</span>
-          <p>
-            Big ideas often start
-            <br />
-            with a little note.
-          </p>
-        </div>
         <NavLink
           className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
           to="/settings/profile"
@@ -245,7 +236,6 @@ export default function AppShell() {
               label={theme === "dark" ? "Use light theme" : "Use dark theme"}
               onClick={toggleTheme}
             />
-            <InterfaceZoom />
             <div className="notification-button">
               <IconButton
                 icon={Bell}

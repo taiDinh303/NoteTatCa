@@ -1,28 +1,23 @@
-import { createContext, useContext, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ZoomIn } from "lucide-react";
-import { Button, Modal } from "./ui";
+import { createPortal } from "react-dom";
 
 const storageKey = "ntc.interface.zoom.v1";
-const ZoomContext = createContext<{
-  percent: number;
-  setPercent: (value: number) => void;
-}>({
-  percent: 100,
-  setPercent: () => {},
-});
+const clamp = (value: number) => Math.min(150, Math.max(50, value));
 
 export function DisplayPreferences({ children }: { children: ReactNode }) {
   const [percent, setPercent] = useState(() => {
     try {
-      const saved = Number(localStorage.getItem(storageKey));
-      return Number.isInteger(saved) && saved >= 25 && saved <= 150
-        ? saved
+      const saved = localStorage.getItem(storageKey);
+      return saved?.trim() && Number.isFinite(Number(saved))
+        ? Math.round(clamp(Number(saved)))
         : 100;
     } catch {
       return 100;
     }
   });
+  const target = useRef(percent);
+  const [visible, setVisible] = useState(false);
   useLayoutEffect(() => {
     document.documentElement.style.setProperty(
       "--interface-scale",
@@ -31,111 +26,131 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(storageKey, String(percent));
     } catch {
-      // Display preferences must also work with browser storage disabled.
+      /* Display preferences are optional when browser storage is blocked. */
     }
   }, [percent]);
-  return (
-    <ZoomContext.Provider value={{ percent, setPercent }}>
-      {children}
-    </ZoomContext.Provider>
-  );
-}
-
-export function InterfaceZoom() {
-  const { percent, setPercent } = useContext(ZoomContext);
-  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    let frame = 0;
+    let hideTimer = 0;
+    let pinch: { ids: number[]; distance: number; percent: number } | undefined;
+    let safariBase: number | undefined;
+    function change(value: number) {
+      if (!Number.isFinite(value)) return;
+      target.current = clamp(value);
+      if (!frame)
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          setPercent(Math.round(target.current));
+          setVisible(true);
+        });
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => setVisible(false), 1200);
+    }
+    function wheel(event: WheelEvent) {
+      if (
+        !(event.ctrlKey || event.metaKey) ||
+        !event.deltaY ||
+        !event.cancelable
+      )
+        return;
+      event.preventDefault();
+      const unit =
+        event.deltaMode === 1
+          ? 16
+          : event.deltaMode === 2
+            ? window.innerHeight
+            : 1;
+      change(target.current * Math.exp(-event.deltaY * unit * 0.001));
+    }
+    const distance = (a: Touch, b: Touch) =>
+      Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    function touchStart(event: TouchEvent) {
+      if (event.touches.length !== 2) {
+        pinch = undefined;
+        return;
+      }
+      if (!event.cancelable) return;
+      event.preventDefault();
+      const [a, b] = Array.from(event.touches);
+      const span = distance(a, b);
+      if (span > 0)
+        pinch = {
+          ids: [a.identifier, b.identifier],
+          distance: span,
+          percent: target.current,
+        };
+    }
+    function touchMove(event: TouchEvent) {
+      if (!pinch || event.touches.length !== 2 || !event.cancelable) return;
+      const touches = Array.from(event.touches);
+      const a = touches.find((touch) => touch.identifier === pinch?.ids[0]);
+      const b = touches.find((touch) => touch.identifier === pinch?.ids[1]);
+      if (!a || !b) return;
+      event.preventDefault();
+      change((pinch.percent * distance(a, b)) / pinch.distance);
+    }
+    function touchEnd() {
+      pinch = undefined;
+    }
+    function pointerMove(event: PointerEvent) {
+      // Pinching on a drag handle must not also start reordering notes.
+      if (pinch && event.pointerType === "touch") event.stopPropagation();
+    }
+    function gestureStart(event: Event) {
+      if (!event.cancelable) return;
+      event.preventDefault();
+      safariBase = target.current;
+    }
+    function gestureChange(event: Event) {
+      if (!event.cancelable) return;
+      event.preventDefault();
+      const scale = (event as Event & { scale?: number }).scale;
+      if (!pinch && safariBase !== undefined && typeof scale === "number")
+        change(safariBase * scale);
+    }
+    function gestureEnd() {
+      safariBase = undefined;
+    }
+    const options = { passive: false, capture: true };
+    window.addEventListener("wheel", wheel, options);
+    window.addEventListener("touchstart", touchStart, options);
+    window.addEventListener("touchmove", touchMove, options);
+    window.addEventListener("touchend", touchEnd, true);
+    window.addEventListener("touchcancel", touchEnd, true);
+    window.addEventListener("pointermove", pointerMove, true);
+    window.addEventListener("gesturestart", gestureStart, options);
+    window.addEventListener("gesturechange", gestureChange, options);
+    window.addEventListener("gestureend", gestureEnd, true);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(hideTimer);
+      window.removeEventListener("wheel", wheel, true);
+      window.removeEventListener("touchstart", touchStart, true);
+      window.removeEventListener("touchmove", touchMove, true);
+      window.removeEventListener("touchend", touchEnd, true);
+      window.removeEventListener("touchcancel", touchEnd, true);
+      window.removeEventListener("pointermove", pointerMove, true);
+      window.removeEventListener("gesturestart", gestureStart, true);
+      window.removeEventListener("gesturechange", gestureChange, true);
+      window.removeEventListener("gestureend", gestureEnd, true);
+    };
+  }, []);
   return (
     <>
-      <button
-        type="button"
-        className="zoom-trigger"
-        aria-label={`Interface zoom: ${percent}%`}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        title="Interface zoom"
-        onClick={() => setOpen(true)}
-      >
-        <ZoomIn size={16} aria-hidden="true" />
-        <span>{percent}%</span>
-      </button>
-      {open ? (
-        <ZoomPanel
-          percent={percent}
-          onChange={setPercent}
-          onClose={() => setOpen(false)}
-        />
-      ) : null}
+      {children}
+      {visible
+        ? createPortal(
+            <div
+              className="zoom-indicator"
+              role="status"
+              aria-label="Interface zoom"
+              aria-atomic="true"
+            >
+              {percent}%
+            </div>,
+            document.body,
+          )
+        : null}
     </>
-  );
-}
-
-function ZoomPanel({
-  percent,
-  onChange,
-  onClose,
-}: {
-  percent: number;
-  onChange: (value: number) => void;
-  onClose: () => void;
-}) {
-  const [draft, setDraft] = useState(String(percent));
-  function apply(value: number) {
-    const next = Math.min(150, Math.max(25, Math.round(value)));
-    onChange(next);
-    setDraft(String(next));
-  }
-  function commit() {
-    const value = draft.trim() ? Number(draft) : NaN;
-    if (Number.isFinite(value)) apply(value);
-    else setDraft(String(percent));
-  }
-  return (
-    <Modal open onClose={onClose} title="Interface zoom" className="zoom-panel">
-      <div className="modal-body">
-        <label className="zoom-input-row">
-          <span>Zoom percentage</span>
-          <span className="zoom-number-wrap">
-            <input
-              type="number"
-              min={25}
-              max={150}
-              step={1}
-              inputMode="numeric"
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              onBlur={commit}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.preventDefault();
-                  commit();
-                }
-              }}
-            />
-            <span aria-hidden="true">%</span>
-          </span>
-        </label>
-        <input
-          className="zoom-slider"
-          type="range"
-          aria-label="Zoom level"
-          aria-valuetext={`${percent}%`}
-          min={25}
-          max={150}
-          step={1}
-          value={percent}
-          onChange={(event) => apply(Number(event.target.value))}
-        />
-        <div className="zoom-range-labels" aria-hidden="true">
-          <span>25%</span>
-          <span>150%</span>
-        </div>
-      </div>
-      <div className="modal-footer">
-        <Button variant="secondary" onClick={() => apply(100)}>
-          Reset to 100%
-        </Button>
-        <Button onClick={onClose}>Done</Button>
-      </div>
-    </Modal>
   );
 }

@@ -19,6 +19,24 @@ async function login(page: Page, email = "a@example.test") {
     }),
   ).toBeVisible();
 }
+async function ctrlWheel(page: Page, deltaY: number) {
+  const viewport = page.viewportSize()!;
+  await page.mouse.move(viewport.width / 2, viewport.height / 2);
+  await page.keyboard.down("Control");
+  await page.mouse.wheel(0, deltaY);
+  await page.keyboard.up("Control");
+}
+async function setZoom(page: Page, percent: number) {
+  await ctrlWheel(page, -3000);
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
+  if (percent !== 150) {
+    await ctrlWheel(
+      page,
+      percent === 50 ? 3000 : Math.log(150 / percent) * 1000,
+    );
+  }
+  await expect(page.locator("html")).toHaveCSS("zoom", String(percent / 100));
+}
 async function createNote(
   page: Page,
   title: string,
@@ -463,6 +481,13 @@ test("scales the interface without reloads, preserves notes and fits desktop and
   ).toHaveCount(0);
   await expect(page.getByText("Just for you", { exact: true })).toHaveCount(0);
   await expect(page.locator(".global-search kbd")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: /^Interface zoom:/ }),
+  ).toHaveCount(0);
+  await expect(page.locator(".sidebar-tip")).toHaveCount(0);
+  await expect(
+    page.getByText("Big ideas often start", { exact: false }),
+  ).toHaveCount(0);
   await page.keyboard.press("Control+k");
   await expect(
     page.getByLabel("Search your notes", { exact: true }),
@@ -481,28 +506,7 @@ test("scales the interface without reloads, preserves notes and fits desktop and
     (window as Window & { zoomMarker?: string }).zoomMarker = "kept";
   });
   async function zoom(level: number) {
-    await page.getByRole("button", { name: /^Interface zoom:/ }).click();
-    await inViewport(".zoom-panel");
-    const panel = page.getByRole("dialog", {
-      name: "Interface zoom",
-      exact: true,
-    });
-    await panel
-      .getByRole("spinbutton", { name: "Zoom percentage", exact: true })
-      .fill(String(level));
-    await panel
-      .getByRole("spinbutton", { name: "Zoom percentage", exact: true })
-      .press("Enter");
-    await expect(
-      panel.getByRole("slider", { name: "Zoom level", exact: true }),
-    ).toHaveValue(String(level));
-    await panel.getByRole("button", { name: "Done", exact: true }).click();
-    await expect(
-      page.getByRole("button", {
-        name: `Interface zoom: ${level}%`,
-        exact: true,
-      }),
-    ).toBeVisible();
+    await setZoom(page, level);
     await expect(page.locator("html")).toHaveCSS("zoom", String(level / 100));
   }
   async function inViewport(selector: string) {
@@ -528,20 +532,16 @@ test("scales the interface without reloads, preserves notes and fits desktop and
     fullPage: true,
   });
   await page.getByRole("link", { name: "Reminders", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Interface zoom: 125%" }),
-  ).toBeVisible();
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
   expect(
     await page.evaluate(
       () => (window as Window & { zoomMarker?: string }).zoomMarker,
     ),
   ).toBe("kept");
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Interface zoom: 125%" }),
-  ).toBeVisible();
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
   await page.getByRole("link", { name: "All notes", exact: true }).click();
-  for (const level of [25, 40, 75, 100, 125, 150]) {
+  for (const level of [50, 75, 100, 125, 150]) {
     await zoom(level);
     await inViewport(".topbar");
     await inViewport("#workspace-main");
@@ -591,7 +591,7 @@ test("scales the interface without reloads, preserves notes and fits desktop and
   await editor.getByRole("button", { name: "Close", exact: true }).click();
   for (const width of [320, 390, 768, 1024]) {
     await page.setViewportSize({ width, height: 844 });
-    for (const level of [25, 150]) {
+    for (const level of [50, 150]) {
       await zoom(level);
       await inViewport(".topbar");
       await inViewport("#workspace-main");
@@ -608,147 +608,184 @@ test("scales the interface without reloads, preserves notes and fits desktop and
   await expect(page).toHaveURL(/\/settings\/profile$/);
   await zoom(100);
   await page.reload();
-  await expect(
-    page.getByRole("button", { name: "Interface zoom: 100%" }),
-  ).toBeVisible();
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
 });
 
-test("adjusts zoom by dragging, keyboard and numeric entry while keeping recovery controls readable", async ({
+test("zooms with Ctrl wheel within bounds and briefly shows a bottom-center percentage", async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("zoom-seeded")) {
+      localStorage.setItem("ntc.interface.zoom.v1", "42");
+      sessionStorage.setItem("zoom-seeded", "true");
+    }
+  });
   await login(page);
-  await page.getByRole("button", { name: /^Interface zoom:/ }).click();
-  const panel = page.getByRole("dialog", {
-    name: "Interface zoom",
-    exact: true,
-  });
-  const input = panel.getByRole("spinbutton", {
-    name: "Zoom percentage",
-    exact: true,
-  });
-  const slider = panel.getByRole("slider", { name: "Zoom level", exact: true });
-  await input.fill("73");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1");
-  await input.press("Enter");
-  await expect(slider).toHaveValue("73");
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.73");
-  await input.fill("");
-  await input.press("Tab");
-  await expect(input).toHaveValue("73");
-  await input.fill("999");
-  await input.press("Enter");
-  await expect(input).toHaveValue("150");
-  await input.fill("1");
-  await input.press("Enter");
-  await expect(input).toHaveValue("25");
-  await slider.focus();
-  await slider.press("ArrowRight");
-  await expect(input).toHaveValue("26");
-  await slider.press("Home");
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.25");
-  const rangeBounds = (await slider.boundingBox())!;
-  await page.mouse.move(
-    rangeBounds.x + 8,
-    rangeBounds.y + rangeBounds.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    rangeBounds.x + rangeBounds.width - 8,
-    rangeBounds.y + rangeBounds.height / 2,
-    { steps: 12 },
-  );
-  await page.mouse.up();
-  await expect(input).toHaveValue("150");
-  await slider.press("Home");
-  await expect(input).toHaveValue("25");
-  await page.setViewportSize({ width: 390, height: 844 });
-  const bounds = (await panel.boundingBox())!;
-  expect(bounds.width).toBeGreaterThan(300);
-  expect(bounds.x).toBeGreaterThanOrEqual(0);
-  expect(bounds.x + bounds.width).toBeLessThanOrEqual(391);
-  expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
-  await page.screenshot({
-    path: "../artifacts/frontend/zoom-slider-mobile.png",
-  });
-  await panel.getByRole("button", { name: "Done", exact: true }).click();
-  const trigger = page.getByRole("button", {
-    name: "Interface zoom: 25%",
-    exact: true,
-  });
-  const triggerBounds = (await trigger.boundingBox())!;
-  expect(triggerBounds.height).toBeGreaterThanOrEqual(44);
-  expect(triggerBounds.x).toBeGreaterThanOrEqual(0);
-  expect(triggerBounds.x + triggerBounds.width).toBeLessThanOrEqual(391);
-  await trigger.click();
-  await expect(input).toHaveValue("25");
-  await panel
-    .getByRole("button", { name: "Reset to 100%", exact: true })
-    .click();
-  await expect(input).toHaveValue("100");
-  await expect(slider).toHaveValue("100");
-  await panel.getByRole("button", { name: "Done", exact: true }).click();
-  await page.reload();
+  const hud = page.locator(".zoom-indicator");
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
+  await expect(hud).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Interface zoom: 100%", exact: true }),
-  ).toBeVisible();
+    page.getByRole("button", { name: /^Interface zoom:/ }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("dialog", { name: "Interface zoom" }),
+  ).toHaveCount(0);
+  const originalDpr = await page.evaluate(() => devicePixelRatio);
+  await page.mouse.wheel(0, 200);
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
+  await expect(hud).toHaveCount(0);
+  await ctrlWheel(page, -3000);
+  await expect(hud).toHaveText("150%");
+  const bounds = (await hud.boundingBox())!;
+  const viewport = page.viewportSize()!;
+  expect(bounds.x + bounds.width / 2).toBeCloseTo(viewport.width / 2, 0);
+  expect(viewport.height - bounds.y - bounds.height).toBeCloseTo(24, 0);
+  expect(await page.evaluate(() => devicePixelRatio)).toBe(originalDpr);
+  await page.screenshot({
+    path: "../artifacts/frontend/zoom-wheel-indicator.png",
+    animations: "disabled",
+  });
+  await expect(hud).toHaveCount(0, { timeout: 4000 });
+  await ctrlWheel(page, 3000);
+  await expect(hud).toHaveText("50%");
+  await page.reload();
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
+  await expect(hud).toHaveCount(0);
+  const canceled = await page.evaluate(() => {
+    const event = new WheelEvent("wheel", {
+      ctrlKey: true,
+      deltaY: -2,
+      deltaMode: 1,
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(event);
+    return event.defaultPrevented;
+  });
+  expect(canceled).toBe(true);
+  await expect(page.locator("html")).not.toHaveCSS("zoom", "0.5");
 });
 
-test.describe("touch zoom controls", () => {
+test.describe("pinch zoom", () => {
   test.use({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
   });
-  test("drags on a phone and restores an arbitrary percentage after reload", async ({
+  test("uses two fingers without double native zoom, keeps one-finger scroll and editor content", async ({
     page,
     context,
   }) => {
     await login(page);
-    await page.getByRole("button", { name: /^Interface zoom:/ }).tap();
-    const panel = page.getByRole("dialog", {
-      name: "Interface zoom",
-      exact: true,
-    });
-    const slider = panel.getByRole("slider", {
-      name: "Zoom level",
-      exact: true,
-    });
-    const input = panel.getByRole("spinbutton", {
-      name: "Zoom percentage",
-      exact: true,
-    });
-    const bounds = (await slider.boundingBox())!;
     const session = await context.newCDPSession(page);
+    async function pinch(startDistance: number, endDistance: number) {
+      function points(distance: number) {
+        return [
+          { id: 1, x: 195 - distance / 2, y: 400 },
+          { id: 2, x: 195 + distance / 2, y: 400 },
+        ];
+      }
+      await session.send("Input.dispatchTouchEvent", {
+        type: "touchStart",
+        touchPoints: points(startDistance),
+      });
+      for (let step = 1; step <= 5; step++) {
+        await session.send("Input.dispatchTouchEvent", {
+          type: "touchMove",
+          touchPoints: points(
+            startDistance + ((endDistance - startDistance) * step) / 5,
+          ),
+        });
+      }
+      await session.send("Input.dispatchTouchEvent", {
+        type: "touchEnd",
+        touchPoints: [],
+      });
+    }
+    const hud = page.locator(".zoom-indicator");
+    const reorderRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().endsWith("/notes/reorder"))
+        reorderRequests.push(request.url());
+    });
+    const handle = (await page.locator(".drag-handle").first().boundingBox())!;
+    const handleX = handle.x + handle.width / 2;
+    const handleY = handle.y + handle.height / 2;
     await session.send("Input.dispatchTouchEvent", {
       type: "touchStart",
-      touchPoints: [{ x: bounds.x + 8, y: bounds.y + bounds.height / 2 }],
+      touchPoints: [{ id: 1, x: handleX, y: handleY }],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [
+        { id: 1, x: handleX, y: handleY },
+        { id: 2, x: handleX - 100, y: handleY },
+      ],
     });
     await session.send("Input.dispatchTouchEvent", {
       type: "touchMove",
       touchPoints: [
-        { x: bounds.x + bounds.width - 8, y: bounds.y + bounds.height / 2 },
+        { id: 1, x: handleX + 10, y: handleY },
+        { id: 2, x: handleX - 170, y: handleY },
       ],
     });
     await session.send("Input.dispatchTouchEvent", {
       type: "touchEnd",
       touchPoints: [],
     });
-    await session.detach();
-    await expect(input).toHaveValue("150");
-    await input.fill("42");
-    await panel.getByRole("button", { name: "Done", exact: true }).tap();
-    await expect(
-      page.getByRole("button", { name: "Interface zoom: 42%", exact: true }),
-    ).toBeVisible();
-    await page.reload();
-    await page
-      .getByRole("button", { name: "Interface zoom: 42%", exact: true })
-      .tap();
-    await expect(input).toHaveValue("42");
-    await expect(slider).toHaveValue("42");
-    await page.screenshot({
-      path: "../artifacts/frontend/zoom-slider-touch.png",
+    await expect(hud).toHaveText("150%");
+    expect(reorderRequests).toEqual([]);
+    await expect(page.locator(".note-editor-modal")).toHaveCount(0);
+    await pinch(120, 240);
+    await expect(hud).toHaveText("150%");
+    await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
+    expect(await page.evaluate(() => visualViewport?.scale)).toBe(1);
+    await pinch(240, 60);
+    await expect(hud).toHaveText("50%");
+    await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
+    await pinch(80, 160);
+    await expect(page.locator("html")).toHaveCSS("zoom", "1");
+    const beforeScroll = await page.evaluate(() => scrollY);
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: 210, y: 700 }],
     });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: 210, y: 500 }],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: 210, y: 300 }],
+    });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect
+      .poll(() => page.evaluate(() => scrollY))
+      .toBeGreaterThan(beforeScroll);
+    await expect(page.locator("html")).toHaveCSS("zoom", "1");
+    const editor = await createNote(
+      page,
+      "Pinch draft",
+      "Keep this note while zooming.",
+    );
+    await pinch(120, 240);
+    await expect(hud).toHaveText("150%");
+    await expect(
+      editor.getByRole("textbox", { name: "Note content" }),
+    ).toHaveText("Keep this note while zooming.");
+    const bounds = (await hud.boundingBox())!;
+    expect(bounds.x + bounds.width / 2).toBeCloseTo(195, 0);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
+    await page.screenshot({
+      path: "../artifacts/frontend/zoom-pinch-indicator.png",
+      animations: "disabled",
+    });
+    await editor.getByRole("button", { name: "Close", exact: true }).tap();
+    expect(reorderRequests).toEqual([]);
+    await session.detach();
   });
 });
 
@@ -766,21 +803,7 @@ test("administrator can change interface zoom without personal content requests"
   });
   await login(page, "admin@example.test");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("button", { name: /^Interface zoom:/ }).click();
-  const zoomPanel = page.getByRole("dialog", {
-    name: "Interface zoom",
-    exact: true,
-  });
-  await zoomPanel
-    .getByRole("spinbutton", { name: "Zoom percentage", exact: true })
-    .fill("150");
-  await zoomPanel
-    .getByRole("spinbutton", { name: "Zoom percentage", exact: true })
-    .press("Enter");
-  await zoomPanel.getByRole("button", { name: "Done", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Interface zoom: 150%" }),
-  ).toBeVisible();
+  await setZoom(page, 150);
   await page
     .getByRole("button", { name: "Open navigation", exact: true })
     .click();
@@ -791,9 +814,7 @@ test("administrator can change interface zoom without personal content requests"
   await expect(
     page.getByRole("heading", { name: "Accounts", exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Interface zoom: 150%" }),
-  ).toBeVisible();
+  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
   expect(personalRequests).toEqual([]);
 });
 

@@ -2,6 +2,12 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Gesture zoom50–150% và bỏ sidebar tip — 2026-10-21
+
+Focused Chromium **4/4 PASS (1.9phút gồm startup)**: Ctrl-wheel50–150%, wheel thường không zoom, deltaMode lines, legacy preference42→50/reload, HUD giữa dưới/auto-hide, DPR không đổi; mobile hai ngón không nhân đôi native zoom (visualViewport.scale1), một ngón vẫn cuộn và editor giữ nội dung; admin isolation, responsive và không còn nút/dialog/sidebar-tip.
+
+Bổ sung pinch bắt đầu ở drag handle: không request reorder hoặc mở note ngoài ý muốn. Rerun pinch + pointer/keyboard reorder + autosave network retry **3/3 PASS (47.3giây gồm startup)**; không cộng ca pinch lặp thành ca mới. 29Vitest+4configuration, lint/typecheck/Production build và backend Release0warning/0error PASS; chưa full26browser/backend rerun. Đã xem ảnh HUD trên mobile editor; chỉ fixture riêng, chưa thiết bị vật lý/Safari/Firefox/production. Những mốc slider25–150% bên dưới đã được thay thế bởi gesture50–150%.
+
 ## Thanh kéo và nhập zoom25–150% — 2026-10-21
 
 Focused Chromium **3/3 PASS (1.6phút gồm startup)**: range kéo chuột, keyboard Home/ArrowRight, nhập73% và commit Enter/blur, clamp ngoài biên/ô trống/reset, persistence/layout25–150% và admin isolation. Ca mobile isMobile/hasTouch dùng CDP touch events **1/1 PASS (25.6giây gồm startup)**: vuốt150%, nhập42%, reload vẫn42 và hai control đồng bộ. Đã xem ảnh bảng zoom ở25%/42% trong viewport390×844; trigger/dialog vẫn đọc và bấm được.

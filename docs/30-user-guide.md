@@ -45,4 +45,6 @@ Khi lỗi, ghi thời gian và mã lỗi/traceId nếu có; không gửi passwor
 
 ## Thu phóng giao diện
 
-Nhấn nút phần trăm cạnh nút sáng/tối trên thanh trên cùng. Kéo **Zoom level** từ25% đến150% (từng1%) để đổi ngay, hoặc gõ vào **Zoom percentage** rồi nhấn Enter/rời ô. Giá trị vượt giới hạn được đưa về25% hoặc150%; để trống sẽ giữ mức đang dùng. Nhấn **Reset to 100%** để trở về mặc định và **Done** để đóng. Bảng điều chỉnh vẫn dễ đọc khi giao diện thu nhỏ. Dùng được cho tài khoản người dùng/quản trị trên máy tính và điện thoại, nhớ riêng trong trình duyệt đang dùng và không tải lại trang. Đây là kích thước hiển thị, không thay chữ/định dạng được lưu trong note; thao tác pinch/zoom của trình duyệt vẫn dùng được. Nhãn ⌘ K đã bỏ nhưng Ctrl+K (Windows) hoặc Cmd+K (Mac) vẫn focus ô tìm kiếm.
+Giữ **Ctrl + lăn chuột** để phóng to/thu nhỏ từ **50% đến150%**; Cmd + lăn chuột cũng được hỗ trợ. Trên điện thoại, dùng **hai ngón chụm vào/mở ra**. Số phần trăm hiện tạm ở giữa cạnh dưới và tự ẩn sau khoảng1.2giây khi dừng thao tác. Không còn nút hoặc bảng chỉnh zoom.
+
+Lựa chọn được nhớ trong trình duyệt cho cả người dùng/admin, không tải lại trang hoặc đổi nội dung/định dạng note. Lăn chuột thường và cuộn một ngón vẫn cuộn trang. Phím tắt zoom bàn phím của trình duyệt vẫn hoạt động riêng. Nhãn ⌘ K đã bỏ nhưng Ctrl+K (Windows) hoặc Cmd+K (Mac) vẫn focus tìm kiếm. Sidebar cũng đã bỏ khối Big ideas often start with a little note.

@@ -2,6 +2,20 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Công bố gesture zoom50–150% và sidebar gọn lên main — 2026-10-21
+
+- Theo yêu cầu “push lên giúp tôi”, phạm vi11file React/docs/test: Ctrl/Cmd+wheel và pinch hai ngón50–150%, HUD phần trăm giữa dưới tự ẩn, bỏ nút/bảng zoom và sidebar tip, cập nhật hồi quy/tài liệu. Không commit hai appsettings API local, credentials hoặc artifacts.
+- Fetch trước publication: main/HEAD và origin/main cùnge76767b, divergence0/0. Dùng evidence đã hoàn tất ở entry dưới: focused4/4 và focused3/3 (pinch lặp một ca),29Vitest+4configuration, lint/typecheck/Production build và .NET Release0warning/0error PASS. Không chạy lại suites cho lượt chỉ publication; docs48Markdown/178local links/0errors và staged diff được kiểm.
+- Giữ cấu hình local theo hash baseline; chỉ commit/push source lên main rồi đối chiếu HEAD với refs/heads/main trên remote. Không manual deploy/migration hoặc thay dashboard/cloud data; hosting/CI có thể tự triển khai từ push. Chưa xác minh production rollout trong lượt này.
+
+## Zoom bằng Ctrl+wheel/pinch50–150%, HUD tạm và bỏ sidebar tip — 2026-10-21
+
+- Theo yêu cầu mới nhất, DEC-021 đổi giới hạn thành50–150%; bỏ toàn bộ nút/menu/dialog/slider/ô nhập zoom. Ctrl (hoặc Cmd)+wheel và trackpad ctrl-wheel đổi app zoom; hai ngón tính tỷ lệ khoảng cách để pinch. HUD phần trăm portal ở body, giữa cạnh dưới, inverse zoom giữ kích thước đọc được, z-index trên editor và pointer-events:none; tự ẩn sau1.2giây. Giữ preference cùng key; mức cũ25–49 được nâng lên50. Theo ảnh bổ sung, bỏ khối Big ideas often start with a little note và CSS/sidebar-tip liên quan.
+- Listener capture passive:false chỉ preventDefault gesture zoom để không nhân đôi native browser pinch, không chặn wheel thường hoặc một ngón. Chuẩn hóa wheel deltaMode; RAF gộp update theo frame, ref giữ delta lẻ, cleanup đầy đủ listener/RAF/timer ở StrictMode. Có fallback gesture events Safari nhưng runtime Safari chưa kiểm. Chặn chuyển tiếp pointermove touch khi pinch để tránh kích hoạt drag sensor cùng lúc. Không remount editor/workspace, không đổi auth/cache/API/schema hoặc nội dung note; browser keyboard zoom vẫn riêng.
+- Focused Chromium **4/4 PASS (1.9phút gồm startup)**: viewport/SPA/note và sidebar copy removal; Ctrl-wheel bounds/pulse/HUD center-bottom/auto-hide, deltaMode lines, DPR không đổi, preference cũ42→50 và reload; mobile hai ngón có isMobile/hasTouch/CDP touch events, visualViewport.scale vẫn1, cuộn một ngón và editor giữ nội dung; admin không personal requests. Đã xem ảnh zoom-pinch-indicator.png:150% giữa dưới, editor/Close còn dùng được.
+- Để kiểm tương tác drag sensor, bổ sung pinch bắt đầu từ drag handle rồi thêm ngón thứ hai, xác nhận không POST reorder hoặc mở editor ngoài ý muốn. Rerun pinch cùng pointer/keyboard reorder và network autosave retry: **3/3 PASS (47.3giây gồm startup)**. Một ca pinch lặp lại, không cộng thành7ca khác nhau. Source runtime không đổi sau lượt focused4; chỉ thêm assertion hồi quy. Chưa full26browser/backend rerun; các mốc full suite ở entries trước là lịch sử.
+- **29 Vitest + 4 configuration PASS**, ESLint max-warnings0/TypeScript/Production Vite build PASS; solution .NET Release strict **0warning/0error**. Chỉ fixture SQLite/captured email, không owner DB/SMTP/cloud thật; chưa Safari/Firefox hoặc điện thoại vật lý. Cập nhật plan/UI/frontend/user-guide/testing/worklog; docs48Markdown/178local links/0errors, git diff --check PASS (thông báo LF/CRLF). Hai appsettings API local giữ đúng hash baseline. Chưa commit/push/deploy.
+
 ## Công bố thanh kéo và nhập zoom25–150% lên main — 2026-10-21
 
 - Theo yêu cầu “push luôn”, phạm vi9file React/docs/test: thay preset bằng slider25–150% và ô nhập phần trăm, reset/persistence, dialog/trigger dễ đọc ở25%, các regression chuột/keyboard/touch và tài liệu tương ứng. Không commit hai appsettings API local, credentials hoặc artifacts.
