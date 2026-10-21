@@ -11,13 +11,15 @@ public class ContentAlignmentTests
     [InlineData("paragraph", "left")]
     [InlineData("paragraph", "center")]
     [InlineData("heading", "center")]
+    [InlineData("paragraph", "right")]
+    [InlineData("heading", "justify")]
     public void SupportedAlignmentPreservesPlainText(string type, string alignment)
     {
         Assert.Equal("Private text", ContentRules.PlainText(Document(type, alignment), null));
     }
 
     [Theory]
-    [InlineData("paragraph", "right")]
+    [InlineData("paragraph", "invalid")]
     [InlineData("paragraph", "center; color:red")]
     [InlineData("codeBlock", "center")]
     [InlineData("paragraph", null)]

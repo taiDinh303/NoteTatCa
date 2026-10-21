@@ -146,3 +146,7 @@ Regression riêng SQLite/synthetic:7DemoAccountTests PASS gồm content validati
 ## Editor alignment — 2026-10-21
 
 Focused Chromium6/6: optional title/fullscreen/counter gọn, ghim light/dark/persist, Markdown, căn giữa rồi autosave/reload/bỏ căn giữa ở desktop/mobile. Frontend30Vitest+4config; backend121PASS/1SKIP PostgreSQL opt-in, gồm7 regression allowlist alignment. Lint/typecheck/Production build và .NET Release0warning/0error PASS. Fixture loopback, không DB thật/email thật; không coi là fullbrowser/production evidence. Chi tiết publication scope ở worklog.
+
+## Menu căn lề4 lựa chọn — 2026-10-21
+
+Hồi quy desktop/mobile chọn trái/giữa/phải/đều từ một menu, lưu và reload từng giá trị. API allowlist nhận4 giá trị trên paragraph/heading, vẫn reject unsafe/null/wrong node. Các kết quả thực tế và phạm vi publication ghi ở worklog.

@@ -2058,7 +2058,7 @@ test("supports search, pinning, theme and an empty private workspace for another
 });
 
 for (const mobile of [false, true]) {
-  test(`center text persists and heading controls match ${mobile ? "mobile" : "desktop"}`, async ({
+  test(`alignment menu persists and heading controls match ${mobile ? "mobile" : "desktop"}`, async ({
     page,
   }) => {
     if (mobile) await page.setViewportSize({ width: 390, height: 844 });
@@ -2070,7 +2070,10 @@ for (const mobile of [false, true]) {
     const content = editor.getByRole("textbox", { name: "Note content" });
     await content.fill("Centered private text");
     await editor
-      .getByRole("button", { name: "Center text", exact: true })
+      .getByRole("button", { name: "Text alignment", exact: true })
+      .click();
+    await page
+      .getByRole("menuitemradio", { name: "Align center", exact: true })
       .click();
     await expect(content.locator("p").first()).toHaveCSS(
       "text-align",
@@ -2103,17 +2106,37 @@ for (const mobile of [false, true]) {
         .locator("p")
         .first(),
     ).toHaveCSS("text-align", "center");
-    await editor
-      .getByRole("button", { name: "Center text", exact: true })
-      .click();
-    await expect(
-      editor
-        .getByRole("textbox", { name: "Note content" })
-        .locator("p")
-        .first(),
-    ).toHaveCSS("text-align", "start");
-    await expect(
-      editor.getByText("All changes saved", { exact: true }),
-    ).toBeVisible();
+    for (const [label, alignment] of [
+      ["Align right", "right"],
+      ["Justify", "justify"],
+      ["Align left", "left"],
+    ]) {
+      await editor
+        .getByRole("button", { name: "Text alignment", exact: true })
+        .click();
+      await expect(page.getByRole("menuitemradio")).toHaveCount(4);
+      await page
+        .getByRole("menuitemradio", { name: label, exact: true })
+        .click();
+      await expect(
+        editor
+          .getByRole("textbox", { name: "Note content" })
+          .locator("p")
+          .first(),
+      ).toHaveCSS("text-align", alignment);
+      await expect(
+        editor.getByText("All changes saved", { exact: true }),
+      ).toBeVisible();
+      await editor.getByRole("button", { name: "Close", exact: true }).click();
+      await page.reload();
+      await page.getByText("Centered private text", { exact: true }).click();
+      editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+      await expect(
+        editor
+          .getByRole("textbox", { name: "Note content" })
+          .locator("p")
+          .first(),
+      ).toHaveCSS("text-align", alignment);
+    }
   });
 }

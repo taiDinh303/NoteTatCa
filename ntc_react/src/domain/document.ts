@@ -15,7 +15,13 @@ function cleanAttrs(type: string, attrs?: Record<string, unknown>) {
     const value = attrs?.[key];
     if (value !== null && value !== undefined) {
       if (key === "textAlign") {
-        if (value === "left" || value === "center") result[key] = value;
+        if (
+          value === "left" ||
+          value === "center" ||
+          value === "right" ||
+          value === "justify"
+        )
+          result[key] = value;
       } else if (key === "color") {
         if (
           typeof value === "string" &&

@@ -94,7 +94,7 @@ public static partial class ContentRules
         {
             var valid = (type, attr.Name) switch
             {
-                ("paragraph" or "heading", "textAlign") => attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString() is "left" or "center",
+                ("paragraph" or "heading", "textAlign") => attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString() is "left" or "center" or "right" or "justify",
                 ("heading", "level") => attr.Value.TryGetInt32(out var level) && level is >= 1 and <= 6,
                 ("orderedList", "start") => attr.Value.TryGetInt32(out var start) && start is >= 1 and <= 1_000_000,
                 ("taskItem", "checked") => attr.Value.ValueKind is JsonValueKind.True or JsonValueKind.False,

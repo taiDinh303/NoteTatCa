@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
@@ -10,6 +11,10 @@ import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   AlignCenter,
+  AlignLeft,
+  AlignRight,
+  AlignJustify,
+  Check,
   Bold,
   CheckSquare,
   Code2,
@@ -39,13 +44,19 @@ import {
   Modal,
 } from "../../shared/ui";
 import { download } from "../../shared/utils";
+const alignmentOptions = [
+  { value: "left", label: "Align left", icon: AlignLeft },
+  { value: "center", label: "Align center", icon: AlignCenter },
+  { value: "right", label: "Align right", icon: AlignRight },
+  { value: "justify", label: "Justify", icon: AlignJustify },
+];
 const extensions = [
   StarterKit.configure({
     link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
   }),
   TextAlign.configure({
     types: ["heading", "paragraph"],
-    alignments: ["left", "center"],
+    alignments: ["left", "center", "right", "justify"],
   }),
   TaskList,
   TaskItem.configure({ nested: true }),
@@ -117,7 +128,10 @@ export default function RichEditor({
   const state = useEditorState({
     editor,
     selector: ({ editor }) => ({
-      centered: editor?.isActive({ textAlign: "center" }),
+      alignment:
+        ["center", "right", "justify"].find((alignment) =>
+          editor?.isActive({ textAlign: alignment }),
+        ) ?? "left",
       bold: editor?.isActive("bold"),
       italic: editor?.isActive("italic"),
       underline: editor?.isActive("underline"),
@@ -159,13 +173,51 @@ export default function RichEditor({
           active={state?.strike}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         />
-        <IconButton
-          icon={AlignCenter}
-          label="Center text"
-          active={state?.centered}
-          aria-pressed={!!state?.centered}
-          onClick={() => editor.chain().focus().toggleTextAlign("center").run()}
-        />
+        <Dropdown.Root>
+          <Dropdown.Trigger asChild>
+            <IconButton
+              icon={
+                alignmentOptions.find(
+                  (option) => option.value === state?.alignment,
+                )?.icon ?? AlignLeft
+              }
+              label="Text alignment"
+            />
+          </Dropdown.Trigger>
+          <Dropdown.Portal>
+            <Dropdown.Content
+              className="dropdown"
+              sideOffset={7}
+              align="start"
+              aria-label="Text alignment"
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                editor.commands.focus();
+              }}
+            >
+              <Dropdown.RadioGroup
+                value={state?.alignment ?? "left"}
+                onValueChange={(value) =>
+                  editor.chain().focus().setTextAlign(value).run()
+                }
+              >
+                {alignmentOptions.map(({ value, label, icon: Icon }) => (
+                  <Dropdown.RadioItem
+                    className="dropdown-item"
+                    key={value}
+                    value={value}
+                  >
+                    <Icon size={16} />
+                    <span>{label}</span>
+                    <Dropdown.ItemIndicator>
+                      <Check size={16} />
+                    </Dropdown.ItemIndicator>
+                  </Dropdown.RadioItem>
+                ))}
+              </Dropdown.RadioGroup>
+            </Dropdown.Content>
+          </Dropdown.Portal>
+        </Dropdown.Root>
         <span className="toolbar-divider" />
         <IconButton
           icon={Heading2}

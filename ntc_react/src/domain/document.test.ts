@@ -78,3 +78,12 @@ it("preserves center alignment only on supported blocks", () => {
       .attrs,
   ).toBeUndefined();
 });
+
+it.each(["left", "center", "right", "justify"])(
+  "preserves %s block alignment",
+  (textAlign) => {
+    expect(
+      canonicalDocument({ type: "paragraph", attrs: { textAlign } }).attrs,
+    ).toEqual({ textAlign });
+  },
+);

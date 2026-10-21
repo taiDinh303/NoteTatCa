@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Một nút căn lề4 lựa chọn — 2026-10-21
+
+- Thay Center text toggle bằng Text alignment dropdown radio4 lựa chọn: Align left, Align center, Align right, Justify. Icon trigger theo alignment tại vùng chọn; đánh dấu lựa chọn hiện tại. Dùng Radix đã có, giữ selection và trả focus editor khi đóng. Mở rộng Tiptap/canonical/API allowlist đúng4 giá trị trên paragraph/heading; CSS tùy ý/null/node khác vẫn bị từ chối. Không migration, không đổi ownership hoặc plain projection. Cập nhật UI/frontend/user guide/testing.
+- Validation: ESLint max-warnings0 PASS;34Vitest+4configuration PASS; TypeScript/Production Vite build PASS. .NET Release strict tuần tự0warning/0error;9focused alignment tests PASS. Focused Chromium2/2PASS (1.7phút): desktop và390x844 chọn đủ4 option, autosave và reload kiểm từng alignment; giữ counter/heading control regression. Fixture SQLite loopback/captured email; không DB/SMTP/cloud thật. Không chạy lại full backend/fullbrowser hoặc kiểm Firefox/Safari/điện thoại vật lý; production CHƯA XÁC MINH.
+- Publication scope chỉ editor/canonical/API allowlist/tests và docs liên quan. Giữ ngoài commit các thay đổi Home/router/menu/landing CSS/home.spec.ts và entry worklog Home đang làm song song, cùng hai appsettings API local đã kiểm hash. Fetch main cùng9186191/divergence0/0; docs48Markdown/178links/0errors, staged diff kiểm trước commit. Push main theo quyền đã cấp rồi đối chiếu remote SHA; không manual deploy.
+
 ## Editor đồng nhất nút, căn giữa và bộ đếm gọn — 2026-10-21
 
 - Add title/Pin hoặc Unpin/fullscreen dùng chung editor-heading-action: nền trong suốt, màu theo heading, hover10% currentColor/focus outline. Counter hiển thị x / 100,000, giữ aria-label Character count. Thêm Center text toggle cho paragraph/heading/vùng chọn; nhấn lại xóa alignment về mặc định. Tiptap TextAlign3.32.0 cùng phiên bản editor; canonical frontend giữ left/center, bỏ null/giá trị không hỗ trợ. API ContentRules nhận đúng left/center trên paragraph/heading, từ chối thuộc tính/giá trị khác; plain projection và ownership không đổi. Không migration. Export Markdown cảnh báo mất alignment.
