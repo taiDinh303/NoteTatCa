@@ -1,0 +1,34 @@
+.settings-readonly {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0 0 28px;
+}
+.settings-readonly dt {
+  color: var(--subtle);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.settings-readonly dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.settings-edit-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.settings-view-field p {
+  overflow-wrap: anywhere;
+}
+.account-forms form > .button + .button,
+.password-form > .button + .button {
+  margin-left: 10px;
+}
+@container viewport (max-width: 480px) {
+  .settings-readonly {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+}

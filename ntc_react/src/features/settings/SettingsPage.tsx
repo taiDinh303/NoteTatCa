@@ -1,3 +1,4 @@
+import "./settings.css";
 import { useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -76,6 +77,7 @@ export default function SettingsPage({
 }
 function ProfileForm({ me }: { me: Me }) {
   const [params] = useSearchParams();
+  const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const p = me.profile;
@@ -115,6 +117,7 @@ function ProfileForm({ me }: { me: Me }) {
                   timeZoneId: profile.timeZoneId || me.account.timeZoneId,
                 },
               });
+              setEditing(false);
               toast.success("Profile updated");
             })
             .catch(setError)
@@ -131,100 +134,150 @@ function ProfileForm({ me }: { me: Me }) {
           </div>
         </div>
         <ErrorBanner error={error} />
-        <div className="form-grid">
-          <Field label="First name">
-            <input
-              name="givenName"
-              autoComplete="given-name"
-              defaultValue={p?.givenName ?? ""}
-              autoFocus={params.get("edit") === "name"}
-              maxLength={25}
-              required
-            />
-          </Field>
-          <Field label="Last name">
-            <input
-              name="familyName"
-              autoComplete="family-name"
-              defaultValue={p?.familyName ?? ""}
-              maxLength={25}
-            />
-          </Field>
-          <Field label="Birthday">
-            <input
-              name="birthDate"
-              type="date"
-              autoComplete="bday"
-              defaultValue={p?.birthDate?.slice(0, 10) ?? ""}
-              autoFocus={params.get("edit") === "birthday"}
-            />
-          </Field>
-          <Field label="Gender">
-            <select
-              name="gender"
-              defaultValue={p?.gender ?? 0}
-              autoFocus={params.get("edit") === "gender"}
-            >
-              <option value={0}>Prefer not to say</option>
-              <option value={1}>Male</option>
-              <option value={2}>Female</option>
-            </select>
-          </Field>
-        </div>
-        {p ? (
+        {editing ? (
           <>
-            <Field label="Profile picture URL" hint="Optional HTTPS image URL.">
-              <input
-                type="url"
-                value={picture}
-                onChange={(e) => setPicture(e.target.value)}
-                placeholder="https://"
-                maxLength={2048}
-              />
-            </Field>
-            <Field label="Address">
-              <input
-                name="address"
-                autoComplete="street-address"
-                defaultValue={p.address ?? ""}
-                maxLength={500}
-              />
-            </Field>
             <div className="form-grid">
-              <Field label="Timezone">
+              <Field label="First name">
                 <input
-                  name="timeZoneId"
-                  defaultValue={p.timeZoneId || "Asia/Ho_Chi_Minh"}
+                  name="givenName"
+                  autoComplete="given-name"
+                  defaultValue={p?.givenName ?? ""}
+                  autoFocus={params.get("edit") === "name"}
+                  maxLength={25}
                   required
-                  maxLength={100}
-                  list="profile-zones"
                 />
-                <datalist id="profile-zones">
-                  <option>Asia/Ho_Chi_Minh</option>
-                  <option>UTC</option>
-                  <option>Europe/London</option>
-                  <option>America/New_York</option>
-                </datalist>
               </Field>
-              <Field label="Locale">
+              <Field label="Last name">
                 <input
-                  name="locale"
-                  defaultValue={p.locale ?? ""}
-                  placeholder="en"
-                  maxLength={10}
+                  name="familyName"
+                  autoComplete="family-name"
+                  defaultValue={p?.familyName ?? ""}
+                  maxLength={25}
                 />
+              </Field>
+              <Field label="Birthday">
+                <input
+                  name="birthDate"
+                  type="date"
+                  autoComplete="bday"
+                  defaultValue={p?.birthDate?.slice(0, 10) ?? ""}
+                  autoFocus={params.get("edit") === "birthday"}
+                />
+              </Field>
+              <Field label="Gender">
+                <select
+                  name="gender"
+                  defaultValue={p?.gender ?? 0}
+                  autoFocus={params.get("edit") === "gender"}
+                >
+                  <option value={0}>Prefer not to say</option>
+                  <option value={1}>Male</option>
+                  <option value={2}>Female</option>
+                </select>
               </Field>
             </div>
+            {p ? (
+              <>
+                <Field
+                  label="Profile picture URL"
+                  hint="Optional HTTPS image URL."
+                >
+                  <input
+                    type="url"
+                    value={picture}
+                    onChange={(e) => setPicture(e.target.value)}
+                    placeholder="https://"
+                    maxLength={2048}
+                  />
+                </Field>
+                <Field label="Address">
+                  <input
+                    name="address"
+                    autoComplete="street-address"
+                    defaultValue={p.address ?? ""}
+                    maxLength={500}
+                  />
+                </Field>
+                <div className="form-grid">
+                  <Field label="Timezone">
+                    <input
+                      name="timeZoneId"
+                      defaultValue={p.timeZoneId || "Asia/Ho_Chi_Minh"}
+                      required
+                      maxLength={100}
+                      list="profile-zones"
+                    />
+                    <datalist id="profile-zones">
+                      <option>Asia/Ho_Chi_Minh</option>
+                      <option>UTC</option>
+                      <option>Europe/London</option>
+                      <option>America/New_York</option>
+                    </datalist>
+                  </Field>
+                  <Field label="Locale">
+                    <input
+                      name="locale"
+                      defaultValue={p.locale ?? ""}
+                      placeholder="en"
+                      maxLength={10}
+                    />
+                  </Field>
+                </div>
+              </>
+            ) : null}
+            <div className="settings-card-footer">
+              <span className="field-hint">
+                Your profile is only used for your account.
+              </span>
+              <div className="settings-edit-actions">
+                <Button
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setEditing(false);
+                    setPicture(p?.picture ?? "");
+                    setError(undefined);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button busy={busy} type="submit">
+                  Save profile
+                </Button>
+              </div>
+            </div>
           </>
-        ) : null}
-        <div className="settings-card-footer">
-          <span className="field-hint">
-            Your profile is only used for your account.
-          </span>
-          <Button busy={busy} type="submit">
-            Save profile
-          </Button>
-        </div>
+        ) : (
+          <>
+            <dl className="settings-readonly">
+              {[
+                ["First name", p?.givenName],
+                ["Last name", p?.familyName],
+                ["Birthday", p?.birthDate?.slice(0, 10)],
+                [
+                  "Gender",
+                  p?.gender === 1
+                    ? "Male"
+                    : p?.gender === 2
+                      ? "Female"
+                      : "Prefer not to say",
+                ],
+                ["Profile picture URL", p?.picture],
+                ["Address", p?.address],
+                ["Timezone", p?.timeZoneId || me.account.timeZoneId],
+                ["Locale", p?.locale],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value || "Not provided"}</dd>
+                </div>
+              ))}
+            </dl>
+            <Button variant="secondary" onClick={() => setEditing(true)}>
+              Edit profile
+            </Button>
+          </>
+        )}
       </form>
       <aside>
         <div className="profile-summary settings-card">
@@ -258,6 +311,16 @@ function AccountSettings({ me }: { me: Me }) {
   const [error, setError] = useState<unknown>();
   const [busy, setBusy] = useState("");
   const [unlink, setUnlink] = useState(false);
+  const [editing, setEditing] = useState("");
+  function edit(section: string) {
+    setError(undefined);
+    setEditing(section);
+  }
+  const cancel = (
+    <Button variant="secondary" disabled={!!busy} onClick={() => edit("")}>
+      Cancel
+    </Button>
+  );
   async function run(
     key: string,
     action: () => Promise<unknown>,
@@ -268,6 +331,7 @@ function AccountSettings({ me }: { me: Me }) {
     setError(undefined);
     try {
       await action();
+      setEditing("");
       toast.success(message);
       if (signOut) await auth.logout();
     } catch (error) {
@@ -300,64 +364,94 @@ function AccountSettings({ me }: { me: Me }) {
           </span>
         </div>
         <div className="form-grid account-forms">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              void run(
-                "email",
-                () => account.changeEmail(String(data.get("email"))),
-                "Check your new inbox to confirm this email change.",
-              );
-            }}
-          >
-            <Field label="New email address">
-              <input
-                type="email"
-                name="email"
-                autoComplete="email"
-                required
-                maxLength={256}
-                autoFocus={params.get("edit") === "email"}
-                placeholder="you@example.com"
-              />
-            </Field>
-            <Button variant="secondary" busy={busy === "email"} type="submit">
-              Send confirmation link
-            </Button>
-          </form>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              void run(
-                "phone",
-                async () => {
-                  const value = await account.phone(
-                    String(data.get("phone")) || null,
-                  );
-                  cache.setQueryData<Me>(workspace.key("me"), {
-                    ...me,
-                    account: value,
-                  });
-                },
-                "Phone number updated",
-              );
-            }}
-          >
-            <Field label="Phone number">
-              <input
-                type="tel"
-                name="phone"
-                autoComplete="tel"
-                defaultValue={me.account.phoneNumber ?? ""}
-                maxLength={32}
-              />
-            </Field>
-            <Button variant="secondary" busy={busy === "phone"} type="submit">
-              Save phone number
-            </Button>
-          </form>
+          {editing === "email" ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const data = new FormData(e.currentTarget);
+                void run(
+                  "email",
+                  () => account.changeEmail(String(data.get("email"))),
+                  "Check your new inbox to confirm this email change.",
+                );
+              }}
+            >
+              <Field label="New email address">
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  required
+                  maxLength={256}
+                  autoFocus={params.get("edit") === "email"}
+                  placeholder="you@example.com"
+                />
+              </Field>
+              <Button variant="secondary" busy={busy === "email"} type="submit">
+                Send confirmation link
+              </Button>
+              {cancel}
+            </form>
+          ) : (
+            <div className="settings-view-field">
+              <span className="field-label">Email address</span>
+              <p>{me.account.email}</p>
+              <Button
+                variant="secondary"
+                disabled={!!busy}
+                onClick={() => edit("email")}
+              >
+                Edit email
+              </Button>
+            </div>
+          )}
+          {editing === "phone" ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const data = new FormData(e.currentTarget);
+                void run(
+                  "phone",
+                  async () => {
+                    const value = await account.phone(
+                      String(data.get("phone")) || null,
+                    );
+                    cache.setQueryData<Me>(workspace.key("me"), {
+                      ...me,
+                      account: value,
+                    });
+                  },
+                  "Phone number updated",
+                );
+              }}
+            >
+              <Field label="Phone number">
+                <input
+                  type="tel"
+                  name="phone"
+                  autoComplete="tel"
+                  defaultValue={me.account.phoneNumber ?? ""}
+                  maxLength={32}
+                />
+              </Field>
+              <Button variant="secondary" busy={busy === "phone"} type="submit">
+                Save phone number
+              </Button>
+              {cancel}
+            </form>
+          ) : (
+            <div className="settings-view-field">
+              <span className="field-label">Phone number</span>
+              <p>{me.account.phoneNumber || "Not provided"}</p>
+              <Button
+                variant="secondary"
+                disabled={!!busy}
+                onClick={() => edit("phone")}
+              >
+                Edit phone number
+              </Button>
+            </div>
+          )}
         </div>
       </section>
       <section className="settings-card">
@@ -374,7 +468,22 @@ function AccountSettings({ me }: { me: Me }) {
             </p>
           </div>
         </div>
-        {me.account.hasPassword ? (
+        {editing !== "password" ? (
+          <div className="settings-view-field">
+            <p>
+              {me.account.hasPassword
+                ? "A password is set for your account."
+                : "No password is set for your account."}
+            </p>
+            <Button
+              variant="secondary"
+              disabled={!!busy}
+              onClick={() => edit("password")}
+            >
+              Edit password
+            </Button>
+          </div>
+        ) : me.account.hasPassword ? (
           <form
             className="password-form"
             onSubmit={(e) => {
@@ -435,21 +544,25 @@ function AccountSettings({ me }: { me: Me }) {
             >
               Change password
             </Button>
+            {cancel}
           </form>
         ) : (
-          <Button
-            variant="secondary"
-            busy={busy === "password-email"}
-            onClick={() =>
-              void run(
-                "password-email",
-                () => account.passwordEmail(),
-                "Password setup link sent to your email.",
-              )
-            }
-          >
-            Send password setup link
-          </Button>
+          <div>
+            <Button
+              variant="secondary"
+              busy={busy === "password-email"}
+              onClick={() =>
+                void run(
+                  "password-email",
+                  () => account.passwordEmail(),
+                  "Password setup link sent to your email.",
+                )
+              }
+            >
+              Send password setup link
+            </Button>
+            {cancel}
+          </div>
         )}
       </section>
       <section className="settings-card">

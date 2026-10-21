@@ -1501,6 +1501,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
 test("updates profile and revokes another session", async ({ page }) => {
   await login(page);
   await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "Edit profile", exact: true }).click();
   await page.getByLabel("First name", { exact: true }).fill("Browser");
   await page.getByLabel("Last name", { exact: true }).fill("Tester");
   await page.getByLabel("Timezone", { exact: true }).fill("UTC");

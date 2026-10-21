@@ -56,3 +56,7 @@ Lựa chọn được nhớ trong trình duyệt cho cả người dùng/admin, 
 ## Đổi màu note
 
 Nhấn biểu tượng **cọ vẽ** ở thanh dưới để mở bảng màu. Chọn màu có sẵn hoặc **Custom color** để pha màu; **Default note color** bỏ màu nền riêng. Màu tự lưu cùng note. Nhấn bên ngoài bảng hoặc Escape để đóng.
+
+## Xem trước khi sửa hồ sơ/tài khoản — 2026-10-21
+
+Profile mặc định hiển thị thông tin dạng văn bản, giá trị trống là Not provided; chọn Edit profile mới mở form. Save profile thành công trở về chế độ xem; Cancel bỏ thay đổi chưa lưu. Account & security có Edit email, Edit phone number và Edit password riêng; chỉ mục đang sửa có input. Cancel xóa bản nhập của mục đó; khi API lỗi, form và dữ liệu đang nhập vẫn giữ để sửa/thử lại. Gửi đổi email vẫn cần xác nhận ở email mới, thay mật khẩu vẫn đăng xuất theo luồng bảo mật hiện có. Áp dụng cho customer và admin; Active sessions/Connected accounts giữ hành động hiện có.

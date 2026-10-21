@@ -135,3 +135,7 @@ Add title, Pin/Unpin và fullscreen dùng chung nền trong suốt, hover nhẹ 
 ## Bảng màu note thu gọn — 2026-10-21
 
 Thanh editor chỉ có một nút cọ vẽ Note background color. Radix Popover mở lên phía trên, tránh mép viewport; bảng4 cột, ô44px, đánh dấu màu hiện tại. Chọn preset hoặc Default note color đóng bảng; Custom color mở bộ pha màu native và cập nhật autosave. Escape/click ngoài đóng bảng, trả focus trigger. Lazy editor không lấy focus từ bảng màu/menu đang mở. Không thêm hình nền hoặc đổi API/dữ liệu màu.
+
+## Settings xem trước, Edit mới mở form (2026-10-21)
+
+SettingsPage dùng read view cho profile/contact/password, không render input/select khi vào trang (kể cả query legacy edit). Edit là thao tác rõ ràng; Cancel unmount form, reset picture draft và error; Save thành công đóng edit, thất bại giữ form. Profile tiếp tục dùng version/cache update; email confirmation, phone update, password sign-out và connected provider/session flows giữ nguyên API. Chung component cho admin/customer, CSS riêng settings.css tránh thay style editor/workspace.
