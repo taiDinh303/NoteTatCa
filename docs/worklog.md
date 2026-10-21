@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Luôn hiện ô tiêu đề trống, bỏ Add title — 2026-10-21
+
+- Bỏ showTitle/Add title/placeholder và blur ẩn title. Input Note title luôn hiện cùng hàng icon/ghim/fullscreen, giữ aria-label/maxlength150, chấp nhận rỗng; mở note ưu tiên content, click title nhập trực tiếp. Không đổi API/schema/autosave hoặc dữ liệu. Cập nhật helper/regression dùng input trực tiếp và giữ input khi clear/blur/reopen.
+- Focused Chromium5/5PASS(1.1phút): header393/1280 không Add title/không placeholder, cùng hàng, chọn icon/persist; full viewport/clear title giữ input; lazy editor giữ focus title; rich autosave/label/trash/restore. ESLint max-warnings0 và TypeScript/Production build PASS; .NET solution Release strict tuần tự0warning/0error. Lượt E2E đầu không khởi động do fixture build, serial rebuild thấy7 cảnh báo file bị FrontendFixture khác giữ nhưng0error, rerun thành công; không kill process khác. Không chạy unit/fullbrowser/backend suites; fixture loopback SQLite/captured email, không owner DB/SMTP/cloud. Thiết bị thật/production CHƯA XÁC MINH.
+- Publication scope chỉ NoteEditor/title tests và docs liên quan. Các thay đổi persistent-session/auth/jobs/storage cùng docs/hunk workspace sessionStorage đang làm song song giữ ngoài commit; stage riêng nội dung title. Fetch main cùngfba779c/divergence0/0; kiểm docs/diff và hash local API config trước commit. Push main theo quyền đã cấp, đối chiếu remote SHA; không manual deploy/migration.
+
 ## Header editor gọn, icon dropdown và ẩn trạng thái lưu thường — 2026-10-21
 
 - Bỏ hiển thị dòng All changes saved/normal save status; giữ role status ở sr-only cho trợ năng và data-save-state cho hồi quy. ErrorBanner/409/Retry save/close guard/autosave không đổi. Icon note mở Radix Popover preset/Remove icon/custom emoji thay hàng emoji inline; chọn preset đóng, Escape đóng riêng bảng, lưu icon như cũ. Focus guard giữ custom/menu đang tương tác.

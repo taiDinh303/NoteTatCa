@@ -56,7 +56,7 @@ async function createNote(
 ) {
   await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
-  await editor.getByRole("button", { name: "Add title", exact: true }).click();
+  await editor.getByLabel("Note title", { exact: true }).click();
   await editor.getByLabel("Note title").fill(title);
   await editor.getByRole("textbox", { name: "Note content" }).fill(content);
   await expect(
@@ -1037,7 +1037,7 @@ test("edits content in a full viewport with an optional title and fixed characte
   await login(page);
   await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
-  await expect(editor.getByLabel("Note title", { exact: true })).toHaveCount(0);
+  await expect(editor.getByLabel("Note title", { exact: true })).toBeVisible();
   await expect(
     editor.getByRole("button", { name: "Save", exact: true }),
   ).toHaveCount(0);
@@ -1084,13 +1084,13 @@ test("edits content in a full viewport with an optional title and fixed characte
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();
-  await editor.getByRole("button", { name: "Add title", exact: true }).click();
+  await editor.getByLabel("Note title", { exact: true }).click();
   const title = editor.getByLabel("Note title", { exact: true });
   await expect(title).toBeFocused();
   await title.fill("Optional title");
   await title.fill("");
   await content.click();
-  await expect(title).toHaveCount(0);
+  await expect(title).toBeVisible();
   await expect(content).toContainText("contentonly");
   const counter = (await editor
     .getByLabel("Character count", { exact: true })
@@ -1158,9 +1158,9 @@ test("edits content in a full viewport with an optional title and fixed characte
     .getByRole("button", { name: "Open Untitled", exact: true })
     .click();
   const reopened = page.getByRole("dialog", { name: "Edit note", exact: true });
-  await expect(reopened.getByLabel("Note title", { exact: true })).toHaveCount(
-    0,
-  );
+  await expect(
+    reopened.getByLabel("Note title", { exact: true }),
+  ).toBeVisible();
   await expect(
     reopened.getByRole("textbox", { name: "Note content", exact: true }),
   ).toContainText("Final content");
@@ -1186,9 +1186,7 @@ test("keeps the optional title focused when the rich editor loads slowly", async
     await expect(
       dialog.getByText("Loading editor…", { exact: true }),
     ).toBeVisible();
-    await dialog
-      .getByRole("button", { name: "Add title", exact: true })
-      .click();
+    await dialog.getByLabel("Note title", { exact: true }).click();
     const title = dialog.getByLabel("Note title");
     await expect(title).toBeFocused();
     releaseEditor();
@@ -1219,9 +1217,7 @@ test("keeps the optional title focused when the rich editor loads slowly", async
     });
     await reopened.getByLabel("Note title").fill("");
     await reopened.getByRole("textbox", { name: "Note content" }).click();
-    await reopened
-      .getByRole("button", { name: "Add title", exact: true })
-      .click();
+    await reopened.getByLabel("Note title", { exact: true }).click();
     await expect(reopened.getByLabel("Note title")).toBeFocused();
     await reopened.getByLabel("Note title").fill("A title added again");
     await reopened.getByRole("button", { name: "Close", exact: true }).click();
@@ -1998,7 +1994,7 @@ test("keeps an unsaved draft after a network failure and retries without duplica
   });
   await page.getByRole("button", { name: "Take a note", exact: true }).click();
   const editor = page.getByRole("dialog", { name: "New note", exact: true });
-  await editor.getByRole("button", { name: "Add title", exact: true }).click();
+  await editor.getByLabel("Note title", { exact: true }).click();
   await editor.getByLabel("Note title").fill("Kept after a network error");
   await editor
     .getByRole("textbox", { name: "Note content" })
@@ -2108,7 +2104,7 @@ for (const mobile of [false, true]) {
       path: `../artifacts/frontend/editor-alignment-${mobile ? "mobile" : "desktop"}.png`,
       animations: "disabled",
     });
-    for (const name of ["Add title", "Pin note", "Exit full screen"]) {
+    for (const name of ["Pin note", "Exit full screen"]) {
       const button = editor.getByRole("button", { name, exact: true });
       await page.mouse.move(0, 0);
       await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

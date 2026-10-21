@@ -64,3 +64,6 @@ Profile mặc định hiển thị thông tin dạng văn bản, giá trị tr�
 ## Icon và tiêu đề note
 
 Nhấn icon góc trên để chọn icon từ menu hoặc dán emoji riêng; **Remove icon** bỏ icon tùy chọn. Icon, tiêu đề, ghim và thu phóng nằm trên một hàng. Note vẫn tự lưu; thông báo lưu thành công không hiện trên giao diện, lỗi lưu vẫn hiện để xử lý.
+
+
+Ô tiêu đề luôn nằm trên hàng icon/ghim/thu phóng, không có nút Add title hoặc chữ gợi ý. Bạn có thể bấm trực tiếp để nhập hoặc để trống nếu chỉ cần nội dung.

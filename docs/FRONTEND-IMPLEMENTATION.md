@@ -143,3 +143,7 @@ SettingsPage dùng read view cho profile/contact/password, không render input/s
 ## Header editor một hàng, menu icon — 2026-10-21
 
 Icon note, input tiêu đề tùy chọn, ghim và fullscreen nằm cùng một hàng; input co theo chiều ngang, tiêu đề vẫn tối đa150 ký tự. Chọn icon mở Radix Popover (preset/Remove icon/custom emoji), không thêm hàng vào editor; chọn preset đóng bảng, Escape/click ngoài đóng. Trạng thái autosave thường chỉ thông báo trợ năng, không hiển thị dòng All changes saved; lỗi/409/Retry save vẫn hiện và giữ draft theo quy tắc cũ. Không đổi API/schema.
+
+## Tiêu đề luôn hiện, không placeholder — 2026-10-21
+
+Bỏ Add title và cơ chế ẩn input khi blur rỗng. Luôn hiện input Note title trên hàng icon/ghim/fullscreen, không có placeholder, giữ aria-label trợ năng; cho để trống và giới hạn150 ký tự như cũ. Mở note vẫn ưu tiên focus content; người dùng bấm ô title để nhập. Không đổi API/dữ liệu/autosave.

@@ -19,12 +19,17 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Take a note", exact: true })
       .click();
     let editor = page.getByRole("dialog", { name: "New note", exact: true });
+    await expect(
+      editor.getByRole("button", { name: "Add title", exact: true }),
+    ).toHaveCount(0);
+    await expect(editor.getByLabel("Note title")).toBeVisible();
+    await expect(editor.getByLabel("Note title")).not.toHaveAttribute(
+      "placeholder",
+    );
     await editor
       .getByRole("textbox", { name: "Note content" })
       .fill("Compact header content");
-    await editor
-      .getByRole("button", { name: "Add title", exact: true })
-      .click();
+    await editor.getByLabel("Note title", { exact: true }).click();
     await editor.getByLabel("Note title").fill("Compact header title");
     const heading = editor.locator(".editor-heading");
     const boxes = await Promise.all(

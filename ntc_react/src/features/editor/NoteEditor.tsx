@@ -18,7 +18,6 @@ import {
   Pin,
   PinOff,
   RotateCcw,
-  Type,
   Tag,
   Trash2,
   Upload,
@@ -113,7 +112,6 @@ function EditorSession({
   );
   const labels = useLabels();
   const [fullscreen, setFullscreen] = useState(true);
-  const [showTitle, setShowTitle] = useState(() => !!initial?.title?.trim());
   const [characterCount, setCharacterCount] = useState(
     initial?.content.length ?? 0,
   );
@@ -270,33 +268,16 @@ function EditorSession({
               {status}
             </span>
           </div>
-          {showTitle ? (
-            <div className="editor-title-wrap">
-              <input
-                className="editor-title"
-                aria-label="Note title"
-                placeholder="Title"
-                autoFocus={!draft.title.trim()}
-                value={draft.title}
-                maxLength={150}
-                onChange={(e) => update({ title: e.target.value })}
-                onBlur={() => {
-                  if (!draftRef.current.title.trim()) setShowTitle(false);
-                }}
-              />
-            </div>
-          ) : null}
+          <div className="editor-title-wrap">
+            <input
+              className="editor-title"
+              aria-label="Note title"
+              value={draft.title}
+              maxLength={150}
+              onChange={(e) => update({ title: e.target.value })}
+            />
+          </div>
           <div className="row-actions">
-            {!showTitle ? (
-              <Button
-                className="add-title-button editor-heading-action"
-                variant="ghost"
-                onClick={() => setShowTitle(true)}
-              >
-                <Type size={15} />
-                Add title
-              </Button>
-            ) : null}
             <IconButton
               icon={draft.isPinned ? PinOff : Pin}
               label={draft.isPinned ? "Unpin note" : "Pin note"}
