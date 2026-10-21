@@ -18,12 +18,26 @@ interface PreparationPorts {
   account: Pick<AccountRepository, "me">;
   admin: Pick<AdminRepository, "stats">;
 }
+export type PreparationResource =
+  | "notes"
+  | "trash"
+  | "labels"
+  | "reminders"
+  | "inbox"
+  | "unread"
+  | "me"
+  | "admin-stats";
+export interface PreparationTask {
+  resource: PreparationResource;
+  status: "waiting" | "loading" | "ready" | "error";
+}
 export interface PreparationSnapshot {
   identity?: string;
   status: "idle" | "loading" | "ready" | "error";
   completed: number;
   total: number;
   pages: number;
+  tasks: PreparationTask[];
   error?: unknown;
 }
 export const WORKSPACE_STALE_TIME = 5 * 60_000;
@@ -34,6 +48,7 @@ export class WorkspacePreparation {
     completed: 0,
     total: 0,
     pages: 0,
+    tasks: [],
   };
   private listeners = new Set<() => void>();
   private controller?: AbortController;
@@ -59,7 +74,13 @@ export class WorkspacePreparation {
     this.generation++;
     this.controller?.abort();
     this.flight = undefined;
-    this.snapshot = { status: "idle", completed: 0, total: 0, pages: 0 };
+    this.snapshot = {
+      status: "idle",
+      completed: 0,
+      total: 0,
+      pages: 0,
+      tasks: [],
+    };
     this.listeners.forEach((listener) => listener());
   }
   prepare(session: Session): Promise<void> {
@@ -81,56 +102,83 @@ export class WorkspacePreparation {
       if (generation !== this.generation || identity !== this.identity())
         throw new DOMException("Session changed", "AbortError");
     };
-    const complete = () => {
+    const markTask = (
+      resource: PreparationResource,
+      status: PreparationTask["status"],
+    ) =>
+      this.snapshot.tasks.map((task) =>
+        task.resource === resource ? { ...task, status } : task,
+      );
+    const runTask = async <T>(
+      resource: PreparationResource,
+      load: () => Promise<T>,
+    ) => {
       guard();
-      this.emit({ completed: this.snapshot.completed + 1 });
+      this.emit({ tasks: markTask(resource, "loading") });
+      try {
+        const value = await load();
+        guard();
+        this.emit({
+          completed: this.snapshot.completed + 1,
+          tasks: markTask(resource, "ready"),
+        });
+        return value;
+      } catch (error) {
+        if (generation === this.generation && !controller.signal.aborted)
+          this.emit({ tasks: markTask(resource, "error") });
+        throw error;
+      }
     };
     const paged = async <T>(
-      resource: string,
+      resource: "notes" | "labels" | "reminders" | "inbox",
       parts: unknown[],
       load: (page: number, signal: AbortSignal) => Promise<Page<T>>,
+      task: PreparationResource = resource,
     ) => {
-      const result = await this.cache.fetchQuery({
-        queryKey: key(resource, ...parts),
-        staleTime: WORKSPACE_STALE_TIME,
-        retry: false,
-        queryFn: async ({ signal }) => {
-          const combined = AbortSignal.any([signal, controller.signal]);
-          const pages: Page<T>[] = [];
-          for (let number = 1; ; number++) {
-            guard();
-            const page = await load(number, combined);
-            guard();
-            if (page.currentPage !== number)
-              throw new Error(
-                "The server returned an unexpected page. Please retry loading.",
-              );
-            pages.push(page);
-            this.emit({ pages: this.snapshot.pages + 1 });
-            if (!page.hasNextPage) break;
-          }
-          return {
-            pages,
-            pageParams: pages.map((page) => page.currentPage),
-          } satisfies InfiniteData<Page<T>>;
-        },
-      });
-      complete();
-      return result;
+      return runTask(task, () =>
+        this.cache.fetchQuery({
+          queryKey: key(resource, ...parts),
+          staleTime: WORKSPACE_STALE_TIME,
+          retry: false,
+          queryFn: async ({ signal }) => {
+            const combined = AbortSignal.any([signal, controller.signal]);
+            const pages: Page<T>[] = [];
+            for (let number = 1; ; number++) {
+              guard();
+              const page = await load(number, combined);
+              guard();
+              if (page.currentPage !== number)
+                throw new Error(
+                  "The server returned an unexpected page. Please retry loading.",
+                );
+              pages.push(page);
+              this.emit({ pages: this.snapshot.pages + 1 });
+              if (!page.hasNextPage) break;
+            }
+            return {
+              pages,
+              pageParams: pages.map((page) => page.currentPage),
+            } satisfies InfiniteData<Page<T>>;
+          },
+        }),
+      );
     };
-    const single = async <T>(resource: string, load: () => Promise<T>) => {
-      const result = await this.cache.fetchQuery({
-        queryKey: key(resource),
-        staleTime: WORKSPACE_STALE_TIME,
-        retry: false,
-        queryFn: async () => {
-          const value = await load();
-          guard();
-          return value;
-        },
-      });
-      complete();
-      return result;
+    const single = async <T>(
+      resource: "unread" | "me" | "admin-stats",
+      load: () => Promise<T>,
+    ) => {
+      return runTask(resource, () =>
+        this.cache.fetchQuery({
+          queryKey: key(resource),
+          staleTime: WORKSPACE_STALE_TIME,
+          retry: false,
+          queryFn: async () => {
+            const value = await load();
+            guard();
+            return value;
+          },
+        }),
+      );
     };
     this.emit({
       identity,
@@ -138,6 +186,18 @@ export class WorkspacePreparation {
       completed: 0,
       total: isAdministrator(session) ? 2 : 7,
       pages: 0,
+      tasks: (isAdministrator(session)
+        ? (["me", "admin-stats"] as const)
+        : ([
+            "notes",
+            "trash",
+            "labels",
+            "reminders",
+            "inbox",
+            "unread",
+            "me",
+          ] as const)
+      ).map((resource) => ({ resource, status: "waiting" })),
       error: undefined,
     });
     this.flight = (async () => {
@@ -152,8 +212,12 @@ export class WorkspacePreparation {
           paged("notes", [{}], (page, signal) =>
             this.ports.notes.list({}, page, signal),
           ),
-          paged("notes", [{ trash: true }], (page, signal) =>
-            this.ports.notes.list({ trash: true }, page, signal),
+          paged(
+            "notes",
+            [{ trash: true }],
+            (page, signal) =>
+              this.ports.notes.list({ trash: true }, page, signal),
+            "trash",
           ),
           paged("labels", [], (page, signal) =>
             this.ports.labels.list(page, signal),
@@ -218,7 +282,15 @@ export class WorkspacePreparation {
             queryKey: ["private", session.userId],
           });
           if (generation === this.generation)
-            this.emit({ status: "error", error });
+            this.emit({
+              status: "error",
+              error,
+              tasks: this.snapshot.tasks.map((task) =>
+                task.status === "loading"
+                  ? { ...task, status: "waiting" }
+                  : task,
+              ),
+            });
         }
         throw error;
       })

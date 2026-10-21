@@ -5,7 +5,7 @@
 ## ADR-001 — Chuyển frontend sang React, giữ Razor
 
 - ACCEPTED bởi chủ dự án 2026-10-16; DEC-002/003.
-- Backend hiện có nhiều tầng .NET và Razor. React là consumer mới trong workspace NTC; giữ NTC.VIEW để tham khảo và đối chiếu luồng.
+- Backend gồm nhiều tầng .NET; frontend React ở ntc_react. Razor NTC.VIEW đã gỡ theo DEC-020 ngày 2026-10-21; có thể đối chiếu source cũ trong Git.
 - Không xóa Razor. Git root đã chuyển lên NTC trong nhiệm vụ cấu trúc riêng theo yêu cầu chủ dự án 2026-10-17 (ADR-008). Hệ quả: API không phụ thuộc session Razor cho nghiệp vụ mới; cần rà CORS, OAuth redirect và contract.
 - Xem lại khi React đã thay đủ các luồng và chủ dự án giao xóa Razor. Chưa có ADR thay thế.
 
@@ -59,3 +59,7 @@ Giữ nguyên HEAD/branch/refs/remote, không rewrite lịch sử; Git index chu
 ## ADR-018 — React frontend 2026-10-18
 
 ACCEPTED: người dùng giao xây SPA đầy đủ từ Razor, đặt ntc_react tại root NTC. IMPLEMENTED local theo FRONTEND-IMPLEMENTATION. React function components/hooks cho UI; class services/repositories/session/autosave cho phân tầng/OOP. Server state cache theo user trong memory, không tải toàn bộ DB trước khi dùng; access token memory, refresh theo tab sessionStorage, shared rotation flight, clear cache theo identity. Tiptap JSON canonical theo whitelist backend, Markdown là import/export có cảnh báo. Dnd pointer/keyboard chỉ khi nhóm đã tải đủ và không filter. Không triển khai Supabase Auth, service worker/offline hoặc cloud trong nhiệm vụ này.
+
+## Gỡ Razor theo DEC-020 — 2026-10-21
+
+ACCEPTED theo yêu cầu trực tiếp: chỉ duy trì frontend ntc_react, gỡ NTC.VIEW/NTC.Razor khỏi repo và solution. Các mô tả giữ Razor ở mốc lịch sử bên trên không còn là hướng dẫn hiện hành. Giữ lịch sử Git, cấu hình local trong bản khôi phục ngoài repo và API legacy tương thích; không thay Identity/ownership/database/migrations. Evidence kiểm tra xem worklog.

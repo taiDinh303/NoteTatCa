@@ -4,7 +4,7 @@
 
 ## Hệ thống và ranh giới
 
-React TypeScript/Vite ở `NTC/ntc_react`, UI tiếng Anh → HTTPS bearer API .NET 8 trên Render → Supabase PostgreSQL. Local mặc định vẫn SQL Server. Supabase chỉ database, không thay .NET Identity bằng Supabase Auth. `NTC.VIEW` giữ nguyên tạm thời. Git root hiện là `NTC`; backend projects/solutions giữ trong `NTC/ntc_aspnet`, docs duy nhất `NTC/docs`, scripts/tool/CI/deploy files ở root.
+React TypeScript/Vite ở `NTC/ntc_react`, UI tiếng Anh → HTTPS bearer API .NET 8 trên Render → Supabase PostgreSQL. Local mặc định vẫn SQL Server. Supabase chỉ database, không thay .NET Identity bằng Supabase Auth. `NTC.VIEW` đã gỡ theo DEC-020; frontend hiện hành chỉ ở `ntc_react`. Git root hiện là `NTC`; backend projects/solutions giữ trong `NTC/ntc_aspnet`, docs duy nhất `NTC/docs`, scripts/tool/CI/deploy files ở root.
 
 | Project | Trách nhiệm |
 | --- | --- |

@@ -28,6 +28,7 @@ import { useAuth, useLabels } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 import { useTheme } from "../shared/useTheme";
+import { InterfaceZoom } from "../shared/DisplayPreferences";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 function Sidebar({
   onLabels,
@@ -44,13 +45,6 @@ function Sidebar({
       <Link to="/notes" className="sidebar-brand" onClick={onNavigate}>
         <Logo />
       </Link>
-      <div className="workspace-label">
-        <span className="workspace-glyph">N</span>
-        <span>
-          Personal workspace<small>Just for you</small>
-        </span>
-        <ShieldCheck size={14} />
-      </div>
       <nav className="primary-nav" aria-label="Workspace">
         <NavLink to="/notes" onClick={onNavigate}>
           <FileText size={19} />
@@ -239,9 +233,7 @@ export default function AppShell() {
                   }
                 }}
               />
-            ) : (
-              <kbd>⌘ K</kbd>
-            )}
+            ) : null}
           </form>
           <div className="topbar-actions">
             <span className="private-badge">
@@ -253,6 +245,7 @@ export default function AppShell() {
               label={theme === "dark" ? "Use light theme" : "Use dark theme"}
               onClick={toggleTheme}
             />
+            <InterfaceZoom />
             <div className="notification-button">
               <IconButton
                 icon={Bell}

@@ -50,6 +50,7 @@ test("waits for a waking server before sending credentials and shows connection 
 }) => {
   let healthRequests = 0;
   let signIns = 0;
+  await page.emulateMedia({ reducedMotion: "no-preference" });
   page.on("request", (request) => {
     if (request.url().endsWith("/auth/login")) signIns++;
   });
@@ -68,6 +69,33 @@ test("waits for a waking server before sending credentials and shows connection 
     page.getByRole("complementary", { name: "Connection status" }),
   ).toBeVisible();
   expect(signIns).toBe(0);
+  const connectionNotice = page.getByRole("complementary", {
+    name: "Connection status",
+  });
+  const noticeBounds = (await connectionNotice.boundingBox())!;
+  const headingBounds = (await page
+    .getByRole("heading", { name: "Welcome back.", exact: true })
+    .boundingBox())!;
+  expect(noticeBounds.y + noticeBounds.height).toBeLessThan(headingBounds.y);
+  const spinner = connectionNotice.locator(".connection-spinner");
+  await expect(spinner).toHaveCSS("animation-name", "connection-turn");
+  await expect(spinner).toHaveCSS("animation-play-state", "running");
+  const firstRotation = await spinner.evaluate(
+    (element) => getComputedStyle(element).transform,
+  );
+  await expect
+    .poll(() =>
+      spinner.evaluate((element) => getComputedStyle(element).transform),
+    )
+    .not.toBe(firstRotation);
+  const serverProgress = connectionNotice.getByRole("progressbar", {
+    name: "Server connection progress",
+  });
+  await expect(serverProgress).toBeVisible();
+  expect(await serverProgress.getAttribute("aria-valuenow")).toBeNull();
+  await expect(
+    connectionNotice.getByText(/Connecting to server… Attempt/),
+  ).toBeVisible();
   await page.screenshot({
     path: "../artifacts/frontend/connecting-server.png",
     fullPage: true,
@@ -87,6 +115,14 @@ test("preloads all note pages and switches cached workspace collections without 
     release = resolve;
   });
   let releaseRevalidation!: () => void;
+  let releaseLabels!: () => void;
+  const labelsGate = new Promise<void>((resolve) => {
+    releaseLabels = resolve;
+  });
+  await page.route("**/api/v1/tags?**", async (route) => {
+    await labelsGate;
+    await route.continue().catch(() => {});
+  });
   const revalidationGate = new Promise<void>((resolve) => {
     releaseRevalidation = resolve;
   });
@@ -131,6 +167,23 @@ test("preloads all note pages and switches cached workspace collections without 
     await expect(
       page.getByRole("progressbar", { name: "Workspace loading" }),
     ).toBeVisible();
+    const tasks = page.getByRole("list", { name: "Loading tasks" });
+    await expect(
+      tasks.getByText("Loading notes…", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      tasks.getByText("Loading labels…", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      tasks.getByText("Account details ready", { exact: true }),
+    ).toBeVisible();
+    releaseLabels();
+    await expect(
+      tasks.getByText("Labels ready", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("progressbar", { name: "Workspace loading" }),
+    ).toHaveAttribute("value", "6");
     await page.screenshot({
       path: "../artifacts/frontend/preparing-workspace.png",
       fullPage: true,
@@ -148,6 +201,14 @@ test("preloads all note pages and switches cached workspace collections without 
       path: "../artifacts/frontend/preparing-workspace-mobile.png",
       fullPage: true,
     });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    expect(
+      await tasks
+        .locator(".connection-spinner")
+        .evaluate((element) =>
+          parseFloat(getComputedStyle(element).animationDuration),
+        ),
+    ).toBeLessThan(0.01);
     await page.setViewportSize({ width: 1280, height: 720 });
     release();
     await expect(
@@ -221,6 +282,7 @@ test("preloads all note pages and switches cached workspace collections without 
     expect(laterReads).toBe(0);
   } finally {
     release();
+    releaseLabels();
     releaseRevalidation();
   }
 });
@@ -390,6 +452,188 @@ test("renders responsive workspace without console errors or navigation reloads"
     fullPage: true,
   });
   expect(errors).toEqual([]);
+});
+
+test("scales the interface without reloads, preserves notes and fits desktop and mobile", async ({
+  page,
+}) => {
+  await login(page);
+  await expect(
+    page.getByText("Personal workspace", { exact: true }),
+  ).toHaveCount(0);
+  await expect(page.getByText("Just for you", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".global-search kbd")).toHaveCount(0);
+  await page.keyboard.press("Control+k");
+  await expect(
+    page.getByLabel("Search your notes", { exact: true }),
+  ).toBeFocused();
+  await expect(page.locator(".sidebar")).toHaveCSS("scrollbar-width", "thin");
+  const lightThumb = await page
+    .locator(".sidebar")
+    .evaluate((el) => getComputedStyle(el).scrollbarColor);
+  await page.getByRole("button", { name: "Use dark theme" }).click();
+  expect(
+    await page
+      .locator(".sidebar")
+      .evaluate((el) => getComputedStyle(el).scrollbarColor),
+  ).not.toBe(lightThumb);
+  await page.evaluate(() => {
+    (window as Window & { zoomMarker?: string }).zoomMarker = "kept";
+  });
+  async function zoom(level: number) {
+    await page.getByRole("button", { name: /^Interface zoom:/ }).click();
+    await inViewport(".zoom-menu");
+    await page
+      .getByRole("menuitemradio", {
+        name: level === 100 ? "100% · Default" : `${level}%`,
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByRole("button", {
+        name: `Interface zoom: ${level}%`,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(page.locator("html")).toHaveCSS("zoom", String(level / 100));
+  }
+  async function inViewport(selector: string) {
+    const viewport = page.viewportSize()!;
+    await expect
+      .poll(async () => (await page.locator(selector).boundingBox())!.x)
+      .toBeGreaterThanOrEqual(-1);
+    await expect
+      .poll(async () => {
+        const bounds = (await page.locator(selector).boundingBox())!;
+        return bounds.x + bounds.width;
+      })
+      .toBeLessThanOrEqual(viewport.width + 1);
+  }
+  const initialWidth = (await page.locator(".sidebar").boundingBox())!.width;
+  await zoom(125);
+  expect((await page.locator(".sidebar").boundingBox())!.width).toBeGreaterThan(
+    initialWidth,
+  );
+  await inViewport(".topbar");
+  await page.screenshot({
+    path: "../artifacts/frontend/zoom-desktop-dark.png",
+    fullPage: true,
+  });
+  await page.getByRole("link", { name: "Reminders", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Interface zoom: 125%" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => (window as Window & { zoomMarker?: string }).zoomMarker,
+    ),
+  ).toBe("kept");
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Interface zoom: 125%" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "All notes", exact: true }).click();
+  for (const level of [75, 90, 100, 110, 125, 150]) {
+    await zoom(level);
+    await inViewport(".topbar");
+    await inViewport("#workspace-main");
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(
+    page.getByRole("button", { name: "Open navigation", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  await inViewport(".navigation-drawer");
+  await page
+    .getByRole("dialog", { name: "Your workspace", exact: true })
+    .getByRole("link", { name: "All notes", exact: true })
+    .click();
+  await page.screenshot({
+    path: "../artifacts/frontend/zoom-mobile-dark.png",
+    fullPage: true,
+  });
+  const editor = await createNote(
+    page,
+    "Zoom draft",
+    "Preserved while changing display size.",
+  );
+  const editorBounds = (await editor.boundingBox())!;
+  expect(editorBounds.height).toBeCloseTo(844, 0);
+  await inViewport(".note-editor-modal");
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const button of await editor.locator(".editor-tools button").all()) {
+      const bounds = (await button.boundingBox())!;
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width + 1);
+    }
+    const closeBounds = (await editor.getByRole("button", { name: "Close", exact: true }).boundingBox())!;
+    expect(closeBounds.y + closeBounds.height).toBeLessThanOrEqual(844);
+    await expect(editor.getByRole("textbox", { name: "Note content" })).toHaveText("Preserved while changing display size.");
+  }
+  await page.screenshot({
+    path: "../artifacts/frontend/zoom-mobile-editor.png",
+  });
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
+  for (const width of [320, 390, 768, 1024]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const level of [75, 150]) {
+      await zoom(level);
+      await inViewport(".topbar");
+      await inViewport("#workspace-main");
+      await expect(
+        page.getByRole("button", { name: "Open Zoom draft", exact: true }),
+      ).toBeVisible();
+    }
+  }
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await inViewport(".dropdown");
+  await page
+    .getByRole("menuitem", { name: "Your profile", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/settings\/profile$/);
+  await zoom(100);
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Interface zoom: 100%" }),
+  ).toBeVisible();
+});
+
+test("administrator can change interface zoom without personal content requests", async ({
+  page,
+}) => {
+  const personalRequests: string[] = [];
+  page.on("request", (request) => {
+    if (
+      /\/api\/v1\/(notes|tags|reminders|notifications)(?:[/?]|$)/.test(
+        request.url(),
+      )
+    )
+      personalRequests.push(request.url());
+  });
+  await login(page, "admin@example.test");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: /^Interface zoom:/ }).click();
+  await page.getByRole("menuitemradio", { name: "150%", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Interface zoom: 150%" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Open navigation", exact: true })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Administration navigation", exact: true })
+    .getByRole("link", { name: "Accounts", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Accounts", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Interface zoom: 150%" }),
+  ).toBeVisible();
+  expect(personalRequests).toEqual([]);
 });
 
 test("offers a compact workspace with persistent sidebar control and one labels entry", async ({

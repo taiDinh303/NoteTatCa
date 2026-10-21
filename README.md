@@ -25,7 +25,6 @@ NTC/
     NTC.Repositories/
     NTC.Services/
     NTC.Tests/
-    NTC.VIEW/              # retained Razor source
     ...
   ntc_react/               # React TypeScript SPA
   Dockerfile

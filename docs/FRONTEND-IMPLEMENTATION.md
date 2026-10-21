@@ -12,7 +12,7 @@ Admin có overview/tổng hợp + shortcuts, accounts tìm kiếm/phân trang/cr
 
 Khi cùng user thay đổi nhóm Admin/non-Admin qua login/refresh, AuthService clear cache và đổi request identity để bỏ response cũ đang bay; quyền server vẫn đọc role hiện tại từ DB mỗi request. Frontend guard không thay authorization: API workspace v1/legacy áp dụng CustomerWorkspace policy, từ chối Admin403 kể cả có thêm User; self profile/security/sessions và admin metadata vẫn dùng được. Dữ liệu note cũ được bảo toàn, chưa triển khai lên cloud trong tác vụ này. Kết quả kiểm mới ghi trong worklog.
 
-User chỉ đường dẫn Razor cũ NoteTatCa/NTC.VIEW; thư mục đã được user đổi tên nên nguồn thực tế ntc_aspnet/NTC.VIEW. Giữ toàn bộ Razor, local config và database thật. React tại ntc_react theo yêu cầu mới, thay hướng NTC/ntc_react cũ. UI English. Không deploy, commit/push hoặc tự migrate dữ liệu thật.
+User chỉ đường dẫn Razor cũ NoteTatCa/NTC.VIEW; thư mục đã được user đổi tên nên nguồn thực tế ntc_aspnet/NTC.VIEW. Yêu cầu giữ Razor ban đầu đã được thay bởi DEC-020 ngày 2026-10-21: gỡ NTC.VIEW khỏi repo/solution; giữ bản khôi phục local ngoài repo và không thay database thật. React tại ntc_react theo yêu cầu mới, thay hướng NTC/ntc_react cũ. UI English. Không deploy, commit/push hoặc tự migrate dữ liệu thật.
 
 React/TypeScript/Vite; React Router SPA; TanStack Query cache theo user, invalidation có mục tiêu; Tiptap schema tương thích backend; dnd-kit pointer/keyboard; Radix dialogs/menu. Domain model/types → HTTP repositories → application services → hooks/components/pages. Class/OOP cho session store, API client, repositories và autosave coordinator; React function components/hooks cho rendering, không dùng inheritance để chia sẻ UI.
 
@@ -42,6 +42,8 @@ Nguồn thư viện: [Tiptap StarterKit](https://tiptap.dev/docs/editor/extensio
 
 `WorkspaceReady` chờ preparation và các module workspace chính trước khi mở layout; editor/label dialog được warm background. Progress là số collection/trang thực nhận, không phần trăm theo thời gian giả. Resource lỗi giữ màn hình retry/sign-out, retry dùng lại collection đã tải thành công. Không tải personal content cho Admin: chỉ me/admin-stats và module quản trị. Module tải lỗi cho phép reload chủ động để lấy bundle mới; điều hướng thông thường vẫn SPA.
 
+Bổ sung UI theo ảnh2026-10-20: `PreparationSnapshot.tasks` mô tả resource và waiting/loading/ready/error; UI hiện Loading notes…, Loading labels…, Loading account details… hoặc trạng thái đã xong/chờ/lỗi đúng lifecycle. Khi collection thất bại, các tác vụ bị hủy ngừng icon chạy; reset/retry/đổi account xóa trạng thái cũ. Tổng phần trăm là completed/total collections, không tỷ lệ byte tải. Admin chỉ có hai tác vụ của mình. `ConnectionSpinner` animate wrapper bằng connection-turn, kể cả reconnect còn giữ problem cũ; `ConnectionProgress` là indeterminate khi đợi server/session/application, không aria-valuenow giả. Banner có mô tả bước kết nối/attempt và đặt cao hơn ở trang login để không che heading; reduced-motion dừng chuyển động theo CSS chung.
+
 Cache memory (gcTime Infinity trong phiên), mặc định fresh5phút; labels giữ staleTime2phút, inbox/unread tiếp tục polling foreground60giây. Inbox/Reminders luôn revalidate nền khi mount để thông báo/lịch mới không bị giữ ở snapshot lúc login; cached content vẫn hiển thị trong lúc GET đang chờ. Khi stale hoặc mutation, làm mới nền/invalidations mà không xóa dữ liệu đang hiển thị. Logout/account/nhóm quyền đổi hủy preparation/query, clear private cache; generation và request identity bỏ response cũ, bootstrap cũ không ghi đè phiên login mới. Refresh cùng account không remount editor. Danh sách lớn dùng nhiều RAM/băng thông và kéo dài bước chuẩn bị; không có live snapshot transaction, realtime đồng bộ nhiều tab hoặc offline durable storage. Profile/sessions/security và các trang admin ngoài overview vẫn tải chi tiết theo nhu cầu.
 
 `ServerConnection` probe GET `/health/live` tại API origin trước login/Google/refresh. Dùng một promise chung, timeout mỗi probe≤15giây, tổng120giây, backoff1/2/4/8giây; chỉ nhận JSON status live, không coi trang HTML wake-up là API sẵn sàng. Dev Vite proxy `/health` cùng API target; fixture bridge chuyển tiếp endpoint health thật. Không gửi credentials/bearer/cookie trong probe, không replay POST/mutations và không tạo idle keep-alive. Theo [Render Free](https://render.com/docs/free), cold start là trạng thái hosting cần chờ; frontend không cam kết bỏ được thời gian khởi động. Cách seed/freshness dựa trên [TanStack prefetching](https://tanstack.com/query/latest/docs/framework/react/guides/prefetching).
@@ -50,7 +52,7 @@ Cache memory (gcTime Infinity trong phiên), mặc định fresh5phút; labels g
 
 ## Ánh xạ Razor và module mới
 
-Nguồn kiểm: toàn bộ Pages/*.cshtml và partials trong ntc_aspnet/NTC.VIEW. Razor được giữ nguyên; React không phụ thuộc jQuery/Bootstrap scripts của Razor.
+Nguồn đối chiếu ban đầu: toàn bộ Pages/*.cshtml và partials của ntc_aspnet/NTC.VIEW trong Git trước DEC-020. Razor đã gỡ ngày 2026-10-21; React không phụ thuộc jQuery/Bootstrap scripts của Razor.
 
 | Razor / nghiệp vụ | Route React hiện hành | Chức năng |
 | --- | --- | --- |
@@ -112,6 +114,10 @@ Windows/PowerShell, cwd root NTC; Node24.21/npm11.19/.NET8 target/Chromium Playw
 
 Script kiểm rename cũ .git/verify_backend_rename.py dừng ở assertion toàn bộ refs vì Codex app tự đổi refs/codex/turn-diffs. Đã đối chiếu riêng: chỉ refs/codex thay đổi, HEAD/main/branch/remotes và staged entries giữ nguyên;384backend source/config hashes nguyên byte. Không reset hoặc sửa các app refs để làm assertion xanh.
 
-Không dùng owner DB, gửi SMTP thật, chạy Google OAuth thật, migrate dữ liệu hoặc deploy. Workflow frontend mới là cấu hình, chưa có GitHub run. Chưa commit/push thay đổi frontend. Razor cũ vẫn ở ntc_aspnet/NTC.VIEW.
+Không dùng owner DB, gửi SMTP thật, chạy Google OAuth thật, migrate dữ liệu hoặc deploy. Workflow frontend mới là cấu hình, chưa có GitHub run. Chưa commit/push thay đổi frontend. Tại mốc kiểm ban đầu Razor còn ở ntc_aspnet/NTC.VIEW; đã gỡ theo DEC-020 ngày 2026-10-21.
 
 Polish cuối: hiển thị ảnh profile HTTPS, fallback initials khi lỗi; clear URL không hồi ảnh cũ từ session metadata. Chạy lại lint/build sau chỉnh hiển thị.
+
+## Display preferences — 2026-10-21 / DEC-021
+
+DisplayPreferences ở root giữ mức Interface zoom75–150% (75/90/100/110/125/150), localStorage ntc.interface.zoom.v1; giá trị ngoài danh sách/lỗi storage về100% và storage bị chặn không chặn thao tác. Context chỉ cập nhật hiển thị; customer/admin dùng chung InterfaceZoom cạnh theme. Root CSS zoom và named viewport container cho responsive theo chiều rộng khả dụng; viewport units bù scale cho modal/drawer/editor. Popup định vị theo screen pixels, content theo scale giao diện. Không thêm API/dependency hoặc thay auth/cache/draft; không lưu note/account trong preference. Badge ⌘ K và workspace identity card của customer đã bỏ; giữ shortcut focus tìm kiếm. Scrollbar theo light/dark. Bằng chứng/giới hạn mới xem worklog; các mốc trước là lịch sử.

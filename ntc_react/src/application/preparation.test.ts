@@ -4,7 +4,7 @@ import { WorkspacePreparation } from "./preparation";
 import { WorkspaceService } from "./workspace";
 import { NotesRepository } from "../infrastructure/repositories";
 import { ApiClient } from "../infrastructure/http";
-import type { Note, Page, Session } from "../domain/models";
+import type { Label, Note, Page, Session } from "../domain/models";
 import { draftFrom } from "../domain/models";
 
 const session = { userId: "a", roles: ["User"] } as Session;
@@ -70,6 +70,69 @@ function ports() {
   };
 }
 describe("workspace preparation", () => {
+  it("reports the collection actually waiting and loading, then marks it ready", async () => {
+    const cache = new QueryClient();
+    const source = ports();
+    let release!: (value: Page<Label>) => void;
+    source.labels.list.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          release = resolve;
+        }),
+    );
+    const loader = new WorkspacePreparation(cache, source, () => "a:member");
+    const pending = loader.prepare(session);
+    expect(loader.getSnapshot().tasks).toContainEqual({
+      resource: "me",
+      status: "waiting",
+    });
+    await vi.waitFor(() =>
+      expect(loader.getSnapshot().tasks).toContainEqual({
+        resource: "me",
+        status: "ready",
+      }),
+    );
+    expect(loader.getSnapshot().tasks).toContainEqual({
+      resource: "labels",
+      status: "loading",
+    });
+    expect(loader.getSnapshot().completed).toBe(6);
+    release(page(note("1").tags));
+    await pending;
+    expect(
+      loader.getSnapshot().tasks.every((task) => task.status === "ready"),
+    ).toBe(true);
+    cache.clear();
+  });
+  it("marks a failed collection and resets task states when retrying it", async () => {
+    const cache = new QueryClient();
+    const source = ports();
+    source.labels.list.mockRejectedValueOnce(
+      new Error("Synthetic collection failure"),
+    );
+    const loader = new WorkspacePreparation(cache, source, () => "a:member");
+    await expect(loader.prepare(session)).rejects.toThrow(
+      "Synthetic collection failure",
+    );
+    expect(loader.getSnapshot().tasks).toContainEqual({
+      resource: "labels",
+      status: "error",
+    });
+    expect(
+      loader.getSnapshot().tasks.some((task) => task.status === "loading"),
+    ).toBe(false);
+    await loader.prepare(session);
+    expect(loader.getSnapshot()).toMatchObject({
+      status: "ready",
+      completed: 7,
+    });
+    expect(
+      loader.getSnapshot().tasks.every((task) => task.status === "ready"),
+    ).toBe(true);
+    loader.reset();
+    expect(loader.getSnapshot().tasks).toEqual([]);
+    cache.clear();
+  });
   it("loads every page once and derives label/pin lists without per-label requests", async () => {
     const cache = new QueryClient();
     const source = ports();
@@ -104,6 +167,10 @@ describe("workspace preparation", () => {
     const source = ports();
     const loader = new WorkspacePreparation(cache, source, () => "a:admin");
     await loader.prepare({ ...session, roles: ["Admin", "User"] });
+    expect(loader.getSnapshot().tasks.map((task) => task.resource)).toEqual([
+      "me",
+      "admin-stats",
+    ]);
     expect(source.admin.stats).toHaveBeenCalledOnce();
     expect(source.notes.list).not.toHaveBeenCalled();
     expect(source.labels.list).not.toHaveBeenCalled();

@@ -1,10 +1,86 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
-import { CloudOff, RefreshCw, WifiOff } from "lucide-react";
+import {
+  Check,
+  Circle,
+  CircleAlert,
+  CloudOff,
+  RefreshCw,
+  WifiOff,
+} from "lucide-react";
 import { auth, cache, connection, preparation } from "./runtime";
 import { useAuth } from "../shared/hooks";
 import { Button, ErrorBanner } from "../shared/ui";
 import { isAdministrator } from "../application/access";
+import type {
+  PreparationResource,
+  PreparationTask,
+} from "../application/preparation";
+
+export function ConnectionSpinner({ size = 22 }: { size?: number }) {
+  return (
+    <span className="connection-spinner" aria-hidden="true">
+      <RefreshCw size={size} />
+    </span>
+  );
+}
+export function ConnectionProgress({
+  label = "Server connection progress",
+}: {
+  label?: string;
+}) {
+  return (
+    <div
+      className="connection-progress"
+      role="progressbar"
+      aria-label={label}
+      aria-valuetext="Waiting for a response"
+    >
+      <span />
+    </div>
+  );
+}
+const resourceNames: Record<PreparationResource, string> = {
+  notes: "notes",
+  trash: "trashed notes",
+  labels: "labels",
+  reminders: "reminders",
+  inbox: "inbox",
+  unread: "unread count",
+  me: "account details",
+  "admin-stats": "administration overview",
+};
+function PreparationTasks({ tasks }: { tasks: PreparationTask[] }) {
+  return (
+    <ul className="startup-tasks" aria-label="Loading tasks">
+      {tasks.map(({ resource, status }) => {
+        const name = resourceNames[resource];
+        const text =
+          status === "ready"
+            ? `${name[0].toUpperCase()}${name.slice(1)} ready`
+            : status === "error"
+              ? `Couldn’t load ${name}`
+              : status === "loading"
+                ? `Loading ${name}…`
+                : `Waiting for ${name}…`;
+        return (
+          <li key={resource} data-resource={resource} data-status={status}>
+            {status === "loading" ? (
+              <ConnectionSpinner size={14} />
+            ) : status === "ready" ? (
+              <Check size={14} aria-hidden="true" />
+            ) : status === "error" ? (
+              <CircleAlert size={14} aria-hidden="true" />
+            ) : (
+              <Circle size={12} aria-hidden="true" />
+            )}
+            <span>{text}</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 function LoadingMark() {
   return (
@@ -12,7 +88,9 @@ function LoadingMark() {
       <span />
       <span />
       <span />
-      <b>N</b>
+      <b>
+        <ConnectionSpinner size={26} />
+      </b>
     </div>
   );
 }
@@ -133,19 +211,29 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
         </>
       ) : (
         <>
-          <p role="status">
-            {snapshot.total
-              ? `${snapshot.completed} of ${snapshot.total} collections ready`
-              : "Opening your workspace…"}
-          </p>
+          <div className="startup-progress-summary">
+            <span role="status">
+              {snapshot.total
+                ? `${snapshot.completed} of ${snapshot.total} collections ready`
+                : "Opening your workspace…"}
+            </span>
+            {snapshot.total ? (
+              <strong>
+                {Math.round((snapshot.completed / snapshot.total) * 100)}%
+              </strong>
+            ) : null}
+          </div>
           <progress
             aria-label="Workspace loading"
             max={snapshot.total || 1}
             value={snapshot.completed}
           />
-          {snapshot.pages ? <small>{snapshot.pages} pages loaded</small> : null}
         </>
       )}
+      {snapshot.tasks.length ? (
+        <PreparationTasks tasks={snapshot.tasks} />
+      ) : null}
+      {snapshot.pages ? <small>{snapshot.pages} pages loaded</small> : null}
     </StartupScreen>
   );
 }
@@ -180,19 +268,26 @@ export function ConnectionNotice() {
   }, []);
   if ((!network.slow && !network.problem) || loading.status === "loading")
     return null;
-  const offline = network.problem === "offline";
+  const connecting =
+    network.warming || (network.pending > 0 && !network.problem);
+  const offline = network.problem === "offline" && !connecting;
   return (
-    <aside className="connection-notice" aria-label="Connection status">
-      {network.problem ? (
+    <aside
+      className={`connection-notice ${!state.session ? "connection-notice-auth" : ""}`}
+      aria-label="Connection status"
+    >
+      {connecting ? (
+        <ConnectionSpinner />
+      ) : network.problem ? (
         offline ? (
           <WifiOff size={22} />
         ) : (
           <CloudOff size={22} />
         )
       ) : (
-        <RefreshCw size={22} className="spin" />
+        <ConnectionSpinner />
       )}
-      <div role="status">
+      <div role="status" className="connection-details">
         <strong>
           {offline
             ? "You’re offline"
@@ -201,6 +296,16 @@ export function ConnectionNotice() {
               : "Connecting to NoteTatCa…"}
         </strong>
         <p>{connectionCopy(offline)}</p>
+        {connecting ? (
+          <>
+            <small className="connection-step">
+              {network.warming
+                ? `Connecting to server… Attempt ${network.attempt}`
+                : "Waiting for response…"}
+            </small>
+            <ConnectionProgress />
+          </>
+        ) : null}
       </div>
       {network.problem && !network.warming && state.status !== "unavailable" ? (
         <Button

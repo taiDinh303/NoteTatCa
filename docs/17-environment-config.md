@@ -26,7 +26,7 @@ WebApplication.CreateBuilder dùng cấu hình .NET mặc định: JSON → JSON
 | Bootstrap__AdminEmail | Chỉ dùng explicit --grant-admin với user verified; không seed password |
 | ASPNETCORE_ENVIRONMENT | Development local, Production cloud |
 | PORT | Hosting port; Docker bind qua entrypoint |
-| ApiSettings__BaseUrl | Legacy Razor API URL, chỉ khi chạy NTC.VIEW |
+| ApiSettings__BaseUrl | Cấu hình Razor lịch sử; không còn dùng sau DEC-020, không cần khai báo cho API/React |
 
 OTP10phút/5lần/60s, refresh7/30 ngày tuyệt đối, trash7 ngày, catch-up24 giờ và quota là policy hiện trong code; không có biến giả `Trash:RetentionDays`/`Reminder:CatchUpHours`. Đổi policy phải cập nhật test/docs.
 
@@ -38,7 +38,7 @@ Rotate: cấp credential mới → cập nhật secret store consumer → smoke 
 
 ## Vị trí file sau khi gom root
 
-.env.example ở NTC root; API settings vẫn ntc_aspnet/NTC.API/appsettings.json và appsettings.Development.json, Razor settings vẫn ntc_aspnet/NTC.VIEW. Không đổi nội dung connection string/secret khi chuyển Git root. Docker context root chỉ nhận production JSON sạch. Các biến environment vẫn ghi đè JSON theo thứ tự .NET mặc định.
+.env.example ở NTC root; API settings vẫn ntc_aspnet/NTC.API/appsettings.json và appsettings.Development.json, Razor NTC.VIEW và cấu hình của nó đã gỡ theo DEC-020; không còn là cấu hình chạy hiện hành. Không đổi nội dung connection string/secret khi chuyển Git root. Docker context root chỉ nhận production JSON sạch. Các biến environment vẫn ghi đè JSON theo thứ tự .NET mặc định.
 
 ## Supabase test profile
 

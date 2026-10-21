@@ -9,7 +9,7 @@ The human user's current instruction takes precedence.
   Repository scripts, .github/, .config/, Dockerfile and render.yaml live here.
 
 - Preserve .NET 8/Identity, private per-user notes and all confirmed decisions.
-- Retain ntc_aspnet/NTC.VIEW temporarily; do not migrate live data or deploy from a code task.
+- Legacy Razor NTC.VIEW was removed at the owner's request on 2026-10-21; do not recreate it. Frontend lives in ntc_react/. Do not migrate live data or deploy from a code task.
 - Keep Core independent of HTTP/EF, contracts independent of persistence implementation;
   business services use ICurrentUser, TimeProvider and repository/unit-of-work interfaces.
 - Use BaseService/BaseApiController for shared behavior, explicit services for features;

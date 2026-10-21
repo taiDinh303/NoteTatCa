@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | DEC-001 | Tạo docs theo đủ file docs_mau cho app ghi chú | TARGET, người dùng 2026-10-16 | Bộ tài liệu này |
 | DEC-002 | Chuyển frontend sang React trong workspace NTC | TARGET, người dùng 2026-10-16 | Tách consumer API khỏi Razor |
-| DEC-003 | Tạm giữ NTC.VIEW | TARGET, người dùng 2026-10-16 | Không xóa Razor trong phiên này |
+| DEC-003 | Tạm giữ NTC.VIEW | SUPERSEDED bởi DEC-020 ngày 2026-10-21 | Source lịch sử còn trong Git |
 | DEC-004 | Docs trước, rồi backend; nhiệm vụ backend được giao 2026-10-17 | TARGET, người dùng 2026-10-16 và 2026-10-17 | Đợt mới theo BACKEND-IMPLEMENTATION |
 | DEC-005 | React TS/Vite ở frontend; .NET API Render, DB Supabase PostgreSQL tương lai, React Vercel; giữ Identity | TARGET Q-008/019 | ADR-002/003; SQL Server hiện tại chưa đổi |
 | DEC-006 | Note riêng từng tài khoản; admin quản lý/khóa user và thống kê, không đọc nội dung note | TARGET Q-001/007 | Ownership, không chia sẻ/team |
@@ -35,6 +35,8 @@ User yêu cầu bỏ toast thành công kiểu Note pinned, editor mặc định
 Theo yêu cầu chủ dự án, sau login/khôi phục phiên tải đủ các trang notes active/trash, labels, reminders, inbox, unread count và hồ sơ trước khi mở workspace. Tối đa bốn luồng tải, tuần tự từng trang trong mỗi collection; tiến trình dựa trên collection/trang hoàn tất. Cache chỉ trong memory của tab đến logout/đổi account/nhóm quyền; labels/pin/search lấy danh sách ban đầu từ notes đã tải đủ, không gọi một API cho từng label. Cache được làm mới nền và invalidation khi sửa; không cam kết dữ liệu là một snapshot transaction hoặc truy cập offline bền vững. Account có nhiều note/nội dung lớn sẽ mất nhiều thời gian/bộ nhớ ở bước đầu.
 
 Login/Google/refresh kiểm tra GET health trước khi gửi credentials/token: một probe dùng chung, timeout/backoff hữu hạn, không tự retry POST/ghi chú. Có animation khi chuẩn bị/chờ kết nối, thông báo offline/API chậm và nút retry khi thất bại; không khẳng định server chắc chắn ngủ chỉ từ lỗi mạng. Giữ editor/draft khi outage, chỉ hết phiên khi server xác nhận auth không hợp lệ. Không thêm keep-alive định kỳ để chống sleep; polling chức năng inbox/unread hiện có vẫn giữ. Admin chỉ preload me/statistics và module quản trị, không note/label/reminder/inbox. Không migrate/deploy hoặc đổi dữ liệu cloud.
+
+Bổ sung cùng ngày theo ảnh user: hiện dòng nhỏ cho từng tác vụ notes/labels/account/reminders/trash/inbox, với trạng thái waiting/loading/ready/error lấy từ preparation thực tế. Progress dữ liệu có phần trăm theo số collection hoàn tất; chờ server/session dùng thanh indeterminate, không phần trăm giả. Icon xoay bằng wrapper animation trong cả kết nối lần đầu và reconnect; reduced-motion vẫn được tôn trọng. Banner login đặt phía trên để không đè heading/form.
 
 ## Backlog theo thứ tự
 
@@ -86,3 +88,11 @@ Theo yêu cầu chủ dự án 2026-10-17: backend hiện là ntc_aspnet, Git ro
 ## React 2026-10-18
 
 Theo yêu cầu mới, frontend chính thức ở ntc_react; các module Razor có route/SPA thay thế và module mới theo API. Quyết định cache, editor, session và phạm vi xác minh tại [FRONTEND-IMPLEMENTATION](FRONTEND-IMPLEMENTATION.md). Cloud/data cutover và giữ Razor là các ranh giới riêng.
+
+## DEC-020 — Gỡ frontend Razor cũ (2026-10-21)
+
+Theo yêu cầu trực tiếp của chủ dự án, gỡ ntc_aspnet/NTC.VIEW và project NTC.Razor khỏi solution; quyết định này thay DEC-003 giữ tạm. Frontend hiện hành là ntc_react. Source lịch sử còn trong Git; toàn bộ thư mục local gồm cấu hình chưa commit được giữ bản khôi phục ngoài repo. Không xóa dữ liệu, migrations, backend services hoặc adapter API legacy; không deploy trong tác vụ này.
+
+## DEC-021 — Hiển thị gọn và thu phóng giao diện (2026-10-21)
+
+Theo yêu cầu chủ dự án, bỏ badge phím tắt ⌘ K khỏi ô tìm kiếm (giữ Ctrl/Cmd+K để focus), bỏ thẻ Personal workspace/Just for you của sidebar người dùng. Thanh cuộn mảnh, bo tròn, màu theo light/dark. Thêm menu Interface zoom cạnh theme cho customer/admin trên desktop và điện thoại, các mức75/90/100/110/125/150%;100% là Default. Đây là preference hiển thị lưu trên từng trình duyệt, không đổi nội dung note hoặc quyền truy cập, không reload/chặn browser zoom và pinch. Responsive theo không gian khả dụng sau scale; modal/editor vẫn vừa viewport.

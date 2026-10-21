@@ -12,7 +12,12 @@ import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
 import { Spinner } from "../shared/ui";
 import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
-import { ConnectionNotice, StartupScreen, WorkspaceReady } from "./Startup";
+import {
+  ConnectionNotice,
+  ConnectionProgress,
+  StartupScreen,
+  WorkspaceReady,
+} from "./Startup";
 import { Button } from "../shared/ui";
 const AuthPage = lazy(() => import("../features/auth/AuthPage"));
 const AppShell = lazy(() => import("./AppShell"));
@@ -29,7 +34,13 @@ function Root() {
   return (
     <>
       <ConnectionNotice />
-      <Suspense fallback={<StartupScreen title="Opening your space…" />}>
+      <Suspense
+        fallback={
+          <StartupScreen title="Opening your space…">
+            <ConnectionProgress label="Application loading" />
+          </StartupScreen>
+        }
+      >
         <Outlet />
       </Suspense>
     </>
@@ -48,7 +59,9 @@ function Authenticated() {
             : "Unable to restore your session yet"
         }
       >
-        {state.status === "unavailable" ? (
+        {state.status === "loading" ? (
+          <ConnectionProgress label="Session connection progress" />
+        ) : state.status === "unavailable" ? (
           <Button onClick={() => void auth.bootstrap(true)}>
             Retry connection
           </Button>

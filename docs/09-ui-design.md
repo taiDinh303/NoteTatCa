@@ -8,7 +8,7 @@ UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/e
 
 ## Phạm vi đã chốt
 
-React + TypeScript + Vite tại `NTC/ntc_react`; UI tiếng Anh; giữ Razor ở `ntc_aspnet/NTC.VIEW`. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
+React + TypeScript + Vite tại `NTC/ntc_react`; UI tiếng Anh; Razor cũ đã gỡ theo DEC-020, source tham khảo còn trong Git. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
 
 | ID | Route PROPOSED | Component / hành động | REQ / API |
 | --- | --- | --- | --- |
@@ -27,6 +27,7 @@ Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; b
 ## Trạng thái bắt buộc
 
 - DEC-019: sau login/restore có animation chuẩn bị workspace và progress collection/trang thực tế; lỗi có Try again/Sign out. API chậm có trạng thái Connecting, offline có Reconnect; bootstrap lỗi mạng không xóa phiên đang lưu. Giữ layout/editor/draft khi kết nối gián đoạn trong lúc dùng. Chỉ retry GET/probe tự động; Retry save do user chọn khi lưu lỗi. Cache trong memory giúp chuyển notes/labels/trash/reminders/inbox không chờ tải lần đầu sau preparation; không hứa offline đầy đủ hoặc không có background refresh.
+- Loading chi tiết: từng dòng notes/labels/account/... có waiting/loading/ready/error, icon phù hợp và vòng xoay khi đang tải; thanh dữ liệu có phần trăm collection thực, thanh chờ API/session indeterminate không số giả. Banner connecting/reconnecting có spinner đang xoay, đứng yên ở trạng thái offline/error khi không chờ; reduced-motion được giữ. Không đưa note content hoặc thông tin tài khoản cá nhân vào các nhãn tiến trình.
 - Danh sách: loading, rỗng lần đầu, không có kết quả search, lỗi có retry, trang ngoài giới hạn.
 - Editor: sạch/đang sửa/đang lưu/đã lưu/lưu lỗi/conflict. DEC-018 thay Save thường của Q-023 bằng autosave + Retry save chỉ khi lỗi; giữ bản nhập khi401, mất mạng hoặc server lỗi; không báo Saved trước ACK.
 - Notes: một điểm Take a note kể cả empty state; bỏ header giải thích/nút New note/Create your first note trùng. Reminders/Inbox bỏ heading và mô tả đầu trang; Trash/label bỏ heading nhìn thấy, giữ semantic heading cho screen reader và các thao tác/cảnh báo. Sidebar có ẩn/hiện desktop nhớ lựa chọn, mobile drawer, cùng icon ba gạch ngang; YOUR LABELS/icon dùng chung một button, không Create a label trùng. Không routine success toast cho note/label/reminder; lỗi và các xác nhận bảo mật/quản trị giữ nguyên.
@@ -42,3 +43,7 @@ Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; b
 PROPOSED responsive kiểm ở 360/768/1280px; grid chuyển list phù hợp, sidebar drawer trên mobile, drag có phương án di chuyển bằng bàn phím. Modal trap focus, Escape/hủy rõ, trả focus về trigger. Title/content dài, tiếng Việt/emoji và lịch dạng địa phương không tràn.
 
 Nghiệm thu: TC-012/014/015; evidence browser/screenshots ở FRONTEND-IMPLEMENTATION. UI tiếng Anh đã chốt Q-025; layout/CSS/editor đã chọn trong tác vụ React; file 13 không tự tạo Figma.
+
+## Thu phóng và sidebar gọn — DEC-021
+
+Bỏ badge ⌘ K và khối Personal workspace/Just for you; vẫn dùng Ctrl/Cmd+K. Scrollbar thin, thumb bo tròn theo theme, track trong suốt. Interface zoom trên topbar cho cả customer/admin:75/90/100/110/125/150%, lưu preference thiết bị;100% · Default để trở về. Các breakpoint theo container viewport khả dụng sau zoom, toolbar có thể xuống hàng trên màn hình hẹp; editor và drawer giữ trong viewport. Không vô hiệu pinch/native browser zoom; dùng CSS zoom/container queries của trình duyệt hiện đại.

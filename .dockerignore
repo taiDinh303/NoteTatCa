@@ -9,7 +9,6 @@
 **/*.user
 **/*.suo
 **/PublishProfiles
-ntc_aspnet/NTC.VIEW
 ntc_aspnet/NTC.Tests
 ntc_react
 tools/FrontendFixture

@@ -70,7 +70,7 @@ Notifications owner-only, page và read action; note trash/mất quyền không 
 
 ## Legacy và cách tái tạo contract
 
-Giữ route/payload cũ cho Razor, JSON-string email ở auth cũ, username login fallback legacy. Ngoại lệ bảo mật: JWT cũ không có sid phải đăng nhập lại; user CRUD quản trị cần Admin; profile self; connect Google nhận ID token proof thay raw providerKey; rich note không bị client plain cũ ghi đè. Legacy chưa có expected version vẫn chỉ tương thích tạm thời, không dùng cho autosave mới. `NTC.VIEW` chưa được chạy E2E với backend mới.
+Giữ route/payload cũ cho Razor, JSON-string email ở auth cũ, username login fallback legacy. Ngoại lệ bảo mật: JWT cũ không có sid phải đăng nhập lại; user CRUD quản trị cần Admin; profile self; connect Google nhận ID token proof thay raw providerKey; rich note không bị client plain cũ ghi đè. Legacy chưa có expected version vẫn chỉ tương thích tạm thời, không dùng cho autosave mới. NTC.VIEW đã gỡ theo DEC-020; các adapter legacy bảo mật vẫn giữ tương thích API, không bị xóa cùng frontend cũ. Razor lịch sử chưa có browser E2E với backend mới.
 
 OpenAPI export được kiểm thử qua ContractTests; tạo inventory:
 

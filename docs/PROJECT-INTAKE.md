@@ -15,7 +15,7 @@
 | GitHub | https://github.com/taiDinh303/NoteTatCa |
 | Nhiệm vụ phiên này | Hoàn thiện docs theo Marixa, sau đó backend; đã triển khai và kiểm thử |
 | Nhiệm vụ sau | React được giao triển khai 2026-10-18 tại ntc_react; cloud còn giai đoạn sau |
-| Frontend | Chuyển sang React trong workspace NTC; giữ nguyên NTC.VIEW tạm thời |
+| Frontend | React tại ntc_react; Razor NTC.VIEW đã gỡ theo yêu cầu ngày 2026-10-21, xem DEC-020 |
 | Ngôn ngữ | Docs tiếng Việt; UI tiếng Anh đã được chủ dự án xác nhận ở Q-025 |
 | Thời gian | Timezone từng user, mặc định Asia/Ho_Chi_Minh; catch-up 24 giờ; ngày docs Asia/Bangkok; UTC storage đã triển khai |
 | Dữ liệu | Nội dung note, email, hồ sơ, thông tin đăng nhập; phải giữ tài khoản và note cũ |

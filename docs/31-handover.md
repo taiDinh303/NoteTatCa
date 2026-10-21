@@ -12,7 +12,7 @@
 | API | Legacy adapters + /api/v1, [131 operations](api-inventory.md) và health |
 | Tests | NTC.Tests; evidence [06](06-testing.md), lệnh [10](10-setup-local.md) |
 | Deploy assets | Dockerfile,.env.example,render.yaml,GitHub workflow; chưa deploy |
-| Razor | NTC.VIEW giữ nguyên source;6warning cũ, chưa browser E2E với API mới |
+| Razor | NTC.VIEW đã gỡ khỏi repo/solution theo DEC-020 ngày 2026-10-21; source lịch sử còn trong Git |
 | React | NTC/ntc_react SPA; UI English, xem FRONTEND-IMPLEMENTATION |
 | Cloud | Supabase PostgreSQL/Render/Vercel đã chọn; chưa tạo tài nguyên trong phiên |
 

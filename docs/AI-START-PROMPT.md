@@ -11,7 +11,7 @@ rich JSON, autosave/version, reminders/inbox/SMTP lease, refresh/session,
 SQL additive migration và PostgreSQL baseline. Kiểm source/status lại trước sửa.
 Đừng coi snapshot docs-only 2026-10-16 là hiện trạng mới.
 
-Giữ NTC.VIEW; React TS/Vite hiện ở NTC/ntc_react; đọc FRONTEND-IMPLEMENTATION, UI English.
+NTC.VIEW đã gỡ theo DEC-020; không tạo lại. React TS/Vite hiện ở NTC/ntc_react; đọc FRONTEND-IMPLEMENTATION, UI English.
 Supabase chỉ PostgreSQL; Identity .NET; API Render; React Vercel.
 Giữ account/hash/ID/note/audit; không apply/migrate/reset database thật tự động.
 Note private; admin không đọc content; untitled và duplicate label hợp lệ.

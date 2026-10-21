@@ -6,7 +6,7 @@
 
 Đã đọc docs và architecture/source của `D:\My Project\marixa_aspnet_react`. Áp dụng cho NTC: tầng Core độc lập HTTP/EF, contracts không tham chiếu implementation repository; ICurrentUser/TimeProvider; BaseService/BaseApiController; cấu hình DB/auth/CORS/rate limit tập trung; envelope lỗi/validation có traceId; HTTP regression test bằng SQLite biệt lập và provider-model/migration checks. Không mang nghiệp vụ HR, ảnh public, company/attendance/payroll hoặc quyền staff đọc dữ liệu sang note riêng.
 
-Giữ solution .NET 8/Identity, routes legacy và payload đang dùng ở Razor trong khả năng tương thích; bổ sung `/api/v1` cho React. Không sửa/xóa NTC.VIEW. Git root đã được chuyển lên NTC trong task cấu trúc tiếp theo theo yêu cầu chủ dự án. SQL Server vẫn là mặc định local; PostgreSQL/Supabase là provider được bổ sung và có migration history riêng. Không tự apply migration vào DB của chủ dự án; phải giữ account/note cũ.
+Giữ solution .NET 8/Identity, routes legacy và payload đang dùng ở Razor trong khả năng tương thích; bổ sung `/api/v1` cho React. Yêu cầu giữ NTC.VIEW ban đầu đã được thay bằng DEC-020 ngày 2026-10-21: gỡ project Razor khỏi repo/solution; giữ API legacy và dữ liệu. Git root đã được chuyển lên NTC trong task cấu trúc tiếp theo theo yêu cầu chủ dự án. SQL Server vẫn là mặc định local; PostgreSQL/Supabase là provider được bổ sung và có migration history riêng. Không tự apply migration vào DB của chủ dự án; phải giữ account/note cũ.
 
 ## Quyết định bổ sung đã xác nhận
 

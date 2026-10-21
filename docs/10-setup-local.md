@@ -34,7 +34,7 @@ dotnet run --project ntc_aspnet/NTC.API --launch-profile https
 
 API HTTPS5033/HTTP5032 theo launch profile; trust dev certificate nếu cần `dotnet dev-certs https --trust`. Kiểm /health/live,/health/ready và /swagger trong Development. Register/verify user rồi explicit --grant-admin khi cần, Bootstrap__AdminEmail qua secret env. Không có admin password mặc định.
 
-Google/SMTP thật cần credential riêng và callback/client route đúng; suite chỉ fake provider. BackgroundJobs mặc định false; chỉ bật sau review lịch/purge candidates/backups/uptime. NTC.VIEW vẫn giữ, React dùng API v1; evidence browser riêng ở FRONTEND-IMPLEMENTATION.
+Google/SMTP thật cần credential riêng và callback/client route đúng; suite chỉ fake provider. BackgroundJobs mặc định false; chỉ bật sau review lịch/purge candidates/backups/uptime. NTC.VIEW đã gỡ theo DEC-020; chạy frontend ntc_react với API v1; evidence browser riêng ở FRONTEND-IMPLEMENTATION.
 
 ## Cấu trúc root hiện hành
 

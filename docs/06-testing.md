@@ -2,6 +2,18 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Thu phóng và scrollbar — 2026-10-21
+
+Full Chromium **24/24 PASS (3.3phút gồm startup)** sau sửa menu ngoài viewport khi zoom; kiểm preset75–150%, persistence/reload, SPA không reload, sidebar copy removal, Ctrl+K, scrollbar light/dark, drawer/editor và admin isolation. Sau rà ảnh, bổ sung CSS xuống hàng dải màu/thao tác footer ở mobile150%; focused **3/3 PASS (55.9giây gồm startup)** sau thay đổi cuối, thêm bounds từng nút ở320/390px, Close trong viewport và giữ nội dung. Không cộng rerun thành ca mới; full24 là mốc ngay trước CSS footer, focused3 là mốc cuối.
+
+**29 Vitest + 4 configuration PASS**, lint max-warnings0/typecheck/Production Vite build PASS (lint/build lại sau CSS cuối); backend solution Release0warning/0error, không backend-suite rerun trong tác vụ UI này. Đã xem ảnh desktop/mobile zoom. Chỉ fixture SQLite/captured email; chưa Safari/Firefox, điện thoại vật lý hoặc production rollout. Chi tiết tại worklog; dùng CSS zoom/container queries trên trình duyệt hiện đại.
+
+## Chi tiết tiến trình và animation — 2026-10-20
+
+**29 Vitest + 4 configuration PASS**, lint max-warnings0/typecheck/Production build PASS. Focused browser **5/5 PASS**: kết nối, multi-page preload/task labels/progress/cache/mobile/reduced-motion, offline restore, retry collection và admin. Kiểm Loading notes/labels khi request bị giữ, Account details ready khi API xong, progress6/7 khi chỉ notes còn chờ; indeterminate server progress không aria-valuenow giả. CSS transform spinner phải đổi theo thời gian; reduced-motion duration được giảm. Unit kiểm task waiting/loading/ready, failed/cancel/retry/reset và admin chỉ có me/stats.
+
+Sau chỉnh banner login không che heading, rerun ca kết nối **1/1 PASS** và lint/unit/build lại PASS. Không cộng ca rerun hoặc coi đây là full browser/backend rerun; full22ca ở phần dưới là mốc trước UI bổ sung. Đã xem ảnh desktop/mobile; chưa kiểm cloud rollout/cold start Render thật trong lượt này.
+
 ## Preparation/cache/kết nối — 2026-10-20
 
 **22/22 Playwright Chromium PASS trong một lượt**, **27 Vitest + 4 configuration PASS**, ESLint max-warnings0/TypeScript/Production Vite build PASS; backend Release strict0warnings/0errors. Không chạy lại full backend suite vì không đổi backend runtime/schema; browser fixture bridge bổ sung health forwarding và serialization cho connection SQLite dùng chung. Lượt full trước21PASS/1FAIL phát hiện Inbox giữ snapshot rỗng; đã sửa revalidate nền khi mount và xác nhận thông báo dispatch mới xuất hiện.

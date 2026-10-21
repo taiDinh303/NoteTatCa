@@ -12,4 +12,4 @@ Khi sửa contract: export Swagger → regenerate scripts/update_api_inventory.p
 
 ## Sau khi chuyển Git root
 
-Workflow trigger ntc_aspnet/**, docs/**, scripts/** và root tool/Docker/workflow files. Restore/build/test/publish dùng ntc_aspnet/ prefix từ root; dotnet tool restore đọc .config ở root, artifacts/TestResults dùng đường dẫn root. Dockerfile build ntc_aspnet/NTC.API; .dockerignore loại ntc_aspnet/NTC.VIEW, ntc_aspnet/NTC.Tests, frontend/react và nested artifacts/config local. render.yaml giữ Docker context root. Chỉ kiểm source/local build/test trong task; chưa có Docker CLI hoặc GitHub run để xác nhận pipeline thật.
+Workflow trigger ntc_aspnet/**, docs/**, scripts/** và root tool/Docker/workflow files. Restore/build/test/publish dùng ntc_aspnet/ prefix từ root; dotnet tool restore đọc .config ở root, artifacts/TestResults dùng đường dẫn root. Dockerfile build ntc_aspnet/NTC.API; .dockerignore loại ntc_aspnet/NTC.Tests, frontend/react và nested artifacts/config local. render.yaml giữ Docker context root. Chỉ kiểm source/local build/test trong task; chưa có Docker CLI hoặc GitHub run để xác nhận pipeline thật.
