@@ -2,6 +2,12 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Zoom trong menu tài khoản — 2026-10-21
+
+Focused Chromium **4/4 PASS (1.6phút gồm startup)**: menu Zoom (x%) mở dialog, nhập/Enter/blur/empty/clamp, nút−/+ bước10% và disabled ở biên, blur90 rồi+ ra100, reset, persistence67%/reload, focus Done/Escape và viewport mobile; Ctrl-wheel/HUD, pinch/tap trong bảng và admin không personal requests. Đã xem ảnh dark/mobile150%. Không full27browser/backend rerun.
+
+29Vitest+4configuration, lint/typecheck/Production build PASS. Build .NET song song ban đầu lỗi MSB4166 worker; rerun tuần tự -m:1 -nodeReuse:false PASS0warning/0error, nguyên nhân worker chưa xác định. Chỉ fixture SQLite/captured email; chưa cloud/điện thoại vật lý/Safari/Firefox. Chi tiết ở worklog. Quyết định hiện hành bổ sung mục menu và dialog, vẫn không có nút zoom riêng trên topbar; gesture giữ nguyên.
+
 ## Gesture zoom50–150% và bỏ sidebar tip — 2026-10-21
 
 Focused Chromium **4/4 PASS (1.9phút gồm startup)**: Ctrl-wheel50–150%, wheel thường không zoom, deltaMode lines, legacy preference42→50/reload, HUD giữa dưới/auto-hide, DPR không đổi; mobile hai ngón không nhân đôi native zoom (visualViewport.scale1), một ngón vẫn cuộn và editor giữ nội dung; admin isolation, responsive và không còn nút/dialog/sidebar-tip.

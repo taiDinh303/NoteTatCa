@@ -4280,3 +4280,41 @@ td {
     flex-wrap: wrap;
   }
 }
+.modal.zoom-panel {
+  zoom: calc(1 / var(--interface-scale));
+  width: min(360px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+}
+.zoom-adjustments {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 12px;
+}
+.zoom-adjustments > .icon-button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  background: var(--hover);
+}
+.zoom-number-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.zoom-number-wrap input {
+  width: 88px;
+  min-height: 44px;
+  font-size: 16px;
+  text-align: center;
+}
+.zoom-help {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  text-align: center;
+}

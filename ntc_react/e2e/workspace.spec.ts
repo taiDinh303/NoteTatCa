@@ -611,6 +611,83 @@ test("scales the interface without reloads, preserves notes and fits desktop and
   await expect(page.locator("html")).toHaveCSS("zoom", "1");
 });
 
+test("opens account-menu zoom with numeric input, increment buttons and shared gesture state", async ({
+  page,
+}) => {
+  await login(page);
+  await page
+    .getByRole("button", { name: "Use dark theme", exact: true })
+    .click();
+  const account = page.getByRole("button", {
+    name: "Account menu",
+    exact: true,
+  });
+  await account.click();
+  await page
+    .getByRole("menuitem", { name: "Zoom (100%)", exact: true })
+    .click();
+  const panel = page.getByRole("dialog", {
+    name: "Interface zoom",
+    exact: true,
+  });
+  const input = panel.getByRole("spinbutton", {
+    name: "Zoom percentage",
+    exact: true,
+  });
+  await input.fill("83");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await input.press("Enter");
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.83");
+  await panel.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(input).toHaveValue("93");
+  await panel.getByRole("button", { name: "Zoom out", exact: true }).click();
+  await expect(input).toHaveValue("83");
+  await input.fill("90");
+  await panel.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(input).toHaveValue("100");
+  await input.fill("999");
+  await input.press("Tab");
+  await expect(input).toHaveValue("150");
+  await expect(
+    panel.getByRole("button", { name: "Zoom in", exact: true }),
+  ).toBeDisabled();
+  await input.fill("1");
+  await input.press("Enter");
+  await expect(input).toHaveValue("50");
+  await expect(
+    panel.getByRole("button", { name: "Zoom out", exact: true }),
+  ).toBeDisabled();
+  await input.fill("");
+  await input.press("Tab");
+  await expect(input).toHaveValue("50");
+  await ctrlWheel(page, -3000);
+  await expect(input).toHaveValue("150");
+  await page.setViewportSize({ width: 390, height: 844 });
+  const bounds = (await panel.boundingBox())!;
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(391);
+  expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
+  await page.screenshot({
+    path: "../artifacts/frontend/account-zoom-mobile.png",
+    animations: "disabled",
+  });
+  await panel
+    .getByRole("button", { name: "Reset to 100%", exact: true })
+    .click();
+  await input.fill("67");
+  await input.press("Enter");
+  await panel.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(account).toBeFocused();
+  await page.reload();
+  await expect(page.locator("html")).toHaveCSS("zoom", "0.67");
+  await account.click();
+  await page.getByRole("menuitem", { name: "Zoom (67%)", exact: true }).click();
+  await expect(input).toHaveValue("67");
+  await page.keyboard.press("Escape");
+  await expect(panel).toHaveCount(0);
+  await expect(account).toBeFocused();
+});
+
 test("zooms with Ctrl wheel within bounds and briefly shows a bottom-center percentage", async ({
   page,
 }) => {
@@ -784,6 +861,31 @@ test.describe("pinch zoom", () => {
       animations: "disabled",
     });
     await editor.getByRole("button", { name: "Close", exact: true }).tap();
+    await page.getByRole("button", { name: "Account menu", exact: true }).tap();
+    await page
+      .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
+      .tap();
+    const zoomPanel = page.getByRole("dialog", {
+      name: "Interface zoom",
+      exact: true,
+    });
+    await zoomPanel
+      .getByRole("button", { name: "Zoom out", exact: true })
+      .tap();
+    await expect(
+      zoomPanel.getByRole("spinbutton", {
+        name: "Zoom percentage",
+        exact: true,
+      }),
+    ).toHaveValue("140");
+    await pinch(120, 240);
+    await expect(
+      zoomPanel.getByRole("spinbutton", {
+        name: "Zoom percentage",
+        exact: true,
+      }),
+    ).toHaveValue("150");
+    await zoomPanel.getByRole("button", { name: "Done", exact: true }).tap();
     expect(reorderRequests).toEqual([]);
     await session.detach();
   });
@@ -804,6 +906,22 @@ test("administrator can change interface zoom without personal content requests"
   await login(page, "admin@example.test");
   await page.setViewportSize({ width: 390, height: 844 });
   await setZoom(page, 150);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
+    .click();
+  const zoomPanel = page.getByRole("dialog", {
+    name: "Interface zoom",
+    exact: true,
+  });
+  await zoomPanel
+    .getByRole("button", { name: "Zoom out", exact: true })
+    .click();
+  await expect(
+    zoomPanel.getByRole("spinbutton", { name: "Zoom percentage", exact: true }),
+  ).toHaveValue("140");
+  await zoomPanel.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await zoomPanel.getByRole("button", { name: "Done", exact: true }).click();
   await page
     .getByRole("button", { name: "Open navigation", exact: true })
     .click();

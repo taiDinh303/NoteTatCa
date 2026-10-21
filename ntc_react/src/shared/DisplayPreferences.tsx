@@ -1,6 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { DisplayZoomContext } from "./displayZoom";
 
 const storageKey = "ntc.interface.zoom.v1";
 const clamp = (value: number) => Math.min(150, Math.max(50, value));
@@ -18,6 +26,15 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
   });
   const target = useRef(percent);
   const [visible, setVisible] = useState(false);
+  const manualChange = useRef<(value: number) => void>(() => {});
+  const changePercent = useCallback(
+    (value: number) => manualChange.current(value),
+    [],
+  );
+  const zoomContext = useMemo(
+    () => ({ percent, change: changePercent }),
+    [percent, changePercent],
+  );
   useLayoutEffect(() => {
     document.documentElement.style.setProperty(
       "--interface-scale",
@@ -34,10 +51,15 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     let hideTimer = 0;
     let pinch: { ids: number[]; distance: number; percent: number } | undefined;
     let safariBase: number | undefined;
-    function change(value: number) {
+    function change(value: number, immediate = false) {
       if (!Number.isFinite(value)) return;
       target.current = clamp(value);
-      if (!frame)
+      if (immediate) {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        setPercent(Math.round(target.current));
+        setVisible(true);
+      } else if (!frame)
         frame = requestAnimationFrame(() => {
           frame = 0;
           setPercent(Math.round(target.current));
@@ -46,6 +68,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       window.clearTimeout(hideTimer);
       hideTimer = window.setTimeout(() => setVisible(false), 1200);
     }
+    manualChange.current = (value) => change(Math.round(value), true);
     function wheel(event: WheelEvent) {
       if (
         !(event.ctrlKey || event.metaKey) ||
@@ -122,6 +145,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     window.addEventListener("gesturechange", gestureChange, options);
     window.addEventListener("gestureend", gestureEnd, true);
     return () => {
+      manualChange.current = () => {};
       cancelAnimationFrame(frame);
       window.clearTimeout(hideTimer);
       window.removeEventListener("wheel", wheel, true);
@@ -136,7 +160,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     };
   }, []);
   return (
-    <>
+    <DisplayZoomContext.Provider value={zoomContext}>
       {children}
       {visible
         ? createPortal(
@@ -151,6 +175,6 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
             document.body,
           )
         : null}
-    </>
+    </DisplayZoomContext.Provider>
   );
 }

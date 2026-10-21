@@ -2,6 +2,20 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Công bố Zoom trong menu tài khoản lên main — 2026-10-21
+
+- Theo yêu cầu “push lên luôn”, phạm vi12file React/docs/test: mục Zoom (x%) trong menu tài khoản customer/admin, dialog nhập50–150% và nút−/+ bước10%, reset/focus/persistence, đồng bộ Ctrl-wheel/pinch/HUD và hồi quy/tài liệu. Không commit hai appsettings API local, credentials hoặc artifacts.
+- Fetch trước publication: main/HEAD và origin/main cùng66b6d46, divergence0/0. Dùng evidence hoàn tất ở entry dưới: focused4/4,29Vitest+4configuration, lint/typecheck/Production build PASS; .NET Release tuần tự0warning/0error sau lỗi worker song song đã ghi rõ. Không chạy lại suites trong lượt chỉ publication. Docs48Markdown/178local links/0errors; kiểm staged scope/diff và hash cấu hình local trước commit.
+- Chỉ commit/push source lên main rồi đối chiếu HEAD với refs/heads/main trên remote. Không manual deploy/migration hoặc thay dashboard/cloud data; hosting/CI có thể tự triển khai từ push. Chưa xác minh production rollout trong lượt này.
+
+## Zoom trong menu tài khoản, ô nhập và nút−/+ — 2026-10-21
+
+- Theo ảnh/yêu cầu mới, thêm mục Zoom (x%) vào ShellAccountMenu dùng chung customer/admin, trước Sign out. Không thêm nút riêng lên topbar. Mục mở ZoomDialog với ô nhập50–150%, hai nút−/+ bước10%, Reset to 100% và Done; vùng bấm44px, inverse scale giữ bảng dễ đọc trên điện thoại. Enter/blur áp dụng, round/clamp số nhập, ô trống giữ mức đang dùng, disable nút tại biên. Đóng bằng Done/Escape trả focus về avatar.
+- DisplayZoomContext/useDisplayZoom chia sẻ percent và setter với gesture hiện có. Context value memoized, setter manual áp dụng ngay và hủy RAF cũ để blur rồi bấm−/+ lấy đúng giá trị vừa nhập; gesture vẫn RAF, cùng giới hạn/HUD/storage. Draft null theo percent live khi Ctrl-wheel hoặc pinch trong lúc bảng mở; draft đang gõ giữ riêng. Không remount editor/cache, không API/dependency mới, không thay Identity/ownership/data/config hoặc khôi phục footer/sidebar-tip đã bỏ.
+- Focused Chromium **4/4 PASS (1.6phút gồm startup)**: mục menu/numeric83%, Enter/blur/empty/clamp,−/+, blur90 rồi+ ra100, disabled tại50/150, reset, lưu67/reload/menu label cập nhật, focus Done/Escape và mobile390×844; Ctrl-wheel/HUD cũ; mobile isMobile/hasTouch/CDP pinch/drag isolation/editor và thao tác tap zoom-dialog, input theo gesture; admin cùng control không request nội dung cá nhân. Đã xem ảnh account-zoom-mobile.png ở dark/150%, bảng nằm trong viewport. Không chạy lại full27browser/backend suite cho control này; các mốc full trước vẫn lịch sử.
+- **29 Vitest + 4 configuration PASS**, ESLint max-warnings0/TypeScript/Production Vite build PASS. Lượt build .NET song song báo MSB4166 do child node thoát, không có diagnostic failure file được đọc ở thư mục được báo; không kết luận nguyên nhân. Chạy lại tuần tự `dotnet build ntc_aspnet/NTC.sln -c Release --no-restore -warnaserror -m:1 -nodeReuse:false` PASS **0warning/0error**. Không sửa backend để xử lý sự cố worker. Rà React Best Practices/Verification: hooks/state/context, native input labels, dropdown chỉ chứa mục mở dialog thay input lồng menu, không thêm data fetching.
+- Cập nhật plan/UI/frontend/user-guide/testing/worklog; docs48Markdown/178local links/0errors, git diff --check PASS (thông báo LF/CRLF). Fixture SQLite/captured email riêng; không DB/mail/cloud thật, chưa thiết bị vật lý/Safari/Firefox hoặc production. Giữ appsettings API local; chưa commit/push/deploy.
+
 ## Xóa footer “Keep what matters.” và “Privacy & data” — 2026-10-21 (đã mở rộng phạm vi)
 
 - Theo yêu cầu mới nhất (2026-10-21): xóa 2 dòng chữ “Keep what matters.” và link “Privacy & data” ở trang /notes (và các trang workspace dùng chung AppShell). Thay đổi 1 file: ntc_react/src/app/AppShell.tsx (gỡ `<footer class="workspace-footer">`); import Link vẫn dùng cho sidebar brand. Không đụng AdminShell (/admin), AuthPage, PublicPages; không đổi CSS, auth, cache, API, schema hay dữ liệu. Chưa tự deploy; hosting/CI tự triển khai khi push.
