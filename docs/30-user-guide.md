@@ -48,3 +48,7 @@ Khi lỗi, ghi thời gian và mã lỗi/traceId nếu có; không gửi passwor
 Giữ **Ctrl + lăn chuột** để phóng to/thu nhỏ từ **50% đến150%**; Cmd + lăn chuột cũng được hỗ trợ. Trên điện thoại, dùng **hai ngón chụm vào/mở ra**. Số phần trăm hiện tạm ở giữa cạnh dưới và tự ẩn sau khoảng1.2giây khi dừng thao tác. Bạn cũng có thể mở menu avatar/tài khoản → **Zoom (x%)**, nhập phần trăm rồi Enter/rời ô, hoặc dùng **− / +** (mỗi lần10%). **Reset to 100%** về mặc định và **Done** đóng bảng. Chỉnh bằng gesture hay bảng đều đồng bộ và nhớ cùng lựa chọn; không có nút zoom riêng trên thanh trên cùng.
 
 Lựa chọn được nhớ trong trình duyệt cho cả người dùng/admin, không tải lại trang hoặc đổi nội dung/định dạng note. Lăn chuột thường và cuộn một ngón vẫn cuộn trang. Phím tắt zoom bàn phím của trình duyệt vẫn hoạt động riêng. Nhãn ⌘ K đã bỏ nhưng Ctrl+K (Windows) hoặc Cmd+K (Mac) vẫn focus tìm kiếm. Sidebar cũng đã bỏ khối Big ideas often start with a little note.
+
+## Căn giữa nội dung note
+
+Đặt con trỏ trong đoạn hoặc chọn các đoạn, nhấn **Center text** trên toolbar để căn giữa. Nhấn lại để trở về căn trái. Định dạng tự lưu và được giữ khi mở lại; Markdown xuất ra không giữ căn giữa. Bộ đếm cuối editor dùng dạng **8 / 100,000**.

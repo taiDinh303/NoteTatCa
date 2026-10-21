@@ -4318,14 +4318,14 @@ td {
   line-height: 1.6;
   text-align: center;
 }
-.editor-heading .editor-pin {
+.editor-heading .editor-heading-action {
   background: transparent;
   color: inherit;
 }
-.editor-heading .editor-pin:hover {
+.editor-heading .editor-heading-action:hover {
   background: color-mix(in srgb, currentColor 10%, transparent);
 }
-.editor-heading .editor-pin:focus-visible {
+.editor-heading .editor-heading-action:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }

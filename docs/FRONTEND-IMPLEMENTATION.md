@@ -127,3 +127,7 @@ RAF gộp các update gesture theo frame, target lưu trong ref để không m�
 ## Nút ghim trong editor — 2026-10-21
 
 Theo ảnh/yêu cầu chủ dự án, editor hiển thị Pin khi chưa ghim và PinOff (Unpin note) khi đã ghim, đồng nhất note card. Bỏ nền active tối; nút trong suốt, màu icon theo foreground tương phản của heading, hover nhẹ từ currentColor và focus outline rõ. aria-pressed phản ánh trạng thái; giữ nguyên update/autosave/version/ownership. Không đổi nút/tag/reminder active khác. Evidence và giới hạn kiểm thử ở worklog.
+
+## Editor: nút đồng nhất và căn giữa — 2026-10-21
+
+Add title, Pin/Unpin và fullscreen dùng chung nền trong suốt, hover nhẹ theo foreground và focus outline; vẫn giữ trạng thái ghim qua icon/aria-pressed. Toolbar có Center text: áp dụng cho paragraph/heading trong vùng chọn, nhấn lại trở về căn trái mặc định. TextAlign cùng phiên bản Tiptap3.32.0; canonical document và API chỉ nhận textAlign left/center trên paragraph/heading, không nhận CSS tùy ý. Dữ liệu cũ không có thuộc tính vẫn giữ nguyên. Markdown export cảnh báo mất alignment. Bộ đếm cuối editor hiển thị x / 100,000, giữ nhãn trợ năng Character count. Không cần migration. Evidence thực tế ở worklog.

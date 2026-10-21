@@ -1067,7 +1067,7 @@ test("edits content in a full viewport with an optional title and fixed characte
   expect((await editor.boundingBox())!.width).toBeCloseTo(viewport.width);
   await expect(
     editor.getByLabel("Character count", { exact: true }),
-  ).toHaveText("11 / 100,000 characters");
+  ).toHaveText("11 / 100,000");
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();
@@ -1271,12 +1271,10 @@ for (const theme of ["light", "dark"]) {
         .evaluate((element) => getComputedStyle(element).color);
       await expect(unpin).toHaveCSS("color", foreground);
     }
-    await editor
-      .locator(".editor-heading")
-      .screenshot({
-        path: `../artifacts/frontend/editor-pin-${theme}.png`,
-        animations: "disabled",
-      });
+    await editor.locator(".editor-heading").screenshot({
+      path: `../artifacts/frontend/editor-pin-${theme}.png`,
+      animations: "disabled",
+    });
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await expect(
@@ -2058,3 +2056,64 @@ test("supports search, pinning, theme and an empty private workspace for another
     page.getByText("Project notes", { exact: true }),
   ).not.toBeVisible();
 });
+
+for (const mobile of [false, true]) {
+  test(`center text persists and heading controls match ${mobile ? "mobile" : "desktop"}`, async ({
+    page,
+  }) => {
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 });
+    await login(page);
+    await page
+      .getByRole("button", { name: "Take a note", exact: true })
+      .click();
+    let editor = page.getByRole("dialog", { name: "New note", exact: true });
+    const content = editor.getByRole("textbox", { name: "Note content" });
+    await content.fill("Centered private text");
+    await editor
+      .getByRole("button", { name: "Center text", exact: true })
+      .click();
+    await expect(content.locator("p").first()).toHaveCSS(
+      "text-align",
+      "center",
+    );
+    await expect(editor.getByLabel("Character count")).toHaveText(
+      "21 / 100,000",
+    );
+    await mkdir("../artifacts/frontend", { recursive: true });
+    await editor.screenshot({
+      path: `../artifacts/frontend/editor-alignment-${mobile ? "mobile" : "desktop"}.png`,
+      animations: "disabled",
+    });
+    for (const name of ["Add title", "Pin note", "Exit full screen"]) {
+      const button = editor.getByRole("button", { name, exact: true });
+      await page.mouse.move(0, 0);
+      await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(button).toBeVisible();
+    }
+    await expect(
+      editor.getByText("All changes saved", { exact: true }),
+    ).toBeVisible();
+    await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await page.reload();
+    await page.getByText("Centered private text", { exact: true }).click();
+    editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+    await expect(
+      editor
+        .getByRole("textbox", { name: "Note content" })
+        .locator("p")
+        .first(),
+    ).toHaveCSS("text-align", "center");
+    await editor
+      .getByRole("button", { name: "Center text", exact: true })
+      .click();
+    await expect(
+      editor
+        .getByRole("textbox", { name: "Note content" })
+        .locator("p")
+        .first(),
+    ).toHaveCSS("text-align", "start");
+    await expect(
+      editor.getByText("All changes saved", { exact: true }),
+    ).toBeVisible();
+  });
+}

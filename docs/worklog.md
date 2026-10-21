@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Editor đồng nhất nút, căn giữa và bộ đếm gọn — 2026-10-21
+
+- Add title/Pin hoặc Unpin/fullscreen dùng chung editor-heading-action: nền trong suốt, màu theo heading, hover10% currentColor/focus outline. Counter hiển thị x / 100,000, giữ aria-label Character count. Thêm Center text toggle cho paragraph/heading/vùng chọn; nhấn lại xóa alignment về mặc định. Tiptap TextAlign3.32.0 cùng phiên bản editor; canonical frontend giữ left/center, bỏ null/giá trị không hỗ trợ. API ContentRules nhận đúng left/center trên paragraph/heading, từ chối thuộc tính/giá trị khác; plain projection và ownership không đổi. Không migration. Export Markdown cảnh báo mất alignment.
+- Validation: ESLint max-warnings0, TypeScript, Production Vite build PASS;30 Vitest +4 configuration PASS. .NET solution Release tuần tự -m:1 -nodeReuse:false PASS0warning/0error; full backend121PASS/1SKIP (PostgreSQL opt-in không bật),7 tests alignment gồm reject unsafe/null/wrong node. Focused Chromium6/6PASS (2.1phút): optional title/fullscreen/counter, PinOff light/dark/persist, Markdown, center→autosave→reload→uncenter desktop/mobile. Đã xem ảnh mobile390x844: toolbar wrap, text center/counter/Close rõ. Fixture loopback SQLite/captured email, không owner DB/SMTP/cloud. Full browser suite, Safari/thiết bị thật và production rollout CHƯA XÁC MINH.
+- Publication scope: editor React/dependency lock/canonical docs/tests, API allowlist và regression liên quan, UI/frontend/user guide/worklog. Fetch origin/main cùng c3f92d7, divergence0/0 trước commit. Thay đổi trang chủ/router/menu/home test và các hunk CSS landing xuất hiện song song được giữ ngoài commit; chỉ stage hunk CSS editor. Hai appsettings local giữ nguyên hash baseline, không stage secret/artifact. Kiểm docs/local links và staged diff trước commit, push main theo quyền đã cấp và đối chiếu remote SHA sau push; không manual deploy.
+
 ## Công bố nút ghim và quyền chủ động push React — 2026-10-21
 
 - Theo chỉ dẫn “react bạn cứ thoải mái push lên nha”, từ nay các thay đổi React hoàn tất cùng test/docs liên quan được chủ động push main sau kiểm tra phù hợp; đã ghi vào root AGENTS.md để các lượt tiếp theo tuân theo, không cần hỏi lại. Vẫn giữ local config/secret ngoài Git, cập nhật worklog và kiểm remote sau push.

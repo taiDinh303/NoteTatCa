@@ -1,6 +1,7 @@
 import type { RichNode } from "./models";
 const attributes: Record<string, string[]> = {
-  heading: ["level"],
+  paragraph: ["textAlign"],
+  heading: ["level", "textAlign"],
   orderedList: ["start"],
   taskItem: ["checked"],
   codeBlock: ["language"],
@@ -13,7 +14,9 @@ function cleanAttrs(type: string, attrs?: Record<string, unknown>) {
   for (const key of attributes[type] ?? []) {
     const value = attrs?.[key];
     if (value !== null && value !== undefined) {
-      if (key === "color") {
+      if (key === "textAlign") {
+        if (value === "left" || value === "center") result[key] = value;
+      } else if (key === "color") {
         if (
           typeof value === "string" &&
           /^#(?:[\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(value)

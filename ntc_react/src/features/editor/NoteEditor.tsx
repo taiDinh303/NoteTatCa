@@ -237,7 +237,7 @@ function EditorSession({
           <div className="row-actions">
             {!showTitle ? (
               <Button
-                className="add-title-button"
+                className="add-title-button editor-heading-action"
                 variant="ghost"
                 onClick={() => setShowTitle(true)}
               >
@@ -248,11 +248,12 @@ function EditorSession({
             <IconButton
               icon={draft.isPinned ? PinOff : Pin}
               label={draft.isPinned ? "Unpin note" : "Pin note"}
-              className="editor-pin"
+              className="editor-pin editor-heading-action"
               aria-pressed={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
             />
             <IconButton
+              className="editor-heading-action"
               icon={fullscreen ? Minimize2 : Maximize2}
               label={fullscreen ? "Exit full screen" : "Enter full screen"}
               aria-pressed={fullscreen}
@@ -539,7 +540,7 @@ function EditorSession({
           </div>
           <div className="row-actions">
             <span className="editor-count" aria-label="Character count">
-              {characterCount.toLocaleString("en-US")} / 100,000 characters
+              {characterCount.toLocaleString("en-US")} / 100,000
             </span>
             {snapshot.status === "error" ? (
               <Button

@@ -52,3 +52,29 @@ describe("document contract", () => {
     );
   });
 });
+
+it("preserves center alignment only on supported blocks", () => {
+  expect(
+    canonicalDocument({ type: "paragraph", attrs: { textAlign: "center" } })
+      .attrs,
+  ).toEqual({ textAlign: "center" });
+  expect(
+    canonicalDocument({
+      type: "heading",
+      attrs: { level: 2, textAlign: "center" },
+    }).attrs,
+  ).toEqual({ level: 2, textAlign: "center" });
+  expect(
+    canonicalDocument({
+      type: "paragraph",
+      attrs: { textAlign: "expression(unsafe)" },
+    }).attrs,
+  ).toBeUndefined();
+  expect(
+    canonicalDocument({ type: "paragraph", attrs: { textAlign: null } }).attrs,
+  ).toBeUndefined();
+  expect(
+    canonicalDocument({ type: "codeBlock", attrs: { textAlign: "center" } })
+      .attrs,
+  ).toBeUndefined();
+});

@@ -6,8 +6,10 @@ import TaskItem from "@tiptap/extension-task-item";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
+import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
+  AlignCenter,
   Bold,
   CheckSquare,
   Code2,
@@ -40,6 +42,10 @@ import { download } from "../../shared/utils";
 const extensions = [
   StarterKit.configure({
     link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
+  }),
+  TextAlign.configure({
+    types: ["heading", "paragraph"],
+    alignments: ["left", "center"],
   }),
   TaskList,
   TaskItem.configure({ nested: true }),
@@ -111,6 +117,7 @@ export default function RichEditor({
   const state = useEditorState({
     editor,
     selector: ({ editor }) => ({
+      centered: editor?.isActive({ textAlign: "center" }),
       bold: editor?.isActive("bold"),
       italic: editor?.isActive("italic"),
       underline: editor?.isActive("underline"),
@@ -151,6 +158,13 @@ export default function RichEditor({
           label="Strikethrough"
           active={state?.strike}
           onClick={() => editor.chain().focus().toggleStrike().run()}
+        />
+        <IconButton
+          icon={AlignCenter}
+          label="Center text"
+          active={state?.centered}
+          aria-pressed={!!state?.centered}
+          onClick={() => editor.chain().focus().toggleTextAlign("center").run()}
         />
         <span className="toolbar-divider" />
         <IconButton
@@ -327,7 +341,7 @@ export default function RichEditor({
       {markdown === "export" ? (
         <ConfirmDialog
           title="Export as Markdown?"
-          description="Markdown cannot preserve text colors, highlights or every rich-text detail. Your original note will stay unchanged."
+          description="Markdown cannot preserve text colors, highlights, alignment or every rich-text detail. Your original note will stay unchanged."
           confirmLabel="Download Markdown"
           onClose={() => setMarkdown(null)}
           onConfirm={() => {
