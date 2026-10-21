@@ -10,6 +10,7 @@ public static partial class ContentRules
 {
     public const int MaxTextLength = 100_000;
     private static readonly HashSet<string> Nodes = ["doc", "paragraph", "text", "heading", "bulletList", "orderedList", "listItem", "taskList", "taskItem", "blockquote", "codeBlock", "hardBreak", "horizontalRule"];
+    private static readonly HashSet<string> FontSizes = ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px", "48px"];
     private static readonly HashSet<string> Marks = ["bold", "italic", "underline", "strike", "code", "link", "textStyle", "highlight"];
     [GeneratedRegex("^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")]
     private static partial Regex HexColor();
@@ -99,6 +100,7 @@ public static partial class ContentRules
                 ("orderedList", "start") => attr.Value.TryGetInt32(out var start) && start is >= 1 and <= 1_000_000,
                 ("taskItem", "checked") => attr.Value.ValueKind is JsonValueKind.True or JsonValueKind.False,
                 ("codeBlock", "language") => attr.Value.ValueKind == JsonValueKind.Null || attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString()!.Length <= 32 && attr.Value.GetString()!.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' or '+'),
+                ("textStyle", "fontSize") => attr.Value.ValueKind == JsonValueKind.String && FontSizes.Contains(attr.Value.GetString()!),
                 ("textStyle" or "highlight", "color") => attr.Value.ValueKind == JsonValueKind.String && HexColor().IsMatch(attr.Value.GetString()!),
                 ("link", "href") => attr.Value.ValueKind == JsonValueKind.String && Uri.TryCreate(attr.Value.GetString(), UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" or "mailto",
                 _ => false

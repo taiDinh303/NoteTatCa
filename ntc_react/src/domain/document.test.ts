@@ -87,3 +87,38 @@ it.each(["left", "center", "right", "justify"])(
     ).toEqual({ textAlign });
   },
 );
+
+describe("font size contract", () => {
+  it.each([
+    "12px",
+    "14px",
+    "16px",
+    "18px",
+    "20px",
+    "24px",
+    "28px",
+    "32px",
+    "40px",
+    "48px",
+  ])("preserves %s alongside text color", (fontSize) => {
+    expect(
+      canonicalDocument({
+        type: "text",
+        text: "Size",
+        marks: [{ type: "textStyle", attrs: { fontSize, color: "#123456" } }],
+      }).marks?.[0].attrs,
+    ).toEqual({ color: "#123456", fontSize });
+  });
+  it.each([null, "1000px", "1em", "16px;color:red", 16])(
+    "drops unsupported font size %s",
+    (fontSize) => {
+      expect(
+        canonicalDocument({
+          type: "text",
+          text: "Size",
+          marks: [{ type: "textStyle", attrs: { fontSize } }],
+        }).marks?.[0].attrs,
+      ).toBeUndefined();
+    },
+  );
+});

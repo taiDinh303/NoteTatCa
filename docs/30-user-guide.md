@@ -71,3 +71,7 @@ Nhấn icon góc trên để chọn icon từ menu hoặc dán emoji riêng; **R
 ## Ghi nhớ đăng nhập — 2026-10-21
 
 Đăng nhập mặc định được lưu trên trình duyệt, không tự hết hạn sau7/30ngày; mở lại cùng trình duyệt/profile có thể tiếp tục dùng notes. Active sessions hiển thị No expiration. Sign out, thu hồi phiên, đổi mật khẩu/quyền hoặc khóa account vẫn chấm dứt phiên; xóa dữ liệu trang/private browsing cũng có thể làm mất phiên đã lưu. Phiên cũ còn hợp lệ được nâng thời hạn khi làm mới; phiên đã hết hạn cần đăng nhập lại một lần. Notes cache vẫn ở memory, không phải offline storage.
+
+## Cỡ chữ nội dung
+
+Chọn đoạn chữ rồi mở **Font size** trên toolbar để chọn cỡ12–48px. Nếu chưa chọn chữ, cỡ mới áp dụng khi gõ tiếp. **Default** trở về cỡ mặc định và giữ các định dạng khác như in đậm/màu chữ. Cỡ chữ tự lưu; Markdown xuất ra không giữ cỡ riêng.

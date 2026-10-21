@@ -4,7 +4,7 @@ import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
-import { TextStyle } from "@tiptap/extension-text-style";
+import { TextStyle, FontSize } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
@@ -18,7 +18,7 @@ import {
   Bold,
   CheckSquare,
   Code2,
-  Heading2,
+  Type,
   Highlighter,
   Italic,
   Link2,
@@ -43,6 +43,7 @@ import {
   IconButton,
   Modal,
 } from "../../shared/ui";
+import { FONT_SIZES } from "../../domain/formatting";
 import { download } from "../../shared/utils";
 const alignmentOptions = [
   { value: "left", label: "Align left", icon: AlignLeft },
@@ -61,6 +62,7 @@ const extensions = [
   TaskList,
   TaskItem.configure({ nested: true }),
   TextStyle,
+  FontSize,
   Color,
   Highlight.configure({ multicolor: true }),
   Placeholder.configure({
@@ -136,7 +138,9 @@ export default function RichEditor({
       italic: editor?.isActive("italic"),
       underline: editor?.isActive("underline"),
       strike: editor?.isActive("strike"),
-      heading: editor?.isActive("heading"),
+      fontSize:
+        (editor?.getAttributes("textStyle").fontSize as string | undefined) ??
+        "",
       bullet: editor?.isActive("bulletList"),
       ordered: editor?.isActive("orderedList"),
       tasks: editor?.isActive("taskList"),
@@ -219,14 +223,59 @@ export default function RichEditor({
           </Dropdown.Portal>
         </Dropdown.Root>
         <span className="toolbar-divider" />
-        <IconButton
-          icon={Heading2}
-          label="Heading"
-          active={state?.heading}
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        />
+        <Dropdown.Root>
+          <Dropdown.Trigger asChild>
+            <Button
+              variant="ghost"
+              className="font-size-trigger"
+              aria-label="Font size"
+            >
+              <Type size={16} />
+              <span>
+                {state?.fontSize ? parseInt(state.fontSize, 10) : "Size"}
+              </span>
+            </Button>
+          </Dropdown.Trigger>
+          <Dropdown.Portal>
+            <Dropdown.Content
+              className="dropdown font-size-menu"
+              sideOffset={7}
+              align="start"
+              aria-label="Font size"
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                editor.commands.focus();
+              }}
+            >
+              <Dropdown.RadioGroup
+                value={state?.fontSize ?? ""}
+                onValueChange={(value) => {
+                  if (value) editor.chain().focus().setFontSize(value).run();
+                  else editor.chain().focus().unsetFontSize().run();
+                }}
+              >
+                {[
+                  { value: "", label: "Default" },
+                  ...FONT_SIZES.map((size) => ({
+                    value: `${size}px`,
+                    label: `${size} px`,
+                  })),
+                ].map(({ value, label }) => (
+                  <Dropdown.RadioItem
+                    className="dropdown-item"
+                    key={value}
+                    value={value}
+                  >
+                    <Dropdown.ItemIndicator>
+                      <Check size={16} />
+                    </Dropdown.ItemIndicator>
+                    <span>{label}</span>
+                  </Dropdown.RadioItem>
+                ))}
+              </Dropdown.RadioGroup>
+            </Dropdown.Content>
+          </Dropdown.Portal>
+        </Dropdown.Root>
         <IconButton
           icon={List}
           label="Bullet list"
@@ -393,7 +442,7 @@ export default function RichEditor({
       {markdown === "export" ? (
         <ConfirmDialog
           title="Export as Markdown?"
-          description="Markdown cannot preserve text colors, highlights, alignment or every rich-text detail. Your original note will stay unchanged."
+          description="Markdown cannot preserve text colors, font sizes, highlights, alignment or every rich-text detail. Your original note will stay unchanged."
           confirmLabel="Download Markdown"
           onClose={() => setMarkdown(null)}
           onConfirm={() => {

@@ -2,6 +2,13 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Menu cỡ chữ thay H2/Heading — 2026-10-21
+
+- Toolbar bỏ nút Heading2, thay Font size dropdown radio Default và12/14/16/18/20/24/28/32/40/48px. Hiển thị cỡ tại con trỏ/vùng chọn, set/unsetFontSize giữ màu/in đậm/marks khác; menu có giới hạn chiều cao và scroll trên mobile. Dùng FontSize export sẵn của Tiptap text-style3.32.0, không dependency mới. Giữ heading nodes/Markdown shortcut để đọc/sửa note cũ an toàn.
+- Canonical textStyle.fontSize và API ContentRules dùng cùng allowlist preset px; từ chối null/non-string/đơn vị lạ/CSS injection/out-of-range. Plain projection/ownership/schema version không đổi; không migration. Markdown export cảnh báo mất cỡ chữ; cập nhật API contract/UI/frontend/user guide.
+- Validation: ESLint max-warnings0/TypeScript/Production build PASS;50Vitest+4configuration PASS. .NET Release strict tuần tự0warning/0error;15focused font-size tests PASS. Focused Chromium3/3PASS(56.2s):393/1280px bỏ Heading, chọn24px/vùng chọn, in đậm, autosave/reload và Default giữ bold; Markdown import/checklist/export PASS. Đã xem ảnh393px: menu scroll được/không tràn viewport, title cùng hàng. Native extension làm việc trên selection và stored mark, không đổi định dạng toàn note qua CSS.
+- Không chạy fullbrowser/backend suite hoặc Firefox/Safari/thiết bị thật; fixture loopback SQLite/captured email, không owner DB/SMTP/cloud. Production CHƯA XÁC MINH. Publication scope editor/canonical/formatting/CSS/API allowlist/tests và docs liên quan; main hiệnf691b8d, fetch divergence0/0. Kiểm docs48Markdown/178links/0errors, staged diff và hash local API config; giữ hai appsettings ngoài commit. Push main theo quyền đã cấp và đối chiếu remote SHA, không manual deploy.
+
 ## Luôn hiện ô tiêu đề trống, bỏ Add title — 2026-10-21
 
 - Bỏ showTitle/Add title/placeholder và blur ẩn title. Input Note title luôn hiện cùng hàng icon/ghim/fullscreen, giữ aria-label/maxlength150, chấp nhận rỗng; mở note ưu tiên content, click title nhập trực tiếp. Không đổi API/schema/autosave hoặc dữ liệu. Cập nhật helper/regression dùng input trực tiếp và giữ input khi clear/blur/reopen.

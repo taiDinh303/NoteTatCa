@@ -1,3 +1,4 @@
+import { isNoteFontSize } from "./formatting";
 import type { RichNode } from "./models";
 const attributes: Record<string, string[]> = {
   paragraph: ["textAlign"],
@@ -6,7 +7,7 @@ const attributes: Record<string, string[]> = {
   taskItem: ["checked"],
   codeBlock: ["language"],
   link: ["href"],
-  textStyle: ["color"],
+  textStyle: ["color", "fontSize"],
   highlight: ["color"],
 };
 function cleanAttrs(type: string, attrs?: Record<string, unknown>) {
@@ -22,6 +23,8 @@ function cleanAttrs(type: string, attrs?: Record<string, unknown>) {
           value === "justify"
         )
           result[key] = value;
+      } else if (key === "fontSize") {
+        if (isNoteFontSize(value)) result[key] = value;
       } else if (key === "color") {
         if (
           typeof value === "string" &&

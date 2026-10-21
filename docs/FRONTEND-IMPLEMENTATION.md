@@ -149,3 +149,7 @@ Icon note, input tiêu đề tùy chọn, ghim và fullscreen nằm cùng một 
 Bỏ Add title và cơ chế ẩn input khi blur rỗng. Luôn hiện input Note title trên hàng icon/ghim/fullscreen, không có placeholder, giữ aria-label trợ năng; cho để trống và giới hạn150 ký tự như cũ. Mở note vẫn ưu tiên focus content; người dùng bấm ô title để nhập. Không đổi API/dữ liệu/autosave.
 
 Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sau rotation, không persist vào localStorage. Chỉ nhận message nếu userId/refreshToken khớp credential đang lưu. Web Locks tuần tự login/Google/refresh/logout; chưa kiểm browser thiếu Web Locks/BroadcastChannel.
+
+## Cỡ chữ thay nút Heading — 2026-10-21
+
+Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default cùng12/14/16/18/20/24/28/32/40/48px; trigger hiện cỡ tại con trỏ/vùng chọn. Chọn cỡ áp dụng textStyle.fontSize trên văn bản đang chọn hoặc nội dung gõ tiếp, Default bỏ fontSize và giữ marks khác. Dùng FontSize từ package Tiptap text-style3.32.0 sẵn có; không thêm dependency. Canonical/API cùng allowlist preset px, từ chối giá trị CSS tùy ý. Heading cũ và Markdown headings vẫn tương thích, không migrate. Export Markdown cảnh báo mất font size.
