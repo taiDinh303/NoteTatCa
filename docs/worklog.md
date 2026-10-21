@@ -2,6 +2,13 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Một nút cọ vẽ mở bảng màu note — 2026-10-21
+
+- Thay dãy swatches ở footer bằng NoteColorPicker, một nút Paintbrush. Radix Popover1.3.1 mở phía trên, collision padding/width theo viewport và interface scale; grid4 cột/ô44px, check màu hiện tại, preset/default đóng bảng, custom dùng color input native và autosave hiện hành. Giữ nguyên palette/API/ownership/dữ liệu. Thêm CSS scope riêng, không đổi bố cục ngoài editor.
+- Lượt đầu focused3PASS/1FAIL phát hiện mobile mở bảng màu ngay lúc lazy editor onReady lấy focus làm đóng bảng. Sửa focus guard không lấy focus từ trigger expanded, màu hoặc menu đang mở. Lượt cuối focused Chromium5/5PASS(1.5phút): desktop light/mobile dark chọn preset/custom/default, dấu chọn, focus/Escape không đóng editor, viewport bounds, custom save/reload, pin light/dark và rich autosave/labels/trash/restore. Custom color được đặt bằng native DOM setter/input/change để kiểm app callback, không coi là thao tác OS picker thật. Đã xem ảnh bảng light/dark gọn và không tràn.
+- ESLint max-warnings0, TypeScript/Production Vite build PASS sau sửa; .NET solution Release strict tuần tự0warning/0error. Không chạy lại unit/fullbrowser/backend suites vì scope UI; fixture loopback SQLite/captured email, không DB/SMTP/cloud thật. Safari/thiết bị thật/production CHƯA XÁC MINH.
+- Publication scope React picker/editor/style/dependency lock/tests và UI/frontend/user guide/worklog. Main hiện1b45f6a (thay đổi header song song đã có trong Git); fetch divergence0/0. Hai appsettings local nguyên hash, giữ ngoài commit. Kiểm docs/staged diff, push main theo quyền đã cấp và đối chiếu remote SHA; không manual deploy/migration.
+
 ## Sidebar đóng khi chạm bên ngoài, bỏ nút X — 2026-10-21
 
 - Modal thêm hideCloseButton/dismissOnOutside opt-in, mặc định giữ hành vi cũ. Drawer customer/admin bật cả hai: bỏ X, click/touch vùng ngoài đóng qua Radix, click bên trong không đóng; Escape và chọn link vẫn đóng, hamburger mở lại. Giữ dialog title/focus trap. Không đổi note editor/form/confirmation khác.

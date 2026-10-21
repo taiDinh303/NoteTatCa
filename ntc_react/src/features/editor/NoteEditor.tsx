@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { AutosaveCoordinator } from "../../application/autosave";
 import { notes, workspace } from "../../app/runtime";
 import type { Note, NoteDraft } from "../../domain/models";
-import { draftFrom, EMOJIS, NOTE_COLORS } from "../../domain/models";
+import { draftFrom, EMOJIS } from "../../domain/models";
 import { notePalette } from "../../domain/color";
 import { useAuth, useLabels, useMe } from "../../shared/hooks";
 import {
@@ -42,6 +42,7 @@ import {
   Modal,
   Spinner,
 } from "../../shared/ui";
+import NoteColorPicker from "./NoteColorPicker";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 const RichEditor = lazy(() => import("./RichEditor"));
@@ -375,7 +376,7 @@ function EditorSession({
                 // Lazy editor startup must not steal focus from an optional title or another input.
                 if (
                   !document.activeElement?.matches(
-                    "input, textarea, select, [contenteditable='true']",
+                    "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, [role='menuitem'], [role='menuitemradio']",
                   )
                 )
                   commands.focus();
@@ -460,31 +461,10 @@ function EditorSession({
         ) : null}
         <footer className="editor-footer">
           <div className="editor-tools">
-            <div className="color-swatches" aria-label="Note background color">
-              {NOTE_COLORS.map((color, i) => (
-                <button
-                  key={color || "none"}
-                  type="button"
-                  className={`color-swatch ${draft.backgroundColor === color ? "selected" : ""}`}
-                  style={{ background: color || "var(--surface)" }}
-                  aria-label={
-                    i === 0 ? "Default note color" : `Note color ${i}`
-                  }
-                  aria-pressed={draft.backgroundColor === color}
-                  onClick={() => update({ backgroundColor: color })}
-                >
-                  {draft.backgroundColor === color ? <Check size={12} /> : null}
-                </button>
-              ))}
-              <label className="custom-color" title="Custom note color">
-                <input
-                  type="color"
-                  aria-label="Custom note color"
-                  value={draft.backgroundColor || "#ffffff"}
-                  onChange={(e) => update({ backgroundColor: e.target.value })}
-                />
-              </label>
-            </div>
+            <NoteColorPicker
+              color={draft.backgroundColor}
+              onChange={(backgroundColor) => update({ backgroundColor })}
+            />
             <span className="toolbar-divider" />
             <IconButton
               icon={Tag}

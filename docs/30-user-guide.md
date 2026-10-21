@@ -52,3 +52,7 @@ Lựa chọn được nhớ trong trình duyệt cho cả người dùng/admin, 
 ## Căn lề nội dung note
 
 Đặt con trỏ trong đoạn hoặc chọn các đoạn, nhấn **Text alignment** trên toolbar rồi chọn **Align left** (trái), **Align center** (giữa), **Align right** (phải) hoặc **Justify** (đều hai bên). Menu đánh dấu lựa chọn hiện tại và icon nút thay đổi theo căn lề. Định dạng tự lưu và được giữ khi mở lại; Markdown xuất ra không giữ căn giữa. Bộ đếm cuối editor dùng dạng **8 / 100,000**.
+
+## Đổi màu note
+
+Nhấn biểu tượng **cọ vẽ** ở thanh dưới để mở bảng màu. Chọn màu có sẵn hoặc **Custom color** để pha màu; **Default note color** bỏ màu nền riêng. Màu tự lưu cùng note. Nhấn bên ngoài bảng hoặc Escape để đóng.

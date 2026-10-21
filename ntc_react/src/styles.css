@@ -4421,3 +4421,47 @@ td {
   }
   .customer-shell > .main-column { min-height: calc(100dvh / var(--interface-scale) - 66px); }
 }
+
+.note-color-menu {
+  z-index: 160;
+  width: min(300px, calc(100vw / var(--interface-scale) - 24px));
+  padding: 14px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px #0003;
+}
+.note-color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.note-color-menu .color-swatch {
+  width: 44px;
+  height: 44px;
+  justify-self: center;
+}
+.note-color-menu .color-swatch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}
+.note-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.note-custom-color .custom-color {
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.note-custom-color:focus-within {
+  outline: 2px solid var(--text);
+  border-radius: 8px;
+}

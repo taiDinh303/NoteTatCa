@@ -59,3 +59,7 @@ Add title, Pin/Unpin và fullscreen dùng chung nền trong suốt, hover nhẹ 
 ## Sidebar drawer — 2026-10-21
 
 Sidebar mobile customer/admin không hiện nút X. Chạm/click vùng ngoài drawer đóng, chạm bên trong giữ mở; Escape hoặc chọn link đóng, hamburger mở lại. Chỉ drawer bật dismissOnOutside/hideCloseButton; dialog editor/form/confirmation giữ quy tắc hiện hành.
+
+## Bảng màu note thu gọn — 2026-10-21
+
+Thanh editor chỉ có một nút cọ vẽ Note background color. Radix Popover mở lên phía trên, tránh mép viewport; bảng4 cột, ô44px, đánh dấu màu hiện tại. Chọn preset hoặc Default note color đóng bảng; Custom color mở bộ pha màu native và cập nhật autosave. Escape/click ngoài đóng bảng, trả focus trigger. Lazy editor không lấy focus từ bảng màu/menu đang mở. Không thêm hình nền hoặc đổi API/dữ liệu màu.

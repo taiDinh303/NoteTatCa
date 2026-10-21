@@ -20,9 +20,14 @@ async function login(page: Page, email = "a@example.test") {
   ).toBeVisible();
 }
 async function openAccountMenu(page: Page) {
-  const account = page.getByRole("button", { name: "Account menu", exact: true });
+  const account = page.getByRole("button", {
+    name: "Account menu",
+    exact: true,
+  });
   if (!(await account.isVisible())) {
-    await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Open navigation", exact: true })
+      .click();
   }
   await account.click();
 }
@@ -1251,9 +1256,12 @@ for (const theme of ["light", "dark"]) {
     });
     await expect(unpin).toHaveAttribute("aria-pressed", "true");
     await expect(unpin.locator("svg")).toHaveClass(/lucide-pin-off/);
+    await editor
+      .getByRole("button", { name: "Note background color", exact: true })
+      .click();
     for (const color of ["#fff4d4", "#202824", "#ae6262"]) {
       // Native OS color pickers are outside the headless browser surface.
-      await editor
+      await page
         .getByLabel("Custom note color", { exact: true })
         .evaluate((input, value) => {
           Object.getOwnPropertyDescriptor(
@@ -1279,6 +1287,7 @@ for (const theme of ["light", "dark"]) {
         .evaluate((element) => getComputedStyle(element).color);
       await expect(unpin).toHaveCSS("color", foreground);
     }
+    await page.keyboard.press("Escape");
     await editor.locator(".editor-heading").screenshot({
       path: `../artifacts/frontend/editor-pin-${theme}.png`,
       animations: "disabled",
@@ -1329,7 +1338,10 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await editor.getByRole("button", { name: "Bold", exact: true }).click();
   await editor.getByRole("textbox", { name: "Note content" }).press("End");
   await page.keyboard.type(" and a bold idea");
-  await editor.getByLabel("Note color 3", { exact: true }).click();
+  await editor
+    .getByRole("button", { name: "Note background color", exact: true })
+    .click();
+  await page.getByLabel("Note color 3", { exact: true }).click();
   await editor
     .getByRole("button", { name: "Note labels", exact: true })
     .click();
