@@ -2,6 +2,19 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Công bố nút ghim và quyền chủ động push React — 2026-10-21
+
+- Theo chỉ dẫn “react bạn cứ thoải mái push lên nha”, từ nay các thay đổi React hoàn tất cùng test/docs liên quan được chủ động push main sau kiểm tra phù hợp; đã ghi vào root AGENTS.md để các lượt tiếp theo tuân theo, không cần hỏi lại. Vẫn giữ local config/secret ngoài Git, cập nhật worklog và kiểm remote sau push.
+- Phạm vi8file: Pin/PinOff editor, nền trong suốt/hover/focus, hai regression light/dark, UI/frontend/testing/worklog và working agreement. Fetch trước publication: main/HEAD và origin/main cùng75771c6, divergence0/0. Dùng evidence đã hoàn tất ở entry dưới: focused2/2, lint/typecheck/Production build và .NET Release tuần tự0warning/0error PASS; không chạy lại suites cho lượt chỉ publication. Docs48Markdown/178local links/0errors, staged diff và hash local config được kiểm trước commit.
+- Chỉ commit/push source lên main rồi đối chiếu HEAD với refs/heads/main trên remote. Không commit hai appsettings API local, credentials hoặc artifacts; không manual deploy/migration/thay dashboard hoặc dữ liệu cloud. Hosting/CI có thể tự chạy từ push; chưa xác minh production rollout trong lượt này.
+
+## Nút ghim editor rõ hơn, dùng biểu tượng bỏ ghim — 2026-10-21
+
+- Theo ảnh/yêu cầu chủ dự án, NoteEditor dùng PinOff khi đã ghim và Pin khi chưa ghim, giữ tooltip/action Unpin note/Pin note và thêm aria-pressed. Bỏ class active gây nền accent tối; editor-pin trong suốt, foreground kế thừa heading theo notePalette, hover pha10% currentColor và focus outline rõ. Đồng nhất icon với note card đang có, không đổi các nút active khác hoặc logic update/autosave/version/ownership.
+- Focused Chromium **2/2 PASS (1.2phút gồm startup)** cho light/dark: ghim/bỏ ghim, icon/pressed state, nền trong suốt và màu theo heading với nền vàng#fff4d4, tối#202824, đỏ#ae6262; đóng/reload/mở lại xác nhận cả hai trạng thái được lưu. Custom color được đặt qua DOM input/change dùng native value setter vì OS color picker nằm ngoài headless surface; không coi là kiểm thao tác color picker thật. Đã xem ảnh editor-pin-light.png/editor-pin-dark.png ở header đỏ, không còn khối nền tối.
+- ESLint max-warnings0/TypeScript/Production Vite build PASS; .NET solution Release tuần tự -m:1 -nodeReuse:false **0warning/0error**. Không chạy lại unit/fullbrowser/backend suites cho thay đổi icon/CSS cục bộ; fixture SQLite/captured email riêng, không DB/SMTP/cloud thật. Chưa xác minh production hoặc thiết bị thật.
+- Cập nhật UI/frontend/testing/worklog; docs48Markdown/178local links/0errors, git diff --check PASS (thông báo LF/CRLF). Hai appsettings API local nguyên hash baseline; chưa commit/push/deploy.
+
 ## Công bố Zoom trong menu tài khoản lên main — 2026-10-21
 
 - Theo yêu cầu “push lên luôn”, phạm vi12file React/docs/test: mục Zoom (x%) trong menu tài khoản customer/admin, dialog nhập50–150% và nút−/+ bước10%, reset/focus/persistence, đồng bộ Ctrl-wheel/pinch/HUD và hồi quy/tài liệu. Không commit hai appsettings API local, credentials hoặc artifacts.

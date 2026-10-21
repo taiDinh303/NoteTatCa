@@ -17,6 +17,7 @@ import {
   Maximize2,
   Minimize2,
   Pin,
+  PinOff,
   RotateCcw,
   Type,
   Tag,
@@ -245,9 +246,10 @@ function EditorSession({
               </Button>
             ) : null}
             <IconButton
-              icon={Pin}
+              icon={draft.isPinned ? PinOff : Pin}
               label={draft.isPinned ? "Unpin note" : "Pin note"}
-              active={draft.isPinned}
+              className="editor-pin"
+              aria-pressed={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
             />
             <IconButton

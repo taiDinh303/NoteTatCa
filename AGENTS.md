@@ -23,6 +23,9 @@ The human user's current instruction takes precedence.
 - Before completing a code/docs task or committing it, update docs/worklog.md
   with the outcome, actual validation and remaining work. For publication, record
   the commit scope and verify the remote branch after pushing.
+- The owner authorizes pushing completed React changes, including related tests/docs,
+  to main after appropriate validation without asking again. Keep local configuration
+  outside commits, record the publication scope and verify the remote branch.
 - Do not recreate ntc_aspnet/docs or a nested Git repository. Use root docs/ directly.
 - Run build/test/tool commands from the root using ntc_aspnet/ project paths.
   Preserve Git history, working changes and local configuration when reorganizing files.

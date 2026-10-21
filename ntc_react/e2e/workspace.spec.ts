@@ -1223,6 +1223,94 @@ test("keeps the optional title focused when the rich editor loads slowly", async
   }
 });
 
+for (const theme of ["light", "dark"]) {
+  test(`shows a clear unpin icon in the ${theme} editor and persists pin changes`, async ({
+    page,
+  }) => {
+    await login(page);
+    if (theme === "dark")
+      await page
+        .getByRole("button", { name: "Use dark theme", exact: true })
+        .click();
+    const title = `Pin appearance ${theme}`;
+    const editor = await createNote(page, title);
+    const pin = editor.getByRole("button", { name: "Pin note", exact: true });
+    await expect(pin).toHaveAttribute("aria-pressed", "false");
+    await pin.click();
+    const unpin = editor.getByRole("button", {
+      name: "Unpin note",
+      exact: true,
+    });
+    await expect(unpin).toHaveAttribute("aria-pressed", "true");
+    await expect(unpin.locator("svg")).toHaveClass(/lucide-pin-off/);
+    for (const color of ["#fff4d4", "#202824", "#ae6262"]) {
+      // Native OS color pickers are outside the headless browser surface.
+      await editor
+        .getByLabel("Custom note color", { exact: true })
+        .evaluate((input, value) => {
+          Object.getOwnPropertyDescriptor(
+            HTMLInputElement.prototype,
+            "value",
+          )!.set!.call(input, value);
+          input.dispatchEvent(new Event("input", { bubbles: true }));
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+        }, color);
+      await expect
+        .poll(() =>
+          editor
+            .locator(".editor-heading")
+            .evaluate((element) => element.style.backgroundColor),
+        )
+        .toBe(
+          `rgb(${[1, 3, 5].map((offset) => parseInt(color.slice(offset, offset + 2), 16)).join(", ")})`,
+        );
+      await page.mouse.move(0, 0);
+      await expect(unpin).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      const foreground = await editor
+        .locator(".editor-heading")
+        .evaluate((element) => getComputedStyle(element).color);
+      await expect(unpin).toHaveCSS("color", foreground);
+    }
+    await editor
+      .locator(".editor-heading")
+      .screenshot({
+        path: `../artifacts/frontend/editor-pin-${theme}.png`,
+        animations: "disabled",
+      });
+    await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: `Unpin ${title}`, exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: `Open ${title}`, exact: true })
+      .click();
+    const reopened = page.getByRole("dialog", {
+      name: "Edit note",
+      exact: true,
+    });
+    await expect(
+      reopened
+        .getByRole("button", { name: "Unpin note", exact: true })
+        .locator("svg"),
+    ).toHaveClass(/lucide-pin-off/);
+    await reopened
+      .getByRole("button", { name: "Unpin note", exact: true })
+      .click();
+    const unpinned = reopened.getByRole("button", {
+      name: "Pin note",
+      exact: true,
+    });
+    await expect(unpinned).toHaveAttribute("aria-pressed", "false");
+    await expect(unpinned.locator("svg")).toHaveClass(/lucide-pin$/);
+    await reopened.getByRole("button", { name: "Close", exact: true }).click();
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: `Pin ${title}`, exact: true }),
+    ).toBeVisible();
+  });
+}
+
 test("creates rich notes, autosaves updates, assigns labels and restores from trash", async ({
   page,
 }) => {

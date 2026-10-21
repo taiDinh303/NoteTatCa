@@ -2,6 +2,12 @@
 
 > 2026-10-19 | CURRENT backend:114 PASS,0 FAIL,1 SKIP trong115tests. Các mốc80/81 bên dưới là lịch sử; không thay thế production verification.
 
+## Nút ghim editor — 2026-10-21
+
+Focused Chromium **2/2 PASS (1.2phút gồm startup)**: light/dark, Pin/PinOff và aria-pressed, nền nút trong suốt, màu theo heading vàng/tối/đỏ custom, lưu ghim/bỏ ghim qua close/reload/reopen. Custom color input được đặt bằng native value setter+DOM events, không kiểm OS color picker. Đã xem hai ảnh header đỏ ở artifacts/frontend/editor-pin-light.png và editor-pin-dark.png.
+
+Lint max-warnings0/typecheck/Production build và .NET Release tuần tự0warning/0error PASS. Không unit/fullbrowser/backend suite rerun cho thay đổi icon/CSS này; chỉ fixture riêng, không xác minh production/thiết bị thật. Chi tiết ở worklog.
+
 ## Zoom trong menu tài khoản — 2026-10-21
 
 Focused Chromium **4/4 PASS (1.6phút gồm startup)**: menu Zoom (x%) mở dialog, nhập/Enter/blur/empty/clamp, nút−/+ bước10% và disabled ở biên, blur90 rồi+ ra100, reset, persistence67%/reload, focus Done/Escape và viewport mobile; Ctrl-wheel/HUD, pinch/tap trong bảng và admin không personal requests. Đã xem ảnh dark/mobile150%. Không full27browser/backend rerun.
