@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { inbox, workspace } from "./runtime";
-import { useAuth, useLabels } from "../shared/hooks";
+import { useAuth, useLabels, useNotes } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 import { useTheme } from "../shared/useTheme";
@@ -40,6 +40,10 @@ function Sidebar({
   accountControls?: ReactNode;
 }) {
   const query = useLabels();
+  const notesQuery = useNotes({});
+  const trashQuery = useNotes({ trash: true });
+  const notesCount = notesQuery.data?.pages[0]?.totalItems;
+  const trashCount = trashQuery.data?.pages[0]?.totalItems;
   const { pathname } = useLocation();
   const allLabels = query.data?.pages.flatMap((p) => p.items) ?? [];
   return (
@@ -48,6 +52,11 @@ function Sidebar({
         <NavLink to="/notes" onClick={onNavigate}>
           <FileText size={19} />
           All notes
+          {typeof notesCount === 'number' ? (
+            <span className='nav-count' aria-hidden='true'>
+              {notesCount}
+            </span>
+          ) : null}
         </NavLink>
         <NavLink to="/reminders" onClick={onNavigate}>
           <CalendarDays size={19} />
@@ -60,6 +69,11 @@ function Sidebar({
         <NavLink to="/trash" onClick={onNavigate}>
           <Trash2 size={19} />
           Trash
+          {typeof trashCount === 'number' ? (
+            <span className='nav-count' aria-hidden='true'>
+              {trashCount}
+            </span>
+          ) : null}
         </NavLink>
       </nav>
       <button

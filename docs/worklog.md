@@ -2,6 +2,13 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Đưa số notes/trash lên sidebar, xóa khối • N notes trên nội dung — 2026-10-22
+
+- Sidebar (AppShell.tsx): thêm useNotes({}) + useNotes({trash:true}) lấy totalItems, render <span class="nav-count" aria-hidden> bên phải 2 item "All notes" và "Trash". aria-hidden để không đổi accessible name của link (bảo vệ e2e getByRole link exact-name).
+- Xóa khối <div class="workspace-count"> (live-dot + count + sync-hint Updating) trong NotesPage.tsx, cùng const count và import LoaderCircle không dùng nữa. Toolbar còn lại chỉ row-actions (pinned filter + view-toggle); .workspace-toolbar justify-content: flex-end.
+- styles.css: thêm .primary-nav .nav-count (margin-left:auto pill tabular-nums, bg var(--hover), color var(--muted); a.active .nav-count color var(--text)); xóa .workspace-count/.live-dot/.sync-hint + mobile override .sync-hint display:none.
+- Bằng chứng: 65/65 Playwright chromium PASS (workspace 39/39, header 4/4, sidebar-dismiss, home, settings). typecheck/ESLint/Production Vite build PASS; 50 unit + 4 config PASS. Scope React/CSS, .NET không đổi.
+- Chưa kiểm Safari/thiết bị vật lý. Publication scope: AppShell.tsx, NotesPage.tsx, styles.css, docs/worklog.md; giữ 2 appsettings local ngoài commit; push main theo quyền đã cấp rồi đối chiếu remote SHA.
 ## Mở/chuyển view<->edit note không còn lệch 10px do react-remove-scroll - 2026-10-22
 
 - Người dùng báo production (note-tat-ca.vercel.app) vẫn lệch dù entry trước đã có: `scrollbar-gutter: stable` reserve gutter 10px LÚC NÀO CŨNG, nên `clientWidth = innerWidth - 10` ở cả 2 trạng thái. Nhưng Radix Dialog scroll-lock (react-remove-scroll) đo `gap = innerWidth - clientWidth = 10` và inject `body[data-scroll-locked]{margin-right:10px !important}` để "bù" thanh scrollbar nó cho là vừa ẩn -> gutter bị reserve 2 LẦN -> body hẹp đúng 10px mỗi lần mở/toggle (shift trái + hở phải + jitter view<->edit). E2E headless không có scrollbar native (gap=0) nên không tái tạo được bug; đã dùng browser headed trên production + tài khoản thật để bắt được.

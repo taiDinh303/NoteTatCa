@@ -25,7 +25,6 @@ import {
   GripVertical,
   LayoutGrid,
   List,
-  LoaderCircle,
   Pin,
   PinOff,
   Plus,
@@ -304,7 +303,6 @@ export default function NotesPage({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  const count = query.data?.pages[0]?.totalItems ?? 0;
   async function act(
     note: Note,
     action: "pin" | "trash" | "restore" | "delete",
@@ -436,18 +434,6 @@ export default function NotesPage({
         </button>
       )}
       <div className="workspace-toolbar">
-        <div className="workspace-count">
-          <span className="live-dot" />
-          {query.isPending
-            ? "Finding your notes…"
-            : `${count} ${count === 1 ? "note" : "notes"}`}
-          {query.isFetching && !query.isPending ? (
-            <span className="sync-hint">
-              <LoaderCircle size={12} className="spin" />
-              Updating
-            </span>
-          ) : null}
-        </div>
         <div className="row-actions">
           {!trash ? (
             <Select
