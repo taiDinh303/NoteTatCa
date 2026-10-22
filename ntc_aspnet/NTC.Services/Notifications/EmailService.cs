@@ -28,7 +28,7 @@ public sealed class EmailService : IEmailService
         return QueryHelpers.AddQueryString(_clientUrl + path, query);
     }
     public Task SendVerificationCodeAsync(string email, string code) =>
-        _sender.SendEmailAsync(email, "Your NoteTatCa confirmation code", _renderer.RenderVerificationCode(code));
+        _sender.SendEmailAsync(email, "Your NoteTatCa code — a little space for your ideas", _renderer.RenderVerificationCode(code));
     public Task SendChangeEmailConfirmationAsync(ApplicationUser user, string token, string newEmail) =>
         _sender.SendEmailAsync(newEmail, "Confirm new email", _renderer.RenderChangeEmail(user.UserName ?? "there", Link("/auth/confirm-change-email", user, token, newEmail), newEmail));
     public Task SendSetPasswordLinkAsync(ApplicationUser user, string token) =>

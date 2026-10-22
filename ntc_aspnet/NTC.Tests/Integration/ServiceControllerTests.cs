@@ -235,6 +235,15 @@ public sealed class ServiceControllerTests
         var query = QueryHelpers.ParseQuery(link.Query); Assert.Equal(email, query["newEmail"].ToString()); Assert.Equal(proof, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(query["token"]!)));
         var hostile = renderer.RenderChangeEmail("' onclick='bad", "https://client.example.test/?a='&b=<x>", "<script>bad</script>");
         Assert.DoesNotContain("<script>", hostile); Assert.DoesNotContain("href='https://client.example.test/?a='", hostile);
+        await service.SendVerificationCodeAsync("owner@example.test", "<script>123456</script>");
+        var verification = sender.Messages.Last();
+        Assert.Equal("owner@example.test", verification.To);
+        Assert.Contains("NoteTatCa", verification.Subject);
+        Assert.Contains("&lt;script&gt;123456&lt;/script&gt;", verification.Body);
+        Assert.DoesNotContain("<script>", verification.Body);
+        Assert.Contains("10 minutes", verification.Body);
+        Assert.Contains("never share your code", verification.Body);
+        Assert.Contains("safely ignore", verification.Body);
     }
 
     [Fact]
