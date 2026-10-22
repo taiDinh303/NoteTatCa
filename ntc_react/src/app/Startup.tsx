@@ -1,4 +1,11 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { ReactNode } from "react";
 import {
   Check,
@@ -9,6 +16,7 @@ import {
   WifiOff,
 } from "lucide-react";
 import { auth, cache, connection, preparation } from "./runtime";
+import { StartupPresentation } from "./startup-context";
 import { useAuth } from "../shared/hooks";
 import { Button, ErrorBanner } from "../shared/ui";
 import { isAdministrator } from "../application/access";
@@ -16,6 +24,20 @@ import type {
   PreparationResource,
   PreparationTask,
 } from "../application/preparation";
+
+export function ConnectionFeedback({ children }: { children: ReactNode }) {
+  const [screens, setScreens] = useState(0);
+  const register = useCallback(() => {
+    setScreens((count) => count + 1);
+    return () => setScreens((count) => count - 1);
+  }, []);
+  return (
+    <StartupPresentation value={register}>
+      {children}
+      <ConnectionNotice suppressed={screens > 0} />
+    </StartupPresentation>
+  );
+}
 
 export function ConnectionSpinner({ size = 22 }: { size?: number }) {
   return (
@@ -108,6 +130,8 @@ export function StartupScreen({
   children?: ReactNode;
   busy?: boolean;
 }) {
+  const register = useContext(StartupPresentation);
+  useLayoutEffect(() => register?.(), [register]);
   const network = useSyncExternalStore(
     connection.subscribe,
     connection.getSnapshot,
@@ -118,7 +142,12 @@ export function StartupScreen({
         {busy ? <LoadingMark /> : <CloudOff size={42} />}
         <h1>{title}</h1>
         {network.warming || network.problem ? (
-          <p role="status">{connectionCopy(network.problem === "offline")}</p>
+          <div role="status">
+            <p>{connectionCopy(network.problem === "offline")}</p>
+            {network.warming ? (
+              <small>Connecting to server… Attempt {network.attempt}</small>
+            ) : null}
+          </div>
         ) : null}
         {children}
       </div>
@@ -238,7 +267,7 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
   );
 }
 
-export function ConnectionNotice() {
+function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
   const network = useSyncExternalStore(
     connection.subscribe,
     connection.getSnapshot,
@@ -266,7 +295,11 @@ export function ConnectionNotice() {
       window.removeEventListener("online", online);
     };
   }, []);
-  if ((!network.slow && !network.problem) || loading.status === "loading")
+  if (
+    suppressed ||
+    (!network.slow && !network.problem) ||
+    loading.status === "loading"
+  )
     return null;
   const connecting =
     network.warming || (network.pending > 0 && !network.problem);

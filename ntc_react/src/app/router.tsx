@@ -13,7 +13,7 @@ import { useAuth } from "../shared/hooks";
 import { Spinner } from "../shared/ui";
 import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
 import {
-  ConnectionNotice,
+  ConnectionFeedback,
   ConnectionProgress,
   StartupScreen,
   WorkspaceReady,
@@ -32,8 +32,7 @@ function Root() {
     void auth.bootstrap();
   }, []);
   return (
-    <>
-      <ConnectionNotice />
+    <ConnectionFeedback>
       <Suspense
         fallback={
           <StartupScreen title="Opening your space…">
@@ -43,7 +42,7 @@ function Root() {
       >
         <Outlet />
       </Suspense>
-    </>
+    </ConnectionFeedback>
   );
 }
 function Authenticated() {
