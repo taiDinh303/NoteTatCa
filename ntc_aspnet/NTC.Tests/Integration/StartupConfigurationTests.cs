@@ -7,6 +7,19 @@ namespace NTC.Tests.Integration;
 
 public sealed class StartupConfigurationTests
 {
+    [Fact]
+    public void Brevo_requires_key_and_verified_sender_configuration_without_disclosing_secrets()
+    {
+        var values = Valid(); values["Email:Provider"] = "Brevo";
+        var error = Assert.Throws<InvalidOperationException>(() => Check(values));
+        Assert.Contains("EMAIL__BREVO__APIKEY", error.Message);
+        Assert.Contains("EMAIL__FROMEMAIL", error.Message);
+        values["Email:Brevo:ApiKey"] = "synthetic-secret";
+        values["Email:FromEmail"] = "sender@example.test";
+        Check(values);
+        values["Email:Provider"] = "typo";
+        Assert.Contains("EMAIL__PROVIDER", Assert.Throws<InvalidOperationException>(() => Check(values)).Message);
+    }
     private static Dictionary<string, string?> Valid() => new()
     {
         ["Database:Provider"]="PostgreSQL",

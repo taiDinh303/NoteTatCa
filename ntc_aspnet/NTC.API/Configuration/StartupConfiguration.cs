@@ -13,6 +13,17 @@ public static class StartupConfiguration
         if (environment.IsEnvironment("Testing")) return;
         var errors = new List<string>();
         var production = environment.IsProduction();
+        var emailProvider = config["Email:Provider"] ?? "Smtp";
+        if (!new[] { "Smtp", "Brevo" }.Contains(emailProvider, StringComparer.OrdinalIgnoreCase))
+            errors.Add("EMAIL__PROVIDER must be Smtp or Brevo.");
+        if (emailProvider.Equals("Brevo", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(config["Email:Brevo:ApiKey"]))
+                errors.Add("EMAIL__BREVO__APIKEY is required for the Brevo provider.");
+            var from = config["Email:FromEmail"];
+            if (string.IsNullOrWhiteSpace(from) || !System.Net.Mail.MailAddress.TryCreate(from, out var address) || address.Address != from)
+                errors.Add("EMAIL__FROMEMAIL must be a valid verified sender address.");
+        }
         var provider = config["Database:Provider"] ?? "SqlServer";
         if (!provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase)
             && !provider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase))

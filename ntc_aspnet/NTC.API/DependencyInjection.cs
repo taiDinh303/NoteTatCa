@@ -28,7 +28,12 @@ public static class DependencyInjection
         services.AddScoped<IBackgroundMaintenanceService, BackgroundMaintenanceService>();
         services.AddScoped<IGoogleIdentityValidator, GoogleIdentityValidator>();
         services.AddScoped<IOtpService, OtpService>(); services.AddScoped<EmailTemplateRenderer>();
-        services.AddScoped<IEmailSender, SmtpEmailSender>(); services.AddScoped<IEmailService, EmailService>();
+        if (string.Equals(config["Email:Provider"], "Brevo", StringComparison.OrdinalIgnoreCase))
+            services.AddHttpClient<IEmailSender, BrevoEmailSender>()
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        else
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddEndpointsApiExplorer(); services.AddSwaggerGen(options =>
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "NoteTatCa API", Version = "v1" });

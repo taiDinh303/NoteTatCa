@@ -4,6 +4,12 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
+2026-10-22 CURRENT source: thêm Brevo HTTPS adapter qua `IEmailSender` cho OTP, khôi phục email/mật khẩu và reminder; chọn `EMAIL__PROVIDER=Brevo`, SMTP vẫn là mặc định tương thích. Adapter POST tới endpoint cố định `https://api.brevo.com/v3/smtp/email`, header `api-key`, timeout30giây, không tự retry/follow redirect hoặc đưa response body vào lỗi. Reminder vẫn dùng retry/lease hiện có. Brevo xác nhận tiếp nhận request chưa chứng minh thư đã vào inbox. Live delivery NOT VERIFIED, chờ tài khoản/API key và xác minh sender.
+
+Render Free chặn SMTP25/465/587. Tạo Brevo, xác minh sender trong Settings → Senders, Domains & Dedicated IPs → Senders; lấy API key ở SMTP & API → API Keys (không lấy SMTP key), nhập trực tiếp Render `EMAIL__BREVO__APIKEY`. Thêm `EMAIL__FROMEMAIL` là sender đã xác minh, `EMAIL__FROMNAME=NoteTatCa`, `EMAIL__PROVIDER=Brevo` chỉ sau khi đủ key/sender và code đã sẵn sàng. Redeploy để nhận cấu hình, gửi thử đến mailbox do chủ dự án chỉ định; không thử bằng unit/integration test vào DB hoặc email thật. Không cấu hình một mailbox nhận thay mọi user: OTP/reminder giữ email từng account.
+
+Gmail không xác thực được domain của bên thứ ba; Brevo có thể thay domain From sang `brevosend.com` theo chính sách provider. Muốn From mang domain riêng cần domain thuộc sở hữu và DNS authentication; không giả mạo Gmail/Google Group. Nguồn: [Brevo API](https://developers.brevo.com/reference/send-transac-email), [sender](https://help.brevo.com/hc/en-us/articles/208836149-Create-a-new-sender-From-name-and-From-email), [domain replacement](https://help.brevo.com/hc/en-us/articles/16045394674066-Troubleshooting-Domain-authentication), [Render Free](https://render.com/docs/free).
+
 CURRENT: Google server validates ID token audience/subject/verifiedemail, link explicit khi trùng account; API không cần ClientSecret, Razor OAuth riêng giữ nguyên. SMTP adapter dùng config17, không gửi thật trong tests; OTP/recovery đã fake-test, reminders dùng durable retry/lease. External Google/SMTP deliverability thật NOT RUN. Không dùng Supabase Auth/browser database SDK theo Q-019.
 
 | ID | Provider / mục đích | CURRENT/TARGET | Quyền / rủi ro / kiểm thử |

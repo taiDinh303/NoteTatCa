@@ -119,3 +119,7 @@ Menu thẻ bỏ Open note và Pin/Unpin note, thay Add label và Add reminder; n
 ### Quay về View ngay trong editor — 2026-10-22
 
 Theo yêu cầu bổ sung DEC-023: editor có nút View cạnh Close. View chờ flush autosave thành công rồi chuyển sang viewer ngay trong modal flow; lỗi/conflict giữ editor/draft, không cần Close rồi mở lại. Note mới sau lưu cũng xem/sửa qua lại được theo ID vừa tạo.
+
+## Email trên Render Free — 2026-10-22
+
+Chủ dự án chọn giữ Render Free và yêu cầu bổ sung gửi email qua HTTPS API. CURRENT source thêm Brevo adapter cho IEmailSender dùng chung OTP/recovery/reminder; giữ SMTP mặc định cho môi trường hiện hữu. Không đổi người nhận theo account hoặc chuyển OTP sang Google Group. Cấu hình/phê duyệt provider và gửi nhận thật PENDING: chủ dự án đang tạo Brevo và xác minh sender. Hướng dẫn/giới hạn tại [24-integrations](24-integrations.md); rollout chỉ có ý nghĩa sau khi có key/sender hợp lệ.

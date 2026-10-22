@@ -17,6 +17,9 @@ WebApplication.CreateBuilder dùng cấu hình .NET mặc định: JSON → JSON
 | Authentication__Google__ClientId | Audience Google ID token; public identifier; API không cần ClientSecret |
 | Cors__AllowedOrigins__0... | Origin cụ thể; local mặc định https://localhost:5037 và http://localhost:5173 |
 | SmtpSettings__Host / Port / FromEmail / Password / EnableSsl | SMTP OTP/recovery/reminder; password secret, port587/SSLtrue mẫu |
+| EMAIL__PROVIDER | Smtp mặc định để tương thích; Brevo dùng HTTPS API cho Render Free |
+| EMAIL__FROMEMAIL / EMAIL__FROMNAME | Địa chỉ người gửi đã xác minh tại Brevo / tên hiển thị mặc định NoteTatCa |
+| EMAIL__BREVO__APIKEY | API key Brevo, chỉ backend/Render secret store; không phải SMTP key |
 | AppSettings__ClientUrl | Base URL link frontend email; phải trỏ trang auth/notes thật trước release |
 | BackgroundJobs__Enabled | Production true theo quyết định mới; dispatch/email/purge/prune mỗi30 giây; fixture luôn tắt |
 | Swagger__Enabled | false mẫu; Development/Testing vẫn bật |

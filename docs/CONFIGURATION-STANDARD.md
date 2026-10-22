@@ -22,6 +22,8 @@ Development hiện hữu vẫn dùng file local của chủ dự án; không ghi
 
 ## 2. Biến cơ bản trên Render
 
+Email HTTPS (2026-10-22): giữ mặc định SMTP để không thay máy local; Render Free chọn Brevo bằng `EMAIL__PROVIDER=Brevo`, `EMAIL__FROMEMAIL` sender đã xác minh, tùy chọn `EMAIL__FROMNAME`, secret `EMAIL__BREVO__APIKEY` chỉ trong Render/User Secrets. Không đưa secret vào JSON Production/Vercel. Startup check kiểm provider và trường bắt buộc khi chọn Brevo, không gọi API hoặc gửi email; không chứng minh key còn hiệu lực/sender đã được provider phê duyệt. Hướng dẫn tại [24-integrations](24-integrations.md).
+
 | Key | Loại / giá trị |
 | --- | --- |
 | ASPNETCORE_ENVIRONMENT | Production |
