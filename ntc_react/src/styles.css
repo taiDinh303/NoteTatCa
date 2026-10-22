@@ -828,16 +828,17 @@ strong {
 .quick-capture {
   display: flex;
   align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: 20px 22px;
+  gap: 8px;
+  padding: 8px 14px;
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 11px;
-  box-shadow: 0 3px 12px #28374b03;
+  border-radius: 9px;
   text-align: left;
+  font-size: 13px;
+  font-weight: 500;
   color: #8a939d;
-  margin-bottom: 30px;
+  margin-right: auto;
+  cursor: pointer;
   transition:
     box-shadow 0.2s,
     border 0.2s;
@@ -849,34 +850,19 @@ strong {
 .quick-capture > span:nth-child(2) {
   font-size: 13px;
   font-weight: 500;
-  flex: 1;
-}
-.quick-capture small {
-  display: block;
-  font-weight: 400;
-  font-size: 11px;
-  color: #afb4bb;
-  margin-top: 4px;
+  white-space: nowrap;
 }
 .quick-capture-icon {
-  width: 31px;
-  height: 31px;
+  width: 26px;
+  height: 26px;
   background: #fcf7ee;
   border-radius: 8px;
   color: #dcb66e;
   display: grid;
   place-items: center;
+  flex-shrink: 0;
 }
-.capture-decoration {
-  width: 27px;
-  height: 27px;
-  border: 1px solid #f0f0ed;
-  border-radius: 7px;
-  display: grid;
-  place-items: center;
-  color: #c7ccc9;
-  transform: rotate(-7deg);
-}
+
 .workspace-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -3243,10 +3229,7 @@ td {
     font-size: 11px;
     padding: 8px 12px;
   }
-  .quick-capture {
-    padding: 17px 18px;
-    margin-bottom: 24px;
-  }
+
   .note-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
@@ -3510,9 +3493,7 @@ td {
   .note-date {
     font-size: 11px;
   }
-  .quick-capture small {
-    font-size: 11px;
-  }
+
   .workspace-toolbar {
     margin-bottom: 20px;
   }
@@ -4120,10 +4101,7 @@ td {
   max-width: none;
   padding-top: 24px;
 }
-.customer-shell .quick-capture {
-  padding: 12px 18px;
-  margin-bottom: 22px;
-}
+
 .notes-context-title {
   font-size: 21px;
   margin: 0 0 20px;

@@ -20,7 +20,6 @@ import {
   ArrowDown,
   ArrowUp,
   Bell,
-  Check,
   FileText,
   GripVertical,
   LayoutGrid,
@@ -418,22 +417,20 @@ export default function NotesPage({
           Deleted notes are permanently removed after the seven-day retention
           period.
         </div>
-      ) : (
-        <button
-          className="quick-capture"
-          aria-label="Take a note"
-          onClick={() => setEditor({})}
-        >
-          <span className="quick-capture-icon">
-            <Plus size={20} />
-          </span>
-          <span>Take a note…</span>
-          <span className="capture-decoration">
-            <Check size={17} />
-          </span>
-        </button>
-      )}
+      ) : null}
       <div className="workspace-toolbar">
+        {!trash ? (
+          <button
+            className="quick-capture"
+            aria-label="Take a note"
+            onClick={() => setEditor({})}
+          >
+            <span className="quick-capture-icon">
+              <Plus size={18} />
+            </span>
+            <span>Take a note…</span>
+          </button>
+        ) : null}
         <div className="row-actions">
           {!trash ? (
             <Select

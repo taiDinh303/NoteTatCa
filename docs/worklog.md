@@ -2,6 +2,12 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nút Take a note compact cùng hàng toolbar — 2026-10-22
+
+- Di chuyển nút `quick-capture` (Take a note…) từ thanh to riêng xuống trong hàng `.workspace-toolbar`, cùng hàng với `All notes` (Select pinned filter) + view-toggle grid/list: nút ở trái (margin-right:auto), controls ở phải. Bỏ `capture-decoration` (icon Check) và import Check chết; icon Plus 20→18. Chế độ Trash vẫn chỉ show notice-strip + row-actions (row-actions tự căn phải).
+- CSS: `.quick-capture` thành nút compact (padding 8px 14px, radius 9px, gap 8px, nowrap, cursor:pointer), `.quick-capture-icon` 26px + flex-shrink:0; xóa CSS dead `.capture-decoration`, `.quick-capture small`, mobile overrides `.quick-capture`/`.quick-capture small` và `.customer-shell .quick-capture`.
+- Bằng chứng: typecheck/ESLint/Production Vite build PASS; e2e note-view+note-view-toggle+home 9/9 PASS với nút mới; persistent-session flaky 1 lần khi chạy full song song, PASS khi chạy riêng (30.9s); scope React/CSS, .NET không đổi.
+- Chưa kiểm Safari/thiết bị vật lý. Publication scope: NotesPage.tsx, styles.css, docs/worklog.md; giữ 2 appsettings local ngoài commit; push main theo quyền đã cấp rồi đối chiếu remote SHA.
 ## Đưa số notes/trash lên sidebar, xóa khối • N notes trên nội dung — 2026-10-22
 
 - Sidebar (AppShell.tsx): thêm useNotes({}) + useNotes({trash:true}) lấy totalItems, render <span class="nav-count" aria-hidden> bên phải 2 item "All notes" và "Trash". aria-hidden để không đổi accessible name của link (bảo vệ e2e getByRole link exact-name).
