@@ -34,6 +34,19 @@ for (const width of [1440, 1024, 393, 320]) {
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       const drawer = page.getByRole('dialog', { name: 'Your workspace' });
       await expect(drawer).toBeVisible();
+      await expect.poll(async () => (await drawer.boundingBox())!.x).toBeCloseTo(0);
+      for (const scale of [0.9, 1, 1.1]) {
+        await page.evaluate(value => document.documentElement.style.setProperty('--interface-scale', String(value)), scale);
+        await expect.poll(async () => (await drawer.boundingBox())!.height).toBeCloseTo(900, 0);
+        const bounds = (await drawer.boundingBox())!;
+        expect(bounds.x).toBeCloseTo(0);
+        expect(bounds.y).toBeCloseTo(0);
+        expect(bounds.y + bounds.height).toBeCloseTo(900, 0);
+        expect(bounds.width).toBeLessThanOrEqual(width * 0.9 + 1);
+        await expect(drawer).toHaveCSS('border-radius', '0px');
+      }
+      await page.evaluate(() => document.documentElement.style.removeProperty('--interface-scale'));
+      await page.screenshot({ path: `test-results/drawer-${width}.png` });
       await drawer.getByRole('button', { name: 'Use dark theme' }).click();
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
       await page.keyboard.press('Escape');

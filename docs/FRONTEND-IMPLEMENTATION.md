@@ -165,3 +165,7 @@ NoteCard chỉ áp dụng translate từ sortable transform, bỏ scaleX/scaleY 
 ## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
 
 Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.
+
+### Drawer mobile sát đáy — 2026-10-22
+
+Selector .modal.navigation-drawer có độ ưu tiên cao hơn responsive .modal: giữ top/left0, height100dvh/interface-scale, max-height none và radius0 ở mọi mức zoom. Tránh rule modal≤480px giới hạn94dvh gây khoảng hở dưới drawer. Nội dung vẫn overflow-y auto để cuộn khi màn hình thấp.

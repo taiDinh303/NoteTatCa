@@ -2953,7 +2953,7 @@ td {
 .mobile-menu-button {
   display: none;
 }
-.navigation-drawer {
+.modal.navigation-drawer {
   top: 0;
   left: 0;
   transform: none;
