@@ -2,6 +2,13 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mở/chuyển view<->edit note không còn lệch 10px do react-remove-scroll - 2026-10-22
+
+- Người dùng báo production (note-tat-ca.vercel.app) vẫn lệch dù entry trước đã có: `scrollbar-gutter: stable` reserve gutter 10px LÚC NÀO CŨNG, nên `clientWidth = innerWidth - 10` ở cả 2 trạng thái. Nhưng Radix Dialog scroll-lock (react-remove-scroll) đo `gap = innerWidth - clientWidth = 10` và inject `body[data-scroll-locked]{margin-right:10px !important}` để "bù" thanh scrollbar nó cho là vừa ẩn -> gutter bị reserve 2 LẦN -> body hẹp đúng 10px mỗi lần mở/toggle (shift trái + hở phải + jitter view<->edit). E2E headless không có scrollbar native (gap=0) nên không tái tạo được bug; đã dùng browser headed trên production + tài khoản thật để bắt được.
+- Fix CSS: `html body[data-scroll-locked]{margin:0 !important; padding:0 !important}` - specificity (0,1,2) cao hơn selector mà library inject (0,1,1), nên triệt tiêu được double-compensation; giữ `overflow:hidden`/`position:relative` để scroll-lock vẫn chặn scroll nền. Kết hợp cùng entry trước (scrollbar-gutter: stable + modal width calc(100vw/var)) mới đủ.
+- Bằng chứng: probe headed Chromium 1280px -> OPEN: body margin-right=10px, bodyW=1260, topbarW=1260; sau neutralize -> margin=0, bodyW=1270, topbarW=1270 (khớp CLOSED baseline). 65/65 Playwright chromium PASS (gồm note-view 2/2, header 4/4, workspace zoom/edits). Typecheck/ESLint/Production Vite build PASS; 50 unit + 4 config PASS. Scope CSS-only, .NET không đổi, không migration/deploy/DB thật.
+- Chưa kiểm Safari (scrollbar-gutter không hỗ trợ, cần fallback riêng) và thiết bị vật lý. Publication scope: styles.css + docs/worklog.md; giữ 2 appsettings local ngoài commit; push main theo quyền đã cấp rồi đối chiếu remote SHA.
+
 ## Không còn drift layout khi mở/chuyển view<->edit note — 2026-10-22
 
 - Một nguyên nhân cho cả 2 triệu chứng: Modal note (Radix Dialog) bật scroll-lock, ẩn/hiện scrollbar gốc làm thay đổi độ rộng flow của document (hở phải; mọi khung/card và header sticky bị nhảy trái, sidebar fixed không đổi). view<->edit unmount/mount Dialog nên scroll-lock giật 1 lần. Sửa gốc: `html { scrollbar-gutter: stable }` giữ cố định gutter dọc, độ rộng flow không đổi khi scrollbar ẩn/hiện.

@@ -45,6 +45,12 @@ body {
 html {
   scrollbar-gutter: stable;
 }
+
+/* react-remove-scroll (Radix Dialog scroll-lock) injects a ody[data-scroll-locked] rule that adds margin/padding to compensate for the native scrollbar it believes it is hiding. Because scrollbar-gutter: stable already reserves that gutter at all times, the compensation would reserve the space twice and push the in-flow layout (topbar, cards, background) ~10px left on every open/toggle. Neutralize the compensation with a higher-specificity selector so the locked body keeps the same width as the unlocked body. */
+html body[data-scroll-locked] {
+  margin: 0 !important;
+  padding: 0 !important;
+}
 button,
 input,
 select,
