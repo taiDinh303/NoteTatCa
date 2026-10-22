@@ -32,3 +32,137 @@
     gap: 18px;
   }
 }
+
+/* Compact profile/account layouts; session styles stay independent. */
+.settings-profile,
+.settings-account {
+  width: 100%;
+  max-width: 1050px;
+  min-width: 0;
+}
+.profile-card,
+.settings-account.settings-card {
+  padding: 24px;
+}
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.profile-identity > div {
+  min-width: 0;
+}
+.profile-identity .large-avatar {
+  margin: 0;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+}
+.profile-identity h2 {
+  font-size: 17px;
+  margin: 0 0 5px;
+}
+.profile-identity p {
+  margin: 0 0 9px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.profile-card .settings-card-heading,
+.settings-account .settings-card-heading {
+  margin-bottom: 18px;
+}
+.profile-card .settings-readonly {
+  gap: 18px 24px;
+  margin-bottom: 20px;
+}
+.profile-card .settings-readonly dt {
+  margin-bottom: 4px;
+}
+.settings-account .account-section + .account-section {
+  border-top: 1px solid var(--border);
+  margin-top: 22px;
+  padding-top: 22px;
+}
+.settings-account .account-forms {
+  align-items: start;
+}
+.settings-account .settings-view-field p {
+  margin: 5px 0 12px;
+}
+.settings-account .settings-view-field .secure-pill {
+  margin: 0 8px 12px 0;
+}
+.settings-account .account-forms > *,
+.settings-account .form-grid > *,
+.profile-card .form-grid > * {
+  min-width: 0;
+}
+@container viewport (max-width: 600px) {
+  .profile-card.settings-card,
+  .settings-account.settings-card {
+    padding: 18px;
+  }
+  .profile-card .form-grid,
+  .settings-account .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .profile-card .settings-card-footer {
+    align-items: stretch;
+  }
+  .profile-card .settings-edit-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .profile-card input,
+  .settings-account input {
+    min-width: 0;
+    width: 100%;
+  }
+  .settings-account form > .button {
+    margin-top: 8px;
+  }
+  .settings-account .connected-provider {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .settings-account .connected-provider .button {
+    min-height: 40px;
+  }
+  .settings-account .button,
+  .profile-card .button {
+    min-height: 40px;
+  }
+}
+
+.settings-account .account-forms .field-label {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.settings-account .account-email-label .secure-pill {
+  margin: 0;
+}
+
+@container viewport (min-width: 901px) {
+  .profile-card .settings-readonly {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .settings-account .account-section {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.7fr) minmax(0, 1.8fr);
+    gap: 24px;
+    align-items: start;
+  }
+  .settings-account .account-section > * {
+    min-width: 0;
+  }
+  .settings-account .settings-card-heading {
+    margin-bottom: 0;
+  }
+}

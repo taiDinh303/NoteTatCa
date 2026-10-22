@@ -81,11 +81,11 @@ function ProfileForm({ me }: { me: Me }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const p = me.profile;
-  const [picture, setPicture] = useState(p?.picture ?? "");
+  const picture = p?.picture ?? "";
   return (
-    <div className="settings-columns">
+    <div className="settings-profile">
       <form
-        className="settings-card"
+        className="settings-card profile-card"
         onSubmit={(e) => {
           e.preventDefault();
           const data = new FormData(e.currentTarget);
@@ -124,6 +124,21 @@ function ProfileForm({ me }: { me: Me }) {
             .finally(() => setBusy(false));
         }}
       >
+        <div className="profile-identity">
+          <Avatar
+            large
+            name={p?.fullName || me.account.userName}
+            picture={picture}
+          />
+          <div>
+            <h2>{p?.fullName || "Your profile"}</h2>
+            <p>{me.account.email}</p>
+            <span className="secure-pill">
+              <ShieldCheck size={13} />
+              Private account
+            </span>
+          </div>
+        </div>
         <div className="settings-card-heading">
           <div className="settings-symbol">
             <UserRound size={21} />
@@ -178,18 +193,6 @@ function ProfileForm({ me }: { me: Me }) {
             </div>
             {p ? (
               <>
-                <Field
-                  label="Profile picture URL"
-                  hint="Optional HTTPS image URL."
-                >
-                  <input
-                    type="url"
-                    value={picture}
-                    onChange={(e) => setPicture(e.target.value)}
-                    placeholder="https://"
-                    maxLength={2048}
-                  />
-                </Field>
                 <Field label="Address">
                   <input
                     name="address"
@@ -235,7 +238,6 @@ function ProfileForm({ me }: { me: Me }) {
                   disabled={busy}
                   onClick={() => {
                     setEditing(false);
-                    setPicture(p?.picture ?? "");
                     setError(undefined);
                   }}
                 >
@@ -262,7 +264,6 @@ function ProfileForm({ me }: { me: Me }) {
                       ? "Female"
                       : "Prefer not to say",
                 ],
-                ["Profile picture URL", p?.picture],
                 ["Address", p?.address],
                 ["Timezone", p?.timeZoneId || me.account.timeZoneId],
                 ["Locale", p?.locale],
@@ -279,26 +280,6 @@ function ProfileForm({ me }: { me: Me }) {
           </>
         )}
       </form>
-      <aside>
-        <div className="profile-summary settings-card">
-          <Avatar
-            large
-            name={p?.fullName || me.account.userName}
-            picture={picture}
-          />
-          <h3>{p?.fullName || "Your profile"}</h3>
-          <p>{me.account.email}</p>
-          <span className="secure-pill">
-            <ShieldCheck size={13} />
-            Private account
-          </span>
-        </div>
-        <div className="settings-tip">
-          <span>✧</span>
-          <h3>On your time.</h3>
-          <p>Your timezone keeps recurring reminders in step with your day.</p>
-        </div>
-      </aside>
     </div>
   );
 }
@@ -341,9 +322,9 @@ function AccountSettings({ me }: { me: Me }) {
     }
   }
   return (
-    <div className="settings-stack">
+    <div className="settings-account settings-card">
       <ErrorBanner error={error} />
-      <section className="settings-card">
+      <section className="account-section">
         <div className="settings-card-heading">
           <div className="settings-symbol">
             <ShieldCheck size={21} />
@@ -352,16 +333,6 @@ function AccountSettings({ me }: { me: Me }) {
             <h2>Account details</h2>
             <p>Keep your contact details up to date.</p>
           </div>
-        </div>
-        <div className="account-email">
-          <div>
-            <span className="field-label">Current email</span>
-            <strong>{me.account.email}</strong>
-          </div>
-          <span className="secure-pill">
-            <CheckCircle2 size={13} />
-            {me.account.emailConfirmed ? "Verified" : "Not verified"}
-          </span>
         </div>
         <div className="form-grid account-forms">
           {editing === "email" ? (
@@ -394,7 +365,13 @@ function AccountSettings({ me }: { me: Me }) {
             </form>
           ) : (
             <div className="settings-view-field">
-              <span className="field-label">Email address</span>
+              <span className="field-label account-email-label">
+                Email address
+                <span className="secure-pill">
+                  <CheckCircle2 size={13} />
+                  {me.account.emailConfirmed ? "Verified" : "Not verified"}
+                </span>
+              </span>
               <p>{me.account.email}</p>
               <Button
                 variant="secondary"
@@ -454,7 +431,7 @@ function AccountSettings({ me }: { me: Me }) {
           )}
         </div>
       </section>
-      <section className="settings-card">
+      <section className="account-section">
         <div className="settings-card-heading">
           <div className="settings-symbol">
             <KeyRound size={21} />
@@ -565,7 +542,7 @@ function AccountSettings({ me }: { me: Me }) {
           </div>
         )}
       </section>
-      <section className="settings-card">
+      <section className="account-section">
         <div className="settings-card-heading">
           <div className="settings-symbol">
             <Link2 size={21} />

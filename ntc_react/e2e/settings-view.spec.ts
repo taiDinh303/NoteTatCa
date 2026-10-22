@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
 for (const scenario of [
   { width: 1440, admin: false },
+  { width: 320, admin: false },
   { width: 393, admin: false },
+  { width: 430, admin: false },
+  { width: 768, admin: false },
   { width: 1440, admin: true },
 ]) {
   test(`settings view then edit ${scenario.width} admin=${scenario.admin}`, async ({
@@ -28,11 +31,17 @@ for (const scenario of [
     ).toBeVisible();
     const main = page.locator(".workspace-main");
     await expect(main.locator("input, select")).toHaveCount(0);
+    await expect(
+      main.getByText("Profile picture URL", { exact: true }),
+    ).toHaveCount(0);
     await page
       .getByRole("button", { name: "Edit profile", exact: true })
       .click();
     const name = page.getByLabel("First name", { exact: true });
     const original = await name.inputValue();
+    await expect(
+      page.getByLabel("Profile picture URL", { exact: true }),
+    ).toHaveCount(0);
     await name.fill("Discard this");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(main.locator("input, select")).toHaveCount(0);
@@ -67,13 +76,30 @@ for (const scenario of [
     await expect(
       main.locator("dd").filter({ hasText: /^Reviewed$/ }),
     ).toBeVisible();
-    await page.getByRole("navigation", { name: "Settings", exact: true })
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(scenario.width);
+    await page.screenshot({
+      path: `../artifacts/frontend/profile-compact-${scenario.width}-${scenario.admin}.png`,
+      fullPage: true,
+      animations: "disabled",
+    });
+    await page
+      .getByRole("navigation", { name: "Settings", exact: true })
       .getByRole("link", { name: "Account & security", exact: true })
       .click();
     await expect(
       page.getByRole("button", { name: "Edit email", exact: true }),
     ).toBeVisible();
     await expect(main.locator("input, select")).toHaveCount(0);
+    await expect(
+      main.getByText(scenario.admin ? "admin@example.test" : "a@example.test", {
+        exact: true,
+      }),
+    ).toHaveCount(1);
+    await expect(
+      main.locator(".settings-account > .account-section"),
+    ).toHaveCount(3);
     await page.getByRole("button", { name: "Edit email", exact: true }).click();
     await page
       .getByLabel("New email address", { exact: true })
@@ -115,11 +141,14 @@ for (const scenario of [
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     expect(
       // With `scrollbar-gutter: stable` the layout width may be narrower than the
-    // physical viewport (no native scrollbar), so the no-overflow invariant is
-    // `scrollWidth <= physical width`.
-    await page.evaluate(() => document.documentElement.scrollWidth),
+      // physical viewport (no native scrollbar), so the no-overflow invariant is
+      // `scrollWidth <= physical width`.
+      await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(scenario.width);
-    await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
+    await page.evaluate(() => {
+      (document.activeElement as HTMLElement)?.blur();
+      window.scrollTo(0, 0);
+    });
     await page.screenshot({
       path: `../artifacts/frontend/settings-readonly-${scenario.width}-${scenario.admin}.png`,
       fullPage: true,

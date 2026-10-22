@@ -179,3 +179,8 @@ Card menu bỏ Open note và Pin/Unpin note, thêm Add label/Add reminder. Add l
 ### Editor → View — 2026-10-22
 
 EditorSession có View cạnh Close, gọi save/flush(true) hiện có; chỉ gọi onView(note) sau lưu thành công. viewing/busy chặn đóng và bấm chuyển lặp; lỗi vẫn giữ coordinator/draft/banner/conflict. NoteEditor dùng resolvedId=noteId hoặc createdId sau View của note mới, đọc note đã commit từ cache rồi chuyển về viewer; Edit lại mount session với version mới. Không đổi API/backend/ownership hoặc autosave protocol.
+
+
+## Settings gọn hơn — 2026-10-22
+
+CURRENT theo yêu cầu chủ dự án: Profile dùng một thẻ chung chứa avatar/tên/email và thông tin cá nhân; bỏ sidebar trang trí và Profile picture URL cả read/edit, giữ nguyên URL ảnh hiện có khi lưu. Desktop rộng chia thông tin ba cột, mobile một cột. Account & security gom contact/password/Google vào một khung có đường phân cách, email chỉ hiện một lần cùng trạng thái xác minh; desktop tiêu đề cạnh nội dung, mobile xếp dọc với input/nút đồng đều. Active sessions và nghiệp vụ auth/ownership/API không đổi. Áp dụng cả settings self của admin. Evidence và giới hạn tại worklog.
