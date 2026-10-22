@@ -32,6 +32,17 @@ for (const scenario of [
     ).toBeVisible();
     const main = page.locator(".workspace-main");
     await expect(
+      main.getByRole("heading", { name: "Settings", exact: true }),
+    ).toHaveCount(0);
+    const editBounds = await page
+      .getByRole("button", { name: "Edit profile", exact: true })
+      .boundingBox();
+    const cardBounds = await page.locator(".profile-card").boundingBox();
+    expect(
+      cardBounds!.x + cardBounds!.width - editBounds!.x - editBounds!.width,
+    ).toBeLessThan(30);
+
+    await expect(
       main.getByText("Personal details", { exact: true }),
     ).toHaveCount(0);
     const tabs = await page.locator(".settings-tabs").boundingBox();
@@ -98,7 +109,10 @@ for (const scenario of [
       .getByRole("link", { name: "Account & security", exact: true })
       .click();
     await expect(
-      page.getByRole("button", { name: "Edit email", exact: true }),
+      main
+        .locator(".account-data-row")
+        .filter({ hasText: "Email address" })
+        .getByRole("button", { name: "Change", exact: true }),
     ).toBeVisible();
     const accountCard = await page.locator(".settings-account").boundingBox();
     expect(Math.abs(accountCard!.x - tabs!.x)).toBeLessThan(2);
@@ -112,29 +126,44 @@ for (const scenario of [
     await expect(
       main.locator(".settings-account > .account-section"),
     ).toHaveCount(3);
-    await page.getByRole("button", { name: "Edit email", exact: true }).click();
+    await main
+      .locator(".account-data-row")
+      .filter({ hasText: "Email address" })
+      .getByRole("button", { name: "Change", exact: true })
+      .click();
     await page
       .getByLabel("New email address", { exact: true })
       .fill("discard@example.test");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
-    await page.getByRole("button", { name: "Edit email", exact: true }).click();
+    await main
+      .locator(".account-data-row")
+      .filter({ hasText: "Email address" })
+      .getByRole("button", { name: "Change", exact: true })
+      .click();
     await expect(
       page.getByLabel("New email address", { exact: true }),
     ).toHaveValue("");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
-    await page
-      .getByRole("button", { name: "Edit phone number", exact: true })
+    await main
+      .locator(".account-data-row")
+      .filter({ hasText: "Phone number" })
+      .getByRole("button", { name: "Change", exact: true })
       .click();
     await page.getByLabel("Phone number", { exact: true }).fill("0901234567");
     await page
       .getByRole("button", { name: "Save phone number", exact: true })
       .click();
     await expect(
-      page.getByRole("button", { name: "Edit phone number", exact: true }),
+      main
+        .locator(".account-data-row")
+        .filter({ hasText: "Phone number" })
+        .getByRole("button", { name: "Change", exact: true }),
     ).toBeVisible();
     await expect(main.getByText("0901234567", { exact: true })).toBeVisible();
-    await page
-      .getByRole("button", { name: "Edit password", exact: true })
+    await main
+      .locator(".account-data-row")
+      .filter({ hasText: "A password is set" })
+      .getByRole("button", { name: "Change", exact: true })
       .click();
     await expect(
       page.getByLabel("Current password", { exact: true }),
@@ -144,8 +173,10 @@ for (const scenario of [
       .fill("discard-secret");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(main.locator("input, select")).toHaveCount(0);
-    await page
-      .getByRole("button", { name: "Edit password", exact: true })
+    await main
+      .locator(".account-data-row")
+      .filter({ hasText: "A password is set" })
+      .getByRole("button", { name: "Change", exact: true })
       .click();
     await expect(
       page.getByLabel("Current password", { exact: true }),

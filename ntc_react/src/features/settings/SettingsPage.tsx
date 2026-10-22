@@ -24,7 +24,6 @@ import {
   ErrorPanel,
   Field,
   IconButton,
-  PageHeading,
   Spinner,
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
@@ -48,17 +47,6 @@ export default function SettingsPage({
   const me = useMe();
   return (
     <>
-      <PageHeading
-        eyebrow={
-          administration ? "YOUR ADMIN ACCOUNT" : "MAKE YOURSELF AT HOME"
-        }
-        title="Settings"
-        description={
-          administration
-            ? "Manage your administrator profile, security and active sessions."
-            : "A few details that make this space yours."
-        }
-      />
       <SettingsNav base={administration ? "/admin/settings" : "/settings"} />
       {section === "sessions" ? (
         <Sessions />
@@ -264,7 +252,11 @@ function ProfileForm({ me }: { me: Me }) {
                 </div>
               ))}
             </dl>
-            <Button variant="secondary" onClick={() => setEditing(true)}>
+            <Button
+              className="profile-edit-button"
+              variant="secondary"
+              onClick={() => setEditing(true)}
+            >
               Edit profile
             </Button>
           </>
@@ -354,7 +346,7 @@ function AccountSettings({ me }: { me: Me }) {
               {cancel}
             </form>
           ) : (
-            <div className="settings-view-field">
+            <div className="settings-view-field account-data-row">
               <span className="field-label account-email-label">
                 Email address
                 <span className="secure-pill">
@@ -368,7 +360,7 @@ function AccountSettings({ me }: { me: Me }) {
                 disabled={!!busy}
                 onClick={() => edit("email")}
               >
-                Edit email
+                Change
               </Button>
             </div>
           )}
@@ -407,7 +399,7 @@ function AccountSettings({ me }: { me: Me }) {
               {cancel}
             </form>
           ) : (
-            <div className="settings-view-field">
+            <div className="settings-view-field account-data-row">
               <span className="field-label">Phone number</span>
               <p>{me.account.phoneNumber || "Not provided"}</p>
               <Button
@@ -415,7 +407,7 @@ function AccountSettings({ me }: { me: Me }) {
                 disabled={!!busy}
                 onClick={() => edit("phone")}
               >
-                Edit phone number
+                Change
               </Button>
             </div>
           )}
@@ -436,18 +428,16 @@ function AccountSettings({ me }: { me: Me }) {
           </div>
         </div>
         {editing !== "password" ? (
-          <div className="settings-view-field">
-            <p>
-              {me.account.hasPassword
-                ? "A password is set for your account."
-                : "No password is set for your account."}
-            </p>
+          <div className="settings-view-field account-data-row">
+            {me.account.hasPassword ? (
+              <p>A password is set for your account.</p>
+            ) : null}
             <Button
               variant="secondary"
               disabled={!!busy}
               onClick={() => edit("password")}
             >
-              Edit password
+              {me.account.hasPassword ? "Change" : "Set your password"}
             </Button>
           </div>
         ) : me.account.hasPassword ? (
@@ -554,7 +544,6 @@ function AccountSettings({ me }: { me: Me }) {
             <span className="google-g">G</span>
             <div>
               <strong>Google</strong>
-              <span>Connected</span>
             </div>
             <Button variant="secondary" onClick={() => setUnlink(true)}>
               <Unlink size={15} />
@@ -661,7 +650,7 @@ function Sessions() {
           Load more sessions
         </Button>
       ) : null}
-      <div className="settings-card-footer">
+      <div className="settings-card-footer sessions-footer">
         <span className="field-hint">
           Revoking a session also ends its refreshed replacements.
         </span>

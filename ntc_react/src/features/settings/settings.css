@@ -166,3 +166,59 @@
     margin-bottom: 0;
   }
 }
+
+.profile-edit-button {
+  display: flex;
+  margin-left: auto;
+}
+.settings-account .account-forms {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+.settings-account .account-data-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: center;
+}
+.settings-account .account-data-row > .field-label,
+.settings-account .account-data-row > p {
+  grid-column: 1;
+}
+.settings-account .account-data-row > .button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+.settings-account .account-data-row > p {
+  margin: 4px 0 0;
+}
+.settings-account .account-data-row > .button:only-child {
+  grid-column: 2;
+}
+.sessions-footer > .button {
+  margin-left: auto;
+  align-self: flex-end;
+}
+@container viewport (max-width: 600px) {
+  .settings-account .account-data-row {
+    column-gap: 12px;
+  }
+  .settings-account .account-data-row > .button {
+    padding-inline: 12px;
+  }
+  .settings-account .account-forms > .account-data-row + .account-data-row {
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+  }
+}
+
+@container viewport (max-width: 480px) {
+  .settings-tabs {
+    gap: 14px;
+    justify-content: space-between;
+  }
+  .settings-tabs a {
+    font-size: 11px;
+  }
+}

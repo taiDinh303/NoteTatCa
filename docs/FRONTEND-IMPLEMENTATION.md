@@ -189,3 +189,8 @@ CURRENT theo yêu cầu chủ dự án: Profile dùng một thẻ chung chứa a
 ### Settings trải hết chiều ngang — 2026-10-22
 
 Theo yêu cầu bổ sung với ảnh Active sessions làm chuẩn: bỏ max-width1050px của Profile/Account & security, dùng toàn chiều ngang vùng nội dung và cùng mép với settings tabs. Bỏ heading Personal details, mô tả và icon UserRound; giữ avatar/tên/email và thông tin hồ sơ. Các cột đều theo grid hiện có; mobile một cột. Active sessions không đổi. Evidence tại worklog.
+
+
+### Settings: các thao tác bên phải — 2026-10-22
+
+Theo ảnh/yêu cầu mới: bỏ heading/eyebrow/description đầu trang Settings, giữ navigation tabs. Edit profile căn dưới phải; Sign out everywhere căn dưới phải cả mobile. Account email/phone/password đã có dùng nút Change bên phải nội dung; tài khoản chưa có password bỏ câu No password is set... và thay bằng Set your password, mở luồng gửi password setup link hiện có. Google liên kết bỏ dòng Connected, giữ Disconnect/confirmation. Account contact xếp từng hàng trước khi xuống mục tiếp theo trên desktop/mobile; mobile có divider, grid nội dung co được và nút cùng mép phải. Tabs≤480px thu gap/font để đủ tên tại320px. Không đổi backend/API/auth/ownership; evidence tại worklog.
