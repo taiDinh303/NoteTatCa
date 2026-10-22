@@ -2,6 +2,11 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Viền select All notes + badge số Pinned/Everything else to đậm hơn — 2026-10-22
+
+- CSS-only (styles.css): .select-wrap thêm viền pill (border var(--border), radius 8px, bg var(--surface)), select chữ 12px/500 var(--text) min-width 90px để hàng All notes có khung rõ như các nút khác. .section-heading h2 span (badge số Pinned / Everything else / Trash groups) từ 8px mờ #aeb4bc lên 11px/600 var(--subtle) + viền + nền var(--hover), tabular-nums, dễ đọc hơn ở cả light/dark.
+- Bằng chứng: ESLint/TypeScript/Production Vite build PASS; 50 unit + 4 config PASS; e2e note-view + workspace 33/33 PASS; persistent-session flake token-rotation 2-tab (Auth error khi chạy song song, PASS khi chạy riêng 30s) - không liên quan CSS. Scope CSS-only, .NET không đổi.
+- Chưa kiểm Safari/thiết bị vật lý. Publication scope: styles.css + docs/worklog.md; giữ 2 appsettings local ngoài commit; push main theo quyền đã cấp rồi đối chiếu remote SHA.
 ## Nút Take a note compact cùng hàng toolbar — 2026-10-22
 
 - Di chuyển nút `quick-capture` (Take a note…) từ thanh to riêng xuống trong hàng `.workspace-toolbar`, cùng hàng với `All notes` (Select pinned filter) + view-toggle grid/list: nút ở trái (margin-right:auto), controls ở phải. Bỏ `capture-decoration` (icon Check) và import Check chết; icon Plus 20→18. Chế độ Trash vẫn chỉ show notice-strip + row-actions (row-actions tự căn phải).
