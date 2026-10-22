@@ -348,13 +348,13 @@ function AccountSettings({ me }: { me: Me }) {
             </form>
           ) : (
             <div className="settings-view-field account-data-row">
-              <span className="field-label account-email-label">
+              <div className="account-email-value">
+                <span>{me.account.email}</span>
                 <span className="secure-pill">
                   <CheckCircle2 size={13} />
                   {me.account.emailConfirmed ? "Verified" : "Not verified"}
                 </span>
-              </span>
-              <p>{me.account.email}</p>
+              </div>
               <Button
                 variant="secondary"
                 disabled={!!busy}
@@ -431,11 +431,6 @@ function AccountSettings({ me }: { me: Me }) {
           </div>
           <div>
             <h2>Password</h2>
-            <p>
-              {me.account.hasPassword
-                ? "Change your password to keep your account secure."
-                : "Set a password to add another sign-in method."}
-            </p>
           </div>
         </div>
         {editing !== "password" ? (
@@ -540,7 +535,6 @@ function AccountSettings({ me }: { me: Me }) {
           </div>
           <div>
             <h2>Connected accounts</h2>
-            <p>Choose how you sign in.</p>
           </div>
         </div>
         {linked.isPending ? (
@@ -552,10 +546,7 @@ function AccountSettings({ me }: { me: Me }) {
           />
         ) : linked.data.some((l) => l.provider === "Google") ? (
           <div className="connected-provider">
-            <span className="google-g">G</span>
-            <div>
-              <strong>Google</strong>
-            </div>
+            <div className="connected-provider-label">Google</div>
             <Button variant="secondary" onClick={() => setUnlink(true)}>
               <Unlink size={15} />
               Disconnect

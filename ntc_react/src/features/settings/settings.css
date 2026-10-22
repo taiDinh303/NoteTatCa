@@ -222,3 +222,23 @@
     font-size: 11px;
   }
 }
+
+.settings-account .account-email-value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  grid-column: 1;
+}
+.settings-account .account-email-value > span:first-child {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.settings-account .account-email-value .secure-pill {
+  margin: 0;
+  white-space: nowrap;
+}
+.settings-account .connected-provider-label {
+  font: inherit;
+}
