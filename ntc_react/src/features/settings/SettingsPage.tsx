@@ -8,6 +8,8 @@ import {
   Link2,
   LogOut,
   Monitor,
+  Mail,
+  Phone,
   ShieldCheck,
   Unlink,
 } from "lucide-react";
@@ -309,11 +311,10 @@ function AccountSettings({ me }: { me: Me }) {
       <section className="account-section">
         <div className="settings-card-heading">
           <div className="settings-symbol">
-            <ShieldCheck size={21} />
+            <Mail size={21} />
           </div>
           <div>
-            <h2>Account details</h2>
-            <p>Keep your contact details up to date.</p>
+            <h2>Email address</h2>
           </div>
         </div>
         <div className="form-grid account-forms">
@@ -348,7 +349,6 @@ function AccountSettings({ me }: { me: Me }) {
           ) : (
             <div className="settings-view-field account-data-row">
               <span className="field-label account-email-label">
-                Email address
                 <span className="secure-pill">
                   <CheckCircle2 size={13} />
                   {me.account.emailConfirmed ? "Verified" : "Not verified"}
@@ -364,6 +364,18 @@ function AccountSettings({ me }: { me: Me }) {
               </Button>
             </div>
           )}
+        </div>
+      </section>
+      <section className="account-section">
+        <div className="settings-card-heading">
+          <div className="settings-symbol">
+            <Phone size={21} />
+          </div>
+          <div>
+            <h2>Phone number</h2>
+          </div>
+        </div>
+        <div className="form-grid account-forms">
           {editing === "phone" ? (
             <form
               onSubmit={(e) => {
@@ -400,7 +412,6 @@ function AccountSettings({ me }: { me: Me }) {
             </form>
           ) : (
             <div className="settings-view-field account-data-row">
-              <span className="field-label">Phone number</span>
               <p>{me.account.phoneNumber || "Not provided"}</p>
               <Button
                 variant="secondary"

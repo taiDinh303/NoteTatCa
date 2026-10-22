@@ -26,6 +26,18 @@ for (const width of [320, 393, 1440]) {
       route.fulfill({ json: { data: [{ provider: "Google" }] } }),
     );
     await page.goto("/settings/account");
+    await expect(
+      page.getByRole("heading", { name: "Account details", exact: true }),
+    ).toHaveCount(0);
+    for (const name of ["Email address", "Phone number"]) {
+      const section = page
+        .locator(".account-section")
+        .filter({ has: page.getByRole("heading", { name, exact: true }) });
+      await expect(section.locator(".settings-symbol svg")).toBeVisible();
+      await expect(
+        section.getByRole("button", { name: "Change", exact: true }),
+      ).toBeVisible();
+    }
     await expect(page.getByText("Connected", { exact: true })).toHaveCount(0);
     await expect(
       page.getByText("No password is set for your account.", { exact: true }),

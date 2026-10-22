@@ -110,7 +110,7 @@ for (const scenario of [
       .click();
     await expect(
       main
-        .locator(".account-data-row")
+        .locator(".account-section")
         .filter({ hasText: "Email address" })
         .getByRole("button", { name: "Change", exact: true }),
     ).toBeVisible();
@@ -125,9 +125,9 @@ for (const scenario of [
     ).toHaveCount(1);
     await expect(
       main.locator(".settings-account > .account-section"),
-    ).toHaveCount(3);
+    ).toHaveCount(4);
     await main
-      .locator(".account-data-row")
+      .locator(".account-section")
       .filter({ hasText: "Email address" })
       .getByRole("button", { name: "Change", exact: true })
       .click();
@@ -136,7 +136,7 @@ for (const scenario of [
       .fill("discard@example.test");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await main
-      .locator(".account-data-row")
+      .locator(".account-section")
       .filter({ hasText: "Email address" })
       .getByRole("button", { name: "Change", exact: true })
       .click();
@@ -145,7 +145,7 @@ for (const scenario of [
     ).toHaveValue("");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await main
-      .locator(".account-data-row")
+      .locator(".account-section")
       .filter({ hasText: "Phone number" })
       .getByRole("button", { name: "Change", exact: true })
       .click();
@@ -155,7 +155,7 @@ for (const scenario of [
       .click();
     await expect(
       main
-        .locator(".account-data-row")
+        .locator(".account-section")
         .filter({ hasText: "Phone number" })
         .getByRole("button", { name: "Change", exact: true }),
     ).toBeVisible();
