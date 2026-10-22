@@ -152,7 +152,7 @@ Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sa
 
 ## Cỡ chữ thay nút Heading — 2026-10-21
 
-Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default cùng12/14/16/18/20/24/28/32/40/48px; trigger hiện cỡ tại con trỏ/vùng chọn. Chọn cỡ áp dụng textStyle.fontSize trên văn bản đang chọn hoặc nội dung gõ tiếp, Default bỏ fontSize và giữ marks khác. Dùng FontSize từ package Tiptap text-style3.32.0 sẵn có; không thêm dependency. Canonical/API cùng allowlist preset px, từ chối giá trị CSS tùy ý. Heading cũ và Markdown headings vẫn tương thích, không migrate. Export Markdown cảnh báo mất font size.
+Toolbar bỏ nút H2/Heading và thay bằng Font size. Menu radio có Default cùng8/9/10/11/12/14/18/24/30/36/48/60/72/96px (mặc định 11px); trigger hiện cỡ tại con trỏ/vùng chọn. Chọn cỡ áp dụng textStyle.fontSize trên văn bản đang chọn hoặc nội dung gõ tiếp, Default bỏ fontSize và giữ marks khác. Dùng FontSize từ package Tiptap text-style3.32.0 sẵn có; không thêm dependency. Canonical/API cùng allowlist preset px, từ chối giá trị CSS tùy ý. Heading cũ và Markdown headings vẫn tương thích, không migrate. Export Markdown cảnh báo mất font size.
 
 ### Note editor compact default — 2026-10-21
 

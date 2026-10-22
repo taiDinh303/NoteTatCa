@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 for (const width of [393, 1280]) {
-  test(`font size replaces Heading and persists ${width}`, async ({
+  test(`font size stepper and persist ${width}`, async ({
     page,
     request,
   }) => {
@@ -26,25 +26,33 @@ for (const width of [393, 1280]) {
       editor.getByRole("button", { name: "Heading", exact: true }),
     ).toHaveCount(0);
     await content.press("Control+a");
-    await editor
-      .getByRole("button", { name: "Font size", exact: true })
-      .click();
-    await expect(
-      page.getByRole("menuitemradio", { name: "Default", exact: true }),
-    ).toHaveAttribute("aria-checked", "true");
+
+    // The font size control is a [ - ] N [ + ] stepper, defaulting to 11.
+    const input = editor.getByRole("spinbutton", { name: "Font size" });
+    await expect(input).toHaveValue("11");
     await mkdir("../artifacts/frontend", { recursive: true });
     await page.screenshot({
       path: `../artifacts/frontend/font-size-${width}.png`,
     });
-    await page
-      .getByRole("menuitemradio", { name: "24 px", exact: true })
-      .click();
+
+    // Typing a value and committing with Enter applies it.
+    await input.fill("24");
+    await input.press("Enter");
     await expect(
       content.locator("span").filter({ hasText: "Size changes persist" }),
     ).toHaveCSS("font-size", "24px");
-    await expect(
-      editor.getByRole("button", { name: "Font size", exact: true }),
-    ).toContainText("24");
+    await expect(input).toHaveValue("24");
+
+    // The + and - buttons step to the next/previous preset.
+    await editor
+      .getByRole("button", { name: "Increase font size", exact: true })
+      .click();
+    await expect(input).toHaveValue("30");
+    await editor
+      .getByRole("button", { name: "Decrease font size", exact: true })
+      .click();
+    await expect(input).toHaveValue("24");
+
     await editor.getByRole("button", { name: "Bold", exact: true }).click();
     await expect(content.locator("strong")).toHaveText("Size changes persist");
     await expect(editor.locator('[data-save-state="saved"]')).toBeAttached();
@@ -53,20 +61,26 @@ for (const width of [393, 1280]) {
     await page
       .getByRole("button", { name: "Open Font size note", exact: true })
       .click();
-    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "View note", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     content = editor.getByRole("textbox", { name: "Note content" });
     await expect(
       content.locator("span").filter({ hasText: "Size changes persist" }),
     ).toHaveCSS("font-size", "24px");
     await content.press("Control+a");
-    await editor
-      .getByRole("button", { name: "Font size", exact: true })
-      .click();
-    await page
-      .getByRole("menuitemradio", { name: "Default", exact: true })
-      .click();
-    await expect(content.locator('[style*="font-size"]')).toHaveCount(0);
-    await expect(content.locator("strong")).toHaveText("Size changes persist");
+    // The stepper reads back the saved size and can commit 8 again.
+    await expect(editor.getByRole("spinbutton", { name: "Font size" })).toHaveValue(
+      "24",
+    );
+    const input2 = editor.getByRole("spinbutton", { name: "Font size" });
+    await input2.fill("8");
+    await input2.press("Enter");
+    await expect(
+      content.locator("span").filter({ hasText: "Size changes persist" }),
+    ).toHaveCSS("font-size", "8px");
+    await expect(editor.locator('[data-save-state="saved"]')).toBeAttached();
   });
 }

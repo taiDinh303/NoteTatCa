@@ -90,16 +90,20 @@ it.each(["left", "center", "right", "justify"])(
 
 describe("font size contract", () => {
   it.each([
+    "8px",
+    "9px",
+    "10px",
+    "11px",
     "12px",
     "14px",
-    "16px",
     "18px",
-    "20px",
     "24px",
-    "28px",
-    "32px",
-    "40px",
+    "30px",
+    "36px",
     "48px",
+    "60px",
+    "72px",
+    "96px",
   ])("preserves %s alongside text color", (fontSize) => {
     expect(
       canonicalDocument({

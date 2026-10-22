@@ -18,12 +18,13 @@ import {
   Bold,
   CheckSquare,
   Code2,
-  Type,
   Highlighter,
   Italic,
   Link2,
   List,
   ListOrdered,
+  Minus,
+  Plus,
   Quote,
   Redo2,
   Strikethrough,
@@ -43,7 +44,13 @@ import {
   IconButton,
   Modal,
 } from "../../shared/ui";
-import { FONT_SIZES } from "../../domain/formatting";
+import {
+  DEFAULT_FONT_SIZE,
+  FONT_SIZES,
+  MAX_FONT_SIZE,
+  MIN_FONT_SIZE,
+  clampFontSize,
+} from "../../domain/formatting";
 import { download } from "../../shared/utils";
 const alignmentOptions = [
   { value: "left", label: "Align left", icon: AlignLeft },
@@ -104,6 +111,7 @@ export default function RichEditor({
   onCharacterCount: (count: number) => void;
 }) {
   const [link, setLink] = useState(false);
+  const [fontInput, setFontInput] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
   const [error, setError] = useState<unknown>();
   const [source, setSource] = useState("");
@@ -166,6 +174,26 @@ export default function RichEditor({
       highlight: editor?.isActive("highlight"),
     }),
   });
+  const fontSizeValue = state?.fontSize
+    ? parseInt(state.fontSize, 10)
+    : DEFAULT_FONT_SIZE;
+  function applyFontSize(size: number) {
+    editor.chain().focus().setFontSize(`${clampFontSize(size)}px`).run();
+    setFontInput(null);
+  }
+  function stepFontSize(direction: 1 | -1) {
+    const options = FONT_SIZES.filter((size) =>
+      direction === 1 ? size > fontSizeValue : size < fontSizeValue,
+    );
+    const target = direction === 1 ? options[0] : options[options.length - 1];
+    if (target !== undefined) applyFontSize(target);
+  }
+  function commitFontSize() {
+    if (fontInput === null) return;
+    const value = parseInt(fontInput, 10);
+    if (Number.isFinite(value)) applyFontSize(value);
+    else setFontInput(null);
+  }
   if (!editor) return null;
   return (
     <>
@@ -240,56 +268,35 @@ export default function RichEditor({
           </Dropdown.Portal>
         </Dropdown.Root>
         <span className="toolbar-divider" />
-        <Dropdown.Root>
-          <Dropdown.Trigger asChild>
-            <Button
-              variant="ghost"
-              className="font-size-trigger"
-              aria-label="Font size"
-            >
-              <Type size={16} />
-              <span>
-                {state?.fontSize ? parseInt(state.fontSize, 10) : "Size"}
-              </span>
-            </Button>
-          </Dropdown.Trigger>
-          <Dropdown.Portal>
-            <Dropdown.Content
-              className="dropdown font-size-menu"
-              sideOffset={7}
-              align="start"
-              aria-label="Font size"
-              onCloseAutoFocus={(event) => {
+        <div className="font-size-stepper">
+          <IconButton
+            icon={Minus}
+            label="Decrease font size"
+            onClick={() => stepFontSize(-1)}
+          />
+          <input
+            className="font-size-input"
+            type="number"
+            inputMode="decimal"
+            min={MIN_FONT_SIZE}
+            max={MAX_FONT_SIZE}
+            aria-label="Font size"
+            value={fontInput ?? String(fontSizeValue)}
+            onChange={(event) => setFontInput(event.target.value)}
+            onBlur={() => commitFontSize()}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
                 event.preventDefault();
-                editor.commands.focus();
-              }}
-            >
-              <Dropdown.RadioGroup
-                value={state?.fontSize ?? ""}
-                onValueChange={(value) => {
-                  if (value) editor.chain().focus().setFontSize(value).run();
-                  else editor.chain().focus().unsetFontSize().run();
-                }}
-              >
-                {[
-                  { value: "", label: "Default" },
-                  ...FONT_SIZES.map((size) => ({
-                    value: `${size}px`,
-                    label: `${size} px`,
-                  })),
-                ].map(({ value, label }) => (
-                  <Dropdown.RadioItem
-                    className="dropdown-item"
-                    key={value}
-                    value={value}
-                  >
-                    <span>{label}</span>
-                  </Dropdown.RadioItem>
-                ))}
-              </Dropdown.RadioGroup>
-            </Dropdown.Content>
-          </Dropdown.Portal>
-        </Dropdown.Root>
+                commitFontSize();
+              }
+            }}
+          />
+          <IconButton
+            icon={Plus}
+            label="Increase font size"
+            onClick={() => stepFontSize(1)}
+          />
+        </div>
         <IconButton
           icon={List}
           label="Bullet list"

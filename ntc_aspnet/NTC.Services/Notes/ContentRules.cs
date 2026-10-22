@@ -10,7 +10,7 @@ public static partial class ContentRules
 {
     public const int MaxTextLength = 100_000;
     private static readonly HashSet<string> Nodes = ["doc", "paragraph", "text", "heading", "bulletList", "orderedList", "listItem", "taskList", "taskItem", "blockquote", "codeBlock", "hardBreak", "horizontalRule"];
-    private static readonly HashSet<string> FontSizes = ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px", "40px", "48px"];
+    private static readonly HashSet<string> FontSizes = ["8px", "9px", "10px", "11px", "12px", "14px", "18px", "24px", "30px", "36px", "48px", "60px", "72px", "96px"];
     private static readonly HashSet<string> Marks = ["bold", "italic", "underline", "strike", "code", "link", "textStyle", "highlight"];
     [GeneratedRegex("^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")]
     private static partial Regex HexColor();

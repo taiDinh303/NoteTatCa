@@ -74,7 +74,7 @@ Nhấn icon góc trên để chọn icon từ menu hoặc dán emoji riêng; **R
 
 ## Cỡ chữ nội dung
 
-Chọn đoạn chữ rồi mở **Font size** trên toolbar để chọn cỡ12–48px. Nếu chưa chọn chữ, cỡ mới áp dụng khi gõ tiếp. **Default** trở về cỡ mặc định và giữ các định dạng khác như in đậm/màu chữ. Cỡ chữ tự lưu; Markdown xuất ra không giữ cỡ riêng.
+Chọn đoạn chữ rồi mở **Font size** trên toolbar, dùng nút −/+ hoặc gõ thẳng số (8–96px) rồi nhấn Enter. Cỡ mặc định là 11px. Nếu chưa chọn chữ, cỡ mới áp dụng khi gõ tiếp. Cỡ chữ tự lưu; Markdown xuất ra không giữ cỡ riêng.
 
 ### Mở note ở khung nhỏ — 2026-10-21
 

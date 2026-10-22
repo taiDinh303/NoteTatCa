@@ -6,7 +6,7 @@ namespace NTC.Tests.Unit;
 public class ContentFontSizeTests
 {
     [Theory]
-    [InlineData("12px")][InlineData("14px")][InlineData("16px")][InlineData("18px")][InlineData("20px")][InlineData("24px")][InlineData("28px")][InlineData("32px")][InlineData("40px")][InlineData("48px")]
+    [InlineData("8px")][InlineData("9px")][InlineData("10px")][InlineData("11px")][InlineData("12px")][InlineData("14px")][InlineData("18px")][InlineData("24px")][InlineData("30px")][InlineData("36px")][InlineData("48px")][InlineData("60px")][InlineData("72px")][InlineData("96px")]
     public void SupportedFontSizePreservesText(string fontSize) => Assert.Equal("Private text", ContentRules.PlainText(Document(fontSize), null));
     [Theory]
     [InlineData(null)][InlineData("1000px")][InlineData("1em")][InlineData("16px;color:red")][InlineData(16)]

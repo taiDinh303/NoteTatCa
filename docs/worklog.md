@@ -2,6 +2,15 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Cỡ chữ đổi thành stepper − N + (gõ được số, không còn menu cuộn) — 2026-10-22
+
+- RichEditor.tsx: thay dropdown menu radio cỡ chữ (Default + 12/14/.../48px, có thanh cuộn) bằng stepper [−] N [+]: hai nút tăng/giảm (bước đến preset gần nhất theo FONT_SIZES) + ô number input gõ được số rồi Enter/blur (snap về preset gần nhất qua clampFontSize). Cỡ mặc định 11px (DEFAULT_FONT_SIZE), bỏ hẳn tùy chọn Default.
+- domain/formatting.ts: FONT_SIZES mới 8/9/10/11/12/14/18/24/30/36/48/60/72/96px + MIN/MAX/DEFAULT_FONT_SIZE + clampFontSize; isNoteFontSize giữ nguyên logic so allowlist.
+- Backend đồng bộ allowlist: ContentRules.cs HashSet FontSizes cùng 14 preset px; ContentFontSizeTests.cs InlineData cập nhật (19/19 PASS).
+- CSS: .editor-toolbar .font-size-stepper (pill viền, icon 26px, khớp view-toggle) + .font-size-input (44px, tabular-nums, ẩn spinner webkit, focus ring accent); xóa CSS menu cũ .font-size-menu/.font-size-trigger.
+- E2E: font-size.spec.ts viết lại cho stepper (default 11, gõ 24→Enter, +/− bước 30/24, persist sau reload, gõ 8→Enter) 2/2 PASS; document.test.ts cập nhật 14 size (54/54 PASS). Docs: 15-api-contract, 30-user-guide, 09-ui-design, FRONTEND-IMPLEMENTATION cập nhật allowlist + mô tả stepper.
+- Bằng chứng: TypeScript/ESLint/Production Vite build PASS; 54 React unit + 4 config PASS; 19 backend ContentFontSizeTests PASS; e2e font-size 2/2. Scope editor/domain/backend/docs/tests, .NET API không đổi. 2 fail workspace admin-settings/persistent-session khi chạy full suite là PRE-EXISTING (đã verify fail cả khi stash hết thay đổi này — do refactor SettingsPage trước đó + flake token-rotation, không liên quan).
+- Chưa kiểm Safari/thiết bị vật lý; không deploy. Publication scope: formatting.ts, RichEditor.tsx, styles.css, document.test.ts, font-size.spec.ts, ContentRules.cs, ContentFontSizeTests.cs, 4 docs + worklog; giữ 2 appsettings local ngoài commit.
 ## Nút Edit trong note view dùng variant ghost, hết viền — 2026-10-22
 
 - NoteEditor.tsx (NoteViewer): nút Edit ở footer từ variant=secondary (có viền) sang variant=ghost, đồng bộ với nút Close cùng hàng; icon Pencil giữ nguyên.
