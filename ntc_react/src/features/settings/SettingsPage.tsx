@@ -10,7 +10,6 @@ import {
   Monitor,
   ShieldCheck,
   Unlink,
-  UserRound,
 } from "lucide-react";
 import { toast } from "sonner";
 import { account, auth, cache, workspace } from "../../app/runtime";
@@ -137,15 +136,6 @@ function ProfileForm({ me }: { me: Me }) {
               <ShieldCheck size={13} />
               Private account
             </span>
-          </div>
-        </div>
-        <div className="settings-card-heading">
-          <div className="settings-symbol">
-            <UserRound size={21} />
-          </div>
-          <div>
-            <h2>Personal details</h2>
-            <p>A name, a face, a little about you.</p>
           </div>
         </div>
         <ErrorBanner error={error} />

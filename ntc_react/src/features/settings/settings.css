@@ -37,7 +37,7 @@
 .settings-profile,
 .settings-account {
   width: 100%;
-  max-width: 1050px;
+  max-width: none;
   min-width: 0;
 }
 .profile-card,

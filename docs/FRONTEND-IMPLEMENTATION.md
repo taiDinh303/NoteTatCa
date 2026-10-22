@@ -184,3 +184,8 @@ EditorSession có View cạnh Close, gọi save/flush(true) hiện có; chỉ g�
 ## Settings gọn hơn — 2026-10-22
 
 CURRENT theo yêu cầu chủ dự án: Profile dùng một thẻ chung chứa avatar/tên/email và thông tin cá nhân; bỏ sidebar trang trí và Profile picture URL cả read/edit, giữ nguyên URL ảnh hiện có khi lưu. Desktop rộng chia thông tin ba cột, mobile một cột. Account & security gom contact/password/Google vào một khung có đường phân cách, email chỉ hiện một lần cùng trạng thái xác minh; desktop tiêu đề cạnh nội dung, mobile xếp dọc với input/nút đồng đều. Active sessions và nghiệp vụ auth/ownership/API không đổi. Áp dụng cả settings self của admin. Evidence và giới hạn tại worklog.
+
+
+### Settings trải hết chiều ngang — 2026-10-22
+
+Theo yêu cầu bổ sung với ảnh Active sessions làm chuẩn: bỏ max-width1050px của Profile/Account & security, dùng toàn chiều ngang vùng nội dung và cùng mép với settings tabs. Bỏ heading Personal details, mô tả và icon UserRound; giữ avatar/tên/email và thông tin hồ sơ. Các cột đều theo grid hiện có; mobile một cột. Active sessions không đổi. Evidence tại worklog.

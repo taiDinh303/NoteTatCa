@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 for (const scenario of [
+  { width: 1920, admin: false },
   { width: 1440, admin: false },
   { width: 320, admin: false },
   { width: 393, admin: false },
@@ -30,6 +31,14 @@ for (const scenario of [
       page.getByRole("button", { name: "Edit profile", exact: true }),
     ).toBeVisible();
     const main = page.locator(".workspace-main");
+    await expect(
+      main.getByText("Personal details", { exact: true }),
+    ).toHaveCount(0);
+    const tabs = await page.locator(".settings-tabs").boundingBox();
+    const profile = await page.locator(".profile-card").boundingBox();
+    expect(Math.abs(profile!.x - tabs!.x)).toBeLessThan(2);
+    expect(Math.abs(profile!.width - tabs!.width)).toBeLessThan(2);
+
     await expect(main.locator("input, select")).toHaveCount(0);
     await expect(
       main.getByText("Profile picture URL", { exact: true }),
@@ -91,6 +100,9 @@ for (const scenario of [
     await expect(
       page.getByRole("button", { name: "Edit email", exact: true }),
     ).toBeVisible();
+    const accountCard = await page.locator(".settings-account").boundingBox();
+    expect(Math.abs(accountCard!.x - tabs!.x)).toBeLessThan(2);
+    expect(Math.abs(accountCard!.width - tabs!.width)).toBeLessThan(2);
     await expect(main.locator("input, select")).toHaveCount(0);
     await expect(
       main.getByText(scenario.admin ? "admin@example.test" : "a@example.test", {
