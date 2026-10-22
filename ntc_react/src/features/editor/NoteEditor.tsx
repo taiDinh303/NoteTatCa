@@ -13,6 +13,7 @@ import {
   Bell,
   Copy,
   Download,
+  Eye,
   Maximize2,
   Minimize2,
   Pencil,
@@ -61,13 +62,15 @@ export default function NoteEditor({
   initialAction?: NoteOpenAction;
 }) {
   const [editing, setEditing] = useState(!noteId);
+  const [createdId, setCreatedId] = useState<string>();
+  const resolvedId = noteId ?? createdId;
   const query = useQuery({
-    queryKey: workspace.key("note", noteId),
-    queryFn: () => notes.find(noteId!),
-    enabled: !!noteId,
+    queryKey: workspace.key("note", resolvedId),
+    queryFn: () => notes.find(resolvedId!),
+    enabled: !!resolvedId,
     staleTime: 0,
   });
-  if (noteId && !query.data)
+  if (resolvedId && !query.data)
     return (
       <Modal
         open
@@ -102,9 +105,13 @@ export default function NoteEditor({
     );
   return (
     <EditorSession
-      key={noteId ?? "new"}
+      key={resolvedId ?? "new"}
       initial={query.data}
       onClose={onClose}
+      onView={(note) => {
+        setCreatedId(note.id);
+        setEditing(false);
+      }}
     />
   );
 }
@@ -284,9 +291,11 @@ function NoteViewer({
 function EditorSession({
   initial,
   onClose,
+  onView,
 }: {
   initial?: Note;
   onClose: () => void;
+  onView: (note: Note) => void;
 }) {
   const state = useAuth();
   const me = useMe();
@@ -310,6 +319,7 @@ function EditorSession({
     initial?.content.length ?? 0,
   );
   const [closing, setClosing] = useState(false);
+  const [viewing, setViewing] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
@@ -355,7 +365,7 @@ function EditorSession({
     }
   }
   function requestClose() {
-    if (closing) return;
+    if (closing || viewing) return;
     if (snapshot.dirty) {
       if (snapshot.status === "error" || snapshot.status === "conflict") {
         setClosePrompt(true);
@@ -728,7 +738,16 @@ function EditorSession({
                 Retry save
               </Button>
             ) : null}
-            <Button variant="ghost" busy={closing} onClick={requestClose}>
+            <Button variant="ghost" busy={viewing} disabled={closing} onClick={() => {
+              if (viewing || closing) return;
+              setViewing(true);
+              void save().then((note) => { if (note) onView(note); })
+                .catch(() => {}).finally(() => setViewing(false));
+            }}>
+              <Eye size={15} />
+              View
+            </Button>
+            <Button variant="ghost" busy={closing} disabled={viewing} onClick={requestClose}>
               Close
             </Button>
           </div>

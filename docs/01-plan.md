@@ -115,3 +115,7 @@ Theo yêu cầu mới thay mặc định khung nhỏ trên điện thoại: cont
 Chủ dự án chọn rõ chỉ nút Edit mới bật sửa; click nội dung/checklist không tự vào editor. Note mới vẫn tạo/sửa/autosave trực tiếp. Note đã lưu mở từ card hoặc deep link ?note= ở View note: hiện icon/title/nội dung rich text, giữ màu/định dạng/checklist chỉ đọc, chỉ có Edit/Close; ẩn input title, toolbar, tool chỉnh màu/nhãn/reminder, save status và counter. Mobile luôn toàn màn hình; desktop view khung nhỏ, Edit mới có các nút editor/thu phóng desktop. Giữ autosave/error/conflict/draft guards trong chế độ sửa.
 
 Menu thẻ bỏ Open note và Pin/Unpin note, thay Add label và Add reminder; nút ghim trực tiếp và Move earlier/later/trash giữ. Add label mở hộp riêng chọn nhãn, Save labels với version lúc mở, lỗi giữ lựa chọn; Add reminder mở quản lý nhắc lịch của đúng note, không tự bật editor. Không thay backend/schema/ownership.
+
+### Quay về View ngay trong editor — 2026-10-22
+
+Theo yêu cầu bổ sung DEC-023: editor có nút View cạnh Close. View chờ flush autosave thành công rồi chuyển sang viewer ngay trong modal flow; lỗi/conflict giữ editor/draft, không cần Close rồi mở lại. Note mới sau lưu cũng xem/sửa qua lại được theo ID vừa tạo.

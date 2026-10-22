@@ -87,3 +87,5 @@ Tiêu đề trong note-card-identity hiển thị một dòng, overflow hidden/t
 ## Chế độ xem note — DEC-023 / 2026-10-22
 
 Note đã lưu mở View note chỉ đọc: icon/title/nội dung và Edit/Close. Không toolbar/input/counter/tool chỉnh sửa; chạm/gõ/checklist không thay dữ liệu. Edit bật editor đầy đủ, note mới vào editor ngay. Card menu: Add label, Add reminder, Move earlier/later, Move to trash; không Open note hoặc Pin/Unpin note trong menu. Ghim vẫn có nút riêng. Mobile view/editor toàn màn hình, desktop view nhỏ và editor có nút thu/phóng.
+
+Bổ sung2026-10-22: footer editor có View để trở về màn hình chỉ xem mà không đóng note. Chờ lưu xong mới chuyển, hiện trạng thái busy và chặn đóng trong lúc chuyển; lỗi giữ bản nháp/editor. Mobile vẫn toàn màn hình.
