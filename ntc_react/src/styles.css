@@ -4157,6 +4157,21 @@ td {
   flex-direction: column;
   min-height: 0;
 }
+@container viewport (max-width: 800px) {
+  .modal.note-editor-modal {
+    inset: 0;
+    transform: none;
+    width: 100%;
+    height: calc(100dvh / var(--interface-scale));
+    max-width: none;
+    max-height: calc(100dvh / var(--interface-scale));
+    border: 0;
+    border-radius: 0;
+  }
+  .note-editor-modal .editor-size-toggle {
+    display: none;
+  }
+}
 .editor-content {
   display: flex;
   flex-direction: column;
@@ -4335,6 +4350,8 @@ td {
 /* Workspace header spans the navigation and content columns. */
 .customer-shell > .topbar {
   display: grid;
+  /* Cover subpixel seams above the sticky header when scrolling at fractional zoom. */
+  box-shadow: 0 -2px 0 var(--surface);
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
   width: 100%;
   z-index: 25;

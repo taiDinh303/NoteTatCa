@@ -105,3 +105,7 @@ Theo yêu cầu chủ dự án, browser lưu refresh credential lâu dài để 
 ### Mặc định khung ghi chú — 2026-10-21
 
 Theo yêu cầu mới, Take a note mở note mới ở khung nhỏ, thay mặc định fullscreen của DEC-018. Nút Enter full screen/Exit full screen vẫn chuyển kích thước, giữ draft/autosave. Theo bổ sung cùng lượt, mở note đã lưu cũng bắt đầu ở khung nhỏ, kể cả trạng thái chờ tải note.
+
+### Mobile editor luôn toàn màn hình — 2026-10-22
+
+Theo yêu cầu mới thay mặc định khung nhỏ trên điện thoại: container≤800px luôn mở note mới/note đã lưu/khung chờ tải toàn màn hình, ẩn nút Enter/Exit full screen. Desktop giữ hành vi khung nhỏ và nút chuyển kích thước. Không đổi autosave/draft/API hoặc dữ liệu.

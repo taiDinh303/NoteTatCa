@@ -1106,19 +1106,11 @@ test("edits content in a full viewport with an optional title and fixed characte
     fullPage: false,
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  await editor
-    .getByRole("button", { name: "Exit full screen", exact: true })
-    .click();
-  const compactMobile = (await editor.boundingBox())!;
-  expect(compactMobile.width).toBeLessThan(390);
-  expect(compactMobile.height).toBeLessThan(844);
+  await expect(editor.getByRole("button", { name: /full screen/ })).toHaveCount(0);
   await expect(content).toContainText("contentonly");
   await expect(
     editor.getByRole("button", { name: "Close", exact: true }),
   ).toBeInViewport();
-  await editor
-    .getByRole("button", { name: "Enter full screen", exact: true })
-    .click();
   const mobile = (await editor.boundingBox())!;
   expect(mobile.width).toBeCloseTo(390);
   expect(mobile.height).toBeCloseTo(844);
@@ -2109,7 +2101,7 @@ for (const mobile of [false, true]) {
       path: `../artifacts/frontend/editor-alignment-${mobile ? "mobile" : "desktop"}.png`,
       animations: "disabled",
     });
-    for (const name of ["Pin note", "Enter full screen"]) {
+    for (const name of mobile ? ["Pin note"] : ["Pin note", "Enter full screen"]) {
       const button = editor.getByRole("button", { name, exact: true });
       await page.mouse.move(0, 0);
       await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");

@@ -10,6 +10,7 @@ for (const width of [1440, 1024, 393, 320]) {
     const header = page.locator('.customer-shell > .topbar');
     const box = (await header.boundingBox())!;
     expect(box.x).toBe(0);
+    expect(box.y).toBe(0);
     expect(box.width).toBe(width);
     await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
     const search = page.getByRole('search');
@@ -59,6 +60,31 @@ for (const width of [1440, 1024, 393, 320]) {
     await page.getByRole('textbox', { name: 'Search your notes', exact: true }).fill('Welcome');
     await expect(page).toHaveURL(/q=Welcome/);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    if (width <= 800) {
+      for (const scale of [0.9, 1, 1.1]) {
+        await page.evaluate((value) => {
+          document.documentElement.style.setProperty('--interface-scale', String(value));
+          document.querySelector<HTMLElement>('.main-column')!.style.minHeight = '2400px';
+          window.scrollTo(0, 301);
+        }, scale);
+        await expect.poll(async () => (await header.boundingBox())!.y).toBeLessThanOrEqual(1);
+        const coverage = await header.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return { top: rect.top, shadow: style.boxShadow, surface: style.backgroundColor,
+            atTop: document.elementFromPoint(innerWidth / 2, 1)?.closest('.topbar') === element };
+        });
+        expect(coverage.top).toBeGreaterThanOrEqual(-1);
+        expect(coverage.atTop).toBe(true);
+        expect(coverage.shadow).toContain(coverage.surface);
+        expect(coverage.shadow).toContain('0px -2px 0px');
+      }
+      await page.evaluate(() => {
+        document.documentElement.style.removeProperty('--interface-scale');
+        document.querySelector<HTMLElement>('.main-column')!.style.removeProperty('min-height');
+        window.scrollTo(0, 0);
+      });
+    }
     await page.screenshot({ path: `test-results/header-${width}.png`, fullPage: true });
   });
 }

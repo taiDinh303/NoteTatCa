@@ -293,7 +293,7 @@ function EditorSession({
               onClick={() => update({ isPinned: !draft.isPinned })}
             />
             <IconButton
-              className="editor-heading-action"
+              className="editor-heading-action editor-size-toggle"
               icon={fullscreen ? Minimize2 : Maximize2}
               label={fullscreen ? "Exit full screen" : "Enter full screen"}
               aria-pressed={fullscreen}

@@ -81,3 +81,5 @@ Chọn đoạn chữ rồi mở **Font size** trên toolbar để chọn cỡ12�
 Take a note mở editor nhỏ mặc định; chọn Enter full screen nếu muốn mở rộng và Exit full screen để thu nhỏ. Việc đổi kích thước giữ nội dung đang nhập. Mở lại note đã lưu cũng bắt đầu ở khung nhỏ; chỉ phóng to khi chọn Enter full screen.
 
 Tiêu đề note hiển thị ngay cạnh icon ở đầu thẻ trong danh sách. Khi đổi màu bằng cọ vẽ, toàn bộ khung note đang mở đổi nền; màu tự lưu và đồng bộ với thẻ ngoài danh sách.
+
+Cập nhật2026-10-22: trên điện thoại (giao diện≤800px), tạo/mở note luôn toàn màn hình và không có nút thu/phóng. Desktop giữ khung nhỏ mặc định và nút chuyển kích thước. Close vẫn đóng note, autosave giữ nguyên.

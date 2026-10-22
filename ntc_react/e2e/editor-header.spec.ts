@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
-for (const width of [393, 1280]) {
+for (const width of [320, 393, 430, 768, 1280]) {
   test(`compact editor heading and icon dropdown ${width}`, async ({
     page,
     request,
@@ -19,6 +19,14 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Take a note", exact: true })
       .click();
     let editor = page.getByRole("dialog", { name: "New note", exact: true });
+    if (width <= 800) {
+      await expect(editor.getByRole("button", { name: /full screen/ })).toHaveCount(0);
+      await expect.poll(async () => (await editor.boundingBox())!.width).toBeCloseTo(width);
+      const bounds = (await editor.boundingBox())!;
+      expect(bounds.x).toBeCloseTo(0);
+      expect(bounds.y).toBeCloseTo(0);
+      expect(bounds.height).toBeCloseTo(852);
+    }
     await expect(
       editor.getByRole("button", { name: "Add title", exact: true }),
     ).toHaveCount(0);
@@ -37,7 +45,7 @@ for (const width of [393, 1280]) {
         editor.getByRole("button", { name: "Choose note icon" }),
         editor.getByLabel("Note title"),
         editor.getByRole("button", { name: "Pin note", exact: true }),
-        editor.getByRole("button", { name: "Enter full screen" }),
+        ...(width > 800 ? [editor.getByRole("button", { name: "Enter full screen" })] : []),
       ].map((element) => element.boundingBox()),
     );
     const center = boxes[0]!.y + boxes[0]!.height / 2;
@@ -72,7 +80,16 @@ for (const width of [393, 1280]) {
       .click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor).not.toHaveClass(/fullscreen/);
-    await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toBeVisible();
+    if (width <= 800) {
+      await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toHaveCount(0);
+      const bounds = (await editor.boundingBox())!;
+      expect(bounds.x).toBeCloseTo(0);
+      expect(bounds.y).toBeCloseTo(0);
+      expect(bounds.width).toBeCloseTo(width);
+      expect(bounds.height).toBeCloseTo(852);
+    } else {
+      await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toBeVisible();
+    }
     await expect(
       editor.getByRole("button", { name: "Choose note icon" }),
     ).toHaveText("💡");
