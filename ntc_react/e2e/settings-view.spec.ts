@@ -114,8 +114,11 @@ for (const scenario of [
     ).toHaveValue("");
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     expect(
-      await page.evaluate(() => document.documentElement.scrollWidth),
-    ).toBe(scenario.width);
+      // With `scrollbar-gutter: stable` the layout width may be narrower than the
+    // physical viewport (no native scrollbar), so the no-overflow invariant is
+    // `scrollWidth <= physical width`.
+    await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(scenario.width);
     await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
     await page.screenshot({
       path: `../artifacts/frontend/settings-readonly-${scenario.width}-${scenario.admin}.png`,

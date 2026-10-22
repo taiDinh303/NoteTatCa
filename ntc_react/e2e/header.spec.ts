@@ -8,16 +8,17 @@ for (const width of [1440, 1024, 393, 320]) {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(page).toHaveURL(/\/notes/);
     const header = page.locator('.customer-shell > .topbar');
+    const layout = await page.evaluate(() => document.body.clientWidth);
     const box = (await header.boundingBox())!;
     expect(box.x).toBe(0);
     expect(box.y).toBe(0);
-    expect(box.width).toBe(width);
+    expect(box.width).toBe(layout);
     await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
     const search = page.getByRole('search');
     const searchBox = (await search.boundingBox())!;
     await expect(search).toHaveCSS("border-top-width", "1px");
     await expect(search).toHaveCSS("border-radius", "12px");
-    if (width > 800) expect(Math.abs(searchBox.x + searchBox.width / 2 - width / 2)).toBeLessThan(2);
+    if (width > 800) expect(Math.abs(searchBox.x + searchBox.width / 2 - layout / 2)).toBeLessThan(2);
     if (width > 800) {
       const sidebar = (await page.locator('#workspace-navigation').boundingBox())!;
       expect(sidebar.y).toBeGreaterThanOrEqual(box.y + box.height);
@@ -72,7 +73,7 @@ for (const width of [1440, 1024, 393, 320]) {
     }
     await page.getByRole('textbox', { name: 'Search your notes', exact: true }).fill('Welcome');
     await expect(page).toHaveURL(/q=Welcome/);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(layout);
     if (width <= 800) {
       for (const scale of [0.9, 1, 1.1]) {
         await page.evaluate((value) => {

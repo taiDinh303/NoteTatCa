@@ -37,6 +37,14 @@
 body {
   margin: 0;
 }
+/* Keep the root scroller's vertical scrollbar gutter reserved at all times so
+   a dialog's scroll-lock hiding the root scrollbar cannot change the document's
+   flow width. This stops the background, cards and sticky topbar from shifting
+   left / opening a gap on the right, and removes the one-frame judder when a
+   note opens or toggles view<->edit (the fixed left sidebar never moves). */
+html {
+  scrollbar-gutter: stable;
+}
 button,
 input,
 select,
@@ -4145,7 +4153,7 @@ td {
   inset: 0;
   transform: none;
   animation: fade-in 0.12s ease-out;
-  width: 100%;
+  width: calc(100vw / var(--interface-scale));
   height: calc(100dvh / var(--interface-scale));
   max-width: none;
   max-height: calc(100dvh / var(--interface-scale));
@@ -4171,7 +4179,7 @@ td {
   .modal.note-editor-modal {
     inset: 0;
     transform: none;
-    width: 100%;
+    width: calc(100vw / var(--interface-scale));
     height: calc(100dvh / var(--interface-scale));
     max-width: none;
     max-height: calc(100dvh / var(--interface-scale));

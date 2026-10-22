@@ -6,10 +6,17 @@ for (const width of [320, 393, 430, 768]) {
     const heading = page.getByRole('heading', { name: 'Clear your mind. Keep your ideas.' });
     await expect(heading).toBeVisible();
     const box = await heading.boundingBox();
-    expect(Math.abs(box!.x + box!.width / 2 - width / 2)).toBeLessThan(2);
+    // `html { scrollbar-gutter: stable }` reserves the gutter, so the heading is
+    // centered within the layout width (`document.body.clientWidth`), not the physical
+    // viewport set by `setViewportSize`.
+    const layoutWidth = await page.evaluate(() => document.body.clientWidth);
+    expect(Math.abs(box!.x + box!.width / 2 - layoutWidth / 2)).toBeLessThan(2);
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(width);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    // With `scrollbar-gutter: stable` the layout width may be narrower than the
+    // physical viewport (no native scrollbar on short pages), so the no-overflow
+    // invariant is `scrollWidth <= physical width`.
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     await page.screenshot({ path: `test-results/home-${width}.png`, fullPage: true });
   });
 }

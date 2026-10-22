@@ -2,6 +2,15 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Không còn drift layout khi mở/chuyển view<->edit note — 2026-10-22
+
+- Một nguyên nhân cho cả 2 triệu chứng: Modal note (Radix Dialog) bật scroll-lock, ẩn/hiện scrollbar gốc làm thay đổi độ rộng flow của document (hở phải; mọi khung/card và header sticky bị nhảy trái, sidebar fixed không đổi). view<->edit unmount/mount Dialog nên scroll-lock giật 1 lần. Sửa gốc: `html { scrollbar-gutter: stable }` giữ cố định gutter dọc, độ rộng flow không đổi khi scrollbar ẩn/hiện.
+- Chuyển 2 modal full-screen (.note-editor-modal.fullscreen và mobile max-width:800 .modal.note-editor-modal) width từ `100%` (layout viewport) sang `calc(100vw / var(--interface-scale))` (physical viewport) để không bị hẹp 10px do gutter đã giữ. Sidebar giữ `scrollbar-gutter: stable` như cũ.
+- Cập nhật assertion e2e theo invariant mới: header.spec (topbar/search/scrollWidth so `body.clientWidth`), home.spec (heading theo layoutWidth, scrollWidth <= width), settings-view.spec (scrollWidth <= width), workspace.spec (HUD zoom theo center của body; compact modal theo body.clientWidth).
+- Bằng chứng: 65/65 Playwright chromium PASS (note-view 2/2, header 4/4, workspace 39/39, home, settings). Typecheck/ESLint max-warnings0/Production Vite build PASS; 50 unit + 4 config PASS. Chỉ scope React/CSS/tests, .NET không đổi.
+- Chưa kiểm điện thoại vật lý/Safari/production; không manual deploy/migration DB thật. Hai appsettings local giữ nguyên hash, ngoài commit.
+- Publication scope: styles.css, e2e/header.spec.ts, e2e/home.spec.ts, e2e/settings-view.spec.ts, e2e/workspace.spec.ts và docs/worklog.md. Fetch main, kiểm docs/diff và hash local API config, push main theo quyền đã cấp rồi đối chiếu remote SHA.
+
 ## Card title một dòng có dấu ba chấm — 2026-10-21
 
 - Note-card-identity h3 dùng nowrap/ellipsis/flex1/min-width0 thay wrap dài; thêm title tooltip đầy đủ, không đổi giá trị note hoặc editor.

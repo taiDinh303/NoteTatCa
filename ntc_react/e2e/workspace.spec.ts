@@ -728,7 +728,8 @@ test("zooms with Ctrl wheel within bounds and briefly shows a bottom-center perc
   await expect(hud).toHaveText("150%");
   const bounds = (await hud.boundingBox())!;
   const viewport = page.viewportSize()!;
-  expect(bounds.x + bounds.width / 2).toBeCloseTo(viewport.width / 2, 0);
+  const bodyBox = (await page.locator('body').boundingBox())!;
+  expect(bounds.x + bounds.width / 2).toBeCloseTo(bodyBox.x + bodyBox.width / 2, 0);
   expect(viewport.height - bounds.y - bounds.height).toBeCloseTo(24, 0);
   expect(await page.evaluate(() => devicePixelRatio)).toBe(originalDpr);
   await page.screenshot({
@@ -1069,7 +1070,8 @@ test("edits content in a full viewport with an optional title and fixed characte
   const compact = (await editor.boundingBox())!;
   expect(compact.width).toBeLessThan(viewport.width);
   expect(compact.height).toBeLessThan(viewport.height);
-  expect(compact.x).toBeCloseTo((viewport.width - compact.width) / 2);
+  const layoutWidth = await page.evaluate(() => document.body.clientWidth);
+  expect(compact.x).toBeCloseTo((layoutWidth - compact.width) / 2);
   expect(compact.y).toBeCloseTo((viewport.height - compact.height) / 2);
   await expect(content).toContainText("contentonly");
   await expect(
