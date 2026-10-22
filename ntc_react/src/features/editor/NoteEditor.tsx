@@ -277,7 +277,7 @@ function NoteViewer({
         </Suspense>
       </div>
       <footer className="editor-footer note-view-footer">
-        <Button variant="secondary" onClick={onEdit}>
+        <Button variant="ghost" onClick={onEdit}>
           <Pencil size={15} />
           Edit
         </Button>

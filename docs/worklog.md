@@ -2,6 +2,11 @@
 
 > 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nút Edit trong note view dùng variant ghost, hết viền — 2026-10-22
+
+- NoteEditor.tsx (NoteViewer): nút Edit ở footer từ variant=secondary (có viền) sang variant=ghost, đồng bộ với nút Close cùng hàng; icon Pencil giữ nguyên.
+- Bằng chứng: typecheck/ESLint/Production Vite build PASS. Scope 1 dòng TSX, .NET không đổi.
+- Chưa kiểm thiết bị vật lý. Publication scope: NoteEditor.tsx + docs/worklog.md; giữ 2 appsettings local ngoài commit; push main theo quyền đã cấp rồi đối chiếu remote SHA.
 ## Viền select All notes + badge số Pinned/Everything else to đậm hơn — 2026-10-22
 
 - CSS-only (styles.css): .select-wrap thêm viền pill (border var(--border), radius 8px, bg var(--surface)), select chữ 12px/500 var(--text) min-width 90px để hàng All notes có khung rõ như các nút khác. .section-heading h2 span (badge số Pinned / Everything else / Trash groups) từ 8px mờ #aeb4bc lên 11px/600 var(--subtle) + viền + nền var(--hover), tabular-nums, dễ đọc hơn ở cả light/dark.
