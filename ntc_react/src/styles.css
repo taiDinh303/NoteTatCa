@@ -4157,6 +4157,16 @@ td {
   flex-direction: column;
   min-height: 0;
 }
+.note-view-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 0;
+  overflow-wrap: anywhere;
+}
+.note-view-heading h2 { margin: 0; font-size: 20px; }
+.note-view-footer { justify-content: flex-end; }
+.note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
   .modal.note-editor-modal {
     inset: 0;

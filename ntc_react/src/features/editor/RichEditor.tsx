@@ -75,6 +75,23 @@ export interface EditorCommands {
   focus: () => void;
   plainText: () => string;
 }
+export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
+  const editor = useEditor({
+    extensions: extensions.filter(
+      (extension) => extension.name !== "placeholder",
+    ),
+    content: JSON.parse(documentJson),
+    editable: false,
+    editorProps: {
+      attributes: {
+        class: "rich-editor",
+        "aria-label": "Note content",
+        role: "region",
+      },
+    },
+  });
+  return <EditorContent editor={editor} />;
+}
 export default function RichEditor({
   initial,
   onChange,

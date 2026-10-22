@@ -83,3 +83,9 @@ Take a note mở editor nhỏ mặc định; chọn Enter full screen nếu mu�
 Tiêu đề note hiển thị ngay cạnh icon ở đầu thẻ trong danh sách. Khi đổi màu bằng cọ vẽ, toàn bộ khung note đang mở đổi nền; màu tự lưu và đồng bộ với thẻ ngoài danh sách.
 
 Cập nhật2026-10-22: trên điện thoại (giao diện≤800px), tạo/mở note luôn toàn màn hình và không có nút thu/phóng. Desktop giữ khung nhỏ mặc định và nút chuyển kích thước. Close vẫn đóng note, autosave giữ nguyên.
+
+### Xem trước, Edit mới sửa — 2026-10-22
+
+Bấm thẻ note đã lưu để xem nội dung. Màn hình xem chỉ có nội dung và nút Edit/Close; chạm nội dung hoặc checklist không sửa note. Chọn Edit để hiện các công cụ và autosave như trước. Tạo note mới vẫn nhập trực tiếp.
+
+Menu ba chấm trên thẻ có Add label (chọn nhãn rồi Save labels) và Add reminder (mở nhắc lịch của note). Không còn Open note/Pin/Unpin note trong menu; bấm thẻ để xem và dùng nút ghim riêng. Move earlier/later và Move to trash vẫn giữ.

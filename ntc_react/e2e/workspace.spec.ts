@@ -1154,6 +1154,7 @@ test("edits content in a full viewport with an optional title and fixed characte
   await card
     .getByRole("button", { name: "Open Untitled", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
   const reopened = page.getByRole("dialog", { name: "Edit note", exact: true });
   await expect(
     reopened.getByLabel("Note title", { exact: true }),
@@ -1208,6 +1209,7 @@ test("keeps the optional title focused when the rich editor loads slowly", async
         exact: true,
       })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     const reopened = page.getByRole("dialog", {
       name: "Edit note",
       exact: true,
@@ -1293,6 +1295,7 @@ for (const theme of ["light", "dark"]) {
     await page
       .getByRole("button", { name: `Open ${title}`, exact: true })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     const reopened = page.getByRole("dialog", {
       name: "Edit note",
       exact: true,
@@ -1449,6 +1452,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
   await page
     .getByRole("button", { name: "Open Project notes", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
   let editor = page.getByRole("dialog", { name: "Edit note", exact: true });
   await editor
     .getByRole("button", { name: "Note reminders", exact: true })
@@ -2113,6 +2117,7 @@ for (const mobile of [false, true]) {
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await page.getByText("Centered private text", { exact: true }).click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(
       editor
@@ -2144,6 +2149,7 @@ for (const mobile of [false, true]) {
       await editor.getByRole("button", { name: "Close", exact: true }).click();
       await page.reload();
       await page.getByText("Centered private text", { exact: true }).click();
+      await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
       editor = page.getByRole("dialog", { name: "Edit note", exact: true });
       await expect(
         editor

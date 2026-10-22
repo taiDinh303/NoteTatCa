@@ -4,7 +4,7 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
-UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/evidence xem FRONTEND-IMPLEMENTATION. Backend đã có v1, version409, idempotency, documentJSON schema1, inbox/admin no-content. DEC-018/2026-10-20: editor desktop mặc định khung nhỏ cho cả tạo/mở note, có nút phóng to/thu nhỏ; yêu cầu2026-10-22: mobile≤800px luôn toàn màn hình, ẩn nút thu/phóng; autosave/status/error, không Save thường; Retry save khi lỗi, Close bảo vệ draft. Title rỗng ẩn, Add title mở ô nhập tùy chọn; counter cố định góc dưới. Duplicate labels phân biệt ID;100k text/1MiB document. Cảnh báo convert rich→plain/Markdown, giữ bản nhập khi conflict; không tự retry overwrite. Storage refresh/multi-tab/XSS và accessibility cần test khi làm React.
+UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/evidence xem FRONTEND-IMPLEMENTATION. Backend đã có v1, version409, idempotency, documentJSON schema1, inbox/admin no-content. DEC-023/2026-10-22: note đã lưu mặc định View note chỉ đọc, chỉ nút Edit bật editor; note mới vào editor ngay. DEC-018/2026-10-20: editor desktop mặc định khung nhỏ cho cả tạo/mở note, có nút phóng to/thu nhỏ; yêu cầu2026-10-22: mobile≤800px luôn toàn màn hình, ẩn nút thu/phóng; autosave/status/error, không Save thường; Retry save khi lỗi, Close bảo vệ draft. Title rỗng ẩn, Add title mở ô nhập tùy chọn; counter cố định góc dưới. Duplicate labels phân biệt ID;100k text/1MiB document. Cảnh báo convert rich→plain/Markdown, giữ bản nhập khi conflict; không tự retry overwrite. Storage refresh/multi-tab/XSS và accessibility cần test khi làm React.
 
 ## Phạm vi đã chốt
 
@@ -83,3 +83,7 @@ Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identit
 ## Tiêu đề card dài — 2026-10-21
 
 Tiêu đề trong note-card-identity hiển thị một dòng, overflow hidden/text-overflow ellipsis, co theo khoảng còn lại cạnh icon/action. Native title tooltip chứa đầy đủ tiêu đề; input editor và dữ liệu150ký tự giữ nguyên. Không cắt chuỗi đã lưu.
+
+## Chế độ xem note — DEC-023 / 2026-10-22
+
+Note đã lưu mở View note chỉ đọc: icon/title/nội dung và Edit/Close. Không toolbar/input/counter/tool chỉnh sửa; chạm/gõ/checklist không thay dữ liệu. Edit bật editor đầy đủ, note mới vào editor ngay. Card menu: Add label, Add reminder, Move earlier/later, Move to trash; không Open note hoặc Pin/Unpin note trong menu. Ghim vẫn có nút riêng. Mobile view/editor toàn màn hình, desktop view nhỏ và editor có nút thu/phóng.

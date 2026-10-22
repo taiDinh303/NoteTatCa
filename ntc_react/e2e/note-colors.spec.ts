@@ -85,6 +85,7 @@ for (const mobile of [false, true]) {
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await page.getByText("Palette private note", { exact: true }).click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor.locator(".editor-heading")).toHaveCSS(
       "background-color",

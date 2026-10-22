@@ -15,6 +15,7 @@ import {
   Download,
   Maximize2,
   Minimize2,
+  Pencil,
   Pin,
   PinOff,
   RotateCcw,
@@ -44,13 +45,22 @@ import NoteColorPicker from "./NoteColorPicker";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 const RichEditor = lazy(() => import("./RichEditor"));
+const ReadOnlyContent = lazy(() =>
+  import("./RichEditor").then((module) => ({
+    default: module.ReadOnlyContent,
+  })),
+);
+export type NoteOpenAction = "labels" | "reminder";
 export default function NoteEditor({
   noteId,
   onClose,
+  initialAction,
 }: {
   noteId?: string;
   onClose: () => void;
+  initialAction?: NoteOpenAction;
 }) {
+  const [editing, setEditing] = useState(!noteId);
   const query = useQuery({
     queryKey: workspace.key("note", noteId),
     queryFn: () => notes.find(noteId!),
@@ -79,12 +89,196 @@ export default function NoteEditor({
         </footer>
       </Modal>
     );
+  if (query.data && !editing && initialAction === "labels")
+    return <NoteLabelsDialog note={query.data} onClose={onClose} />;
+  if (query.data && !editing)
+    return (
+      <NoteViewer
+        note={query.data}
+        onClose={onClose}
+        onEdit={() => setEditing(true)}
+        initialAction={initialAction}
+      />
+    );
   return (
     <EditorSession
       key={noteId ?? "new"}
       initial={query.data}
       onClose={onClose}
     />
+  );
+}
+function NoteLabelsDialog({
+  note,
+  onClose,
+}: {
+  note: Note;
+  onClose: () => void;
+}) {
+  const labels = useLabels();
+  const [original] = useState(note);
+  const [tagIds, setTagIds] = useState(() =>
+    note.tags.map((label) => label.id),
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>();
+  const allLabels = labels.data?.pages.flatMap((page) => page.items) ?? [];
+  return (
+    <Modal
+      open
+      onClose={() => {
+        if (!busy) onClose();
+      }}
+      title="Note labels"
+    >
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          setBusy(true);
+          setError(undefined);
+          void notes
+            .setLabels(original, tagIds)
+            .then((updated) => {
+              workspace.commit(updated);
+              onClose();
+            })
+            .catch(setError)
+            .finally(() => setBusy(false));
+        }}
+      >
+        <div className="modal-body">
+          <ErrorBanner error={error} />
+          {labels.isError ? (
+            <ErrorPanel
+              error={labels.error}
+              retry={() => void labels.refetch()}
+            />
+          ) : labels.isPending ? (
+            <Spinner />
+          ) : allLabels.length ? (
+            allLabels.map((label) => (
+              <label key={label.id} className="check-label">
+                <input
+                  type="checkbox"
+                  checked={tagIds.includes(label.id)}
+                  disabled={
+                    busy || (!tagIds.includes(label.id) && tagIds.length >= 20)
+                  }
+                  onChange={() =>
+                    setTagIds((current) =>
+                      current.includes(label.id)
+                        ? current.filter((id) => id !== label.id)
+                        : [...current, label.id],
+                    )
+                  }
+                />
+                <span
+                  className="color-dot"
+                  style={{ background: label.color ?? "#a0a8b2" }}
+                />
+                {label.name}
+              </label>
+            ))
+          ) : (
+            <p className="muted">
+              Create labels from the sidebar to organize your notes.
+            </p>
+          )}
+          {labels.hasNextPage ? (
+            <Button
+              variant="ghost"
+              disabled={busy}
+              onClick={() => void labels.fetchNextPage()}
+            >
+              Load more labels
+            </Button>
+          ) : null}
+        </div>
+        <footer className="modal-footer">
+          <Button variant="ghost" disabled={busy} onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            busy={busy}
+            disabled={labels.isPending || labels.isError}
+          >
+            Save labels
+          </Button>
+        </footer>
+      </form>
+    </Modal>
+  );
+}
+function NoteViewer({
+  note,
+  onClose,
+  onEdit,
+  initialAction,
+}: {
+  note: Note;
+  onClose: () => void;
+  onEdit: () => void;
+  initialAction?: NoteOpenAction;
+}) {
+  const me = useMe();
+  const auth = useAuth();
+  const [reminderOpen, setReminderOpen] = useState(
+    initialAction === "reminder",
+  );
+  if (reminderOpen)
+    return (
+      <ReminderDialog
+        noteId={note.id}
+        title={note.title ?? ""}
+        zone={
+          me.data?.account.timeZoneId ??
+          auth.session?.timeZoneId ??
+          "Asia/Ho_Chi_Minh"
+        }
+        onClose={() => setReminderOpen(false)}
+      />
+    );
+  return (
+    <Modal
+      open
+      wide
+      hideTitle
+      title="View note"
+      onClose={onClose}
+      className="note-editor-modal note-viewer"
+      style={{
+        ...notePalette(note.backgroundColor),
+        backgroundColor: note.backgroundColor || undefined,
+        ...(note.backgroundColor ? { "--surface": note.backgroundColor } : {}),
+      }}
+    >
+      {note.title || note.iconEmoji ? (
+        <div className="note-view-heading">
+          {note.iconEmoji ? (
+            <span aria-hidden="true">{note.iconEmoji}</span>
+          ) : null}
+          {note.title ? <h2>{note.title}</h2> : null}
+        </div>
+      ) : null}
+      <div className="editor-scroll">
+        <Suspense fallback={<Spinner label="Loading note…" />}>
+          <ReadOnlyContent
+            key={note.version}
+            documentJson={draftFrom(note).documentJson}
+          />
+        </Suspense>
+      </div>
+      <footer className="editor-footer note-view-footer">
+        <Button variant="secondary" onClick={onEdit}>
+          <Pencil size={15} />
+          Edit
+        </Button>
+        <Button variant="ghost" onClick={onClose}>
+          Close
+        </Button>
+      </footer>
+    </Modal>
   );
 }
 function EditorSession({

@@ -62,6 +62,12 @@ export class NotesRepository {
       body: { isPinned: !note.isPinned, version: note.version },
     });
   }
+  setLabels(note: Note, tagIds: string[]) {
+    return this.api.request<Note>(`/notes/${note.id}`, {
+      method: "PATCH",
+      body: { tagIds, version: note.version },
+    });
+  }
   trash(id: string) {
     return this.api.request<boolean>(`/notes/${id}/trash`, { method: "POST" });
   }

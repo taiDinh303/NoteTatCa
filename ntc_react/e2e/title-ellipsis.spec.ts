@@ -35,8 +35,9 @@ for (const width of [393, 1280]) {
     const box = (await heading.boundingBox())!;
     expect(box.height).toBeLessThan(25);
     await page
-      .getByRole("button", { name: `Edit ${title}`, exact: true })
+      .getByRole("button", { name: `View ${title}`, exact: true })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     await expect(
       page
         .getByRole("dialog", { name: "Edit note", exact: true })

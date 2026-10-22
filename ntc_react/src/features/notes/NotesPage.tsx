@@ -53,6 +53,7 @@ import {
 } from "../../shared/ui";
 import { errorMessage, shortDate } from "../../shared/utils";
 const NoteEditor = lazy(() => import("../editor/NoteEditor"));
+import type { NoteOpenAction } from "../editor/NoteEditor";
 function NoteCard({
   note,
   onOpen,
@@ -61,6 +62,7 @@ function NoteCard({
   onAction,
   onMove,
   draggable,
+  onOrganize,
 }: {
   note: Note;
   onOpen: () => void;
@@ -69,6 +71,7 @@ function NoteCard({
   onAction: (action: "pin" | "trash" | "restore" | "delete") => void;
   onMove: (direction: number) => void;
   draggable: boolean;
+  onOrganize: (action: NoteOpenAction) => void;
 }) {
   const {
     setNodeRef,
@@ -105,9 +108,18 @@ function NoteCard({
     >
       <div className="note-card-top">
         {note.iconEmoji || note.title?.trim() ? (
-          <button type="button" className="note-card-identity" onClick={onOpen} aria-label={`Edit ${title}`}>
-            {note.iconEmoji ? <span className="note-emoji">{note.iconEmoji}</span> : null}
-            {note.title?.trim() ? <h3 title={note.title}>{note.title}</h3> : null}
+          <button
+            type="button"
+            className="note-card-identity"
+            onClick={onOpen}
+            aria-label={`View ${title}`}
+          >
+            {note.iconEmoji ? (
+              <span className="note-emoji">{note.iconEmoji}</span>
+            ) : null}
+            {note.title?.trim() ? (
+              <h3 title={note.title}>{note.title}</h3>
+            ) : null}
           </button>
         ) : null}
         <div className="row-actions">
@@ -198,11 +210,16 @@ function NoteCard({
             <ActionMenu
               label={`Actions for ${title}`}
               items={[
-                { label: "Open note", icon: FileText, action: onOpen },
                 {
-                  label: note.isPinned ? "Unpin note" : "Pin note",
-                  icon: Pin,
-                  action: () => onAction("pin"),
+                  label: "Add label",
+                  icon: Tag,
+                  action: () => onOrganize("labels"),
+                  disabled: busy,
+                },
+                {
+                  label: "Add reminder",
+                  icon: Bell,
+                  action: () => onOrganize("reminder"),
                   disabled: busy,
                 },
                 {
@@ -258,7 +275,10 @@ export default function NotesPage({
   };
   const query = useNotes(filter);
   const labels = useLabels();
-  const [editor, setEditor] = useState<{ id?: string } | null>(null);
+  const [editor, setEditor] = useState<{
+    id?: string;
+    action?: NoteOpenAction;
+  } | null>(null);
   const selected = params.get("note");
   const [view, setView] = useState(() => {
     try {
@@ -358,6 +378,7 @@ export default function NotesPage({
                 busy={pending === note.id}
                 trash={trash}
                 draggable={canDrag}
+                onOrganize={(action) => setEditor({ id: note.id, action })}
                 onOpen={() => {
                   if (trash) {
                     navigate(`/trash?note=${note.id}`);
@@ -529,6 +550,8 @@ export default function NotesPage({
             <TrashViewer id={editor?.id ?? selected!} onClose={closeEditor} />
           ) : (
             <NoteEditor
+              key={`${editor?.id ?? selected ?? "new"}:${editor?.action ?? "view"}`}
+              initialAction={editor?.action}
               noteId={editor?.id ?? selected ?? undefined}
               onClose={closeEditor}
             />

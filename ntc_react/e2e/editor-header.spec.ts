@@ -78,6 +78,7 @@ for (const width of [320, 393, 430, 768, 1280]) {
     await page
       .getByRole("button", { name: "Open Compact header title", exact: true })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor).not.toHaveClass(/fullscreen/);
     if (width <= 800) {

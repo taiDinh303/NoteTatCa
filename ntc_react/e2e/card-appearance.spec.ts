@@ -92,8 +92,9 @@ for (const dark of [false, true]) {
       path: `../artifacts/frontend/card-identity-${dark ? "dark-mobile" : "light-desktop"}.png`,
     });
     await card
-      .getByRole("button", { name: "Edit Card appearance", exact: true })
+      .getByRole("button", { name: "View Card appearance", exact: true })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor).toHaveCSS("background-color", "rgb(32, 40, 36)");
     await editor

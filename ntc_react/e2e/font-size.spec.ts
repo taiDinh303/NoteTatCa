@@ -53,6 +53,7 @@ for (const width of [393, 1280]) {
     await page
       .getByRole("button", { name: "Open Font size note", exact: true })
       .click();
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     content = editor.getByRole("textbox", { name: "Note content" });
     await expect(
