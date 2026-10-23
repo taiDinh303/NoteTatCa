@@ -144,7 +144,7 @@ for (const width of [393, 1280]) {
     await expect(
       page.getByRole("dialog", { name: "Edit note", exact: true }),
     ).toHaveCount(0);
-    await labels.getByRole("checkbox", { name: "Work", exact: true }).check();
+    await labels.getByRole("button", { name: "Work", exact: true }).click();
     let rejectLabelSave = true;
     await page.route("**/api/v1/notes/*", async (route) => {
       if (route.request().method() === "PATCH" && rejectLabelSave) {
@@ -156,16 +156,12 @@ for (const width of [393, 1280]) {
         });
       } else await route.continue();
     });
-    await labels
-      .getByRole("button", { name: "Save labels", exact: true })
-      .click();
+    await labels.getByRole("button", { name: "Save", exact: true }).click();
     await expect(
-      labels.getByRole("checkbox", { name: "Work", exact: true }),
-    ).toBeChecked();
+      labels.getByRole("button", { name: "Work", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
     await expect(labels.getByRole("alert")).toBeVisible();
-    await labels
-      .getByRole("button", { name: "Save labels", exact: true })
-      .click();
+    await labels.getByRole("button", { name: "Save", exact: true }).click();
     await expect(card.locator(".note-tags")).toContainText("Work");
     await card
       .getByRole("button", { name: "Actions for Read first note", exact: true })

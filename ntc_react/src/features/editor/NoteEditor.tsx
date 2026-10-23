@@ -12,6 +12,7 @@ import { useBlocker } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
+  Check,
   Copy,
   Download,
   Eye,
@@ -45,6 +46,7 @@ import {
   Spinner,
 } from "../../shared/ui";
 import NoteColorPicker from "./NoteColorPicker";
+import "./NoteLabelsDialog.css";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 const RichEditor = lazy(() => import("./RichEditor"));
@@ -141,6 +143,9 @@ function NoteLabelsDialog({
         if (!busy) onClose();
       }}
       title={tr("Note labels")}
+      hideTitle
+      hideCloseButton
+      className="note-labels-dialog"
     >
       <form
         onSubmit={(event) => {
@@ -167,29 +172,36 @@ function NoteLabelsDialog({
           ) : labels.isPending ? (
             <Spinner />
           ) : allLabels.length ? (
-            allLabels.map((label) => (
-              <label key={label.id} className="check-label">
-                <input
-                  type="checkbox"
-                  checked={tagIds.includes(label.id)}
+            <div className="note-label-options">
+              {allLabels.map((label) => (
+                <button
+                  key={label.id}
+                  type="button"
+                  className="note-label-option"
+                  aria-pressed={tagIds.includes(label.id)}
                   disabled={
                     busy || (!tagIds.includes(label.id) && tagIds.length >= 20)
                   }
-                  onChange={() =>
+                  onClick={() =>
                     setTagIds((current) =>
                       current.includes(label.id)
                         ? current.filter((id) => id !== label.id)
                         : [...current, label.id],
                     )
                   }
-                />
-                <span
-                  className="color-dot"
-                  style={{ background: label.color ?? "#a0a8b2" }}
-                />
-                {label.name}
-              </label>
-            ))
+                >
+                  <Tag
+                    size={14}
+                    aria-hidden="true"
+                    style={{ color: label.color ?? undefined }}
+                  />
+                  <span>{label.name}</span>
+                  {tagIds.includes(label.id) ? (
+                    <Check size={14} aria-hidden="true" />
+                  ) : null}
+                </button>
+              ))}
+            </div>
           ) : (
             <p className="muted">
               {tr("Create labels from the sidebar to organize your notes.")}
@@ -214,7 +226,7 @@ function NoteLabelsDialog({
             busy={busy}
             disabled={labels.isPending || labels.isError}
           >
-            {tr("Save labels")}
+            {tr("Save")}
           </Button>
         </footer>
       </form>

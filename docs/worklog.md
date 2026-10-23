@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Modal chọn label dạng nút và footer cố định — 2026-10-23
+
+- Theo ảnh/yêu cầu: bỏ title hiển thị Note labels và X, giữ title sr-only cho accessibility; đổi checkbox list thành native toggle button aria-pressed, hàng ngang/wrap, nền/viền/tick cho selected, chưa chọn mờ, disabled khi đủ20 hoặc đang lưu. Tên dài wrap trong nút không tràn khung. NoteLabelsDialog.css scoped modal: chỉ modal-body cuộn, form flex/min-height0, footer Cancel/Save không co; Save labels→Save dùng bản dịch có sẵn. Không đổi API/version/ownership hoặc dữ liệu.
+- Validation từ root: React Production build PASS; .NET solution Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS. Chromium mới2/2 PASS:320px dark/1440px light,40labels/tên50ký tự, title clipped/X absent, trạng thái selected/unselected, scroll>100px và tọa độ Cancel/Save không đổi, không tràn ngang, giới hạn20/disable và bật lại khi bỏ chọn, Space toggle, Save persist/Cancel không lưu. Viewer/card shortcuts/error retry hiện có2/2 PASS ở393/1280px, cập nhật locator button/Save. Đã xem screenshot mobile/desktop. Lượt mới đầu fail vì test dùng toBeHidden cho title sr-only (Playwright vẫn coi visible); đổi assertion sang CSS clip/1px rồi chạy lại2/2 PASS.
+- Review react-best-practices: native button/aria-pressed hỗ trợ keyboard, không thêm hooks/dependency, giữ busy/error/conflict/draft hiện có. Không full suite/thiết bị thật/production; loopback fixture SQLite/email giả, không DB/email thật/manual deploy/migrate.
+- Publication scope: NoteEditor.tsx, NoteLabelsDialog.css, e2e/note-label-buttons.spec.ts, e2e/note-view.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Giữ .agnes ngoài commit; push main theo quyền đã cấp và đối chiếu SHA remote.
+
 ## Trang Settings (PreferencesPage) full width, đồng bộ font/kích cỡ với Help & feedback — 2026-10-23
 
 - Theo ảnh chủ dự án: trang `/settings` (PreferencesPage, hiển thị "Settings" + các hàng Language/Privacy/Appearance) bị giới hạn `max-width: 720px`, nhỏ hơn Help & feedback. Đổi `.preferences-page` thành `width: 100%`, bỏ max-width, thêm `padding-bottom: 24px` như `.help-page`.
