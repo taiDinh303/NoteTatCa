@@ -990,7 +990,13 @@ strong {
 .note-card.dragging {
   box-shadow: 0 12px 40px #25304419;
   z-index: 30;
+  cursor: grabbing;
+  will-change: transform;
 }
+.note-card.draggable { cursor: grab; }
+.note-card.draggable.dragging { cursor: grabbing; }
+.note-card.draggable .note-open,
+.note-card.draggable .note-card-identity { cursor: inherit; }
 .note-card-top {
   display: flex;
   justify-content: space-between;

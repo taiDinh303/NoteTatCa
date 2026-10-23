@@ -2,6 +2,14 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kéo toàn bộ card, khớp grid khi zoom và animation nhẹ — 2026-10-23
+
+- Theo ảnh/yêu cầu: kéo từ thân/title/preview/labels/footer của card; ghim/menu không kích hoạt drag. Click bình thường vẫn mở View note. Handle tiếp tục hỗ trợ bàn phím. MouseSensor dùng ngưỡng7px; TouchSensor giữ220ms/tolerance6px để tránh chặn cuộn ngay khi chạm card.
+- Sửa translate từ tọa độ màn hình sang CSS pixels bằng cách chia --interface-scale. Card nhường chỗ khớp x/y ô grid khi app zoom75/100/125%; không scale thẻ khác chiều cao. Animation chỉ transform160ms ease-out, will-change chỉ khi đang kéo; giữ prefers-reduced-motion và giới hạn pinned group/filter/pagination/API.
+- Validation thực tế: Chromium7/7 PASS gồm4ca kéo từ preview (1440px zoom75/100/125%,393px100%), khớp mép ô sai số<2px, kích thước không đổi, không mở note khi kéo, thứ tự persist sau reload, menu/click mở note;2ca read-only/Edit/card shortcuts ở393/1280px;1ca pointer+keyboard reorder. Ca riêng cảm ứng giả lập Chromium393px nhấn giữ/kéo/drop/reload/menu/open1/1 PASS. Đã xem screenshot drag zoom75%. Không kiểm Safari/thiết bị cảm ứng thật hoặc đo FPS; fixture HTTP loopback5199, dữ liệu giả.
+- React Production build PASS (sau khi sửa lỗi type keyboard handler ở lần build đầu); ESLint max-warnings0 PASS; .NET solution Release --no-restore PASS,0warnings/0errors; git diff --check PASS. Lần browser đầu timeout chờ fixture180s, chạy lại fixture và các ca nêu trên PASS. Không chạy full suite/deploy/migrate hay dùng DB/email thật.
+- Publication scope: NotesPage.tsx, styles.css, e2e/drag-shape.spec.ts, docs/FRONTEND-IMPLEMENTATION.md, docs/worklog.md. Push main theo quyền đã cấp, đối chiếu remote SHA sau push. Giữ hai appsettings local và .agnes/ ngoài commit; thay đổi Help/sidebar của chat khác đã có ở88bb2b0 không thuộc commit này.
+
 ## Thêm mục "Trợ giúp và phản hồi" vào sidebar (chỉ link, chưa có nội dung) — 2026-10-23
 
 - Theo yêu cầu chủ dự án (ảnh): thêm mục "Trợ giúp và phản hồi" ở dưới Settings trong sidebar; chỉ cần mục + link tới trang, chưa cần nội dung.

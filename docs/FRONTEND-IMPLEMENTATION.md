@@ -178,6 +178,8 @@ Desktop: EditorSession khởi tạo fullscreen=false cho cả note mới và not
 
 NoteCard chỉ áp dụng translate từ sortable transform, bỏ scaleX/scaleY khi rectSortingStrategy đổi chỗ thẻ có chiều cao khác nhau. Giữ kích thước/chữ/icon của cả thẻ đang kéo và các thẻ đang nhường chỗ; opacity thẻ đang kéo0.95 để đọc rõ. Không thay reorder/ownership/pinned-group/keyboard hoặc API.
 
+Cập nhật2026-10-23: kéo từ thân card, title, preview, labels hoặc footer; nút ghim/menu độc lập. Chuột vượt7px mới kéo; cảm ứng giữ220ms, tolerance6px để cuộn một ngón vẫn dùng được. Handle giữ cho bàn phím Space/arrows/Space. Khoảng translate chia cho --interface-scale để card nhường chỗ khớp mép ô grid ở app zoom khác100%. Chỉ animate transform160ms ease-out; card đang kéo theo con trỏ trực tiếp, không scale hoặc animate kích thước; tôn trọng prefers-reduced-motion hiện có. Các giới hạn pinned-group, search/filter/pagination và API reorder giữ nguyên.
+
 ## Tiêu đề cạnh icon và màu nền toàn editor — 2026-10-21
 
 Thẻ note ngoài danh sách đặt icon và title trong cùng note-card-identity ở hàng đầu, title có thể wrap dài; cả identity và nội dung vẫn mở note, ghim/drag riêng. Không tự thêm Untitled hiển thị cho note rỗng title. Modal nhận style tùy chọn để NoteEditor truyền backgroundColor, surface và foreground theo notePalette: màu áp dụng cả header/body/toolbar/footer, default bỏ override và trở về theme. Inline màu chữ người dùng vẫn giữ. Không đổi dữ liệu/API/schema.

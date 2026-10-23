@@ -4,7 +4,8 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -16,7 +17,6 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import {
   ArrowDown,
   ArrowUp,
@@ -80,7 +80,17 @@ function NoteCard({
     isDragging,
     attributes,
     listeners,
-  } = useSortable({ id: note.id, disabled: !draggable });
+  } = useSortable({
+    id: note.id,
+    disabled: !draggable,
+    transition: { duration: 160, easing: "ease-out" },
+  });
+  // The title/preview buttons are also drag surfaces. Keep action controls
+  // independent, and leave keyboard activation on the accessible handle.
+  const canStartDrag = (target: EventTarget) =>
+    target instanceof Element &&
+    (!target.closest("button, a, input, [role='menuitem']") ||
+      !!target.closest(".note-open, .note-card-identity, .drag-handle"));
   const [now] = useState(() => Date.now());
   const expiry = note.deletedTime
     ? Math.max(
@@ -96,15 +106,23 @@ function NoteCard({
       ref={setNodeRef}
       style={{
         ...notePalette(note.backgroundColor),
-        // Rect sorting also supplies scale factors for differently sized cards.
-        // Move cards without stretching their text, icons or height.
-        transform: CSS.Translate.toString(transform),
+        // Dnd-kit measures screen pixels; CSS transforms use pixels before the
+        // app's CSS zoom. Translate only, so unequal cards keep their shape.
+        transform: transform
+          ? `translate3d(calc(${transform.x}px / var(--interface-scale)), calc(${transform.y}px / var(--interface-scale)), 0)`
+          : undefined,
         transition: transition,
         backgroundColor: note.backgroundColor || undefined,
         opacity: isDragging ? 0.95 : 1,
       }}
-      className={`note-card ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
+      className={`note-card ${draggable ? "draggable" : ""} ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}
+      onMouseDown={(event) => {
+        if (canStartDrag(event.target)) listeners?.onMouseDown?.(event);
+      }}
+      onTouchStart={(event) => {
+        if (canStartDrag(event.target)) listeners?.onTouchStart?.(event);
+      }}
     >
       <div className="note-card-top">
         {note.iconEmoji || note.title?.trim() ? (
@@ -130,7 +148,7 @@ function NoteCard({
               aria-label={tr("Move {0}", title)}
               title={tr("Drag to move. Keyboard: Space, arrow keys, Space.")}
               {...attributes}
-              {...listeners}
+              onKeyDown={(event) => listeners?.onKeyDown?.(event)}
             >
               <GripVertical size={16} />
             </button>
@@ -172,7 +190,11 @@ function NoteCard({
             <span
               key={t.id}
               className="label-chip"
-              style={t.color ? { background: labelTint(t.color) ?? undefined } : undefined}
+              style={
+                t.color
+                  ? { background: labelTint(t.color) ?? undefined }
+                  : undefined
+              }
             >
               <Tag size={10} style={t.color ? { color: t.color } : undefined} />
               {t.name}
@@ -309,7 +331,10 @@ export default function NotesPage({
   const canDrag =
     !trash && !q && !tagId && !reminderView && !query.hasNextPage && !pending;
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 7 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 7 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 220, tolerance: 6 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
