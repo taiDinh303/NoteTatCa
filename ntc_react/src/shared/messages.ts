@@ -1,5 +1,8 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Note information": ["Thông tin ghi chú", "笔记信息", "ノート情報"],
+  Edited: ["Đã sửa", "已编辑", "編集済み"],
+  "Last edited": ["Chỉnh sửa lần cuối", "最后编辑", "最終編集"],
   Default: ["Mặc định", "默认", "デフォルト"],
   Administration: ["Quản trị", "管理", "管理"],
   "System management": ["Quản lý hệ thống", "系统管理", "システム管理"],

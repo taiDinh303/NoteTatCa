@@ -1097,6 +1097,7 @@ strong {
   letter-spacing: 0.1px;
   color: var(--muted);
 }
+.note-card-footer > .row-actions { margin-left: auto; }
 .note-card-footer .icon-button {
   width: 27px;
   height: 25px;
@@ -4169,7 +4170,17 @@ td {
   overflow-wrap: anywhere;
 }
 .note-view-heading h2 { margin: 0; font-size: 20px; }
-.note-view-footer { justify-content: flex-end; border-top: 0; }
+.note-view-footer { justify-content: space-between; border-top: 0; flex-wrap: nowrap; gap: 8px; }
+.note-view-actions { display: flex; align-items: center; flex-shrink: 0; gap: 4px; }
+.note-view-timestamp { background: none; border: 0; padding: 6px 0; text-align: left; color: var(--subtle); font-size: 12px; cursor: pointer; min-width: 0; }
+.note-view-timestamp:hover { color: var(--text); }
+.note-information { z-index: 170; width: min(340px, calc(100vw / var(--interface-scale) - 24px)); background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 28px #0002; padding: 16px; }
+.note-information h3 { font-size: 14px; margin: 0 0 12px; }
+.note-information dl { margin: 0; font-size: 12px; }
+.note-information dl > div { display: flex; justify-content: space-between; gap: 16px; padding: 8px 0; }
+.note-information dt { color: var(--subtle); }
+.note-information dd { margin: 0; text-align: right; }
+@container viewport (max-width: 480px) { .note-view-timestamp { font-size: 10px; } }
 .note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
   .modal.note-editor-modal {
@@ -4529,10 +4540,11 @@ td {
 .note-icon-grid button:focus-visible { outline: 2px solid var(--text); }
 .note-icon-menu input { width: 100%; }
 
-.editor-toolbar .font-size-stepper { display: flex; align-items: center; gap: 1px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
-.editor-toolbar .font-size-stepper .icon-button { width: 26px; height: 26px; min-width: 26px; padding: 0; }
-.font-size-input { width: 44px; min-width: 44px; height: 26px; padding: 0 4px; border: 0; background: transparent; font-size: 12px; font-weight: 600; text-align: center; color: var(--text); font-variant-numeric: tabular-nums; appearance: textfield; }
-.font-size-input:focus { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent-soft); }
+.editor-toolbar .font-size-stepper { display: flex; align-items: center; gap: 1px; border: 0; background: transparent; }
+.editor-toolbar .font-size-stepper .icon-button { width: 29px; height: 29px; min-width: 29px; padding: 0; }
+.editor-toolbar input.font-size-input { width: 40px; min-width: 40px; height: 29px; padding: 0 4px; border: 0; border-radius: 6px; box-shadow: none; background: transparent; font-size: 12px; font-weight: 600; text-align: center; color: inherit; font-variant-numeric: tabular-nums; appearance: textfield; }
+.editor-toolbar .font-size-input:hover { background: var(--hover); }
+.editor-toolbar input.font-size-input:focus { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent-soft); }
 .font-size-input::-webkit-outer-spin-button, .font-size-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .note-card-identity { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; background: none; border: 0; padding: 0; text-align: left; color: inherit; }

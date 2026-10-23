@@ -33,6 +33,7 @@ import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom, EMOJIS } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
 import { useAuth, useLabels, useMe } from "../../shared/hooks";
+import { dateTime } from "../../shared/utils";
 import {
   ActionMenu,
   Button,
@@ -237,6 +238,14 @@ function NoteViewer({
   const [reminderOpen, setReminderOpen] = useState(
     initialAction === "reminder",
   );
+  const zone = me.data?.account.timeZoneId ?? auth.session?.timeZoneId;
+  const modified = new Intl.DateTimeFormat(currentLanguage(), {
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: zone,
+  }).format(new Date(note.lastUpdatedTime));
   if (reminderOpen)
     return (
       <ReminderDialog
@@ -281,13 +290,56 @@ function NoteViewer({
         </Suspense>
       </div>
       <footer className="editor-footer note-view-footer">
-        <Button variant="ghost" onClick={onEdit}>
-          <Pencil size={15} />
-          {tr("Edit")}
-        </Button>
-        <Button variant="ghost" onClick={onClose}>
-          {tr("Close")}
-        </Button>
+        <Popover.Root>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className="note-view-timestamp"
+              aria-label={tr("Note information")}
+            >
+              {tr("Edited")} ·{" "}
+              <time dateTime={note.lastUpdatedTime}>{modified}</time>
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              className="note-information"
+              side="top"
+              align="start"
+              sideOffset={8}
+              collisionPadding={12}
+            >
+              <h3>{tr("Note information")}</h3>
+              <dl>
+                <div>
+                  <dt>{tr("Created")}</dt>
+                  <dd>
+                    <time dateTime={note.createdTime}>
+                      {dateTime(note.createdTime, zone)}
+                    </time>
+                  </dd>
+                </div>
+                <div>
+                  <dt>{tr("Last edited")}</dt>
+                  <dd>
+                    <time dateTime={note.lastUpdatedTime}>
+                      {dateTime(note.lastUpdatedTime, zone)}
+                    </time>
+                  </dd>
+                </div>
+              </dl>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
+        <div className="note-view-actions">
+          <Button variant="ghost" onClick={onEdit}>
+            <Pencil size={15} />
+            {tr("Edit")}
+          </Button>
+          <Button variant="ghost" onClick={onClose}>
+            {tr("Close")}
+          </Button>
+        </div>
       </footer>
     </Modal>
   );
@@ -746,7 +798,8 @@ function EditorSession({
           </div>
           <div className="row-actions">
             <span className="editor-count" aria-label={tr("Character count")}>
-              {characterCount.toLocaleString(currentLanguage())} / {(100000).toLocaleString(currentLanguage())}
+              {characterCount.toLocaleString(currentLanguage())} /{" "}
+              {(100000).toLocaleString(currentLanguage())}
             </span>
             {snapshot.status === "error" ? (
               <Button

@@ -212,3 +212,8 @@ Theo yêu cầu bổ sung với ảnh Active sessions làm chuẩn: bỏ max-wid
 ### Settings: các thao tác bên phải — 2026-10-22
 
 Theo ảnh/yêu cầu mới: bỏ heading/eyebrow/description đầu trang Settings, giữ navigation tabs. Edit profile căn dưới phải; Sign out everywhere căn dưới phải cả mobile. Account email/phone/password đã có dùng nút Change bên phải nội dung; tài khoản chưa có password bỏ câu No password is set... và thay bằng Set your password, mở luồng gửi password setup link hiện có. Google liên kết bỏ dòng Connected, giữ Disconnect/confirmation. Account contact xếp từng hàng trước khi xuống mục tiếp theo trên desktop/mobile; mobile có divider, grid nội dung co được và nút cùng mép phải. Tabs≤480px thu gap/font để đủ tên tại320px. Không đổi backend/API/auth/ownership; evidence tại worklog.
+
+
+### Thời gian chỉ trong View và toolbar cỡ chữ đồng bộ — 2026-10-23
+
+Card thường không hiển thị lastUpdatedTime; Trash giữ retention. View đặt Edited + ngày/giờ ở trái footer, Edit/Close ở phải. Nhấn thời gian mở popover Created/Last edited theo locale và timezone tài khoản; không thêm thời gian vào Edit. Menu card giữ bên phải. Cụm cỡ chữ bỏ border/nền bao riêng, nút± và ô nhập cao29px như các nút toolbar, nền hover/focus và màu chữ theo theme/note; giữ hành vi nhập/tăng/giảm hiện có.

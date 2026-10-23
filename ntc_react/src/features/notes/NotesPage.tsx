@@ -49,7 +49,7 @@ import {
   SkeletonCards,
   Spinner,
 } from "../../shared/ui";
-import { errorMessage, shortDate } from "../../shared/utils";
+import { errorMessage } from "../../shared/utils";
 const NoteEditor = lazy(() => import("../editor/NoteEditor"));
 import type { NoteOpenAction } from "../editor/NoteEditor";
 function NoteCard({
@@ -205,13 +205,13 @@ function NoteCard({
         </div>
       ) : null}
       <div className="note-card-footer">
-        <span className="note-date">
-          {trash
-            ? expiry
+        {trash ? (
+          <span className="note-date">
+            {expiry
               ? tr(expiry === 1 ? "{0} day left" : "{0} days left", expiry)
-              : tr("Retention elapsed")
-            : shortDate(note.lastUpdatedTime)}
-        </span>
+              : tr("Retention elapsed")}
+          </span>
+        ) : null}
         <div className="row-actions">
           {!trash && note.reminders.some((r) => r.isActive) ? (
             <span

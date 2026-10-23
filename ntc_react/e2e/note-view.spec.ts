@@ -28,6 +28,7 @@ for (const width of [393, 1280]) {
     await expect(content.locator("input[type=checkbox]")).toHaveCount(1);
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
+    await expect(page.locator(".note-card .note-date")).toHaveCount(0);
     let writes = 0;
     page.on("request", (request) => {
       if (
@@ -40,6 +41,32 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Open Read first note", exact: true })
       .click();
     let viewer = page.getByRole("dialog", { name: "View note", exact: true });
+    const timestamp = viewer.getByRole("button", {
+      name: "Note information",
+      exact: true,
+    });
+    await expect(timestamp).toContainText("Edited");
+    const stampBounds = (await timestamp.boundingBox())!;
+    const editBounds = (await viewer
+      .getByRole("button", { name: "Edit", exact: true })
+      .boundingBox())!;
+    expect(stampBounds.x).toBeLessThan(editBounds.x);
+    expect(
+      Math.abs(
+        stampBounds.y +
+          stampBounds.height / 2 -
+          editBounds.y -
+          editBounds.height / 2,
+      ),
+    ).toBeLessThan(3);
+    await timestamp.click();
+    const information = page.locator(".note-information");
+    await expect(information).toContainText("Created");
+    await expect(information).toContainText("Last edited");
+    await expect(information.locator("time")).toHaveCount(2);
+    await page.keyboard.press("Escape");
+    await expect(information).toHaveCount(0);
+    await expect(viewer).toBeVisible();
     const readContent = viewer.getByRole("region", { name: "Note content" });
     await expect(readContent).toContainText("Keep this checklist unchanged");
     await expect(readContent).toHaveAttribute("contenteditable", "false");
@@ -70,19 +97,36 @@ for (const width of [393, 1280]) {
     viewer = page.getByRole("dialog", { name: "View note", exact: true });
     await viewer.getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+    await expect(editor.locator(".note-view-timestamp")).toHaveCount(0);
+    const fontSize = editor.getByRole("spinbutton", {
+      name: "Font size",
+      exact: true,
+    });
+    const decrease = editor.getByRole("button", {
+      name: "Decrease font size",
+      exact: true,
+    });
+    const bold = editor.getByRole("button", { name: "Bold", exact: true });
+    expect((await fontSize.boundingBox())!.height).toBeCloseTo(
+      (await bold.boundingBox())!.height,
+      0,
+    );
+    expect((await decrease.boundingBox())!.height).toBeCloseTo(
+      (await bold.boundingBox())!.height,
+      0,
+    );
+    await expect(fontSize).toHaveCSS("border-top-width", "0px");
     await editor
       .getByRole("textbox", { name: "Note content" })
       .fill("Edited explicitly");
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
-    const card = page
-      .getByRole("article")
-      .filter({
-        has: page.getByRole("button", {
-          name: "Open Read first note",
-          exact: true,
-        }),
-      });
+    const card = page.getByRole("article").filter({
+      has: page.getByRole("button", {
+        name: "Open Read first note",
+        exact: true,
+      }),
+    });
     await expect(card).toContainText("Edited explicitly");
     await card
       .getByRole("button", { name: "Actions for Read first note", exact: true })
@@ -102,15 +146,23 @@ for (const width of [393, 1280]) {
     ).toHaveCount(0);
     await labels.getByRole("checkbox", { name: "Work", exact: true }).check();
     let rejectLabelSave = true;
-    await page.route('**/api/v1/notes/*', async route => {
-      if (route.request().method() === 'PATCH' && rejectLabelSave) {
+    await page.route("**/api/v1/notes/*", async (route) => {
+      if (route.request().method() === "PATCH" && rejectLabelSave) {
         rejectLabelSave = false;
-        await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ message: 'Synthetic label save failure' }) });
+        await route.fulfill({
+          status: 503,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Synthetic label save failure" }),
+        });
       } else await route.continue();
     });
-    await labels.getByRole("button", { name: "Save labels", exact: true }).click();
-    await expect(labels.getByRole('checkbox', { name: 'Work', exact: true })).toBeChecked();
-    await expect(labels.getByRole('alert')).toBeVisible();
+    await labels
+      .getByRole("button", { name: "Save labels", exact: true })
+      .click();
+    await expect(
+      labels.getByRole("checkbox", { name: "Work", exact: true }),
+    ).toBeChecked();
+    await expect(labels.getByRole("alert")).toBeVisible();
     await labels
       .getByRole("button", { name: "Save labels", exact: true })
       .click();
@@ -141,13 +193,22 @@ for (const width of [393, 1280]) {
       viewer.getByRole("region", { name: "Note content" }),
     ).toContainText("Edited explicitly");
     await expect(viewer.locator(".editor-toolbar")).toHaveCount(0);
-    await expect(viewer.getByRole('region', { name: 'Note content' })).toBeVisible();
-    await page.screenshot({ path: `test-results/note-view-${width}.png`, animations: 'disabled' });
+    await expect(
+      viewer.getByRole("region", { name: "Note content" }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `test-results/note-view-${width}.png`,
+      animations: "disabled",
+    });
     await viewer.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await expect(card.locator(".note-tags")).toContainText("Work");
-    const id = (await card.getAttribute('data-testid'))!.slice(5);
+    const id = (await card.getAttribute("data-testid"))!.slice(5);
     await page.goto(`/notes?note=${id}`);
-    await expect(page.getByRole('dialog', { name: 'View note', exact: true }).getByRole('region', { name: 'Note content' })).toContainText('Edited explicitly');
+    await expect(
+      page
+        .getByRole("dialog", { name: "View note", exact: true })
+        .getByRole("region", { name: "Note content" }),
+    ).toContainText("Edited explicitly");
   });
 }

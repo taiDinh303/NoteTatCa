@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thời gian chỉ ở View và đồng bộ cụm cỡ chữ toolbar — 2026-10-23
+
+- Theo lựa chọn cuối chủ dự án: card thường bỏ ngày, Edit không thêm ngày. View: nút Edited + ngày/giờ ở trái footer, Edit/Close bên phải; click thời gian mở Created/Last edited từ dữ liệu note thật, định dạng4ngôn ngữ và timezone tài khoản. Không thêm số ký tự vào View. Trash giữ số ngày retention; menu card vẫn căn phải.
+- Theo ảnh bổ sung: bỏ khung/nền riêng của font-size-stepper, nút± và ô nhập cùng chiều cao29px với toolbar, ô không border/box-shadow và bo góc6px, dùng nền hover/focus theo theme; giữ nhập/tăng/giảm/lưu cỡ chữ.
+- Review React theo skill react-best-practices: hooks không điều kiện, Popover dùng button/keyboard Escape, time có datetime, không thêm fetch hoặc thư viện. React Production build PASS; ESLint max-warnings0 PASS; .NET Release --no-restore PASS,0warnings/0errors. Chromium focused4/4 PASS ở393/1280px: card không ngày, timestamp trái cùng hàng Edit/Close, popup Created/Last edited và Escape không đóng Viewer, Edit không timestamp, input/nút± cùng chiều cao Bold, input border0, nhập/tăng/giảm/persist cỡ chữ và read-only/card shortcuts. Lượt đầu2ca fail vì global input selector ghi đè border; đã tăng specificity và chạy lại PASS. Đã xem screenshot Viewer và toolbar mobile. git diff --check PASS; không chạy full suite.
+- Scope publication: NotesPage.tsx, NoteEditor.tsx, messages.ts, styles.css, e2e/note-view.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Push main theo quyền đã cấp, đối chiếu remote SHA. Giữ config local/.agnes ngoài commit. Không deploy/migrate/DB/email thật; browser fixture loopback, chưa xác minh thiết bị thật/production.
+
 ## Bỏ divider list view và icon kéo card — 2026-10-23
 
 - Theo2ảnh chủ dự án: bỏ border-top ở footer card list view; bỏ GripVertical icon và khoảng nút hiển thị ở cả grid/list. Giữ control sr-only hỗ trợ keyboard reorder và kéo từ toàn card hiện có.
