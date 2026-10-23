@@ -2,6 +2,15 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Chip label trên note card dùng màu label (icon + tint nền, chữ giữ trung tính) — 2026-10-23
+
+- Theo trao đổi với chủ dự án: chip label trong note card (list view) trước đó dùng CSS cứng `.label-chip` (nền `#757f8510`, chữ `var(--subtle)`) nên không phản ánh màu label đã chọn trong sidebar. Thoả thuận: đổi màu **icon + nền vùng chip**, **giữ màu chữ trung tính** để tránh khó đọc khi màu label trùng tông nền card; label chưa có màu thì giữ fallback xám cũ.
+- `ntc_react/src/domain/color.ts`: thêm `labelTint(hex)` — trả về màu hex (3/6/8 ký tự) + alpha `1F` (~12% tint) hoặc `null` với màu không hợp lệ; không sửa `notePalette`.
+- `ntc_react/src/features/notes/NotesPage.tsx`: chip trong `NoteCard` render `style={{ background: labelTint(t.color) }}` và icon `<Tag>` ăn `style={{ color: t.color }}` khi `t.color` có giá trị; chip "+N" và text giữ nguyên.
+- `ntc_react/src/domain/color.test.ts` (mới): 7 test cho `labelTint` + `notePalette`.
+- Validation từ repository root: `npm --prefix ntc_react run build` (tsc + Vite) PASS; `npx vitest run src/domain/color.test.ts` PASS 7/7. Lỗi fork worker của vitest ở `src/shared/i18n.test.ts` (môi trường undici) không liên quan thay đổi này.
+- Chưa chạy full test suite/e2e, chưa manual preview trên màn hình thật; chưa push commit.
+
 ## Màu nền tự lưu và Automatic cho màu chữ — 2026-10-23
 
 - Theo ảnh/yêu cầu chủ dự án: bỏ dãy màu nền preset trong NoteColorPicker, thay bằng Default, native color picker, mã hex và Apply, Save color, danh sách mã màu đã lưu có nút dùng/xóa. Chuẩn hóa 3/6 ký tự hex thành #RRGGBB, bỏ trùng, key browser riêng theo userId `ntc.saved-note-colors.v1:{userId}`; đọc dữ liệu hỏng an toàn, nhận storage event và báo nếu lưu browser lỗi. Không thêm API/schema/migration hoặc đồng bộ giữa thiết bị.

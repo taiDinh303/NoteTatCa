@@ -1,3 +1,12 @@
+// Light-tinted background for a label color, or null when no valid hex is given.
+export function labelTint(hex?: string | null) {
+  if (!hex || !/^#([\da-f]{3}|[\da-f]{6}|[\da-f]{8})$/i.test(hex))
+    return null;
+  if (hex.length === 4)
+    hex = `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
+  return `${hex.slice(0, 7)}1F`;
+}
+
 // Choose the higher-contrast foreground using WCAG relative luminance.
 export function notePalette(hex?: string | null) {
   if (!hex || !/^#[\da-f]{6}$/i.test(hex)) return undefined;

@@ -36,7 +36,7 @@ import {
 import { toast } from "sonner";
 import type { Note, NoteFilter } from "../../domain/models";
 import { sortNotes } from "../../domain/models";
-import { notePalette } from "../../domain/color";
+import { labelTint, notePalette } from "../../domain/color";
 import { workspace } from "../../app/runtime";
 import { useDebounced, useLabels, useNotes } from "../../shared/hooks";
 import {
@@ -169,8 +169,12 @@ function NoteCard({
       {note.tags.length ? (
         <div className="note-tags">
           {note.tags.slice(0, 3).map((t) => (
-            <span key={t.id} className="label-chip">
-              <Tag size={10} />
+            <span
+              key={t.id}
+              className="label-chip"
+              style={t.color ? { background: labelTint(t.color) ?? undefined } : undefined}
+            >
+              <Tag size={10} style={t.color ? { color: t.color } : undefined} />
               {t.name}
             </span>
           ))}
