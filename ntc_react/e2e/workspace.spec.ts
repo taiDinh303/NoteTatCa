@@ -799,7 +799,7 @@ test.describe("pinch zoom", () => {
       if (request.url().endsWith("/notes/reorder"))
         reorderRequests.push(request.url());
     });
-    const handle = (await page.locator(".drag-handle").first().boundingBox())!;
+    const handle = (await page.locator(".note-open").first().boundingBox())!;
     const handleX = handle.x + handle.width / 2;
     const handleY = handle.y + handle.height / 2;
     await session.send("Input.dispatchTouchEvent", {
@@ -1898,17 +1898,16 @@ test("reorders the pinned group with pointer and keyboard dragging", async ({
   page,
 }) => {
   await login(page);
-  const first = page.getByRole("button", {
-    name: "Move An idea worth exploring",
-    exact: true,
-  });
+  await expect(page.locator(".drag-handle svg")).toHaveCount(0);
+  await page.getByRole("button", { name: "list view", exact: true }).click();
+  await expect(page.locator(".note-card-footer").first()).toHaveCSS("border-top-width", "0px");
+  await page.getByRole("button", { name: "grid view", exact: true }).click();
   const second = page.getByRole("button", {
     name: "Move Little things, lately",
     exact: true,
   });
-  await first.hover();
-  const a = (await first.boundingBox())!;
-  const b = (await second.boundingBox())!;
+  const a = (await page.getByRole("button", { name: "Open An idea worth exploring", exact: true }).boundingBox())!;
+  const b = (await page.getByRole("button", { name: "Open Little things, lately", exact: true }).boundingBox())!;
   const moved = page.waitForResponse(
     (r) =>
       r.url().endsWith("/notes/reorder") && r.request().method() === "POST",

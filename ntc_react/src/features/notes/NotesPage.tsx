@@ -22,7 +22,6 @@ import {
   ArrowUp,
   Bell,
   FileText,
-  GripVertical,
   LayoutGrid,
   List,
   Pin,
@@ -144,13 +143,13 @@ function NoteCard({
           {draggable ? (
             <button
               type="button"
-              className="icon-button drag-handle"
+              className="sr-only drag-handle"
               aria-label={tr("Move {0}", title)}
               title={tr("Drag to move. Keyboard: Space, arrow keys, Space.")}
               {...attributes}
               onKeyDown={(event) => listeners?.onKeyDown?.(event)}
             >
-              <GripVertical size={16} />
+              {tr("Move {0}", title)}
             </button>
           ) : null}
           {!trash ? (

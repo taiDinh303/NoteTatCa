@@ -1136,7 +1136,7 @@ strong {
 .list-view .note-card-footer {
   padding: 12px 18px;
   margin-top: 10px;
-  border-top: 1px solid var(--border);
+  border-top: 0;
   min-height: 0;
 }
 .list-view .note-open h3 {

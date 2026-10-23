@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ divider list view và icon kéo card — 2026-10-23
+
+- Theo2ảnh chủ dự án: bỏ border-top ở footer card list view; bỏ GripVertical icon và khoảng nút hiển thị ở cả grid/list. Giữ control sr-only hỗ trợ keyboard reorder và kéo từ toàn card hiện có.
+- Cập nhật regression pointer/pinch dùng preview card thay vì icon; thêm assertion list footer border0 và không còn drag SVG.
+- Validation: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors. Chromium focused2/2 PASS (kéo toàn card393px, pointer/keyboard reorder, list footer border0, không còn drag SVG); ESLint max-warnings0 PASS sau khi xóa biến test không còn dùng. Không chạy full suite/thiết bị thật.
+- Publication scope: NotesPage.tsx, styles.css, e2e/workspace.spec.ts và worklog này. Giữ config local/.agnes ngoài commit; push main và đối chiếu remote SHA theo quyền đã cấp. Không deploy/migrate hoặc dùng dữ liệu thật.
+
 ## Đồng bộ màu label cho chip trong editor (nền tint + icon, chữ giữ trung tính) — 2026-10-23
 
 - Theo yêu cầu chủ dự án (2 ảnh card + editor): chip label trong editor (footer "Personal × English ×") chưa có màu label như chip card (đã làm ở commit 82ef716). Đồng bộ cùng cách xử lý: icon `Tag` tô `label.color` + nền chip tint 12% bằng `labelTint()`, chữ giữ trung tính; label chưa có màu giữ fallback CSS hiện tại.
