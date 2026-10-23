@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+List view (2026-10-23): hàng label cách preview 12px ở desktop/mobile; bỏ margin thừa trước footer để giữ card gọn và cân đối. Grid không đổi. Build React/.NET Release và Chromium list/grid + reorder PASS; đo khoảng cách trên 6 card ở mỗi viewport 1440/393px PASS, đã xem screenshot local. Chi tiết và giới hạn trong worklog.
+
 ### Settings ứng dụng và tài khoản — 2026-10-23
 
 Theo yêu cầu chủ dự án, sidebar Settings mở `/settings` với ba hàng Language, Privacy và Appearance. `/settings/language` có radio English/Tiếng Việt/中文/日本語, đổi ngay giao diện ứng dụng và định dạng ngày giờ/số, mặc định English. `shared/i18n.ts` dùng external store với một storage listener chung, lưu `ntc.language.v1`, gán `html.lang`, giữ lựa chọn trong memory nếu storage bị chặn. `shared/messages.ts` có 756 source messages cùng bản Việt/Trung/Nhật; dịch ở render, không sửa DOM text hay remount editor. Menu/form/editor/auth/startup/admin được nối vào store, dữ liệu note/nhãn/tên tài khoản vẫn nguyên văn; lỗi API/provider không có trong catalog được giữ nguyên thay vì đoán nghĩa.

@@ -1132,11 +1132,11 @@ strong {
   max-height: 44px;
 }
 .list-view .note-tags {
-  padding: 0 18px;
+  padding: 12px 18px 0;
 }
 .list-view .note-card-footer {
   padding: 12px 18px;
-  margin-top: 10px;
+  margin-top: 0;
   border-top: 0;
   min-height: 0;
 }
@@ -3534,7 +3534,7 @@ td {
     padding: 6px 14px 0;
   }
   .list-view .note-tags {
-    padding: 0 14px;
+    padding: 12px 14px 0;
   }
   .list-view .note-card-footer {
     padding: 10px 14px;

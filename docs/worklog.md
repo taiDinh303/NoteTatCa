@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Cân đối khoảng cách label trong list view — 2026-10-23
+
+- Theo ảnh chủ dự án: hàng label dính sát nội dung ở list view. Thêm khoảng đệm trên 12px cho hàng label ở desktop/mobile, bỏ margin 10px trước footer để phân bổ khoảng trắng cân đối; grid giữ nguyên, không thêm divider.
+- Validation từ root: React Production build PASS; .NET solution Release --no-restore PASS, 0 warnings/0 errors; Chromium regression chuyển list/grid + pointer/keyboard reorder 1/1 PASS. Kiểm tra runtime 6 card ở mỗi viewport 1440/393px: khoảng cách preview → chip 12px, footer liền sau vùng tags, không tràn ngang; đã xem cả hai screenshot trong artifacts/frontend/list-label-spacing-*.png (artifact local, không commit).
+- Lượt browser đầu không chạy vì thiếu Chromium; cài Playwright Chromium và chạy lại PASS. Không full suite/thiết bị thật/production; fixture SQLite/email giả, không DB/email thật hoặc manual deploy/migrate.
+- Publication scope: ntc_react/src/styles.css, docs/FRONTEND-IMPLEMENTATION.md và docs/worklog.md. Lượt commit đầu thiếu user.name/user.email; đã cấu hình riêng repository theo danh tính tác giả nhất quán trong lịch sử Git. Commit/push main theo quyền đã cấp và đối chiếu SHA remote sau push.
+
 ## Modal "Your labels": bỏ dòng mô tả, đổi nút Done thành Close — 2026-10-23
 
 - Theo yêu cầu chủ dự án (ảnh modal labels): bỏ dòng description "A little order for your ideas. Names can repeat; each label stays separate." (trùng tiếng Anh, thừa với ảnh 2); đổi nút "Done" ở footer thành "Close".
