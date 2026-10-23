@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Đồng bộ màu label cho chip trong editor (nền tint + icon, chữ giữ trung tính) — 2026-10-23
+
+- Theo yêu cầu chủ dự án (2 ảnh card + editor): chip label trong editor (footer "Personal × English ×") chưa có màu label như chip card (đã làm ở commit 82ef716). Đồng bộ cùng cách xử lý: icon `Tag` tô `label.color` + nền chip tint 12% bằng `labelTint()`, chữ giữ trung tính; label chưa có màu giữ fallback CSS hiện tại.
+- `ntc_react/src/features/editor/NoteEditor.tsx`: import `labelTint`; chip trong `editor-labels` (mobile top-bar dùng cùng class nên được hưởng luôn) thêm `style` background tint và icon màu.
+- Validation: `npm --prefix ntc_react run build` PASS; eslint clean; `vitest run src/domain/color.test.ts` 7/7 PASS.
+
 ## Kéo toàn bộ card, khớp grid khi zoom và animation nhẹ — 2026-10-23
 
 - Theo ảnh/yêu cầu: kéo từ thân/title/preview/labels/footer của card; ghim/menu không kích hoạt drag. Click bình thường vẫn mở View note. Handle tiếp tục hỗ trợ bàn phím. MouseSensor dùng ngưỡng7px; TouchSensor giữ220ms/tolerance6px để tránh chặn cuộn ngay khi chạm card.

@@ -31,7 +31,7 @@ import { AutosaveCoordinator } from "../../application/autosave";
 import { notes, workspace } from "../../app/runtime";
 import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom, EMOJIS } from "../../domain/models";
-import { notePalette } from "../../domain/color";
+import { labelTint, notePalette } from "../../domain/color";
 import { useAuth, useLabels, useMe } from "../../shared/hooks";
 import {
   ActionMenu,
@@ -607,11 +607,19 @@ function EditorSession({
               <button
                 className="label-chip"
                 key={id}
+                style={
+                  label.color
+                    ? { background: labelTint(label.color) ?? undefined }
+                    : undefined
+                }
                 onClick={() =>
                   update({ tagIds: draft.tagIds.filter((x) => x !== id) })
                 }
               >
-                <Tag size={11} />
+                <Tag
+                  size={11}
+                  style={label.color ? { color: label.color } : undefined}
+                />
                 {label.name}
                 <X size={11} />
               </button>
