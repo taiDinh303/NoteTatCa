@@ -57,7 +57,7 @@ for (const width of [1440, 1024, 393, 320]) {
       await expect(zoom).toBeVisible();
       await zoom.getByRole('button', { name: 'Done', exact: true }).click();
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
-      await page.getByRole('menuitem', { name: 'Your profile', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
       await expect(drawer).toBeHidden();
       await expect(page).toHaveURL(/settings\/profile/);
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();

@@ -615,7 +615,7 @@ test("scales the interface without reloads, preserves notes and fits desktop and
   await openAccountMenu(page);
   await inViewport(".dropdown");
   await page
-    .getByRole("menuitem", { name: "Your profile", exact: true })
+    .getByRole("menuitem", { name: "Account settings", exact: true })
     .click();
   await expect(page).toHaveURL(/\/settings\/profile$/);
   await zoom(100);

@@ -5,8 +5,6 @@ import {
   Home,
   LogOut,
   Settings,
-  ShieldCheck,
-  Users,
   ZoomIn,
 } from "lucide-react";
 import { auth } from "./runtime";
@@ -46,19 +44,9 @@ export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {
             action: () => navigateTo("/Home"),
           },
           {
-            label: "Your profile",
-            icon: Users,
-            action: () => navigateTo(base + "/profile"),
-          },
-          {
-            label: "Account & security",
+            label: "Account settings",
             icon: Settings,
-            action: () => navigateTo(base + "/account"),
-          },
-          {
-            label: "Sessions",
-            icon: ShieldCheck,
-            action: () => navigateTo(base + "/sessions"),
+            action: () => navigateTo(base + "/profile"),
           },
           {
             label: `Zoom (${zoom.percent}%)`,
@@ -108,23 +96,21 @@ export function SessionExpiredDialog({
 }) {
   const state = useAuth();
   if (state.status !== "expired") return null;
+  const description = administration
+    ? "Your session expired. Sign in again to continue administering NoteTatCa."
+    : "Your session expired. Sign in to continue; your current draft stays in this tab.";
+  const hint = administration
+    ? "Your account permissions determine which area opens after sign-in."
+    : "Sign in to the same account to keep editing. Switching accounts clears this workspace and local drafts.";
   return (
     <Modal
       open
       onClose={() => {}}
       title="Welcome back"
-      description={
-        administration
-          ? "Your session expired. Sign in again to continue administering NoteTatCa."
-          : "Your session expired. Sign in to continue; your current draft stays in this tab."
-      }
+      description={description}
     >
       <div className="modal-body">
-        <p className="field-hint">
-          {administration
-            ? "Your account permissions determine which area opens after sign-in."
-            : "Sign in to the same account to keep editing. Switching accounts clears this workspace and local drafts."}
-        </p>
+        <p className="field-hint">{hint}</p>
         <LoginForm onDone={() => {}} />
         <button
           type="button"

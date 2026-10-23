@@ -1,6 +1,15 @@
 ﻿# WORKLOG — NoteTatCa
 
-> 2026-10-21 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+> 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+
+## Dropdown account: "Your profile" -> "Account settings" (gear), bỏ "Account & security" và "Sessions" — 2026-10-23
+
+- Theo yêu cầu chủ dự án: đổi item "Your profile" (icon Users) thành "Account settings" (icon gear Settings) trong ShellAccountMenu; xóa hai item "Account & security" và "Sessions" khỏi dropdown. Các tab Settings trong trang /settings (SettingsPage tabs: Profile / Account & security / Active sessions) giữ nguyên — chỉ bỏ shortcut riêng từ dropdown.
+- ShellControls.tsx: import bỏ Users, ShieldCheck; items còn: Home, Account settings (→ base/profile), Zoom, Sign out. SessionExpiredDialog không đổi logic.
+- e2e cập nhật: header.spec.ts và workspace.spec.ts đổi locator menuitem "Your profile" → "Account settings".
+- Bằng chứng: typecheck/ESLint PASS. Frontend-only, .NET không đổi.
+- Chưa kiểm browser e2e trong lượt này.
+- Publication scope: ShellControls.tsx, e2e/header.spec.ts, e2e/workspace.spec.ts, docs/worklog.md; giữ hai appsettings local ngoài commit.
 
 ## Cỡ chữ đổi thành stepper − N + (gõ được số, không còn menu cuộn) — 2026-10-22
 

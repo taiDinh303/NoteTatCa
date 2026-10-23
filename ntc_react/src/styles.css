@@ -4157,7 +4157,7 @@ td {
   overflow-wrap: anywhere;
 }
 .note-view-heading h2 { margin: 0; font-size: 20px; }
-.note-view-footer { justify-content: flex-end; }
+.note-view-footer { justify-content: flex-end; border-top: 0; }
 .note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
   .modal.note-editor-modal {
