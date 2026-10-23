@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar chỉ cuộn label, đồng bộ Notifications — 2026-10-23
+
+- Theo3ảnh: SidebarLayout.css scoped customer sidebar/workspace-drawer, overflow parent hidden, label-nav flex1/min-height0/overflow-y:auto; header/logo/primary-nav/Manage labels và sidebar-bottom không co/không cuộn. Áp dụng desktop/mobile, không đổi admin drawer. Notifications chuyển từ button trong wrapper riêng thành NavLink settings-link cùng kiểu Settings/Help & feedback, giữ icon18px/badge/đóng drawer và route notifications.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS; Chromium9/9 PASS: header1440/1024/393/320, dismiss customer/admin và scroll320/393/1440. Fixture38labels: label-nav scroll>100px, label cuối vào viewport, tọa độ y header/menu/Manage labels/footer không đổi, outer scrollTop0, Settings/Help vẫn trong viewport. So sánh Notifications/Settings cùng font-size/padding/color/gap/height, click chuyển notifications và đóng drawer. Đã xem screenshot393px cuộn cuối. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; SQLite/email fixture giả.
+- Scope publication: AppShell.tsx, SidebarLayout.css, e2e/sidebar-scroll.spec.ts, e2e/header.spec.ts (locator Notifications đổi button→link), docs/FRONTEND-IMPLEMENTATION.md và worklog. Review React: native NavLink/aria-label, không thêm hooks/dependency, CSS scroll scope riêng. Giữ .agnes ngoài commit; push main theo quyền đã cấp và đối chiếu remote SHA.
+
 ## Help & feedback mobile: dùng mobile-header giống Settings, ẩn h1 riêng — 2026-10-23
 
 - Theo ảnh chủ dự án (mobile): trang Help & feedback hiện vẫn dùng topbar thường (brand/search/actions), trong khi các trang Settings con (Language/Privacy/Appearance) dùng "nút quay lại + tiêu đề" riêng, không có header. Đưa `/help` vào cùng cơ chế: thêm key `"/help": "Help & feedback"` vào `settingsTitles` (AppShell.tsx) và `settingsBack` trỏ về `/notes`; CSS mobile (≤800px) thêm `.help-page > h1 { display: none; }` để ẩn heading riêng, dùng header chung hiển thị "← Help & feedback" — desktop giữ topbar + h1 như cũ.

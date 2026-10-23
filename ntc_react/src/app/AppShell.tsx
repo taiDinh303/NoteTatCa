@@ -1,5 +1,6 @@
 import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
+import "./SidebarLayout.css";
 import type { ReactNode } from "react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
@@ -344,31 +345,28 @@ export default function AppShell() {
         title={<Logo />}
         hideCloseButton
         dismissOnOutside
-        className="navigation-drawer"
+        className="navigation-drawer workspace-drawer"
       >
         <Sidebar
           onLabels={() => setManageLabels(true)}
           onNavigate={() => setMobile(false)}
           accountControls={
-            <div className="drawer-account-controls">
-              <button
-                type="button"
-                className="settings-link drawer-inbox"
-                aria-label={tr("Open inbox")}
-                onClick={() => {
-                  navigate("/notifications");
-                  setMobile(false);
-                }}
-              >
-                <Bell size={18} />
-                {tr("Notifications")}
-                {(unread.data ?? 0) > 0 ? (
-                  <span className="drawer-unread">
-                    {unread.data! > 9 ? "9+" : unread.data}
-                  </span>
-                ) : null}
-              </button>
-            </div>
+            <NavLink
+              to="/notifications"
+              className="settings-link drawer-inbox"
+              aria-label={tr("Open inbox")}
+              onClick={() => {
+                setMobile(false);
+              }}
+            >
+              <Bell size={18} />
+              {tr("Notifications")}
+              {(unread.data ?? 0) > 0 ? (
+                <span className="drawer-unread">
+                  {unread.data! > 9 ? "9+" : unread.data}
+                </span>
+              ) : null}
+            </NavLink>
           }
         />
       </Modal>

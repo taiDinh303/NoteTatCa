@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Sidebar layout (2026-10-23): desktop customer/mobile workspace drawer chỉ label-nav cuộn; logo/menu chính/Manage labels và sidebar-bottom giữ cố định trong flex layout. Notifications mobile là NavLink/settings-link cùng font/màu/padding/icon/chiều cao với Settings, Help & feedback, giữ badge và đóng drawer sau điều hướng. Chromium9ca header/dismiss/scroll PASS (38labels ở320/393/1440px); build React/.NET Release, ESLint PASS. Xem worklog.
+
 Note labels modal (2026-10-23): ẩn tiêu đề/X, giữ tên dialog cho screen reader; label là toggle button aria-pressed, xếp ngang/wrap, selected có nền/viền/tick rõ, chưa chọn mờ và disabled khi đủ20. Tên dài wrap trong nút; chỉ vùng label cuộn, footer Cancel/Save cố định. Regression Chromium320dark/1440light với40labels và viewer393/1280 PASS (scroll, save/cancel, cap20, keyboard, lỗi/retry); build React/.NET Release và ESLint PASS. Chi tiết worklog.
 
 Sidebar motion (2026-10-23): desktop trượt320ms linear và margin nội dung chuyển cùng nhịp; sidebar ẩn có inert/aria-hidden. Mobile customer/admin dùng Radix Presence để giữ drawer trong animation mở/đóng400ms linear, delay0, fill both và fade overlay cùng nhịp. Overlay navigation bỏ blur, chỉ tối nền; modal khác giữ nguyên. Tôn trọng prefers-reduced-motion. Chromium header/dismiss/motion9ca PASS; cảm ứng393px/list đã cuộn/zoom75/100/125%: mốc25/50/75% đi đúng25/50/75% quãng đường cả hai chiều, scroll và tọa độ/kích thước card không đổi. Xem worklog.

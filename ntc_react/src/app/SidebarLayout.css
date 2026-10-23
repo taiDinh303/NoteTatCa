@@ -1,0 +1,27 @@
+.customer-shell > .sidebar,
+.modal.workspace-drawer {
+  overflow: hidden;
+}
+.customer-shell > .sidebar > .primary-nav,
+.customer-shell > .sidebar > .labels-heading,
+.customer-shell > .sidebar > .sidebar-bottom,
+.workspace-drawer > .modal-header,
+.workspace-drawer > .primary-nav,
+.workspace-drawer > .labels-heading,
+.workspace-drawer > .sidebar-bottom {
+  flex-shrink: 0;
+}
+.customer-shell > .sidebar > .label-nav,
+.workspace-drawer > .label-nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.customer-shell > .sidebar > .sidebar-bottom,
+.workspace-drawer > .sidebar-bottom {
+  margin-top: 0;
+  padding-top: 12px;
+}
