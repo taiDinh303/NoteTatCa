@@ -1,3 +1,4 @@
+import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import {
   lazy,
   Suspense,
@@ -61,6 +62,7 @@ export default function NoteEditor({
   onClose: () => void;
   initialAction?: NoteOpenAction;
 }) {
+  useLanguage();
   const [editing, setEditing] = useState(!noteId);
   const [createdId, setCreatedId] = useState<string>();
   const resolvedId = noteId ?? createdId;
@@ -78,16 +80,16 @@ export default function NoteEditor({
         hideTitle
         className="note-editor-modal"
         onClose={onClose}
-        title="Open note"
+        title={tr("Open note")}
       >
         {query.isError ? (
           <ErrorPanel error={query.error} retry={() => void query.refetch()} />
         ) : (
-          <Spinner label="Opening your note…" />
+          <Spinner label={tr("Opening your note…")} />
         )}
         <footer className="editor-footer">
           <Button variant="ghost" onClick={onClose}>
-            Close
+            {tr("Close")}
           </Button>
         </footer>
       </Modal>
@@ -122,6 +124,7 @@ function NoteLabelsDialog({
   note: Note;
   onClose: () => void;
 }) {
+  useLanguage();
   const labels = useLabels();
   const [original] = useState(note);
   const [tagIds, setTagIds] = useState(() =>
@@ -136,7 +139,7 @@ function NoteLabelsDialog({
       onClose={() => {
         if (!busy) onClose();
       }}
-      title="Note labels"
+      title={tr("Note labels")}
     >
       <form
         onSubmit={(event) => {
@@ -188,7 +191,7 @@ function NoteLabelsDialog({
             ))
           ) : (
             <p className="muted">
-              Create labels from the sidebar to organize your notes.
+              {tr("Create labels from the sidebar to organize your notes.")}
             </p>
           )}
           {labels.hasNextPage ? (
@@ -197,20 +200,20 @@ function NoteLabelsDialog({
               disabled={busy}
               onClick={() => void labels.fetchNextPage()}
             >
-              Load more labels
+              {tr("Load more labels")}
             </Button>
           ) : null}
         </div>
         <footer className="modal-footer">
           <Button variant="ghost" disabled={busy} onClick={onClose}>
-            Cancel
+            {tr("Cancel")}
           </Button>
           <Button
             type="submit"
             busy={busy}
             disabled={labels.isPending || labels.isError}
           >
-            Save labels
+            {tr("Save labels")}
           </Button>
         </footer>
       </form>
@@ -228,6 +231,7 @@ function NoteViewer({
   onEdit: () => void;
   initialAction?: NoteOpenAction;
 }) {
+  useLanguage();
   const me = useMe();
   const auth = useAuth();
   const [reminderOpen, setReminderOpen] = useState(
@@ -251,7 +255,7 @@ function NoteViewer({
       open
       wide
       hideTitle
-      title="View note"
+      title={tr("View note")}
       onClose={onClose}
       className="note-editor-modal note-viewer"
       style={{
@@ -269,7 +273,7 @@ function NoteViewer({
         </div>
       ) : null}
       <div className="editor-scroll">
-        <Suspense fallback={<Spinner label="Loading note…" />}>
+        <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
           <ReadOnlyContent
             key={note.version}
             documentJson={draftFrom(note).documentJson}
@@ -279,10 +283,10 @@ function NoteViewer({
       <footer className="editor-footer note-view-footer">
         <Button variant="ghost" onClick={onEdit}>
           <Pencil size={15} />
-          Edit
+          {tr("Edit")}
         </Button>
         <Button variant="ghost" onClick={onClose}>
-          Close
+          {tr("Close")}
         </Button>
       </footer>
     </Modal>
@@ -297,6 +301,7 @@ function EditorSession({
   onClose: () => void;
   onView: (note: Note) => void;
 }) {
+  useLanguage();
   const state = useAuth();
   const me = useMe();
   const [draft, setDraft] = useState(() => draftFrom(initial));
@@ -391,21 +396,21 @@ function EditorSession({
   }
   const status =
     snapshot.status === "saved"
-      ? "All changes saved"
+      ? tr("All changes saved")
       : snapshot.status === "saving"
-        ? "Saving…"
+        ? tr("Saving…")
         : snapshot.status === "dirty"
-          ? "Unsaved changes"
+          ? tr("Unsaved changes")
           : snapshot.status === "conflict"
-            ? "Changes need your attention"
-            : "Could not save";
+            ? tr("Changes need your attention")
+            : tr("Could not save");
   return (
     <>
       <Modal
         open
         wide
         onClose={requestClose}
-        title={initial ? "Edit note" : "New note"}
+        title={initial ? tr("Edit note") : tr("New note")}
         hideTitle
         className={`note-editor-modal ${fullscreen ? "fullscreen" : ""}`}
         style={{
@@ -429,7 +434,7 @@ function EditorSession({
                 <button
                   type="button"
                   className="emoji-trigger"
-                  aria-label="Choose note icon"
+                  aria-label={tr("Choose note icon")}
                 >
                   {draft.iconEmoji || "📝"}
                 </button>
@@ -441,14 +446,14 @@ function EditorSession({
                   align="start"
                   sideOffset={10}
                   collisionPadding={12}
-                  aria-label="Note icons"
+                  aria-label={tr("Note icons")}
                 >
                   <div className="note-icon-grid">
                     {EMOJIS.map((emoji) => (
                       <button
                         key={emoji || "none"}
                         type="button"
-                        aria-label={emoji || "Remove icon"}
+                        aria-label={emoji || tr("Remove icon")}
                         aria-pressed={draft.iconEmoji === emoji}
                         onClick={() => {
                           update({ iconEmoji: emoji });
@@ -460,8 +465,8 @@ function EditorSession({
                     ))}
                   </div>
                   <input
-                    aria-label="Custom note emoji"
-                    placeholder="Or paste an emoji"
+                    aria-label={tr("Custom note emoji")}
+                    placeholder={tr("Or paste an emoji")}
                     value={draft.iconEmoji}
                     maxLength={32}
                     onChange={(event) =>
@@ -482,7 +487,7 @@ function EditorSession({
           <div className="editor-title-wrap">
             <input
               className="editor-title"
-              aria-label="Note title"
+              aria-label={tr("Note title")}
               value={draft.title}
               maxLength={150}
               onChange={(e) => update({ title: e.target.value })}
@@ -491,7 +496,7 @@ function EditorSession({
           <div className="row-actions">
             <IconButton
               icon={draft.isPinned ? PinOff : Pin}
-              label={draft.isPinned ? "Unpin note" : "Pin note"}
+              label={draft.isPinned ? tr("Unpin note") : tr("Pin note")}
               className="editor-pin editor-heading-action"
               aria-pressed={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
@@ -499,7 +504,9 @@ function EditorSession({
             <IconButton
               className="editor-heading-action editor-size-toggle"
               icon={fullscreen ? Minimize2 : Maximize2}
-              label={fullscreen ? "Exit full screen" : "Enter full screen"}
+              label={
+                fullscreen ? tr("Exit full screen") : tr("Enter full screen")
+              }
               aria-pressed={fullscreen}
               onClick={() => setFullscreen((current) => !current)}
             />
@@ -508,10 +515,11 @@ function EditorSession({
         <ErrorBanner error={otherError ?? snapshot.error} />
         {snapshot.status === "conflict" ? (
           <div className="conflict-panel">
-            <strong>Your draft is safe here.</strong>
+            <strong>{tr("Your draft is safe here.")}</strong>
             <p>
-              This note changed elsewhere. Copy your draft or save it as a
-              separate note before loading the server version.
+              {tr(
+                "This note changed elsewhere. Copy your draft or save it as a separate note before loading the server version.",
+              )}
             </p>
             <div className="row-actions">
               <Button
@@ -523,12 +531,14 @@ function EditorSession({
                     )
                     .catch(() =>
                       toast.error(
-                        "Clipboard is unavailable. Select and copy the text manually.",
+                        tr(
+                          "Clipboard is unavailable. Select and copy the text manually.",
+                        ),
                       ),
                     );
                 }}
               >
-                Copy draft
+                {tr("Copy draft")}
               </Button>
               <Button
                 variant="secondary"
@@ -556,7 +566,7 @@ function EditorSession({
                     .finally(() => setCopyBusy(false));
                 }}
               >
-                Save as new note
+                {tr("Save as new note")}
               </Button>
               <Button
                 variant="ghost"
@@ -564,13 +574,13 @@ function EditorSession({
                   setClosePrompt(true);
                 }}
               >
-                Discard and close
+                {tr("Discard and close")}
               </Button>
             </div>
           </div>
         ) : null}
         <div className="editor-scroll">
-          <Suspense fallback={<Spinner label="Loading editor…" />}>
+          <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>
             <RichEditor
               initial={draft.documentJson}
               onCharacterCount={setCharacterCount}
@@ -611,10 +621,10 @@ function EditorSession({
         {tagsOpen ? (
           <div className="label-chooser">
             <div className="section-heading">
-              <strong>Organize with labels</strong>
+              <strong>{tr("Organize with labels")}</strong>
               <IconButton
                 icon={X}
-                label="Close label chooser"
+                label={tr("Close label chooser")}
                 onClick={() => setTagsOpen(false)}
               />
             </div>
@@ -650,7 +660,7 @@ function EditorSession({
               ))
             ) : (
               <p className="muted">
-                Create labels from the sidebar to organize your notes.
+                {tr("Create labels from the sidebar to organize your notes.")}
               </p>
             )}
             {labels.hasNextPage ? (
@@ -658,7 +668,7 @@ function EditorSession({
                 variant="ghost"
                 onClick={() => void labels.fetchNextPage()}
               >
-                Load more labels
+                {tr("Load more labels")}
               </Button>
             ) : null}
           </div>
@@ -672,47 +682,51 @@ function EditorSession({
             <span className="toolbar-divider" />
             <IconButton
               icon={Tag}
-              label="Note labels"
+              label={tr("Note labels")}
               active={tagsOpen}
               onClick={() => setTagsOpen(!tagsOpen)}
             />
             <IconButton
               icon={Bell}
-              label="Note reminders"
+              label={tr("Note reminders")}
               onClick={() => {
                 void save()
                   .then((note) => {
                     if (note) setReminderOpen(true);
                     else
-                      toast.info("Write something first, then add a reminder.");
+                      toast.info(
+                        tr("Write something first, then add a reminder."),
+                      );
                   })
                   .catch(() => {});
               }}
             />
             <ActionMenu
-              label="Note options"
+              label={tr("Note options")}
               items={[
                 {
-                  label: "Import Markdown",
+                  label: tr("Import Markdown"),
                   icon: Upload,
                   action: () => editor.current?.importMarkdown(),
                 },
                 {
-                  label: "Export Markdown",
+                  label: tr("Export Markdown"),
                   icon: Download,
                   action: () => editor.current?.exportMarkdown(),
                 },
                 {
-                  label: "Copy text",
+                  label: tr("Copy text"),
                   icon: Copy,
                   action: () => {
                     void navigator.clipboard
                       .writeText(editor.current?.plainText() ?? "")
-                      .catch(() => toast.error("Clipboard is unavailable."));
+                      .catch(() =>
+                        toast.error(tr("Clipboard is unavailable.")),
+                      );
                   },
                 },
                 {
-                  label: "Move to trash",
+                  label: tr("Move to trash"),
                   icon: Trash2,
                   danger: true,
                   disabled: !snapshot.note,
@@ -723,8 +737,8 @@ function EditorSession({
             />
           </div>
           <div className="row-actions">
-            <span className="editor-count" aria-label="Character count">
-              {characterCount.toLocaleString("en-US")} / 100,000
+            <span className="editor-count" aria-label={tr("Character count")}>
+              {characterCount.toLocaleString(currentLanguage())} / {(100000).toLocaleString(currentLanguage())}
             </span>
             {snapshot.status === "error" ? (
               <Button
@@ -735,20 +749,34 @@ function EditorSession({
                 }}
               >
                 <RotateCcw size={15} />
-                Retry save
+                {tr("Retry save")}
               </Button>
             ) : null}
-            <Button variant="ghost" busy={viewing} disabled={closing} onClick={() => {
-              if (viewing || closing) return;
-              setViewing(true);
-              void save().then((note) => { if (note) onView(note); })
-                .catch(() => {}).finally(() => setViewing(false));
-            }}>
+            <Button
+              variant="ghost"
+              busy={viewing}
+              disabled={closing}
+              onClick={() => {
+                if (viewing || closing) return;
+                setViewing(true);
+                void save()
+                  .then((note) => {
+                    if (note) onView(note);
+                  })
+                  .catch(() => {})
+                  .finally(() => setViewing(false));
+              }}
+            >
               <Eye size={15} />
-              View
+              {tr("View")}
             </Button>
-            <Button variant="ghost" busy={closing} disabled={viewing} onClick={requestClose}>
-              Close
+            <Button
+              variant="ghost"
+              busy={closing}
+              disabled={viewing}
+              onClick={requestClose}
+            >
+              {tr("Close")}
             </Button>
           </div>
         </footer>
@@ -760,8 +788,8 @@ function EditorSession({
             setClosePrompt(false);
             if (blocker.state === "blocked") blocker.reset();
           }}
-          title="Keep your changes?"
-          description="Your latest edits have not been saved yet."
+          title={tr("Keep your changes?")}
+          description={tr("Your latest edits have not been saved yet.")}
         >
           <div className="modal-body">
             <ErrorBanner error={otherError} />
@@ -773,10 +801,10 @@ function EditorSession({
                   void closeSaved().catch(() => {});
                 }}
               >
-                Save and continue
+                {tr("Save and continue")}
               </Button>
               <Button variant="danger" onClick={discard}>
-                Discard unsaved changes
+                {tr("Discard unsaved changes")}
               </Button>
               <Button
                 variant="secondary"
@@ -785,7 +813,7 @@ function EditorSession({
                   if (blocker.state === "blocked") blocker.reset();
                 }}
               >
-                Keep editing
+                {tr("Keep editing")}
               </Button>
             </div>
           </div>
@@ -793,9 +821,11 @@ function EditorSession({
       ) : null}
       {trashPrompt && snapshot.note ? (
         <ConfirmDialog
-          title="Move this note to trash?"
-          description="You can restore it for seven days. Future reminders will stop."
-          confirmLabel="Move to trash"
+          title={tr("Move this note to trash?")}
+          description={tr(
+            "You can restore it for seven days. Future reminders will stop.",
+          )}
+          confirmLabel={tr("Move to trash")}
           onClose={() => setTrashPrompt(false)}
           onConfirm={async () => {
             const note = await save();

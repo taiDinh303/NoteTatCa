@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
@@ -29,6 +30,7 @@ export function ReminderForm({
   onDone: () => Promise<void> | void;
   onCancel: () => void;
 }) {
+  useLanguage();
   const [repeat, setRepeat] = useState(initial?.repeatType ?? 0);
   const [days, setDays] = useState(initial?.repeatDays ?? 0);
   const [ending, setEnding] = useState(
@@ -78,8 +80,11 @@ export function ReminderForm({
     >
       <ErrorBanner error={error} />
       <Field
-        label="Date & time"
-        hint={`Time input uses your browser’s timezone (${Intl.DateTimeFormat().resolvedOptions().timeZone}). Recurrence uses the timezone below.`}
+        label={tr("Date & time")}
+        hint={tr(
+          "Time input uses your browser’s timezone ({0}). Recurrence uses the timezone below.",
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
+        )}
       >
         <input
           type="datetime-local"
@@ -88,7 +93,7 @@ export function ReminderForm({
           required
         />
       </Field>
-      <Field label="Recurrence timezone">
+      <Field label={tr("Recurrence timezone")}>
         <input
           name="zone"
           defaultValue={initial?.timeZoneId ?? zone}
@@ -110,20 +115,20 @@ export function ReminderForm({
         </datalist>
       </Field>
       <div className="form-grid">
-        <Field label="Repeat">
+        <Field label={tr("Repeat")}>
           <select
             value={repeat}
             onChange={(e) => setRepeat(Number(e.target.value))}
           >
             {REPEAT_NAMES.map((n, i) => (
-              <option key={n} value={i}>
-                {n}
+              <option key={tr(n)} value={i}>
+                {tr(n)}
               </option>
             ))}
           </select>
         </Field>
         {repeat ? (
-          <Field label="Every">
+          <Field label={tr("Every")}>
             <input
               type="number"
               name="interval"
@@ -137,30 +142,30 @@ export function ReminderForm({
       </div>
       {repeat === 2 ? (
         <fieldset className="weekday-picker">
-          <legend>On these days</legend>
+          <legend>{tr("On these days")}</legend>
           {WEEKDAYS.map(([day, mask]) => (
-            <label key={day} className={days & mask ? "selected" : ""}>
+            <label key={tr(day)} className={days & mask ? "selected" : ""}>
               <input
                 type="checkbox"
                 checked={Boolean(days & mask)}
                 onChange={() => setDays((value) => value ^ mask)}
               />
-              {day}
+              {tr(day)}
             </label>
           ))}
         </fieldset>
       ) : null}
       {repeat ? (
         <div className="form-grid">
-          <Field label="Ends">
+          <Field label={tr("Ends")}>
             <select value={ending} onChange={(e) => setEnding(e.target.value)}>
-              <option value="never">Never</option>
-              <option value="count">After occurrences</option>
-              <option value="until">On date</option>
+              <option value="never">{tr("Never")}</option>
+              <option value="count">{tr("After occurrences")}</option>
+              <option value="until">{tr("On date")}</option>
             </select>
           </Field>
           {ending === "count" ? (
-            <Field label="Occurrences (including first)">
+            <Field label={tr("Occurrences (including first)")}>
               <input
                 type="number"
                 name="count"
@@ -171,7 +176,7 @@ export function ReminderForm({
               />
             </Field>
           ) : ending === "until" ? (
-            <Field label="Last date & time">
+            <Field label={tr("Last date & time")}>
               <input
                 type="datetime-local"
                 name="until"
@@ -198,18 +203,19 @@ export function ReminderForm({
           name="email"
           defaultChecked={initial?.sendEmail ?? true}
         />{" "}
-        Also send an email reminder
+        {tr("Also send an email reminder")}
       </label>
       <p className="field-hint">
-        Reminders always appear in your inbox. Changing this schedule keeps past
-        inbox notifications.
+        {tr(
+          "Reminders always appear in your inbox. Changing this schedule keeps past inbox notifications.",
+        )}
       </p>
       <div className="form-actions">
         <Button variant="secondary" onClick={onCancel} type="button">
-          Cancel
+          {tr("Cancel")}
         </Button>
         <Button busy={busy} type="submit">
-          {initial ? "Save reminder" : "Set reminder"}
+          {initial ? tr("Save reminder") : tr("Set reminder")}
         </Button>
       </div>
     </form>
@@ -226,6 +232,7 @@ export default function ReminderDialog({
   zone: string;
   onClose: () => void;
 }) {
+  useLanguage();
   const query = useQuery({
     queryKey: workspace.key("note-reminders", noteId),
     queryFn: () => reminders.forNote(noteId),
@@ -245,8 +252,8 @@ export default function ReminderDialog({
     <Modal
       open
       onClose={onClose}
-      title="Reminders"
-      description={title || "Untitled note"}
+      title={tr("Reminders")}
+      description={title || tr("Untitled note")}
     >
       <div className="modal-body">
         <ErrorBanner error={error} />
@@ -271,8 +278,8 @@ export default function ReminderDialog({
             ) : !query.data.length ? (
               <EmptyState
                 icon={Bell}
-                title="Give it a little nudge"
-                description="Choose when this note should find you again."
+                title={tr("Give it a little nudge")}
+                description={tr("Choose when this note should find you again.")}
               />
             ) : (
               <div className="reminder-list">
@@ -287,19 +294,19 @@ export default function ReminderDialog({
                         )}
                       </strong>
                       <span>
-                        {REPEAT_NAMES[reminder.repeatType]} ·{" "}
-                        {reminder.isActive ? "Active" : "Paused"} ·{" "}
+                        {tr(REPEAT_NAMES[reminder.repeatType])} ·{" "}
+                        {reminder.isActive ? tr("Active") : tr("Paused")} ·{" "}
                         {reminder.timeZoneId}
                       </span>
                     </div>
                     <IconButton
                       icon={Pencil}
-                      label="Edit reminder"
+                      label={tr("Edit reminder")}
                       onClick={() => setEditing(reminder)}
                     />
                     <IconButton
                       icon={Trash2}
-                      label="Delete reminder"
+                      label={tr("Delete reminder")}
                       onClick={() => setDeleting(reminder)}
                     />
                   </div>
@@ -317,17 +324,21 @@ export default function ReminderDialog({
               }}
             >
               <Plus size={16} />
-              Add reminder
+              {tr("Add reminder")}
             </Button>
-            <p className="field-hint">Up to five active reminders per note.</p>
+            <p className="field-hint">
+              {tr("Up to five active reminders per note.")}
+            </p>
           </>
         )}
       </div>
       {deleting ? (
         <ConfirmDialog
-          title="Delete reminder?"
-          description="Future reminders will stop. This note will be kept."
-          confirmLabel="Delete reminder"
+          title={tr("Delete reminder?")}
+          description={tr(
+            "Future reminders will stop. This note will be kept.",
+          )}
+          confirmLabel={tr("Delete reminder")}
           danger
           onClose={() => setDeleting(undefined)}
           onConfirm={async () => {

@@ -1,4 +1,5 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { t as tr, useLanguage } from "../../shared/i18n";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -18,6 +19,7 @@ import { GoogleButton } from "./GoogleButton";
 type Mode =
   "login" | "register" | "forgot" | "reset" | "verify" | "confirm" | "password";
 export function LoginForm({ onDone }: { onDone: () => void }) {
+  useLanguage();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [visible, setVisible] = useState(false);
@@ -30,7 +32,7 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
         }}
       />
       <div className="auth-divider">
-        <span>or continue with email</span>
+        <span>{tr("or continue with email")}</span>
       </div>
       <form
         onSubmit={(e) => {
@@ -50,7 +52,7 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
         }}
       >
         <ErrorBanner error={error} />
-        <Field label="Email address">
+        <Field label={tr("Email address")}>
           <input
             autoComplete="email"
             name="email"
@@ -60,19 +62,19 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
             maxLength={256}
           />
         </Field>
-        <Field label="Password">
+        <Field label={tr("Password")}>
           <div className="password-input">
             <input
               autoComplete="current-password"
               name="password"
               type={visible ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder={tr("Enter your password")}
               required
               maxLength={1024}
             />
             <button
               type="button"
-              aria-label={visible ? "Hide password" : "Show password"}
+              aria-label={visible ? tr("Hide password") : tr("Show password")}
               onClick={() => setVisible(!visible)}
             >
               {visible ? <EyeOff size={17} /> : <Eye size={17} />}
@@ -80,11 +82,14 @@ export function LoginForm({ onDone }: { onDone: () => void }) {
           </div>
         </Field>
         <div className="auth-options">
-          <span className="field-hint">Stay signed in on this device</span>
-          <Link to="/forgot-password">Forgot password?</Link>
+          <span className="field-hint">
+            {tr("Stay signed in on this device")}
+          </span>
+          <Link to="/forgot-password">{tr("Forgot password?")}</Link>
         </div>
         <Button className="full-width" busy={busy} type="submit">
-          Sign in <ArrowRight size={16} />
+          {tr("Sign in")}
+          <ArrowRight size={16} />
         </Button>
       </form>
     </>
@@ -112,6 +117,7 @@ const copy: Record<Mode, [string, string]> = {
   ],
 };
 export default function AuthPage({ mode }: { mode: Mode }) {
+  useLanguage();
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const state = useAuth();
@@ -125,7 +131,9 @@ export default function AuthPage({ mode }: { mode: Mode }) {
     mode === "confirm" &&
     (!params.get("userId") || !params.get("token") || !params.get("newEmail"))
       ? new Error(
-          "This confirmation link is incomplete. Request a new link in Settings.",
+          tr(
+            "This confirmation link is incomplete. Request a new link in Settings.",
+          ),
         )
       : undefined,
   );
@@ -154,7 +162,9 @@ export default function AuthPage({ mode }: { mode: Mode }) {
       )
       .then(() => {
         setSuccess(
-          "Your email address has been updated. Sign in with your new email.",
+          tr(
+            "Your email address has been updated. Sign in with your new email.",
+          ),
         );
         void auth.logout();
         navigate("/auth/confirm-change-email", { replace: true });
@@ -187,7 +197,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
       if (mode === "register") {
         const password = String(data.get("password"));
         if (password !== data.get("confirmPassword"))
-          throw new Error("Passwords do not match.");
+          throw new Error(tr("Passwords do not match."));
         await api.request("/auth/register", {
           method: "POST",
           body: {
@@ -209,7 +219,9 @@ export default function AuthPage({ mode }: { mode: Mode }) {
           authenticated: false,
         });
         setSuccess(
-          "If this account is eligible, a recovery link is on its way. Check your inbox and spam folder.",
+          tr(
+            "If this account is eligible, a recovery link is on its way. Check your inbox and spam folder.",
+          ),
         );
       }
       if (mode === "verify") {
@@ -218,16 +230,16 @@ export default function AuthPage({ mode }: { mode: Mode }) {
           body: { email, code: data.get("code") },
           authenticated: false,
         });
-        setSuccess("Email verified. You can now sign in.");
+        setSuccess(tr("Email verified. You can now sign in."));
       }
       if (mode === "reset") {
         if (data.get("password") !== data.get("confirmPassword"))
-          throw new Error("Passwords do not match.");
+          throw new Error(tr("Passwords do not match."));
         const userId = params.get("userId"),
           token = params.get("token");
         if (!userId || !token)
           throw new Error(
-            "This recovery link is incomplete. Request a new one.",
+            tr("This recovery link is incomplete. Request a new one."),
           );
         await api.request("/auth/reset-password", {
           method: "POST",
@@ -235,12 +247,13 @@ export default function AuthPage({ mode }: { mode: Mode }) {
           authenticated: false,
         });
         setSuccess(
-          "Your password has been updated. Sign in with your new password.",
+          tr("Your password has been updated. Sign in with your new password."),
         );
         navigate("/auth/set-password", { replace: true });
       }
       if (mode === "password") {
-        if (!state.session) throw new Error("Sign in to verify your password.");
+        if (!state.session)
+          throw new Error(tr("Sign in to verify your password."));
         await api.request("/api/auth/verify-password", {
           method: "POST",
           body: {
@@ -248,7 +261,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
             password: data.get("password"),
           },
         });
-        setSuccess("Your password has been verified.");
+        setSuccess(tr("Your password has been verified."));
       }
     } catch (error) {
       setError(error);
@@ -265,17 +278,18 @@ export default function AuthPage({ mode }: { mode: Mode }) {
           <Logo />
         </Link>
         <div className="auth-form-wrap">
-          <span className="eyebrow">YOUR LITTLE SPACE</span>
-          <h1>{copy[mode][0]}</h1>
-          <p className="auth-subtitle">{copy[mode][1]}</p>
+          <span className="eyebrow">{tr("YOUR LITTLE SPACE")}</span>
+          <h1>{tr(copy[mode][0])}</h1>
+          <p className="auth-subtitle">{tr(copy[mode][1])}</p>
           {mode === "login" ? (
             <>
               <LoginForm onDone={done} />
               <p className="auth-switch">
-                New around here? <Link to="/register">Create an account</Link>
+                {tr("New around here?")}{" "}
+                <Link to="/register">{tr("Create an account")}</Link>
               </p>
               <Link className="subtle-link" to="/verify-email">
-                Need to verify your email?
+                {tr("Need to verify your email?")}
               </Link>
             </>
           ) : (
@@ -290,13 +304,13 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                     to={mode === "password" ? "/settings/account" : "/login"}
                   >
                     {mode === "password"
-                      ? "Back to settings"
-                      : "Back to sign in"}
+                      ? tr("Back to settings")
+                      : tr("Back to sign in")}
                   </Link>
                 </div>
               ) : mode === "confirm" ? (
                 busy ? (
-                  <Spinner label="Confirming your email…" />
+                  <Spinner label={tr("Confirming your email…")} />
                 ) : null
               ) : (
                 <form
@@ -306,7 +320,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                   }}
                 >
                   {["register", "forgot", "verify"].includes(mode) ? (
-                    <Field label="Email address">
+                    <Field label={tr("Email address")}>
                       <input
                         type="email"
                         autoComplete="email"
@@ -325,7 +339,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                   {["register", "verify"].includes(mode) ? (
                     <>
                       <div className="code-row">
-                        <Field label="Verification code">
+                        <Field label={tr("Verification code")}>
                           <input
                             name="code"
                             inputMode="numeric"
@@ -343,24 +357,31 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                           disabled={!email || codeSent}
                           onClick={() => void sendCode()}
                         >
-                          {codeSent ? "Code sent" : "Send code"}
+                          {codeSent ? tr("Code sent") : tr("Send code")}
                         </Button>
                       </div>
                       {codeSent ? (
                         <p className="field-hint" role="status">
-                          Check your inbox. Codes expire in 10 minutes. You can
-                          request another code after a minute.
+                          {tr(
+                            "Check your inbox. Codes expire in 10 minutes. You can request another code after a minute.",
+                          )}
                         </p>
                       ) : null}
                     </>
                   ) : null}
                   {["register", "reset", "password"].includes(mode) ? (
                     <Field
-                      label={mode === "password" ? "Your password" : "Password"}
+                      label={
+                        mode === "password"
+                          ? tr("Your password")
+                          : tr("Password")
+                      }
                       hint={
                         mode === "password"
                           ? undefined
-                          : "At least 8 characters; include a mix of letters, numbers and symbols."
+                          : tr(
+                              "At least 8 characters; include a mix of letters, numbers and symbols.",
+                            )
                       }
                     >
                       <input
@@ -378,7 +399,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                     </Field>
                   ) : null}
                   {["register", "reset"].includes(mode) ? (
-                    <Field label="Confirm password">
+                    <Field label={tr("Confirm password")}>
                       <input
                         type="password"
                         name="confirmPassword"
@@ -391,27 +412,27 @@ export default function AuthPage({ mode }: { mode: Mode }) {
                   ) : null}
                   <Button type="submit" className="full-width" busy={busy}>
                     {mode === "register"
-                      ? "Create my space"
+                      ? tr("Create my space")
                       : mode === "forgot"
-                        ? "Send recovery link"
+                        ? tr("Send recovery link")
                         : mode === "verify"
-                          ? "Verify email"
+                          ? tr("Verify email")
                           : mode === "password"
-                            ? "Verify password"
-                            : "Set password"}
+                            ? tr("Verify password")
+                            : tr("Set password")}
                     <ArrowRight size={16} />
                   </Button>
                 </form>
               )}
               <Link className="back-link" to="/login">
                 <ArrowLeft size={15} />
-                Back to sign in
+                {tr("Back to sign in")}
               </Link>
             </>
           )}
           <p className="auth-privacy">
             <LockKeyhole size={12} />
-            Private notes. Just for you.
+            {tr("Private notes. Just for you.")}
           </p>
         </div>
       </section>
@@ -422,34 +443,37 @@ export default function AuthPage({ mode }: { mode: Mode }) {
         <div className="paper-card art-note-one">
           <span>💡</span>
           <h2>
-            Good ideas
+            {tr("Good ideas")}
             <br />
-            deserve a home.
+            {tr("deserve a home.")}
           </h2>
           <p>
-            A thought, a plan, a tiny reminder.
+            {tr("A thought, a plan, a tiny reminder.")}
             <br />
-            Keep the things that matter.
+            {tr("Keep the things that matter.")}
           </p>
-          <span className="mini-label">a little inspiration</span>
+          <span className="mini-label">{tr("a little inspiration")}</span>
         </div>
         <div className="paper-card art-note-two">
           <Leaf size={25} />
-          <h3>A little more clarity.</h3>
+          <h3>{tr("A little more clarity.")}</h3>
           <div className="art-check">
-            <span>✓</span> Capture the thought
+            <span>✓</span>
+            {tr("Capture the thought")}
           </div>
           <div className="art-check">
-            <span>✓</span> Make a little space
+            <span>✓</span>
+            {tr("Make a little space")}
           </div>
           <div className="art-check">
-            <span /> Let ideas grow
+            <span />
+            {tr("Let ideas grow")}
           </div>
         </div>
         <div className="art-caption">
-          Less to remember.
+          {tr("Less to remember.")}
           <br />
-          <strong>More room to think.</strong>
+          <strong>{tr("More room to think.")}</strong>
         </div>
         <div className="art-orbit" />
       </aside>

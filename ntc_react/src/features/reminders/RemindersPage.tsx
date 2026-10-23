@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -28,6 +29,7 @@ import {
 import { dateTime, errorMessage } from "../../shared/utils";
 import { ReminderForm } from "./ReminderDialog";
 export default function RemindersPage() {
+  useLanguage();
   const state = useAuth();
   const me = useMe();
   const query = useInfiniteQuery({
@@ -63,31 +65,34 @@ export default function RemindersPage() {
   }
   return (
     <>
-      <h1 className="sr-only">Reminders</h1>
+      <h1 className="sr-only">{tr("Reminders")}</h1>
       <div className="feature-banner">
         <div className="feature-icon">
           <CalendarDays size={27} />
         </div>
         <div>
-          <strong>Let your notes find you.</strong>
+          <strong>{tr("Let your notes find you.")}</strong>
           <p>
-            Open any note and tap the bell to set a reminder. Recurring
-            reminders follow your chosen timezone.
+            {tr(
+              "Open any note and tap the bell to set a reminder. Recurring reminders follow your chosen timezone.",
+            )}
           </p>
         </div>
         <Link className="button secondary" to="/notes">
-          Go to notes
+          {tr("Go to notes")}
         </Link>
       </div>
       {query.isPending ? (
-        <Spinner label="Finding your reminders…" />
+        <Spinner label={tr("Finding your reminders…")} />
       ) : query.isError ? (
         <ErrorPanel error={query.error} retry={() => void query.refetch()} />
       ) : !items.length ? (
         <EmptyState
           icon={Bell}
-          title="Nothing to remember just yet"
-          description="Add a reminder to a note, and it will find its way here."
+          title={tr("Nothing to remember just yet")}
+          description={tr(
+            "Add a reminder to a note, and it will find its way here.",
+          )}
         />
       ) : (
         <div className="reminders-board">
@@ -101,7 +106,7 @@ export default function RemindersPage() {
               </div>
               <div className="reminder-card-content">
                 <Link to={`/notes?note=${reminder.noteId}`}>
-                  <h2>{reminder.noteTitle || "Untitled"}</h2>
+                  <h2>{reminder.noteTitle || tr("Untitled")}</h2>
                 </Link>
                 <p>
                   <Clock3 size={14} />
@@ -112,16 +117,16 @@ export default function RemindersPage() {
                 </p>
                 <div className="reminder-meta">
                   <span>
-                    {REPEAT_NAMES[reminder.repeatType]}
+                    {tr(REPEAT_NAMES[reminder.repeatType])}
                     {reminder.repeatInterval > 1
-                      ? ` · every ${reminder.repeatInterval}`
+                      ? tr("· every {0}", reminder.repeatInterval)
                       : ""}
                   </span>
                   <span>{reminder.timeZoneId}</span>
                   {reminder.sendEmail ? (
                     <span>
                       <Mail size={11} />
-                      Email
+                      {tr("Email")}
                     </span>
                   ) : null}
                 </div>
@@ -129,27 +134,27 @@ export default function RemindersPage() {
               <span
                 className={`status-pill ${reminder.isActive ? "success" : ""}`}
               >
-                {reminder.isActive ? "Active" : "Paused"}
+                {reminder.isActive ? tr("Active") : tr("Paused")}
               </span>
               <ActionMenu
-                label="Reminder actions"
+                label={tr("Reminder actions")}
                 items={[
                   {
-                    label: "Edit reminder",
+                    label: tr("Edit reminder"),
                     icon: Pencil,
                     action: () => setEditing(reminder),
                     disabled: busy === reminder.id,
                   },
                   {
                     label: reminder.isActive
-                      ? "Pause reminder"
-                      : "Enable reminder",
+                      ? tr("Pause reminder")
+                      : tr("Enable reminder"),
                     icon: reminder.isActive ? Pause : Play,
                     action: () => void toggle(reminder),
                     disabled: busy === reminder.id,
                   },
                   {
-                    label: "Delete reminder",
+                    label: tr("Delete reminder"),
                     icon: Trash2,
                     danger: true,
                     separator: true,
@@ -168,11 +173,15 @@ export default function RemindersPage() {
           busy={query.isFetchingNextPage}
           onClick={() => void query.fetchNextPage()}
         >
-          Load more reminders
+          {tr("Load more reminders")}
         </Button>
       ) : null}
       {editing ? (
-        <Modal open onClose={() => setEditing(undefined)} title="Edit reminder">
+        <Modal
+          open
+          onClose={() => setEditing(undefined)}
+          title={tr("Edit reminder")}
+        >
           <div className="modal-body">
             <ReminderForm
               noteId={editing.noteId}
@@ -193,9 +202,11 @@ export default function RemindersPage() {
       ) : null}
       {deleting ? (
         <ConfirmDialog
-          title="Delete reminder?"
-          description="Future reminders will stop. Your note will be kept."
-          confirmLabel="Delete reminder"
+          title={tr("Delete reminder?")}
+          description={tr(
+            "Future reminders will stop. Your note will be kept.",
+          )}
+          confirmLabel={tr("Delete reminder")}
           danger
           onClose={() => setDeleting(undefined)}
           onConfirm={async () => {

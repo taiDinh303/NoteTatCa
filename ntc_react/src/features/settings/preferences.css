@@ -70,3 +70,49 @@ a.preferences-row:hover {
   outline: 2px solid var(--text);
   outline-offset: 3px;
 }
+.language-options {
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.language-option {
+  cursor: pointer;
+}
+.language-option:hover {
+  background: var(--hover);
+}
+.language-option input {
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  accent-color: var(--accent);
+}
+.privacy-sections {
+  display: grid;
+  gap: 16px;
+}
+.privacy-section {
+  padding: 20px;
+}
+.privacy-section h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+}
+.privacy-section p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.privacy-section p:last-child {
+  margin-bottom: 0;
+}
+.privacy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.privacy-sections > .button {
+  justify-self: start;
+}

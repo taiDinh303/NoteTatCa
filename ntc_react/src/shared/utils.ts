@@ -1,20 +1,23 @@
 import { ApiError } from "../infrastructure/http";
+import { currentLanguage, t } from "./i18n";
 export function errorMessage(error: unknown) {
   return error instanceof Error
-    ? error.message
-    : "Something went wrong. Please try again.";
+    ? t(error.message)
+    : t("Something went wrong. Please try again.");
 }
 export function validationMessage(error: unknown) {
   if (error instanceof ApiError) {
     const fields = Object.values(error.fields).flat();
-    return fields.length ? fields.join(" ") : error.message;
+    return fields.length
+      ? fields.map((message) => t(message)).join(" ")
+      : errorMessage(error);
   }
   return errorMessage(error);
 }
 export function dateTime(value: string | null, zone?: string) {
-  if (!value) return "Not scheduled";
+  if (!value) return t("Not scheduled");
   try {
-    return new Intl.DateTimeFormat("en", {
+    return new Intl.DateTimeFormat(currentLanguage(), {
       dateStyle: "medium",
       timeStyle: "short",
       timeZone: zone,
@@ -24,7 +27,7 @@ export function dateTime(value: string | null, zone?: string) {
   }
 }
 export function shortDate(value: string) {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(currentLanguage(), {
     month: "short",
     day: "numeric",
   }).format(new Date(value));

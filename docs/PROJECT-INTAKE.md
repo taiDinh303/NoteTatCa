@@ -16,7 +16,7 @@
 | Nhiệm vụ phiên này | Hoàn thiện docs theo Marixa, sau đó backend; đã triển khai và kiểm thử |
 | Nhiệm vụ sau | React được giao triển khai 2026-10-18 tại ntc_react; cloud còn giai đoạn sau |
 | Frontend | React tại ntc_react; Razor NTC.VIEW đã gỡ theo yêu cầu ngày 2026-10-21, xem DEC-020 |
-| Ngôn ngữ | Docs tiếng Việt; UI tiếng Anh đã được chủ dự án xác nhận ở Q-025 |
+| Ngôn ngữ | Docs tiếng Việt; UI mặc định tiếng Anh, chọn Việt/Anh/Trung/Nhật đổi toàn bộ giao diện theo yêu cầu 2026-10-23, DEC-024 bổ sung Q-025 |
 | Thời gian | Timezone từng user, mặc định Asia/Ho_Chi_Minh; catch-up 24 giờ; ngày docs Asia/Bangkok; UTC storage đã triển khai |
 | Dữ liệu | Nội dung note, email, hồ sơ, thông tin đăng nhập; phải giữ tài khoản và note cũ |
 | Ngân sách / hạn | CHƯA XÁC ĐỊNH, chủ dự án trả lời Q-009/Q-011 |
@@ -24,6 +24,8 @@
 | Thành công | Hướng public nhỏ đã chốt; đề xuất acceptance: luồng React→API→DB, không truy cập chéo owner, không mất note |
 
 ## Phạm vi
+
+2026-10-23/DEC-024: chủ dự án yêu cầu Language có bốn lựa chọn Việt, Anh, Trung, Nhật và chọn là đổi ngay toàn bộ giao diện, ghi nhớ trên trình duyệt; không dịch nội dung ghi chú/nhãn/tên tài khoản do người dùng nhập. Privacy có nội dung phù hợp hành vi NoteTatCa và liên kết quản lý thực, tham khảo ứng dụng ghi chú khác. Đã chọn mobile Settings dùng header gọn với nút ← và tên trang, trang con quay về Settings, Settings quay về ghi chú; PC giữ header/sidebar. Quyết định này thay yêu cầu UI chỉ tiếng Anh trước đó; English vẫn mặc định.
 
 2026-10-20/DEC-019: user yêu cầu tải đầy đủ notes/labels và dữ liệu workspace ngay khi đăng nhập để chuyển trang mượt; thêm animation khi đăng nhập/mất kết nối/chờ API Render khởi động. Chốt tải các trang trước khi mở workspace, cache memory riêng theo account, giữ draft khi lỗi và retry đọc có giới hạn; admin tiếp tục chỉ quản trị. Thiết kế chi tiết/giới hạn tại01-plan và FRONTEND-IMPLEMENTATION.
 
@@ -35,7 +37,7 @@ TARGET đã chốt: docs trước rồi hoàn thiện backend (giao 2026-10-17);
 
 TARGET bản đầu đã chốt: nhiều user, note riêng; email/mật khẩu + Google và xác minh email; nhãn, màu, ghim, kéo thả, tìm kiếm; editor rich text thống nhất có plain text/checklist/Markdown shortcuts/màu chữ/emoji và emoji đại diện note; autosave + nút Save; trash tự xóa sau 7 ngày; reminder trong app/email có lặp; admin quản lý/khóa user và thống kê nhưng không đọc nội dung note người khác.
 
-TARGET tương lai: Supabase PostgreSQL chỉ làm database, giữ .NET Identity; Render cho API, Vercel cho React; giữ tài khoản/note cũ. React TS/Vite ở NTC/ntc_react. UI tiếng Anh, public nhỏ. Git root đã gom lên NTC theo yêu cầu tiếp theo 2026-10-17; một docs duy nhất ở root, backend giữ ntc_aspnet và lịch sử/config được bảo toàn.
+TARGET tương lai: Supabase PostgreSQL chỉ làm database, giữ .NET Identity; Render cho API, Vercel cho React; giữ tài khoản/note cũ. React TS/Vite ở NTC/ntc_react. UI mặc định Anh, có Việt/Trung/Nhật theo DEC-024; public nhỏ. Git root đã gom lên NTC theo yêu cầu tiếp theo 2026-10-17; một docs duy nhất ở root, backend giữ ntc_aspnet và lịch sử/config được bảo toàn.
 
 Ngoài phạm vi đã giao: triển khai production, mua dịch vụ, xóa database, tạo frontend. Backend đã được giao trong phiên2026-10-17. Các mục optional ở [danh mục](00-README.md) giữ NO/UNDECIDED với lý do riêng.
 
@@ -75,7 +77,7 @@ Số câu hiển thị trong UI là 9–15; ID tài liệu là Q-019–025 để
 | Q-009 | Hosting và ngân sách/tháng? | Supabase DB/Render API/Vercel React đã chọn | Plan/region/chi phí lúc deploy | Hosting ĐÃ CHỐT Q-008/019; ngân sách CHƯA XÁC ĐỊNH / chủ dự án |
 | Q-010 | Có dữ liệu SQL hiện tại cần giữ? | Giữ dữ liệu | EF migration | ĐÃ CHỐT Yes tại Q-022 |
 | Q-011 | Quy mô sử dụng và hạn dự kiến? | Public nhỏ | Tải/lịch/nhân lực | Quy mô ĐÃ CHỐT Q-025; hạn CHƯA XÁC ĐỊNH / chủ dự án |
-| Q-012 | UI tiếng Việt/Anh/cả hai? | Tiếng Anh | Nội dung UI | ĐÃ CHỐT Q-025 |
+| Q-012 | UI tiếng Việt/Anh/cả hai? | Việt/Anh/Trung/Nhật | Nội dung UI | ĐÃ CHỐT bổ sung 2026-10-23, DEC-024; mặc định Anh |
 | Q-013 | Nút Save/tự lưu/cả hai? | Cả hai | Xung đột/idempotency/UX | ĐÃ CHỐT Q-023 |
 | Q-014 | Có export note và xóa tài khoản? Yes / No / làm sau | Làm sau khi MVP ổn | Vòng đời dữ liệu | CHƯA XÁC ĐỊNH / chủ dự án |
 | Q-015 | Offline/realtime: A online, tải lại khi cần; B đồng bộ nhiều tab; C sửa offline; D cộng tác realtime? | A bản đầu | Client storage, concurrency | CHƯA XÁC ĐỊNH / chủ dự án |

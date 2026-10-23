@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useEffect, useRef, useState } from "react";
 interface GoogleIdentity {
   accounts: {
@@ -30,7 +31,9 @@ function loadGoogle() {
       googleScript = undefined;
       script.remove();
       reject(
-        new Error("Google sign-in could not load. Please try email sign-in."),
+        new Error(
+          tr("Google sign-in could not load. Please try email sign-in."),
+        ),
       );
     };
     document.head.append(script);
@@ -43,6 +46,7 @@ export function GoogleButton({
   onCredential: (token: string) => Promise<void>;
   label?: "signin_with" | "continue_with";
 }) {
+  const language = useLanguage();
   const element = useRef<HTMLDivElement>(null);
   const callback = useRef(onCredential);
   const [error, setError] = useState("");
@@ -65,11 +69,12 @@ export function GoogleButton({
                 setError(
                   error instanceof Error
                     ? error.message
-                    : "Google sign-in failed.",
+                    : tr("Google sign-in failed."),
                 ),
               );
           },
         });
+        element.current.replaceChildren();
         window.google!.accounts.id.renderButton(element.current, {
           type: "standard",
           theme: "outline",
@@ -77,6 +82,7 @@ export function GoogleButton({
           width: 340,
           text: label,
           shape: "pill",
+          locale: language === "zh" ? "zh-CN" : language,
         });
       })
       .catch((error) => {
@@ -85,7 +91,7 @@ export function GoogleButton({
     return () => {
       active = false;
     };
-  }, [clientId, label]);
+  }, [clientId, label, language]);
   return (
     <div className="google-signin">
       {clientId ? (
@@ -95,13 +101,16 @@ export function GoogleButton({
           className="google-placeholder"
           type="button"
           disabled
-          title="Google sign-in is temporarily unavailable"
+          title={tr("Google sign-in is temporarily unavailable")}
         >
-          <span className="google-g">G</span>Continue with Google
+          <span className="google-g">G</span>
+          {tr("Continue with Google")}
         </button>
       )}
       {!clientId ? (
-        <span className="field-hint">Use email to sign in for now.</span>
+        <span className="field-hint">
+          {tr("Use email to sign in for now.")}
+        </span>
       ) : null}
       {error ? (
         <p role="alert" className="field-error">

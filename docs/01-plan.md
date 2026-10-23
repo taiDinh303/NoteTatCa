@@ -16,7 +16,7 @@
 | DEC-008 | Unified rich editor: plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; conversion cảnh báo | TARGET Q-003/020/021 | Schema version/renderer; bản hiện tại chưa upload ảnh, xem DEC-016 |
 | DEC-009 | Autosave, trạng thái lưu rõ; bỏ Save thường theo DEC-018 | Q-023 cập nhật bởi user2026-10-20 | Version/conflict/idempotency, Retry save khi lỗi |
 | DEC-010 | Trash 7 ngày, restore/xóa hẳn sớm; reminder in-app/email có lặp, timezone user, catch-up 24 giờ | TARGET Q-005/006/024 | Jobs/retention/notifications |
-| DEC-011 | Giữ tài khoản/note cũ; UI tiếng Anh; hướng public nhỏ | TARGET Q-022/025 | Migration an toàn, nội dung UI và vận hành |
+| DEC-011 | Giữ tài khoản/note cũ; mặc định UI tiếng Anh; hướng public nhỏ | TARGET Q-022/025, ngôn ngữ mở rộng tại DEC-024 | Migration an toàn, nội dung UI và vận hành |
 
 ## Quyết định bổ sung 2026-10-18
 
@@ -123,3 +123,11 @@ Theo yêu cầu bổ sung DEC-023: editor có nút View cạnh Close. View chờ
 ## Email trên Render Free — 2026-10-22
 
 Chủ dự án chọn giữ Render Free và yêu cầu bổ sung gửi email qua HTTPS API. CURRENT source thêm Brevo adapter cho IEmailSender dùng chung OTP/recovery/reminder; giữ SMTP mặc định cho môi trường hiện hữu. Không đổi người nhận theo account hoặc chuyển OTP sang Google Group. Cấu hình/phê duyệt provider và gửi nhận thật PENDING: chủ dự án đang tạo Brevo và xác minh sender. Hướng dẫn/giới hạn tại [24-integrations](24-integrations.md); rollout chỉ có ý nghĩa sau khi có key/sender hợp lệ.
+
+## DEC-024 — Đa ngôn ngữ, Privacy và header Settings mobile (2026-10-23)
+
+Chủ dự án xác nhận chọn ngôn ngữ là đổi ngay toàn bộ giao diện: Việt, Anh, Trung, Nhật; mặc định English và ghi nhớ trên trình duyệt. Bổ sung hệ thống dịch nhãn/menu/form/editor/auth/admin/accessibility và định dạng ngày giờ; không dịch dữ liệu người dùng, không remount editor khi đổi ngôn ngữ. Ngôn ngữ ứng dụng là preference trình duyệt riêng, không tự sửa Locale của hồ sơ.
+
+Settings có Language/Privacy/Appearance. Privacy mô tả quyền truy cập note, tài khoản/phiên đăng nhập, browser storage, email nhắc và thời hạn khôi phục; liên kết tới các chức năng có thật. Tham khảo bố cục/nội dung Joplin, Notion, Standard Notes, không đưa cam kết mã hóa đầu cuối, chứng nhận hoặc chính sách kinh doanh của sản phẩm khác vào NoteTatCa. Account export/hard delete, retention backup và thông báo pháp lý của đơn vị vận hành vẫn chưa được chốt.
+
+Chủ dự án chọn mobile Settings dùng header gọn ← và tên trang, thay hamburger/search, không lặp breadcrumb trong nội dung. Trang con → Settings → ghi chú; PC giữ header/sidebar. Admin có App settings với đường dẫn và liên kết self phù hợp, không truy cập workspace khách. Không đổi API/schema/config hoặc tự deploy/migrate.

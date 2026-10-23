@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react";
 import { labels, cache, workspace } from "../../app/runtime";
@@ -15,6 +16,7 @@ import {
   Spinner,
 } from "../../shared/ui";
 export default function LabelsManager({ onClose }: { onClose: () => void }) {
+  useLanguage();
   const query = useLabels();
   const [editing, setEditing] = useState<Label | null>(null);
   const [deleting, setDeleting] = useState<Label>();
@@ -30,8 +32,10 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
     <Modal
       open
       onClose={onClose}
-      title="Your labels"
-      description="A little order for your ideas. Names can repeat; each label stays separate."
+      title={tr("Your labels")}
+      description={tr(
+        "A little order for your ideas. Names can repeat; each label stays separate.",
+      )}
     >
       <div className="modal-body">
         <form
@@ -57,17 +61,17 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
               .finally(() => setBusy(false));
           }}
         >
-          <Field label={editing ? "Edit label" : "New label"}>
+          <Field label={editing ? tr("Edit label") : tr("New label")}>
             <input
               name="name"
               defaultValue={editing?.name ?? ""}
               maxLength={50}
-              placeholder="e.g. Ideas, Personal, Work"
+              placeholder={tr("e.g. Ideas, Personal, Work")}
               required
             />
           </Field>
-          <label className="color-input" title="Label color">
-            <span className="sr-only">Label color</span>
+          <label className="color-input" title={tr("Label color")}>
+            <span className="sr-only">{tr("Label color")}</span>
             <input
               type="color"
               name="color"
@@ -76,11 +80,11 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           </label>
           <Button busy={busy} type="submit">
             {editing ? (
-              "Save"
+              tr("Save")
             ) : (
               <>
                 <Plus size={17} />
-                Add
+                {tr("Add")}
               </>
             )}
           </Button>
@@ -93,7 +97,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                 setFormKey((k) => k + 1);
               }}
             >
-              Cancel
+              {tr("Cancel")}
             </Button>
           ) : null}
         </form>
@@ -105,8 +109,8 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
         ) : items.length === 0 ? (
           <EmptyState
             icon={Tag}
-            title="Everything in its place"
-            description="Create a label to start organizing your notes."
+            title={tr("Everything in its place")}
+            description={tr("Create a label to start organizing your notes.")}
           />
         ) : (
           <div className="label-list">
@@ -116,7 +120,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                 <span>{label.name}</span>
                 <IconButton
                   icon={Pencil}
-                  label={`Edit label ${label.name}`}
+                  label={tr("Edit label {0}", label.name)}
                   onClick={() => {
                     setEditing(label);
                     setFormKey((k) => k + 1);
@@ -124,7 +128,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                 />
                 <IconButton
                   icon={Trash2}
-                  label={`Delete label ${label.name}`}
+                  label={tr("Delete label {0}", label.name)}
                   onClick={() => setDeleting(label)}
                 />
               </div>
@@ -137,20 +141,23 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
             busy={query.isFetchingNextPage}
             onClick={() => void query.fetchNextPage()}
           >
-            Load more labels
+            {tr("Load more labels")}
           </Button>
         ) : null}
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={onClose}>
-          Done
+          {tr("Done")}
         </Button>
       </div>
       {deleting ? (
         <ConfirmDialog
-          title="Delete this label?"
-          description={`“${deleting.name}” will be removed from all notes. Your notes will be kept.`}
-          confirmLabel="Delete label"
+          title={tr("Delete this label?")}
+          description={tr(
+            "“{0}” will be removed from all notes. Your notes will be kept.",
+            deleting.name,
+          )}
+          confirmLabel={tr("Delete label")}
           danger
           onClose={() => setDeleting(undefined)}
           onConfirm={async () => {

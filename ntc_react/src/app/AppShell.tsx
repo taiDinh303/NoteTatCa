@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../shared/i18n";
 import type { ReactNode } from "react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
@@ -10,6 +11,7 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArrowLeft,
   Bell,
   CalendarDays,
   FileText,
@@ -39,6 +41,7 @@ function Sidebar({
   onNavigate: () => void;
   accountControls?: ReactNode;
 }) {
+  useLanguage();
   const query = useLabels();
   const notesQuery = useNotes({});
   const trashQuery = useNotes({ trash: true });
@@ -48,29 +51,29 @@ function Sidebar({
   const allLabels = query.data?.pages.flatMap((p) => p.items) ?? [];
   return (
     <>
-      <nav className="primary-nav" aria-label="Workspace">
+      <nav className="primary-nav" aria-label={tr("Workspace")}>
         <NavLink to="/notes" onClick={onNavigate}>
           <FileText size={19} />
-          All notes
-          {typeof notesCount === 'number' ? (
-            <span className='nav-count' aria-hidden='true'>
+          {tr("All notes")}
+          {typeof notesCount === "number" ? (
+            <span className="nav-count" aria-hidden="true">
               {notesCount}
             </span>
           ) : null}
         </NavLink>
         <NavLink to="/reminders" onClick={onNavigate}>
           <CalendarDays size={19} />
-          Reminders
+          {tr("Reminders")}
         </NavLink>
         <NavLink to="/notifications" onClick={onNavigate}>
           <Bell size={19} />
-          Inbox
+          {tr("Inbox")}
         </NavLink>
         <NavLink to="/trash" onClick={onNavigate}>
           <Trash2 size={19} />
-          Trash
-          {typeof trashCount === 'number' ? (
-            <span className='nav-count' aria-hidden='true'>
+          {tr("Trash")}
+          {typeof trashCount === "number" ? (
+            <span className="nav-count" aria-hidden="true">
               {trashCount}
             </span>
           ) : null}
@@ -79,16 +82,16 @@ function Sidebar({
       <button
         className="sidebar-section-heading labels-heading"
         type="button"
-        aria-label="Manage labels"
+        aria-label={tr("Manage labels")}
         onClick={() => {
           onLabels();
           onNavigate();
         }}
       >
-        <span>YOUR LABELS</span>
+        <span>{tr("YOUR LABELS")}</span>
         <Tag size={14} />
       </button>
-      <nav className="label-nav" aria-label="Labels">
+      <nav className="label-nav" aria-label={tr("Labels")}>
         {allLabels.map((label) => (
           <NavLink
             key={label.id}
@@ -100,14 +103,16 @@ function Sidebar({
           </NavLink>
         ))}
         {allLabels.length === 0 ? (
-          <p className="sidebar-hint">A place for every kind of idea.</p>
+          <p className="sidebar-hint">
+            {tr("A place for every kind of idea.")}
+          </p>
         ) : null}
         {query.hasNextPage ? (
           <button
             className="sidebar-more"
             onClick={() => void query.fetchNextPage()}
           >
-            Load more labels
+            {tr("Load more labels")}
           </button>
         ) : null}
       </nav>
@@ -120,19 +125,39 @@ function Sidebar({
           onClick={onNavigate}
         >
           <Settings size={18} />
-          Settings
+          {tr("Settings")}
         </NavLink>
         <div className="sidebar-footer">
-          A little space. All yours.<span>NoteTatCa</span>
+          {tr("A little space. All yours.")}
+          <span>NoteTatCa</span>
         </div>
       </div>
     </>
   );
 }
 export default function AppShell() {
+  useLanguage();
   const state = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const settingsTitles: Record<string, string> = {
+    "/settings": "Settings",
+    "/settings/language": "Language",
+    "/settings/privacy": "Privacy",
+    "/settings/appearance": "Appearance",
+    "/settings/profile": "Profile",
+    "/settings/account": "Account & security",
+    "/settings/sessions": "Active sessions",
+  };
+  const settingsTitle = settingsTitles[location.pathname];
+  const settingsBack =
+    location.pathname === "/settings" ||
+    location.pathname === "/settings/profile"
+      ? "/notes"
+      : location.pathname === "/settings/account" ||
+          location.pathname === "/settings/sessions"
+        ? "/settings/profile"
+        : "/settings";
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
@@ -174,17 +199,29 @@ export default function AppShell() {
     location.pathname === "/notes" ? (params.get("q") ?? "") : search;
   return (
     <div
-      className={`app-shell customer-shell ${sidebarHidden ? "sidebar-hidden" : ""}`}
+      className={`app-shell customer-shell ${sidebarHidden ? "sidebar-hidden" : ""} ${settingsTitle ? "settings-area" : ""}`}
     >
       <a href="#workspace-main" className="skip-link">
-        Skip to content
+        {tr("Skip to content")}
       </a>
-        <header className="topbar">
-          <div className="topbar-brand">
+      <header className="topbar">
+        {settingsTitle ? (
+          <div className="preferences-mobile-header">
+            <Link
+              className="icon-button"
+              to={settingsBack}
+              aria-label={tr("Back")}
+            >
+              <ArrowLeft size={20} aria-hidden="true" />
+            </Link>
+            <h1>{tr(settingsTitle)}</h1>
+          </div>
+        ) : null}
+        <div className="topbar-brand">
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}
-            label={sidebarHidden ? "Show sidebar" : "Hide sidebar"}
+            label={sidebarHidden ? tr("Show sidebar") : tr("Hide sidebar")}
             aria-controls="workspace-navigation"
             aria-expanded={!sidebarHidden}
             onClick={() => setSidebarHidden((hidden) => !hidden)}
@@ -192,87 +229,94 @@ export default function AppShell() {
           <IconButton
             className="mobile-menu-button"
             icon={Menu}
-            label="Open navigation"
+            label={tr("Open navigation")}
             onClick={() => setMobile(true)}
           />
-          <Link to="/Home" className="header-brand" aria-label="NoteTatCa home">
+          <Link
+            to="/Home"
+            className="header-brand"
+            aria-label={tr("NoteTatCa home")}
+          >
             <Logo />
           </Link>
-          </div>
-          <form
-            className="global-search"
-            role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              navigate(
-                "/notes" +
-                  (displaySearch
-                    ? "?q=" + encodeURIComponent(displaySearch)
-                    : ""),
-              );
+        </div>
+        <form
+          className="global-search"
+          role="search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            navigate(
+              "/notes" +
+                (displaySearch
+                  ? "?q=" + encodeURIComponent(displaySearch)
+                  : ""),
+            );
+          }}
+        >
+          <Search size={18} />
+          <input
+            ref={input}
+            value={displaySearch}
+            aria-label={tr("Search your notes")}
+            placeholder={tr("Search your notes")}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              if (location.pathname === "/notes") {
+                const next = new URLSearchParams(params);
+                if (e.target.value) next.set("q", e.target.value);
+                else next.delete("q");
+                setParams(next, { replace: true });
+              }
             }}
-          >
-            <Search size={18} />
-            <input
-              ref={input}
-              value={displaySearch}
-              aria-label="Search your notes"
-              placeholder="Search your notes"
-              onChange={(e) => {
-                setSearch(e.target.value);
+          />
+          {displaySearch ? (
+            <IconButton
+              icon={X}
+              label={tr("Clear search")}
+              onClick={() => {
+                setSearch("");
                 if (location.pathname === "/notes") {
                   const next = new URLSearchParams(params);
-                  if (e.target.value) next.set("q", e.target.value);
-                  else next.delete("q");
+                  next.delete("q");
                   setParams(next, { replace: true });
                 }
               }}
             />
-            {displaySearch ? (
-              <IconButton
-                icon={X}
-                label="Clear search"
-                onClick={() => {
-                  setSearch("");
-                  if (location.pathname === "/notes") {
-                    const next = new URLSearchParams(params);
-                    next.delete("q");
-                    setParams(next, { replace: true });
-                  }
-                }}
-              />
-            ) : null}
-          </form>
-          <div className="topbar-actions">
-            <span className="private-badge">
-              <ShieldCheck size={13} />
-              Private workspace
-            </span>
+          ) : null}
+        </form>
+        <div className="topbar-actions">
+          <span className="private-badge">
+            <ShieldCheck size={13} />
+            {tr("Private workspace")}
+          </span>
+          <IconButton
+            className="header-theme-toggle"
+            icon={theme === "dark" ? Sun : Moon}
+            label={
+              theme === "dark" ? tr("Use light theme") : tr("Use dark theme")
+            }
+            onClick={toggleTheme}
+          />
+          <div className="notification-button">
             <IconButton
-              className="header-theme-toggle"
-              icon={theme === "dark" ? Sun : Moon}
-              label={theme === "dark" ? "Use light theme" : "Use dark theme"}
-              onClick={toggleTheme}
+              icon={Bell}
+              label={tr("Open inbox")}
+              onClick={() => navigate("/notifications")}
             />
-            <div className="notification-button">
-              <IconButton
-                icon={Bell}
-                label="Open inbox"
-                onClick={() => navigate("/notifications")}
-              />
-              {(unread.data ?? 0) > 0 ? (
-                <span>{unread.data! > 9 ? "9+" : unread.data}</span>
-              ) : null}
-            </div>
-            <div className="topbar-divider" />
-            <div className="header-account-menu"><ShellAccountMenu /></div>
+            {(unread.data ?? 0) > 0 ? (
+              <span>{unread.data! > 9 ? "9+" : unread.data}</span>
+            ) : null}
           </div>
-        </header>
+          <div className="topbar-divider" />
+          <div className="header-account-menu">
+            <ShellAccountMenu />
+          </div>
+        </div>
+      </header>
       <aside className="sidebar" id="workspace-navigation">
         <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
       </aside>
       <div className="main-column">
-
         <main className="workspace-main" id="workspace-main">
           <Outlet />
         </main>
@@ -294,15 +338,19 @@ export default function AppShell() {
                 <button
                   type="button"
                   className="settings-link drawer-inbox"
-                  aria-label="Open inbox"
+                  aria-label={tr("Open inbox")}
                   onClick={() => {
                     navigate("/notifications");
                     setMobile(false);
                   }}
                 >
                   <Bell size={18} />
-                  Notifications
-                  {(unread.data ?? 0) > 0 ? <span className="drawer-unread">{unread.data! > 9 ? "9+" : unread.data}</span> : null}
+                  {tr("Notifications")}
+                  {(unread.data ?? 0) > 0 ? (
+                    <span className="drawer-unread">
+                      {unread.data! > 9 ? "9+" : unread.data}
+                    </span>
+                  ) : null}
                 </button>
               </div>
             }

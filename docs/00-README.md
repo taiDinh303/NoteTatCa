@@ -19,7 +19,7 @@ NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa t�
 
 - Workspace và Git root: `D:\My Project\NTC`; backend: `ntc_aspnet/`.
 - Docs duy nhất: `D:\My Project\NTC\docs`, chính là `docs/` trong Git. Bản trùng trong backend đã chuyển vào recovery backup của Git; không tạo lại bản sync thứ hai.
-- React + TypeScript + Vite đặt ở `NTC/ntc_react`; UI tiếng Anh, hướng public nhỏ. Đã xác nhận Q-008/025.
+- React + TypeScript + Vite đặt ở `NTC/ntc_react`; UI mặc định tiếng Anh, hỗ trợ Việt/Anh/Trung/Nhật theo yêu cầu bổ sung 2026-10-23 (DEC-024); hướng public nhỏ. Đã xác nhận Q-008/025.
 - Cloud tương lai: Supabase PostgreSQL, giữ .NET Identity; Render API, Vercel React. Giữ tài khoản/note cũ, chưa migrate/deploy trong phiên docs.
 - Đã chốt editor unified rich text/checklist/Markdown shortcuts, màu chữ/emoji, autosave (bỏ Save thường theo DEC-018/2026-10-20; có Retry save khi lỗi), nhắc in-app/email có lặp và gửi bù 24 giờ theo timezone user, trash 7 ngày; admin không đọc nội dung note người khác.
 - `ntc_aspnet/NTC.VIEW` đã được gỡ theo yêu cầu chủ dự án ngày 2026-10-21 (DEC-020). Frontend hiện hành là `ntc_react`; source Razor lịch sử còn trong Git, không tạo lại thư mục cũ.

@@ -8,7 +8,7 @@ UI English/React đã triển khai tại ntc_react ngày 2026-10-18; phạm vi/e
 
 ## Phạm vi đã chốt
 
-React + TypeScript + Vite tại `NTC/ntc_react`; UI tiếng Anh; Razor cũ đã gỡ theo DEC-020, source tham khảo còn trong Git. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
+React + TypeScript + Vite tại `NTC/ntc_react`; UI mặc định tiếng Anh, có Việt/Anh/Trung/Nhật theo DEC-024; Razor cũ đã gỡ theo DEC-020, source tham khảo còn trong Git. Chức năng: note riêng, nhãn/màu/ghim/kéo thả/tìm kiếm/trash; một rich editor tích hợp plain/checklist/Markdown shortcuts, màu chữ/emoji và emoji đại diện note; nhắc trong app+email và admin tài khoản/thống kê không đọc note. Q-020/021 đã chốt, không tạo bốn editor độc lập.
 
 | ID | Route PROPOSED | Component / hành động | REQ / API |
 | --- | --- | --- | --- |
@@ -42,7 +42,11 @@ Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; b
 
 PROPOSED responsive kiểm ở 360/768/1280px; grid chuyển list phù hợp, sidebar drawer trên mobile, drag có phương án di chuyển bằng bàn phím. Modal trap focus, Escape/hủy rõ, trả focus về trigger. Title/content dài, tiếng Việt/emoji và lịch dạng địa phương không tràn.
 
-Nghiệm thu: TC-012/014/015; evidence browser/screenshots ở FRONTEND-IMPLEMENTATION. UI tiếng Anh đã chốt Q-025; layout/CSS/editor đã chọn trong tác vụ React; file 13 không tự tạo Figma.
+Nghiệm thu: TC-012/014/015; evidence browser/screenshots ở FRONTEND-IMPLEMENTATION. Q-025 về UI tiếng Anh đã được mở rộng bằng DEC-024; layout/CSS/editor đã chọn trong tác vụ React; file 13 không tự tạo Figma.
+
+## Settings và ngôn ngữ — 2026-10-23
+
+Sidebar Settings mở Language/Privacy/Appearance; tài khoản vẫn nằm tại avatar Account settings. Language là radio group với tên bản địa English, Tiếng Việt, 中文, 日本語, lưu preference riêng trên trình duyệt; đổi tức thì cả label/accessibility/date-time, giữ nội dung người dùng và bản nháp. Mobile Settings có header ← + tên trang, ẩn search/avatar/hamburger và liên kết quay lại trùng trong nội dung; PC giữ toàn bộ header/sidebar và breadcrumb. Privacy có thẻ nội dung về ghi chú riêng, tài khoản, trình duyệt, email nhắc và thời hạn khôi phục; các link account/sessions/trash có thật, không tạo toggle tracking/encryption không có chức năng. Admin có App settings riêng và không có liên kết vào Trash của khách.
 
 ## Thu phóng và sidebar gọn — DEC-021
 

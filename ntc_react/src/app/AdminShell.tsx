@@ -1,6 +1,8 @@
+import { t as tr, useLanguage } from "../shared/i18n";
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
+  ArrowLeft,
   FileText,
   LayoutDashboard,
   Menu,
@@ -15,6 +17,7 @@ import { useTheme } from "../shared/useTheme";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 
 function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
+  useLanguage();
   return (
     <>
       <Link to="/admin/overview" className="sidebar-brand" onClick={onNavigate}>
@@ -25,55 +28,61 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
           <ShieldCheck size={19} />
         </span>
         <span>
-          Administration<small>System management</small>
+          {tr("Administration")}
+          <small>{tr("System management")}</small>
         </span>
       </div>
-      <nav className="primary-nav" aria-label="Administration">
+      <nav className="primary-nav" aria-label={tr("Administration")}>
         <NavLink to="/admin/overview" onClick={onNavigate}>
           <LayoutDashboard size={19} />
-          Overview
+          {tr("Overview")}
         </NavLink>
         <NavLink to="/admin/users" onClick={onNavigate}>
           <Users size={19} />
-          Accounts
+          {tr("Accounts")}
         </NavLink>
         <NavLink to="/admin/roles" onClick={onNavigate}>
           <ShieldCheck size={19} />
-          Roles
+          {tr("Roles")}
         </NavLink>
         <NavLink to="/admin/audit" onClick={onNavigate}>
           <FileText size={19} />
-          Audit trail
+          {tr("Audit trail")}
         </NavLink>
       </nav>
       <div className="sidebar-section-heading">
-        <span>YOUR ADMIN ACCOUNT</span>
+        <span>{tr("YOUR ADMIN ACCOUNT")}</span>
       </div>
-      <nav className="primary-nav" aria-label="Administrator settings">
+      <nav className="primary-nav" aria-label={tr("Administrator settings")}>
         <NavLink to="/admin/settings/profile" onClick={onNavigate}>
           <Users size={18} />
-          Profile
+          {tr("Profile")}
         </NavLink>
         <NavLink to="/admin/settings/account" onClick={onNavigate}>
           <Settings size={18} />
-          Account & security
+          {tr("Account & security")}
         </NavLink>
         <NavLink to="/admin/settings/sessions" onClick={onNavigate}>
           <ShieldCheck size={18} />
-          Active sessions
+          {tr("Active sessions")}
+        </NavLink>
+        <NavLink to="/admin/preferences" onClick={onNavigate}>
+          <Settings size={18} />
+          {tr("App settings")}
         </NavLink>
       </nav>
       <div className="sidebar-bottom">
         <div className="admin-sidebar-note">
           <ShieldCheck size={20} />
           <p>
-            Manage the service.
+            {tr("Manage the service.")}
             <br />
-            Protect everyone’s privacy.
+            {tr("Protect everyone’s privacy.")}
           </p>
         </div>
         <div className="sidebar-footer">
-          Administration console<span>NoteTatCa</span>
+          {tr("Administration console")}
+          <span>NoteTatCa</span>
         </div>
       </div>
     </>
@@ -81,36 +90,65 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
 }
 
 export default function AdminShell() {
+  useLanguage();
+  const location = useLocation();
+  const preferenceTitles: Record<string, string> = {
+    "/admin/preferences": "Settings",
+    "/admin/preferences/language": "Language",
+    "/admin/preferences/privacy": "Privacy",
+    "/admin/preferences/appearance": "Appearance",
+  };
+  const preferenceTitle = preferenceTitles[location.pathname];
   const [mobile, setMobile] = useState(false);
   const { theme, toggleTheme } = useTheme();
   return (
-    <div className="app-shell admin-shell">
+    <div
+      className={`app-shell admin-shell ${preferenceTitle ? "settings-area" : ""}`}
+    >
       <a href="#admin-main" className="skip-link">
-        Skip to content
+        {tr("Skip to content")}
       </a>
       <aside className="sidebar">
         <AdminNavigation onNavigate={() => {}} />
       </aside>
       <div className="main-column">
         <header className="topbar admin-topbar">
+          {preferenceTitle ? (
+            <div className="preferences-mobile-header">
+              <Link
+                className="icon-button"
+                to={
+                  location.pathname === "/admin/preferences"
+                    ? "/admin/overview"
+                    : "/admin/preferences"
+                }
+                aria-label={tr("Back")}
+              >
+                <ArrowLeft size={20} aria-hidden="true" />
+              </Link>
+              <h1>{tr(preferenceTitle)}</h1>
+            </div>
+          ) : null}
           <IconButton
             className="mobile-menu-button"
             icon={Menu}
-            label="Open navigation"
+            label={tr("Open navigation")}
             onClick={() => setMobile(true)}
           />
           <Link to="/admin/overview" className="admin-console-title">
             <ShieldCheck size={20} />
-            <span>Admin console</span>
+            <span>{tr("Admin console")}</span>
           </Link>
           <div className="topbar-actions">
             <span className="private-badge">
               <ShieldCheck size={13} />
-              Administrator
+              {tr("Administrator")}
             </span>
             <IconButton
               icon={theme === "dark" ? Sun : Moon}
-              label={theme === "dark" ? "Use light theme" : "Use dark theme"}
+              label={
+                theme === "dark" ? tr("Use light theme") : tr("Use dark theme")
+              }
               onClick={toggleTheme}
             />
             <div className="topbar-divider" />
@@ -125,7 +163,7 @@ export default function AdminShell() {
         <Modal
           open
           onClose={() => setMobile(false)}
-          title="Administration navigation"
+          title={tr("Administration navigation")}
           hideCloseButton
           dismissOnOutside
           className="navigation-drawer"

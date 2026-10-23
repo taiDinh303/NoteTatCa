@@ -1,11 +1,7 @@
+import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ChevronDown,
-  LogOut,
-  Settings,
-  ZoomIn,
-} from "lucide-react";
+import { ChevronDown, LogOut, Settings, ZoomIn } from "lucide-react";
 import { auth } from "./runtime";
 import { settingsPath } from "../application/access";
 import { useAuth, useMe } from "../shared/hooks";
@@ -14,7 +10,10 @@ import { LoginForm } from "../features/auth/AuthPage";
 import { useDisplayZoom } from "../shared/displayZoom";
 import { ZoomDialog } from "../shared/ZoomDialog";
 
-export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {}) {
+export function ShellAccountMenu({
+  onNavigate,
+}: { onNavigate?: () => void } = {}) {
+  useLanguage();
   const state = useAuth();
   const me = useMe();
   const navigate = useNavigate();
@@ -31,24 +30,24 @@ export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {
     state.session?.fullName ||
     state.session?.givenName ||
     state.session?.userName ||
-    "Your account";
+    tr("Your account");
   return (
     <>
       <ActionMenu
-        label="Account menu"
+        label={tr("Account menu")}
         items={[
           {
-            label: "Account settings",
+            label: tr("Account settings"),
             icon: Settings,
             action: () => navigateTo(base + "/profile"),
           },
           {
-            label: `Zoom (${zoom.percent}%)`,
+            label: tr("Zoom ({0}%)", zoom.percent),
             icon: ZoomIn,
             action: () => setZoomOpen(true),
           },
           {
-            label: "Sign out",
+            label: tr("Sign out"),
             icon: LogOut,
             separator: true,
             action: () => navigateTo("/logout"),
@@ -59,7 +58,7 @@ export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {
           ref={trigger}
           type="button"
           className="avatar-menu"
-          aria-label="Account menu"
+          aria-label={tr("Account menu")}
         >
           <Avatar
             name={name}
@@ -88,19 +87,26 @@ export function SessionExpiredDialog({
 }: {
   administration?: boolean;
 }) {
+  useLanguage();
   const state = useAuth();
   if (state.status !== "expired") return null;
   const description = administration
-    ? "Your session expired. Sign in again to continue administering NoteTatCa."
-    : "Your session expired. Sign in to continue; your current draft stays in this tab.";
+    ? tr(
+        "Your session expired. Sign in again to continue administering NoteTatCa.",
+      )
+    : tr(
+        "Your session expired. Sign in to continue; your current draft stays in this tab.",
+      );
   const hint = administration
-    ? "Your account permissions determine which area opens after sign-in."
-    : "Sign in to the same account to keep editing. Switching accounts clears this workspace and local drafts.";
+    ? tr("Your account permissions determine which area opens after sign-in.")
+    : tr(
+        "Sign in to the same account to keep editing. Switching accounts clears this workspace and local drafts.",
+      );
   return (
     <Modal
       open
       onClose={() => {}}
-      title="Welcome back"
+      title={tr("Welcome back")}
       description={description}
     >
       <div className="modal-body">
@@ -113,7 +119,9 @@ export function SessionExpiredDialog({
             void auth.logout();
           }}
         >
-          {administration ? "Sign out" : "Sign out and discard local drafts"}
+          {administration
+            ? tr("Sign out")
+            : tr("Sign out and discard local drafts")}
         </button>
       </div>
     </Modal>

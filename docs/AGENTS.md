@@ -11,7 +11,7 @@ Phạm vi chỉ thư mục `docs`. Chỉ dẫn người dùng có ưu tiên; fil
 1. Đọc 00-README, PROJECT-INTAKE, 01-plan và snapshot worklog trước khi cập nhật.
 2. Phân biệt CURRENT, TARGET, PROPOSED và NOT VERIFIED. Code là hiện trạng; không dùng lỗi code để hợp thức hóa nghiệp vụ.
 3. Ghi câu trả lời bằng ID Q và nguồn/ngày; cập nhật REQ/RULE/ADR/API/TC liên quan. Không hỏi lại điều đã được chốt.
-4. Không tạo lại `ntc_aspnet/NTC.VIEW`: chủ dự án đã yêu cầu gỡ ngày 2026-10-21. React TS/Vite ở NTC/ntc_react, UI tiếng Anh; decisions Q-001–008 và Q-019–025 đã chốt, không hỏi lại.
+4. Không tạo lại `ntc_aspnet/NTC.VIEW`: chủ dự án đã yêu cầu gỡ ngày 2026-10-21. React TS/Vite ở ntc_react, UI mặc định Anh và có Việt/Trung/Nhật theo DEC-024; decisions Q-001–008 và Q-019–025 đã chốt, không hỏi lại.
 5. Git root đã chuyển lên NTC theo yêu cầu chủ dự án 2026-10-17. NTC/docs là nguồn tài liệu duy nhất trong repo; không tạo lại ntc_aspnet/docs hoặc nested .git. Backend giữ trong ntc_aspnet; Git/tool/CI/scripts/deploy files ở root. Lệnh hiện hành chạy từ root, dùng prefix ntc_aspnet/ cho project .NET. Chỉ xác nhận push sau khi kiểm remote.
 6. Không ghi secret, connection string thật, token, email cá nhân hay nội dung note thật. Ví dụ dùng `example.test` và dữ liệu giả.
 7. Nhiệm vụ tài liệu hoàn tất bằng kiểm tra nội dung/link/trạng thái. Nhiệm vụ code sau này cần nghiệm thu đầu cuối phù hợp; build không thay thế test ownership/runtime.

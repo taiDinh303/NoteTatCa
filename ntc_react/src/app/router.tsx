@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../shared/i18n";
 import { lazy, Suspense, useEffect, useRef } from "react";
 import {
   createBrowserRouter,
@@ -26,9 +27,12 @@ const NotesPage = lazy(() => import("../features/notes/NotesPage"));
 const RemindersPage = lazy(() => import("../features/reminders/RemindersPage"));
 const InboxPage = lazy(() => import("../features/inbox/InboxPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
-const PreferencesPage = lazy(() => import("../features/settings/PreferencesPage"));
+const PreferencesPage = lazy(
+  () => import("../features/settings/PreferencesPage"),
+);
 const AdminPage = lazy(() => import("../features/admin/AdminPage"));
 function Root() {
+  useLanguage();
   useEffect(() => {
     void auth.bootstrap();
   }, []);
@@ -36,8 +40,8 @@ function Root() {
     <ConnectionFeedback>
       <Suspense
         fallback={
-          <StartupScreen title="Opening your space…">
-            <ConnectionProgress label="Application loading" />
+          <StartupScreen title={tr("Opening your space…")}>
+            <ConnectionProgress label={tr("Application loading")} />
           </StartupScreen>
         }
       >
@@ -47,6 +51,7 @@ function Root() {
   );
 }
 function Authenticated() {
+  useLanguage();
   const state = useAuth();
   const location = useLocation();
   if (state.status === "loading" || state.status === "unavailable")
@@ -55,15 +60,15 @@ function Authenticated() {
         busy={state.status === "loading"}
         title={
           state.status === "loading"
-            ? "Restoring your session…"
-            : "Unable to restore your session yet"
+            ? tr("Restoring your session…")
+            : tr("Unable to restore your session yet")
         }
       >
         {state.status === "loading" ? (
-          <ConnectionProgress label="Session connection progress" />
+          <ConnectionProgress label={tr("Session connection progress")} />
         ) : state.status === "unavailable" ? (
           <Button onClick={() => void auth.bootstrap(true)}>
-            Retry connection
+            {tr("Retry connection")}
           </Button>
         ) : null}
       </StartupScreen>
@@ -79,6 +84,7 @@ function Authenticated() {
   );
 }
 function WorkspaceMember() {
+  useLanguage();
   const state = useAuth();
   return isAdministrator(state.session) ? (
     <Navigate to="/admin/overview" replace />
@@ -87,6 +93,7 @@ function WorkspaceMember() {
   );
 }
 function Administrator() {
+  useLanguage();
   const state = useAuth();
   return isAdministrator(state.session) ? (
     <Outlet />
@@ -95,15 +102,30 @@ function Administrator() {
   );
 }
 function SettingsArea() {
+  useLanguage();
   const state = useAuth();
   const location = useLocation();
+  const appPreference = [
+    "/settings",
+    "/settings/language",
+    "/settings/privacy",
+    "/settings/appearance",
+  ].includes(location.pathname);
   return isAdministrator(state.session) ? (
-    <Navigate replace to={"/admin" + location.pathname + location.search} />
+    <Navigate
+      replace
+      to={
+        (appPreference
+          ? location.pathname.replace("/settings", "/admin/preferences")
+          : "/admin" + location.pathname) + location.search
+      }
+    />
   ) : (
     <AppShell />
   );
 }
 function LegacyRedirect({ to }: { to: string }) {
+  useLanguage();
   const location = useLocation();
   return (
     <Navigate
@@ -120,12 +142,14 @@ function LegacyRedirect({ to }: { to: string }) {
   );
 }
 function NoteRoute() {
+  useLanguage();
   const { id } = useParams();
   return (
     <Navigate replace to={"/notes?note=" + encodeURIComponent(id ?? "")} />
   );
 }
 function Logout() {
+  useLanguage();
   const navigate = useNavigate();
   const started = useRef(false);
   useEffect(() => {
@@ -136,7 +160,7 @@ function Logout() {
       .catch(() => {})
       .finally(() => navigate("/login", { replace: true }));
   }, [navigate]);
-  return <Spinner label="Signing out…" />;
+  return <Spinner label={tr("Signing out…")} />;
 }
 const aliases: Record<string, string> = {
   "/Auth/Login": "/login",
@@ -220,9 +244,18 @@ export const router = createBrowserRouter([
                 path: "/settings",
                 element: <PreferencesPage />,
               },
-              { path: "/settings/language", element: <PreferencesPage section="language" /> },
-              { path: "/settings/privacy", element: <PreferencesPage section="privacy" /> },
-              { path: "/settings/appearance", element: <PreferencesPage section="appearance" /> },
+              {
+                path: "/settings/language",
+                element: <PreferencesPage section="language" />,
+              },
+              {
+                path: "/settings/privacy",
+                element: <PreferencesPage section="privacy" />,
+              },
+              {
+                path: "/settings/appearance",
+                element: <PreferencesPage section="appearance" />,
+              },
               {
                 path: "/settings/profile",
                 element: <SettingsPage section="profile" />,
@@ -271,6 +304,28 @@ export const router = createBrowserRouter([
                   {
                     path: "/admin/settings/profile",
                     element: <SettingsPage section="profile" administration />,
+                  },
+                  {
+                    path: "/admin/preferences",
+                    element: <PreferencesPage administration />,
+                  },
+                  {
+                    path: "/admin/preferences/language",
+                    element: (
+                      <PreferencesPage section="language" administration />
+                    ),
+                  },
+                  {
+                    path: "/admin/preferences/privacy",
+                    element: (
+                      <PreferencesPage section="privacy" administration />
+                    ),
+                  },
+                  {
+                    path: "/admin/preferences/appearance",
+                    element: (
+                      <PreferencesPage section="appearance" administration />
+                    ),
                   },
                   {
                     path: "/admin/settings/account",

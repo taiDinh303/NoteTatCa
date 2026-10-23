@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "./i18n";
 import {
   useCallback,
   useEffect,
@@ -14,6 +15,7 @@ const storageKey = "ntc.interface.zoom.v1";
 const clamp = (value: number) => Math.min(150, Math.max(50, value));
 
 export function DisplayPreferences({ children }: { children: ReactNode }) {
+  useLanguage();
   const [percent, setPercent] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -167,7 +169,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
             <div
               className="zoom-indicator"
               role="status"
-              aria-label="Interface zoom"
+              aria-label={tr("Interface zoom")}
               aria-atomic="true"
             >
               {percent}%

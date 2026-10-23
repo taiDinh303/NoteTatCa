@@ -10,6 +10,8 @@ import { DisplayPreferences } from "./shared/DisplayPreferences";
 import "@fontsource-variable/dm-sans";
 import "@fontsource-variable/manrope";
 import "./styles.css";
+import { initializeLanguage } from "./shared/i18n";
+initializeLanguage();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppErrorBoundary>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { t as tr, useLanguage } from "../../shared/i18n";
+import { useEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -73,7 +74,8 @@ const extensions = [
   Color,
   Highlight.configure({ multicolor: true }),
   Placeholder.configure({
-    placeholder: "Start writing… or try # for a heading, [] for a checklist.",
+    placeholder: () =>
+      tr("Start writing… or try # for a heading, [] for a checklist."),
   }),
 ];
 export interface EditorCommands {
@@ -83,6 +85,7 @@ export interface EditorCommands {
   plainText: () => string;
 }
 export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
+  const language = useLanguage();
   const editor = useEditor({
     extensions: extensions.filter(
       (extension) => extension.name !== "placeholder",
@@ -92,11 +95,22 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
     editorProps: {
       attributes: {
         class: "rich-editor",
-        "aria-label": "Note content",
+        "aria-label": tr("Note content"),
         role: "region",
       },
     },
   });
+  useEffect(() => {
+    editor?.setOptions({
+      editorProps: {
+        attributes: {
+          class: "rich-editor",
+          "aria-label": tr("Note content"),
+          role: "region",
+        },
+      },
+    });
+  }, [editor, language]);
   return <EditorContent editor={editor} />;
 }
 export default function RichEditor({
@@ -110,6 +124,7 @@ export default function RichEditor({
   onReady: (commands: EditorCommands) => void;
   onCharacterCount: (count: number) => void;
 }) {
+  const language = useLanguage();
   const [link, setLink] = useState(false);
   const [fontInput, setFontInput] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
@@ -121,7 +136,7 @@ export default function RichEditor({
     editorProps: {
       attributes: {
         class: "rich-editor",
-        "aria-label": "Note content",
+        "aria-label": tr("Note content"),
         role: "textbox",
         "aria-multiline": "true",
       },
@@ -134,7 +149,9 @@ export default function RichEditor({
       onChange(json);
       try {
         if (editor.getText().length > 100000)
-          throw new Error("Note content can contain up to 100,000 characters.");
+          throw new Error(
+            tr("Note content can contain up to 100,000 characters."),
+          );
         setError(undefined);
         validateDocument(json);
       } catch (error) {
@@ -152,6 +169,20 @@ export default function RichEditor({
       });
     },
   });
+  useEffect(() => {
+    if (!editor) return;
+    editor.setOptions({
+      editorProps: {
+        attributes: {
+          class: "rich-editor",
+          "aria-label": tr("Note content"),
+          role: "textbox",
+          "aria-multiline": "true",
+        },
+      },
+    });
+    editor.view.dispatch(editor.state.tr);
+  }, [editor, language]);
   const state = useEditorState({
     editor,
     selector: ({ editor }) => ({
@@ -178,7 +209,11 @@ export default function RichEditor({
     ? parseInt(state.fontSize, 10)
     : DEFAULT_FONT_SIZE;
   function applyFontSize(size: number) {
-    editor.chain().focus().setFontSize(`${clampFontSize(size)}px`).run();
+    editor
+      .chain()
+      .focus()
+      .setFontSize(`${clampFontSize(size)}px`)
+      .run();
     setFontInput(null);
   }
   function stepFontSize(direction: 1 | -1) {
@@ -197,28 +232,28 @@ export default function RichEditor({
   if (!editor) return null;
   return (
     <>
-      <div className="editor-toolbar" aria-label="Text formatting">
+      <div className="editor-toolbar" aria-label={tr("Text formatting")}>
         <IconButton
           icon={Bold}
-          label="Bold"
+          label={tr("Bold")}
           active={state?.bold}
           onClick={() => editor.chain().focus().toggleBold().run()}
         />
         <IconButton
           icon={Italic}
-          label="Italic"
+          label={tr("Italic")}
           active={state?.italic}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         />
         <IconButton
           icon={Underline}
-          label="Underline"
+          label={tr("Underline")}
           active={state?.underline}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
         />
         <IconButton
           icon={Strikethrough}
-          label="Strikethrough"
+          label={tr("Strikethrough")}
           active={state?.strike}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         />
@@ -230,7 +265,7 @@ export default function RichEditor({
                   (option) => option.value === state?.alignment,
                 )?.icon ?? AlignLeft
               }
-              label="Text alignment"
+              label={tr("Text alignment")}
             />
           </Dropdown.Trigger>
           <Dropdown.Portal>
@@ -238,7 +273,7 @@ export default function RichEditor({
               className="dropdown"
               sideOffset={7}
               align="start"
-              aria-label="Text alignment"
+              aria-label={tr("Text alignment")}
               onCloseAutoFocus={(event) => {
                 event.preventDefault();
                 editor.commands.focus();
@@ -257,7 +292,7 @@ export default function RichEditor({
                     value={value}
                   >
                     <Icon size={16} />
-                    <span>{label}</span>
+                    <span>{tr(label)}</span>
                     <Dropdown.ItemIndicator>
                       <Check size={16} />
                     </Dropdown.ItemIndicator>
@@ -271,7 +306,7 @@ export default function RichEditor({
         <div className="font-size-stepper">
           <IconButton
             icon={Minus}
-            label="Decrease font size"
+            label={tr("Decrease font size")}
             onClick={() => stepFontSize(-1)}
           />
           <input
@@ -280,7 +315,7 @@ export default function RichEditor({
             inputMode="decimal"
             min={MIN_FONT_SIZE}
             max={MAX_FONT_SIZE}
-            aria-label="Font size"
+            aria-label={tr("Font size")}
             value={fontInput ?? String(fontSizeValue)}
             onChange={(event) => setFontInput(event.target.value)}
             onBlur={() => commitFontSize()}
@@ -293,51 +328,51 @@ export default function RichEditor({
           />
           <IconButton
             icon={Plus}
-            label="Increase font size"
+            label={tr("Increase font size")}
             onClick={() => stepFontSize(1)}
           />
         </div>
         <IconButton
           icon={List}
-          label="Bullet list"
+          label={tr("Bullet list")}
           active={state?.bullet}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         />
         <IconButton
           icon={ListOrdered}
-          label="Numbered list"
+          label={tr("Numbered list")}
           active={state?.ordered}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         />
         <IconButton
           icon={CheckSquare}
-          label="Checklist"
+          label={tr("Checklist")}
           active={state?.tasks}
           onClick={() => editor.chain().focus().toggleTaskList().run()}
         />
         <IconButton
           icon={Quote}
-          label="Quote"
+          label={tr("Quote")}
           active={state?.quote}
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         />
         <IconButton
           icon={Code2}
-          label="Code block"
+          label={tr("Code block")}
           active={state?.code}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         />
         <span className="toolbar-divider" />
         <IconButton
           icon={Link2}
-          label="Insert link"
+          label={tr("Insert link")}
           onClick={() => setLink(true)}
         />
-        <label className="text-color-picker" title="Text color">
+        <label className="text-color-picker" title={tr("Text color")}>
           <span>A</span>
           <input
             type="color"
-            aria-label="Text color"
+            aria-label={tr("Text color")}
             defaultValue="#374151"
             onChange={(e) =>
               editor.chain().focus().setColor(e.target.value).run()
@@ -346,7 +381,7 @@ export default function RichEditor({
         </label>
         <IconButton
           icon={Highlighter}
-          label="Highlight text"
+          label={tr("Highlight text")}
           active={state?.highlight}
           onClick={() =>
             editor.chain().focus().toggleHighlight({ color: "#fff0a3" }).run()
@@ -355,19 +390,19 @@ export default function RichEditor({
         <div className="toolbar-spacer" />
         <IconButton
           icon={Undo2}
-          label="Undo"
+          label={tr("Undo")}
           onClick={() => editor.chain().focus().undo().run()}
         />
         <IconButton
           icon={Redo2}
-          label="Redo"
+          label={tr("Redo")}
           onClick={() => editor.chain().focus().redo().run()}
         />
       </div>
       <ErrorBanner error={error} />
       <EditorContent className="editor-content" editor={editor} />
       {link ? (
-        <Modal open onClose={() => setLink(false)} title="Add a link">
+        <Modal open onClose={() => setLink(false)} title={tr("Add a link")}>
           <form
             className="modal-body"
             onSubmit={(e) => {
@@ -377,7 +412,7 @@ export default function RichEditor({
               ).trim();
               if (href && !/^(https?:\/\/|mailto:)/i.test(href)) {
                 setError(
-                  new Error("Use an https://, http:// or mailto: link."),
+                  new Error(tr("Use an https://, http:// or mailto: link.")),
                 );
                 return;
               }
@@ -393,14 +428,17 @@ export default function RichEditor({
             }}
           >
             <ErrorBanner error={error} />
-            <Field label="Link URL" hint="Leave empty to remove the link.">
+            <Field
+              label={tr("Link URL")}
+              hint={tr("Leave empty to remove the link.")}
+            >
               <input
                 name="url"
                 placeholder="https://"
                 defaultValue={editor.getAttributes("link").href ?? ""}
               />
             </Field>
-            <Button type="submit">Apply link</Button>
+            <Button type="submit">{tr("Apply link")}</Button>
           </form>
         </Modal>
       ) : null}
@@ -408,11 +446,13 @@ export default function RichEditor({
         <Modal
           open
           onClose={() => setMarkdown(null)}
-          title="Import Markdown"
-          description="This replaces the editor content. Unsupported formatting may be simplified; save or copy your current note first."
+          title={tr("Import Markdown")}
+          description={tr(
+            "This replaces the editor content. Unsupported formatting may be simplified; save or copy your current note first.",
+          )}
         >
           <div className="modal-body">
-            <Field label="Markdown content">
+            <Field label={tr("Markdown content")}>
               <textarea
                 className="markdown-source"
                 value={source}
@@ -422,7 +462,7 @@ export default function RichEditor({
             </Field>
             <div className="form-actions">
               <Button variant="secondary" onClick={() => setMarkdown(null)}>
-                Cancel
+                {tr("Cancel")}
               </Button>
               <Button
                 onClick={() => {
@@ -454,7 +494,7 @@ export default function RichEditor({
                     .catch(setError);
                 }}
               >
-                Replace content
+                {tr("Replace content")}
               </Button>
             </div>
           </div>
@@ -462,9 +502,11 @@ export default function RichEditor({
       ) : null}
       {markdown === "export" ? (
         <ConfirmDialog
-          title="Export as Markdown?"
-          description="Markdown cannot preserve text colors, font sizes, highlights, alignment or every rich-text detail. Your original note will stay unchanged."
-          confirmLabel="Download Markdown"
+          title={tr("Export as Markdown?")}
+          description={tr(
+            "Markdown cannot preserve text colors, font sizes, highlights, alignment or every rich-text detail. Your original note will stay unchanged.",
+          )}
+          confirmLabel={tr("Download Markdown")}
           onClose={() => setMarkdown(null)}
           onConfirm={() => {
             const converter = new TurndownService({

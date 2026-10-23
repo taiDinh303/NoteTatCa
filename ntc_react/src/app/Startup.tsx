@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../shared/i18n";
 import {
   useCallback,
   useContext,
@@ -26,6 +27,7 @@ import type {
 } from "../application/preparation";
 
 export function ConnectionFeedback({ children }: { children: ReactNode }) {
+  useLanguage();
   const [screens, setScreens] = useState(0);
   const register = useCallback(() => {
     setScreens((count) => count + 1);
@@ -40,6 +42,7 @@ export function ConnectionFeedback({ children }: { children: ReactNode }) {
 }
 
 export function ConnectionSpinner({ size = 22 }: { size?: number }) {
+  useLanguage();
   return (
     <span className="connection-spinner" aria-hidden="true">
       <RefreshCw size={size} />
@@ -47,16 +50,17 @@ export function ConnectionSpinner({ size = 22 }: { size?: number }) {
   );
 }
 export function ConnectionProgress({
-  label = "Server connection progress",
+  label = tr("Server connection progress"),
 }: {
   label?: string;
 }) {
+  useLanguage();
   return (
     <div
       className="connection-progress"
       role="progressbar"
       aria-label={label}
-      aria-valuetext="Waiting for a response"
+      aria-valuetext={tr("Waiting for a response")}
     >
       <span />
     </div>
@@ -73,18 +77,19 @@ const resourceNames: Record<PreparationResource, string> = {
   "admin-stats": "administration overview",
 };
 function PreparationTasks({ tasks }: { tasks: PreparationTask[] }) {
+  useLanguage();
   return (
-    <ul className="startup-tasks" aria-label="Loading tasks">
+    <ul className="startup-tasks" aria-label={tr("Loading tasks")}>
       {tasks.map(({ resource, status }) => {
-        const name = resourceNames[resource];
+        const name = tr(resourceNames[resource]);
         const text =
           status === "ready"
-            ? `${name[0].toUpperCase()}${name.slice(1)} ready`
+            ? tr("{0} ready", name[0].toUpperCase() + name.slice(1))
             : status === "error"
-              ? `Couldn’t load ${name}`
+              ? tr("Couldn’t load {0}", name)
               : status === "loading"
-                ? `Loading ${name}…`
-                : `Waiting for ${name}…`;
+                ? tr("Loading {0}…", name)
+                : tr("Waiting for {0}…", name);
         return (
           <li key={resource} data-resource={resource} data-status={status}>
             {status === "loading" ? (
@@ -105,6 +110,7 @@ function PreparationTasks({ tasks }: { tasks: PreparationTask[] }) {
 }
 
 function LoadingMark() {
+  useLanguage();
   return (
     <div className="startup-mark" aria-hidden="true">
       <span />
@@ -118,8 +124,12 @@ function LoadingMark() {
 }
 const connectionCopy = (offline: boolean) =>
   offline
-    ? "You’re offline. Reconnect to continue. Your open draft stays in this tab."
-    : "The server may be starting up or temporarily unavailable. We’re checking the connection.";
+    ? tr(
+        "You’re offline. Reconnect to continue. Your open draft stays in this tab.",
+      )
+    : tr(
+        "The server may be starting up or temporarily unavailable. We’re checking the connection.",
+      );
 
 export function StartupScreen({
   title,
@@ -130,6 +140,7 @@ export function StartupScreen({
   children?: ReactNode;
   busy?: boolean;
 }) {
+  useLanguage();
   const register = useContext(StartupPresentation);
   useLayoutEffect(() => register?.(), [register]);
   const network = useSyncExternalStore(
@@ -145,7 +156,9 @@ export function StartupScreen({
           <div role="status">
             <p>{connectionCopy(network.problem === "offline")}</p>
             {network.warming ? (
-              <small>Connecting to server… Attempt {network.attempt}</small>
+              <small>
+                {tr("Connecting to server… Attempt {0}", network.attempt)}
+              </small>
             ) : null}
           </div>
         ) : null}
@@ -156,6 +169,7 @@ export function StartupScreen({
 }
 
 export function WorkspaceReady({ children }: { children: ReactNode }) {
+  useLanguage();
   const state = useAuth();
   const snapshot = useSyncExternalStore(
     preparation.subscribe,
@@ -211,10 +225,10 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
       busy={snapshot.status !== "error" && !moduleError}
       title={
         snapshot.status === "error" || moduleError
-          ? "Your workspace couldn’t finish loading"
+          ? tr("Your workspace couldn’t finish loading")
           : administrator
-            ? "Preparing administration"
-            : "Preparing your workspace"
+            ? tr("Preparing administration")
+            : tr("Preparing your workspace")
       }
     >
       {snapshot.status === "error" || moduleError ? (
@@ -231,10 +245,10 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
                   void preparation.prepare(state.session).catch(() => {});
               }}
             >
-              Try again
+              {tr("Try again")}
             </Button>
             <Button variant="ghost" onClick={() => void auth.logout()}>
-              Sign out
+              {tr("Sign out")}
             </Button>
           </div>
         </>
@@ -243,8 +257,12 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
           <div className="startup-progress-summary">
             <span role="status">
               {snapshot.total
-                ? `${snapshot.completed} of ${snapshot.total} collections ready`
-                : "Opening your workspace…"}
+                ? tr(
+                    "{0} of {1} collections ready",
+                    snapshot.completed,
+                    snapshot.total,
+                  )
+                : tr("Opening your workspace…")}
             </span>
             {snapshot.total ? (
               <strong>
@@ -253,7 +271,7 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
             ) : null}
           </div>
           <progress
-            aria-label="Workspace loading"
+            aria-label={tr("Workspace loading")}
             max={snapshot.total || 1}
             value={snapshot.completed}
           />
@@ -262,12 +280,18 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
       {snapshot.tasks.length ? (
         <PreparationTasks tasks={snapshot.tasks} />
       ) : null}
-      {snapshot.pages ? <small>{snapshot.pages} pages loaded</small> : null}
+      {snapshot.pages ? (
+        <small>
+          {snapshot.pages}
+          {" "}{tr("pages loaded")}
+        </small>
+      ) : null}
     </StartupScreen>
   );
 }
 
 function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
+  useLanguage();
   const network = useSyncExternalStore(
     connection.subscribe,
     connection.getSnapshot,
@@ -307,7 +331,7 @@ function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
   return (
     <aside
       className={`connection-notice ${!state.session ? "connection-notice-auth" : ""}`}
-      aria-label="Connection status"
+      aria-label={tr("Connection status")}
     >
       {connecting ? (
         <ConnectionSpinner />
@@ -323,18 +347,18 @@ function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
       <div role="status" className="connection-details">
         <strong>
           {offline
-            ? "You’re offline"
+            ? tr("You’re offline")
             : network.problem && !network.warming
-              ? "Connection interrupted"
-              : "Connecting to NoteTatCa…"}
+              ? tr("Connection interrupted")
+              : tr("Connecting to NoteTatCa…")}
         </strong>
         <p>{connectionCopy(offline)}</p>
         {connecting ? (
           <>
             <small className="connection-step">
               {network.warming
-                ? `Connecting to server… Attempt ${network.attempt}`
-                : "Waiting for response…"}
+                ? tr("Connecting to server… Attempt {0}", network.attempt)
+                : tr("Waiting for response…")}
             </small>
             <ConnectionProgress />
           </>
@@ -353,7 +377,7 @@ function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
               .finally(() => setRetrying(false));
           }}
         >
-          Reconnect
+          {tr("Reconnect")}
         </Button>
       ) : null}
     </aside>

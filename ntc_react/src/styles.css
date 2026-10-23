@@ -4518,3 +4518,16 @@ td {
 .note-card-identity h3 { margin: 0; font-size: 14px; font-weight: 700; line-height: 1.55; letter-spacing: -0.1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
 .note-card-top > .row-actions { margin-left: auto; flex-shrink: 0; }
 .note-card-identity:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
+
+.preferences-mobile-header { display: none; }
+@media (max-width: 800px) {
+  .settings-area .topbar > .topbar-brand,
+  .settings-area .topbar > .global-search,
+  .settings-area .topbar > .topbar-actions,
+  .settings-area .topbar > .mobile-menu-button,
+  .settings-area .topbar > .admin-console-title { display: none; }
+  .preferences-mobile-header { display: flex; align-items: center; gap: 12px; width: 100%; }
+  .preferences-mobile-header h1 { margin: 0; font-size: 18px; font-weight: 700; }
+  .preferences-mobile-header .icon-button { flex-shrink: 0; width: 40px; height: 40px; }
+  .preferences-page > h1, .settings-area .preferences-back { display: none; }
+}

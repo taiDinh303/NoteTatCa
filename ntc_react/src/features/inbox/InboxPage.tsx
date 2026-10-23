@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,7 @@ import { useAuth } from "../../shared/hooks";
 import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 export default function InboxPage() {
+  useLanguage();
   const state = useAuth();
   const navigate = useNavigate();
   const [unreadOnly, setUnreadOnly] = useState(false);
@@ -32,7 +34,7 @@ export default function InboxPage() {
   }
   return (
     <>
-      <h1 className="sr-only">Your inbox</h1>
+      <h1 className="sr-only">{tr("Your inbox")}</h1>
       <div className="inbox-actions">
         <Button
           variant="secondary"
@@ -44,8 +46,8 @@ export default function InboxPage() {
               .then(async (count) => {
                 toast.success(
                   count
-                    ? `${count} notifications marked as read`
-                    : "You’re all caught up",
+                    ? tr("{0} notifications marked as read", count)
+                    : tr("You’re all caught up"),
                 );
                 await refresh();
               })
@@ -54,7 +56,7 @@ export default function InboxPage() {
           }}
         >
           <CheckCheck size={17} />
-          Mark all as read
+          {tr("Mark all as read")}
         </Button>
       </div>
       <div className="inbox-tabs">
@@ -62,13 +64,13 @@ export default function InboxPage() {
           className={!unreadOnly ? "active" : ""}
           onClick={() => setUnreadOnly(false)}
         >
-          All notifications
+          {tr("All notifications")}
         </button>
         <button
           className={unreadOnly ? "active" : ""}
           onClick={() => setUnreadOnly(true)}
         >
-          Unread
+          {tr("Unread")}
         </button>
       </div>
       {query.isPending ? (
@@ -78,8 +80,10 @@ export default function InboxPage() {
       ) : !items.length ? (
         <EmptyState
           icon={Inbox}
-          title="You’re all caught up"
-          description="When a reminder is due, it will appear here. Take a little breath."
+          title={tr("You’re all caught up")}
+          description={tr(
+            "When a reminder is due, it will appear here. Take a little breath.",
+          )}
         />
       ) : (
         <div className="inbox-list">
@@ -102,11 +106,14 @@ export default function InboxPage() {
                     .catch((error) => toast.error(errorMessage(error)));
                 }}
               >
-                <strong>A note is waiting for you</strong>
-                <span>{dateTime(item.occurrenceAt)} · Open your note</span>
+                <strong>{tr("A note is waiting for you")}</strong>
+                <span>
+                  {dateTime(item.occurrenceAt)}
+                  {tr("· Open your note")}
+                </span>
               </button>
               {!item.readAt ? (
-                <span className="unread-dot" aria-label="Unread" />
+                <span className="unread-dot" aria-label={tr("Unread")} />
               ) : null}
               <ArrowUpRight size={16} />
             </article>
@@ -120,7 +127,7 @@ export default function InboxPage() {
             busy={query.isFetchingNextPage}
             onClick={() => void query.fetchNextPage()}
           >
-            Load more notifications
+            {tr("Load more notifications")}
           </Button>
         </div>
       ) : null}

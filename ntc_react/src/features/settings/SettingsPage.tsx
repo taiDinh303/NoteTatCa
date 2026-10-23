@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import "./settings.css";
 import { useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
@@ -31,11 +32,12 @@ import {
 import { dateTime, errorMessage } from "../../shared/utils";
 import { GoogleButton } from "../auth/GoogleButton";
 function SettingsNav({ base }: { base: string }) {
+  useLanguage();
   return (
-    <nav className="settings-tabs" aria-label="Settings">
-      <NavLink to={base + "/profile"}>Profile</NavLink>
-      <NavLink to={base + "/account"}>Account & security</NavLink>
-      <NavLink to={base + "/sessions"}>Active sessions</NavLink>
+    <nav className="settings-tabs" aria-label={tr("Settings")}>
+      <NavLink to={base + "/profile"}>{tr("Profile")}</NavLink>
+      <NavLink to={base + "/account"}>{tr("Account & security")}</NavLink>
+      <NavLink to={base + "/sessions"}>{tr("Active sessions")}</NavLink>
     </nav>
   );
 }
@@ -46,6 +48,7 @@ export default function SettingsPage({
   section: "profile" | "account" | "sessions";
   administration?: boolean;
 }) {
+  useLanguage();
   const me = useMe();
   return (
     <>
@@ -65,6 +68,7 @@ export default function SettingsPage({
   );
 }
 function ProfileForm({ me }: { me: Me }) {
+  useLanguage();
   const [params] = useSearchParams();
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -107,7 +111,7 @@ function ProfileForm({ me }: { me: Me }) {
                 },
               });
               setEditing(false);
-              toast.success("Profile updated");
+              toast.success(tr("Profile updated"));
             })
             .catch(setError)
             .finally(() => setBusy(false));
@@ -120,11 +124,11 @@ function ProfileForm({ me }: { me: Me }) {
             picture={picture}
           />
           <div>
-            <h2>{p?.fullName || "Your profile"}</h2>
+            <h2>{p?.fullName || tr("Your profile")}</h2>
             <p>{me.account.email}</p>
             <span className="secure-pill">
               <ShieldCheck size={13} />
-              Private account
+              {tr("Private account")}
             </span>
           </div>
         </div>
@@ -132,7 +136,7 @@ function ProfileForm({ me }: { me: Me }) {
         {editing ? (
           <>
             <div className="form-grid">
-              <Field label="First name">
+              <Field label={tr("First name")}>
                 <input
                   name="givenName"
                   autoComplete="given-name"
@@ -142,7 +146,7 @@ function ProfileForm({ me }: { me: Me }) {
                   required
                 />
               </Field>
-              <Field label="Last name">
+              <Field label={tr("Last name")}>
                 <input
                   name="familyName"
                   autoComplete="family-name"
@@ -150,7 +154,7 @@ function ProfileForm({ me }: { me: Me }) {
                   maxLength={25}
                 />
               </Field>
-              <Field label="Birthday">
+              <Field label={tr("Birthday")}>
                 <input
                   name="birthDate"
                   type="date"
@@ -159,21 +163,21 @@ function ProfileForm({ me }: { me: Me }) {
                   autoFocus={params.get("edit") === "birthday"}
                 />
               </Field>
-              <Field label="Gender">
+              <Field label={tr("Gender")}>
                 <select
                   name="gender"
                   defaultValue={p?.gender ?? 0}
                   autoFocus={params.get("edit") === "gender"}
                 >
-                  <option value={0}>Prefer not to say</option>
-                  <option value={1}>Male</option>
-                  <option value={2}>Female</option>
+                  <option value={0}>{tr("Prefer not to say")}</option>
+                  <option value={1}>{tr("Male")}</option>
+                  <option value={2}>{tr("Female")}</option>
                 </select>
               </Field>
             </div>
             {p ? (
               <>
-                <Field label="Address">
+                <Field label={tr("Address")}>
                   <input
                     name="address"
                     autoComplete="street-address"
@@ -182,7 +186,7 @@ function ProfileForm({ me }: { me: Me }) {
                   />
                 </Field>
                 <div className="form-grid">
-                  <Field label="Timezone">
+                  <Field label={tr("Timezone")}>
                     <input
                       name="timeZoneId"
                       defaultValue={p.timeZoneId || "Asia/Ho_Chi_Minh"}
@@ -197,7 +201,7 @@ function ProfileForm({ me }: { me: Me }) {
                       <option>America/New_York</option>
                     </datalist>
                   </Field>
-                  <Field label="Locale">
+                  <Field label={tr("Locale")}>
                     <input
                       name="locale"
                       defaultValue={p.locale ?? ""}
@@ -210,7 +214,7 @@ function ProfileForm({ me }: { me: Me }) {
             ) : null}
             <div className="settings-card-footer">
               <span className="field-hint">
-                Your profile is only used for your account.
+                {tr("Your profile is only used for your account.")}
               </span>
               <div className="settings-edit-actions">
                 <Button
@@ -221,10 +225,10 @@ function ProfileForm({ me }: { me: Me }) {
                     setError(undefined);
                   }}
                 >
-                  Cancel
+                  {tr("Cancel")}
                 </Button>
                 <Button busy={busy} type="submit">
-                  Save profile
+                  {tr("Save profile")}
                 </Button>
               </div>
             </div>
@@ -233,24 +237,24 @@ function ProfileForm({ me }: { me: Me }) {
           <>
             <dl className="settings-readonly">
               {[
-                ["First name", p?.givenName],
-                ["Last name", p?.familyName],
-                ["Birthday", p?.birthDate?.slice(0, 10)],
+                [tr("First name"), p?.givenName],
+                [tr("Last name"), p?.familyName],
+                [tr("Birthday"), p?.birthDate?.slice(0, 10)],
                 [
-                  "Gender",
+                  tr("Gender"),
                   p?.gender === 1
-                    ? "Male"
+                    ? tr("Male")
                     : p?.gender === 2
-                      ? "Female"
-                      : "Prefer not to say",
+                      ? tr("Female")
+                      : tr("Prefer not to say"),
                 ],
-                ["Address", p?.address],
-                ["Timezone", p?.timeZoneId || me.account.timeZoneId],
-                ["Locale", p?.locale],
+                [tr("Address"), p?.address],
+                [tr("Timezone"), p?.timeZoneId || me.account.timeZoneId],
+                [tr("Locale"), p?.locale],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>
-                  <dd>{value || "Not provided"}</dd>
+                  <dd>{value || tr("Not provided")}</dd>
                 </div>
               ))}
             </dl>
@@ -259,7 +263,7 @@ function ProfileForm({ me }: { me: Me }) {
               variant="secondary"
               onClick={() => setEditing(true)}
             >
-              Edit profile
+              {tr("Edit profile")}
             </Button>
           </>
         )}
@@ -268,6 +272,7 @@ function ProfileForm({ me }: { me: Me }) {
   );
 }
 function AccountSettings({ me }: { me: Me }) {
+  useLanguage();
   const [params] = useSearchParams();
   const linked = useQuery({
     queryKey: workspace.key("logins"),
@@ -283,7 +288,7 @@ function AccountSettings({ me }: { me: Me }) {
   }
   const cancel = (
     <Button variant="secondary" disabled={!!busy} onClick={() => edit("")}>
-      Cancel
+      {tr("Cancel")}
     </Button>
   );
   async function run(
@@ -314,7 +319,7 @@ function AccountSettings({ me }: { me: Me }) {
             <Mail size={21} />
           </div>
           <div>
-            <h2>Email address</h2>
+            <h2>{tr("Email address")}</h2>
           </div>
         </div>
         <div className="form-grid account-forms">
@@ -326,11 +331,11 @@ function AccountSettings({ me }: { me: Me }) {
                 void run(
                   "email",
                   () => account.changeEmail(String(data.get("email"))),
-                  "Check your new inbox to confirm this email change.",
+                  tr("Check your new inbox to confirm this email change."),
                 );
               }}
             >
-              <Field label="New email address">
+              <Field label={tr("New email address")}>
                 <input
                   type="email"
                   name="email"
@@ -342,7 +347,7 @@ function AccountSettings({ me }: { me: Me }) {
                 />
               </Field>
               <Button variant="secondary" busy={busy === "email"} type="submit">
-                Send confirmation link
+                {tr("Send confirmation link")}
               </Button>
               {cancel}
             </form>
@@ -352,7 +357,9 @@ function AccountSettings({ me }: { me: Me }) {
                 <span>{me.account.email}</span>
                 <span className="secure-pill">
                   <CheckCircle2 size={13} />
-                  {me.account.emailConfirmed ? "Verified" : "Not verified"}
+                  {me.account.emailConfirmed
+                    ? tr("Verified")
+                    : tr("Not verified")}
                 </span>
               </div>
               <Button
@@ -360,7 +367,7 @@ function AccountSettings({ me }: { me: Me }) {
                 disabled={!!busy}
                 onClick={() => edit("email")}
               >
-                Change
+                {tr("Change")}
               </Button>
             </div>
           )}
@@ -372,7 +379,7 @@ function AccountSettings({ me }: { me: Me }) {
             <Phone size={21} />
           </div>
           <div>
-            <h2>Phone number</h2>
+            <h2>{tr("Phone number")}</h2>
           </div>
         </div>
         <div className="form-grid account-forms">
@@ -392,11 +399,11 @@ function AccountSettings({ me }: { me: Me }) {
                       account: value,
                     });
                   },
-                  "Phone number updated",
+                  tr("Phone number updated"),
                 );
               }}
             >
-              <Field label="Phone number">
+              <Field label={tr("Phone number")}>
                 <input
                   type="tel"
                   name="phone"
@@ -406,19 +413,19 @@ function AccountSettings({ me }: { me: Me }) {
                 />
               </Field>
               <Button variant="secondary" busy={busy === "phone"} type="submit">
-                Save phone number
+                {tr("Save phone number")}
               </Button>
               {cancel}
             </form>
           ) : (
             <div className="settings-view-field account-data-row">
-              <p>{me.account.phoneNumber || "Not provided"}</p>
+              <p>{me.account.phoneNumber || tr("Not provided")}</p>
               <Button
                 variant="secondary"
                 disabled={!!busy}
                 onClick={() => edit("phone")}
               >
-                Change
+                {tr("Change")}
               </Button>
             </div>
           )}
@@ -430,20 +437,20 @@ function AccountSettings({ me }: { me: Me }) {
             <KeyRound size={21} />
           </div>
           <div>
-            <h2>Password</h2>
+            <h2>{tr("Password")}</h2>
           </div>
         </div>
         {editing !== "password" ? (
           <div className="settings-view-field account-data-row">
             {me.account.hasPassword ? (
-              <p>A password is set for your account.</p>
+              <p>{tr("A password is set for your account.")}</p>
             ) : null}
             <Button
               variant="secondary"
               disabled={!!busy}
               onClick={() => edit("password")}
             >
-              {me.account.hasPassword ? "Change" : "Set your password"}
+              {me.account.hasPassword ? tr("Change") : tr("Set your password")}
             </Button>
           </div>
         ) : me.account.hasPassword ? (
@@ -453,7 +460,7 @@ function AccountSettings({ me }: { me: Me }) {
               e.preventDefault();
               const data = new FormData(e.currentTarget);
               if (data.get("newPassword") !== data.get("confirm")) {
-                setError(new Error("Passwords do not match."));
+                setError(new Error(tr("Passwords do not match.")));
                 return;
               }
               void run(
@@ -463,13 +470,13 @@ function AccountSettings({ me }: { me: Me }) {
                     String(data.get("currentPassword")),
                     String(data.get("newPassword")),
                   ),
-                "Password changed. Sign in again.",
+                tr("Password changed. Sign in again."),
                 true,
               );
             }}
           >
             <div className="form-grid">
-              <Field label="Current password">
+              <Field label={tr("Current password")}>
                 <input
                   type="password"
                   autoComplete="current-password"
@@ -479,7 +486,7 @@ function AccountSettings({ me }: { me: Me }) {
                   autoFocus={params.get("edit") === "password"}
                 />
               </Field>
-              <Field label="New password">
+              <Field label={tr("New password")}>
                 <input
                   type="password"
                   autoComplete="new-password"
@@ -489,7 +496,7 @@ function AccountSettings({ me }: { me: Me }) {
                   maxLength={1024}
                 />
               </Field>
-              <Field label="Confirm new password">
+              <Field label={tr("Confirm new password")}>
                 <input
                   type="password"
                   autoComplete="new-password"
@@ -505,7 +512,7 @@ function AccountSettings({ me }: { me: Me }) {
               busy={busy === "password"}
               type="submit"
             >
-              Change password
+              {tr("Change password")}
             </Button>
             {cancel}
           </form>
@@ -518,11 +525,11 @@ function AccountSettings({ me }: { me: Me }) {
                 void run(
                   "password-email",
                   () => account.passwordEmail(),
-                  "Password setup link sent to your email.",
+                  tr("Password setup link sent to your email."),
                 )
               }
             >
-              Send password setup link
+              {tr("Send password setup link")}
             </Button>
             {cancel}
           </div>
@@ -534,7 +541,7 @@ function AccountSettings({ me }: { me: Me }) {
             <Link2 size={21} />
           </div>
           <div>
-            <h2>Connected accounts</h2>
+            <h2>{tr("Connected accounts")}</h2>
           </div>
         </div>
         {linked.isPending ? (
@@ -549,7 +556,7 @@ function AccountSettings({ me }: { me: Me }) {
             <div className="connected-provider-label">Google</div>
             <Button variant="secondary" onClick={() => setUnlink(true)}>
               <Unlink size={15} />
-              Disconnect
+              {tr("Disconnect")}
             </Button>
           </div>
         ) : (
@@ -557,7 +564,7 @@ function AccountSettings({ me }: { me: Me }) {
             label="continue_with"
             onCredential={async (token) => {
               await account.link(token);
-              toast.success("Google account connected. Sign in again.");
+              toast.success(tr("Google account connected. Sign in again."));
               await auth.logout();
             }}
           />
@@ -565,9 +572,11 @@ function AccountSettings({ me }: { me: Me }) {
       </section>
       {unlink ? (
         <ConfirmDialog
-          title="Disconnect Google?"
-          description="You need a password or another sign-in method before removing your last login option. You will need to sign in again."
-          confirmLabel="Disconnect Google"
+          title={tr("Disconnect Google?")}
+          description={tr(
+            "You need a password or another sign-in method before removing your last login option. You will need to sign in again.",
+          )}
+          confirmLabel={tr("Disconnect Google")}
           onClose={() => setUnlink(false)}
           onConfirm={async () => {
             await account.unlink();
@@ -579,6 +588,7 @@ function AccountSettings({ me }: { me: Me }) {
   );
 }
 function Sessions() {
+  useLanguage();
   const state = useAuth();
   const query = useInfiniteQuery({
     queryKey: workspace.key("sessions"),
@@ -599,9 +609,11 @@ function Sessions() {
           <Monitor size={21} />
         </div>
         <div>
-          <h2>Where you’re signed in</h2>
+          <h2>{tr("Where you’re signed in")}</h2>
           <p>
-            Review your active sessions and sign out the ones you no longer use.
+            {tr(
+              "Review your active sessions and sign out the ones you no longer use.",
+            )}
           </p>
         </div>
       </div>
@@ -612,8 +624,8 @@ function Sessions() {
       ) : !items.length ? (
         <EmptyState
           icon={Monitor}
-          title="No active sessions"
-          description="New sign-ins will appear here."
+          title={tr("No active sessions")}
+          description={tr("New sign-ins will appear here.")}
         />
       ) : (
         <div className="session-list">
@@ -622,22 +634,27 @@ function Sessions() {
               <Monitor size={23} />
               <div>
                 <strong>
-                  {session.isCurrent ? "This session" : "Another session"}
+                  {session.isCurrent
+                    ? tr("This session")
+                    : tr("Another session")}
                   {session.isCurrent ? (
-                    <span className="secure-pill">Current</span>
+                    <span className="secure-pill">{tr("Current")}</span>
                   ) : null}
                 </strong>
                 <span>
-                  Signed in {dateTime(session.createdAt)} ·{" "}
+                  {tr("Signed in")}
+                  {dateTime(session.createdAt)} ·{" "}
                   {new Date(session.expiresAt).getUTCFullYear() >= 9999
-                    ? "No expiration"
-                    : `Expires ${dateTime(session.expiresAt)}`}
+                    ? tr("No expiration")
+                    : tr("Expires {0}", dateTime(session.expiresAt))}
                 </span>
               </div>
               <IconButton
                 icon={LogOut}
                 label={
-                  session.isCurrent ? "Sign out this session" : "Revoke session"
+                  session.isCurrent
+                    ? tr("Sign out this session")
+                    : tr("Revoke session")
                 }
                 onClick={() =>
                   setTarget({ id: session.id, current: session.isCurrent })
@@ -649,24 +666,28 @@ function Sessions() {
       )}
       {query.hasNextPage ? (
         <Button variant="ghost" onClick={() => void query.fetchNextPage()}>
-          Load more sessions
+          {tr("Load more sessions")}
         </Button>
       ) : null}
       <div className="settings-card-footer sessions-footer">
         <span className="field-hint">
-          Revoking a session also ends its refreshed replacements.
+          {tr("Revoking a session also ends its refreshed replacements.")}
         </span>
         <Button variant="secondary" onClick={() => setTarget("all")}>
-          Sign out everywhere
+          {tr("Sign out everywhere")}
         </Button>
       </div>
       {target ? (
         <ConfirmDialog
           title={
-            target === "all" ? "Sign out everywhere?" : "Revoke this session?"
+            target === "all"
+              ? tr("Sign out everywhere?")
+              : tr("Revoke this session?")
           }
-          description="The selected session will stop working immediately. Your account data will be kept."
-          confirmLabel="Sign out"
+          description={tr(
+            "The selected session will stop working immediately. Your account data will be kept.",
+          )}
+          confirmLabel={tr("Sign out")}
           danger
           onClose={() => setTarget(undefined)}
           onConfirm={async () => {

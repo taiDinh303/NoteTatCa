@@ -1,3 +1,4 @@
+import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -41,21 +42,24 @@ export default function AdminPage({
 }: {
   section: "overview" | "users" | "roles" | "audit";
 }) {
+  useLanguage();
   const [refreshing, setRefreshing] = useState(false);
   return (
     <>
       <PageHeading
-        eyebrow="ADMINISTRATION"
+        eyebrow={tr("ADMINISTRATION")}
         title={
           section === "overview"
-            ? "System overview"
+            ? tr("System overview")
             : section === "users"
-              ? "Accounts"
+              ? tr("Accounts")
               : section === "roles"
-                ? "Roles & permissions"
-                : "Audit trail"
+                ? tr("Roles & permissions")
+                : tr("Audit trail")
         }
-        description="Manage accounts and access. Everyone’s note content stays private."
+        description={tr(
+          "Manage accounts and access. Everyone’s note content stays private.",
+        )}
       >
         <Button
           variant="secondary"
@@ -74,7 +78,7 @@ export default function AdminPage({
           }}
         >
           <RefreshCw size={16} />
-          Refresh
+          {tr("Refresh")}
         </Button>
       </PageHeading>
       {section === "overview" ? (
@@ -98,6 +102,7 @@ const statisticsLabels: Record<string, string> = {
   pendingEmails: "Pending emails",
 };
 function Overview() {
+  useLanguage();
   const query = useQuery({
     queryKey: workspace.key("admin-stats"),
     queryFn: () => admin.stats(),
@@ -120,37 +125,37 @@ function Overview() {
                 <Activity size={22} />
               )}
             </div>
-            <span>{statisticsLabels[key] ?? key}</span>
-            <strong>{value.toLocaleString()}</strong>
-            <small>Current system total</small>
+            <span>{tr(statisticsLabels[key] ?? key)}</span>
+            <strong>{value.toLocaleString(currentLanguage())}</strong>
+            <small>{tr("Current system total")}</small>
           </div>
         ))}
       </div>
       <div className="admin-quick-links">
         <Link to="/admin/users">
           <Users size={21} />
-          <strong>Manage accounts</strong>
-          <span>Create, review, lock or restore accounts.</span>
+          <strong>{tr("Manage accounts")}</strong>
+          <span>{tr("Create, review, lock or restore accounts.")}</span>
         </Link>
         <Link to="/admin/roles">
           <ShieldCheck size={21} />
-          <strong>Roles & access</strong>
-          <span>Manage roles and account memberships.</span>
+          <strong>{tr("Roles & access")}</strong>
+          <span>{tr("Manage roles and account memberships.")}</span>
         </Link>
         <Link to="/admin/audit">
           <Activity size={21} />
-          <strong>Review activity</strong>
-          <span>Trace administrative changes and their actors.</span>
+          <strong>{tr("Review activity")}</strong>
+          <span>{tr("Trace administrative changes and their actors.")}</span>
         </Link>
       </div>
       <div className="privacy-callout">
         <ShieldCheck size={30} />
         <div>
-          <h2>Privacy is part of the design.</h2>
+          <h2>{tr("Privacy is part of the design.")}</h2>
           <p>
-            Administrative access includes account metadata and aggregate
-            totals. It never grants access to another person’s note titles or
-            content.
+            {tr(
+              "Administrative access includes account metadata and aggregate totals. It never grants access to another person’s note titles or content.",
+            )}
           </p>
         </div>
       </div>
@@ -166,29 +171,34 @@ function Pager({
   hasNext: boolean;
   onChange: (page: number) => void;
 }) {
+  useLanguage();
   return (
     <div className="pager">
-      <span>Page {page}</span>
+      <span>
+        {tr("Page")}
+        {page}
+      </span>
       <Button
         variant="secondary"
         disabled={page === 1}
         onClick={() => onChange(page - 1)}
       >
         <ChevronLeft size={16} />
-        Previous
+        {tr("Previous")}
       </Button>
       <Button
         variant="secondary"
         disabled={!hasNext}
         onClick={() => onChange(page + 1)}
       >
-        Next
+        {tr("Next")}
         <ChevronRight size={16} />
       </Button>
     </div>
   );
 }
 function Accounts() {
+  useLanguage();
   const auth = useAuth();
   const [search, setSearch] = useState("");
   const q = useDebounced(search);
@@ -220,9 +230,9 @@ function Accounts() {
         <div className="table-search">
           <Search size={17} />
           <input
-            aria-label="Search accounts"
+            aria-label={tr("Search accounts")}
             value={search}
-            placeholder="Find an account…"
+            placeholder={tr("Find an account…")}
             maxLength={200}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -239,7 +249,7 @@ function Accounts() {
               setPage(1);
             }}
           />
-          Include deactivated
+          {tr("Include deactivated")}
         </label>
         <Button
           onClick={() => {
@@ -248,7 +258,7 @@ function Accounts() {
           }}
         >
           <Plus size={16} />
-          Create account
+          {tr("Create account")}
         </Button>
       </div>
       {query.isPending ? (
@@ -261,12 +271,12 @@ function Accounts() {
             <table>
               <thead>
                 <tr>
-                  <th>Account</th>
-                  <th>Status</th>
-                  <th>Email</th>
-                  <th>Created</th>
+                  <th>{tr("Account")}</th>
+                  <th>{tr("Status")}</th>
+                  <th>{tr("Email")}</th>
+                  <th>{tr("Created")}</th>
                   <th>
-                    <span className="sr-only">Actions</span>
+                    <span className="sr-only">{tr("Actions")}</span>
                   </th>
                 </tr>
               </thead>
@@ -289,38 +299,40 @@ function Accounts() {
                         className={`status-pill ${!user.deactivatedAt && !user.isLocked ? "success" : ""}`}
                       >
                         {user.deactivatedAt
-                          ? "Deactivated"
+                          ? tr("Deactivated")
                           : user.isLocked
-                            ? "Locked"
-                            : "Active"}
+                            ? tr("Locked")
+                            : tr("Active")}
                       </span>
                     </td>
                     <td>
                       {user.email}
                       <small className="table-secondary">
-                        {user.emailConfirmed ? "Verified" : "Not verified"}
+                        {user.emailConfirmed
+                          ? tr("Verified")
+                          : tr("Not verified")}
                       </small>
                     </td>
                     <td>{dateTime(user.createdTime)}</td>
                     <td>
                       <ActionMenu
-                        label={`Manage ${user.userName}`}
+                        label={tr("Manage {0}", user.userName)}
                         items={[
                           {
-                            label: "View account details",
+                            label: tr("View account details"),
                             icon: Users,
                             action: () => setDetailsFor(user),
                           },
                           {
-                            label: "Manage roles",
+                            label: tr("Manage roles"),
                             icon: ShieldCheck,
                             action: () => setRolesFor(user),
                             disabled: !!user.deactivatedAt,
                           },
                           {
                             label: user.isLocked
-                              ? "Unlock account"
-                              : "Lock account",
+                              ? tr("Unlock account")
+                              : tr("Lock account"),
                             icon: user.isLocked ? Unlock : LockKeyhole,
                             action: () =>
                               setTarget({ account: user, action: "lock" }),
@@ -330,8 +342,8 @@ function Accounts() {
                           },
                           {
                             label: user.deactivatedAt
-                              ? "Restore account"
-                              : "Deactivate account",
+                              ? tr("Restore account")
+                              : tr("Deactivate account"),
                             icon: user.deactivatedAt ? RotateCcw : UserRoundX,
                             danger: !user.deactivatedAt,
                             action: () =>
@@ -353,8 +365,8 @@ function Accounts() {
             {query.data.items.length === 0 ? (
               <EmptyState
                 icon={Users}
-                title="No accounts found"
-                description="Try a different search."
+                title={tr("No accounts found")}
+                description={tr("Try a different search.")}
               />
             ) : null}
           </div>
@@ -369,8 +381,10 @@ function Accounts() {
         <Modal
           open
           onClose={() => setCreate(false)}
-          title="Create account"
-          description="The account owner must verify their email before signing in."
+          title={tr("Create account")}
+          description={tr(
+            "The account owner must verify their email before signing in.",
+          )}
         >
           <form
             className="modal-body"
@@ -388,7 +402,7 @@ function Accounts() {
                 })
                 .then(async () => {
                   setCreate(false);
-                  toast.success("Account created");
+                  toast.success(tr("Account created"));
                   await refresh();
                 })
                 .catch(setError)
@@ -396,17 +410,17 @@ function Accounts() {
             }}
           >
             <ErrorBanner error={error} />
-            <Field label="Email">
+            <Field label={tr("Email")}>
               <input type="email" name="email" maxLength={256} required />
             </Field>
-            <Field label="Username">
+            <Field label={tr("Username")}>
               <input
                 name="username"
                 maxLength={256}
-                placeholder="Defaults to email"
+                placeholder={tr("Defaults to email")}
               />
             </Field>
-            <Field label="Temporary password">
+            <Field label={tr("Temporary password")}>
               <input
                 type="password"
                 name="password"
@@ -416,14 +430,14 @@ function Accounts() {
                 required
               />
             </Field>
-            <Field label="Initial role">
+            <Field label={tr("Initial role")}>
               <select name="role">
-                <option>User</option>
-                <option>Admin</option>
+                <option>{tr("User")}</option>
+                <option>{tr("Admin")}</option>
               </select>
             </Field>
             <Button busy={busy} type="submit">
-              Create account
+              {tr("Create account")}
             </Button>
           </form>
         </Modal>
@@ -442,18 +456,24 @@ function Accounts() {
           title={
             target.action === "lock"
               ? target.account.isLocked
-                ? "Unlock this account?"
-                : "Lock this account?"
+                ? tr("Unlock this account?")
+                : tr("Lock this account?")
               : target.action === "deactivate"
-                ? "Deactivate this account?"
-                : "Restore this account?"
+                ? tr("Deactivate this account?")
+                : tr("Restore this account?")
           }
           description={
             target.action === "restore"
-              ? "Saved notes are preserved. Existing tokens stay revoked, and any lock remains in effect."
+              ? tr(
+                  "Saved notes are preserved. Existing tokens stay revoked, and any lock remains in effect.",
+                )
               : target.action === "deactivate"
-                ? "This account will stop working, while its notes and history are kept."
-                : "Changing account access takes effect immediately for existing sessions."
+                ? tr(
+                    "This account will stop working, while its notes and history are kept.",
+                  )
+                : tr(
+                    "Changing account access takes effect immediately for existing sessions.",
+                  )
           }
           onClose={() => setTarget(undefined)}
           onConfirm={async () => {
@@ -463,7 +483,7 @@ function Accounts() {
               !target.account.isLocked,
             );
             await refresh();
-            toast.success("Account updated");
+            toast.success(tr("Account updated"));
           }}
         />
       ) : null}
@@ -477,6 +497,7 @@ function AccountDetails({
   user: Account;
   onClose: () => void;
 }) {
+  useLanguage();
   const details = useQuery({
     queryKey: workspace.key("admin-user", user.id),
     queryFn: () => admin.user(user.id),
@@ -491,7 +512,7 @@ function AccountDetails({
     <Modal
       open
       onClose={onClose}
-      title="Account details"
+      title={tr("Account details")}
       description={user.email}
     >
       <div className="modal-body">
@@ -509,57 +530,59 @@ function AccountDetails({
           <>
             <dl className="admin-account-details">
               <div>
-                <dt>Account ID</dt>
+                <dt>{tr("Account ID")}</dt>
                 <dd>
                   <code>{account.id}</code>
                 </dd>
               </div>
               <div>
-                <dt>Username</dt>
+                <dt>{tr("Username")}</dt>
                 <dd>{account.userName}</dd>
               </div>
               <div>
-                <dt>Account area</dt>
-                <dd>{isAdmin ? "Administration only" : "Personal notes"}</dd>
+                <dt>{tr("Account area")}</dt>
+                <dd>
+                  {isAdmin ? tr("Administration only") : tr("Personal notes")}
+                </dd>
               </div>
               <div>
-                <dt>Status</dt>
+                <dt>{tr("Status")}</dt>
                 <dd>
                   {account.deactivatedAt
-                    ? "Deactivated"
+                    ? tr("Deactivated")
                     : account.isLocked
-                      ? "Locked"
-                      : "Active"}
+                      ? tr("Locked")
+                      : tr("Active")}
                 </dd>
               </div>
               <div>
-                <dt>Email</dt>
+                <dt>{tr("Email")}</dt>
                 <dd>
                   {account.email} ·{" "}
-                  {account.emailConfirmed ? "Verified" : "Not verified"}
+                  {account.emailConfirmed ? tr("Verified") : tr("Not verified")}
                 </dd>
               </div>
               <div>
-                <dt>Phone</dt>
-                <dd>{account.phoneNumber || "Not provided"}</dd>
+                <dt>{tr("Phone")}</dt>
+                <dd>{account.phoneNumber || tr("Not provided")}</dd>
               </div>
               <div>
-                <dt>Timezone</dt>
+                <dt>{tr("Timezone")}</dt>
                 <dd>{account.timeZoneId}</dd>
               </div>
               <div>
-                <dt>Password sign-in</dt>
-                <dd>{account.hasPassword ? "Available" : "Not set"}</dd>
+                <dt>{tr("Password sign-in")}</dt>
+                <dd>{account.hasPassword ? tr("Available") : tr("Not set")}</dd>
               </div>
               <div>
-                <dt>Created</dt>
+                <dt>{tr("Created")}</dt>
                 <dd>{dateTime(account.createdTime)}</dd>
               </div>
               <div>
-                <dt>Roles</dt>
+                <dt>{tr("Roles")}</dt>
                 <dd>
                   {memberships.data?.map((role) => role.name).join(", ") ||
-                    "No assigned roles"}
+                    tr("No assigned roles")}
                 </dd>
               </div>
             </dl>
@@ -568,14 +591,14 @@ function AccountDetails({
               to={`/admin/audit?targetUserId=${encodeURIComponent(account.id)}`}
               onClick={onClose}
             >
-              View account activity
+              {tr("View account activity")}
             </Link>
           </>
         ) : null}
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={onClose}>
-          Done
+          {tr("Done")}
         </Button>
       </div>
     </Modal>
@@ -588,6 +611,7 @@ function Memberships({
   user: Account;
   onClose: () => void;
 }) {
+  useLanguage();
   const current = useAuth();
   const [rolePage, setRolePage] = useState(1);
   const roles = useQuery({
@@ -604,13 +628,14 @@ function Memberships({
     <Modal
       open
       onClose={onClose}
-      title="Account roles"
+      title={tr("Account roles")}
       description={user.email}
     >
       <div className="modal-body">
         <p className="field-hint">
-          Admin accounts use administration only, even if User is also assigned.
-          Role changes end the account’s active sessions.
+          {tr(
+            "Admin accounts use administration only, even if User is also assigned. Role changes end the account’s active sessions.",
+          )}
         </p>
         <ErrorBanner error={error} />
         {roles.isPending || memberships.isPending ? (
@@ -631,7 +656,7 @@ function Memberships({
                 <label key={role.id} className="membership-row">
                   <span>
                     <strong>{role.name}</strong>
-                    <small>{role.description || "Application role"}</small>
+                    <small>{role.description || tr("Application role")}</small>
                   </span>
                   <input
                     type="checkbox"
@@ -656,7 +681,7 @@ function Memberships({
                               queryKey: workspace.key("admin-users"),
                             }),
                           ]);
-                          toast.success("Role membership updated");
+                          toast.success(tr("Role membership updated"));
                         })
                         .catch(setError)
                         .finally(() => setBusy(""));
@@ -675,13 +700,14 @@ function Memberships({
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={onClose}>
-          Done
+          {tr("Done")}
         </Button>
       </div>
     </Modal>
   );
 }
 function Roles() {
+  useLanguage();
   const [page, setPage] = useState(1);
   const query = useQuery({
     queryKey: workspace.key("admin-roles", page),
@@ -698,7 +724,9 @@ function Roles() {
   return (
     <>
       <div className="table-toolbar">
-        <p className="muted">Built-in User and Admin roles are protected.</p>
+        <p className="muted">
+          {tr("Built-in User and Admin roles are protected.")}
+        </p>
         <Button
           onClick={() => {
             setError(undefined);
@@ -706,7 +734,7 @@ function Roles() {
           }}
         >
           <Plus size={16} />
-          Create role
+          {tr("Create role")}
         </Button>
       </div>
       {query.isPending ? (
@@ -722,12 +750,12 @@ function Roles() {
                   <ShieldCheck size={22} />
                 </span>
                 <h2>{role.name}</h2>
-                <p>{role.description || "Application role"}</p>
+                <p>{role.description || tr("Application role")}</p>
                 <div className="row-actions">
                   {["Admin", "User"].includes(role.name) ? (
                     <span className="secure-pill">
                       <Check size={12} />
-                      Built-in
+                      {tr("Built-in")}
                     </span>
                   ) : (
                     <>
@@ -739,11 +767,11 @@ function Roles() {
                         }}
                       >
                         <Pencil size={14} />
-                        Edit
+                        {tr("Edit")}
                       </Button>
                       <Button variant="ghost" onClick={() => setDeleting(role)}>
                         <Trash2 size={14} />
-                        Delete
+                        {tr("Delete")}
                       </Button>
                     </>
                   )}
@@ -762,7 +790,7 @@ function Roles() {
         <Modal
           open
           onClose={() => setEditing(undefined)}
-          title={editing ? "Edit role" : "Create role"}
+          title={editing ? tr("Edit role") : tr("Create role")}
         >
           <form
             className="modal-body"
@@ -782,7 +810,7 @@ function Roles() {
                 .then(async () => {
                   await refresh();
                   setEditing(undefined);
-                  toast.success("Role saved");
+                  toast.success(tr("Role saved"));
                 })
                 .catch(setError)
                 .finally(() => setBusy(false));
@@ -790,8 +818,8 @@ function Roles() {
           >
             <ErrorBanner error={error} />
             <Field
-              label="Role name"
-              hint="Letters, numbers, underscores and hyphens only."
+              label={tr("Role name")}
+              hint={tr("Letters, numbers, underscores and hyphens only.")}
             >
               <input
                 name="name"
@@ -801,7 +829,7 @@ function Roles() {
                 maxLength={64}
               />
             </Field>
-            <Field label="Description">
+            <Field label={tr("Description")}>
               <textarea
                 name="description"
                 defaultValue={editing?.description ?? ""}
@@ -809,16 +837,18 @@ function Roles() {
               />
             </Field>
             <Button busy={busy} type="submit">
-              Save role
+              {tr("Save role")}
             </Button>
           </form>
         </Modal>
       ) : null}
       {deleting ? (
         <ConfirmDialog
-          title="Delete this role?"
-          description="The role will be removed from account memberships. Administrative history will be kept."
-          confirmLabel="Delete role"
+          title={tr("Delete this role?")}
+          description={tr(
+            "The role will be removed from account memberships. Administrative history will be kept.",
+          )}
+          confirmLabel={tr("Delete role")}
           danger
           onClose={() => setDeleting(undefined)}
           onConfirm={async () => {
@@ -846,6 +876,7 @@ const auditActions = [
   "Account restored",
 ];
 function Audit() {
+  useLanguage();
   const [params, setParams] = useSearchParams();
   const [page, setPage] = useState(1);
   const [action, setAction] = useState(0);
@@ -872,10 +903,10 @@ function Audit() {
         >
           <Search size={16} />
           <input
-            aria-label="Filter target account ID"
-            placeholder="Target account ID…"
+            aria-label={tr("Filter target account ID")}
+            placeholder={tr("Target account ID…")}
             pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-            title="Enter a complete account ID (UUID)."
+            title={tr("Enter a complete account ID (UUID).")}
             value={targetInput}
             onChange={(e) => setTargetInput(e.target.value)}
           />
@@ -889,10 +920,10 @@ function Audit() {
             setPage(1);
           }}
         >
-          Clear filters
+          {tr("Clear filters")}
         </Button>
         <select
-          aria-label="Audit action filter"
+          aria-label={tr("Audit action filter")}
           value={action}
           onChange={(e) => {
             setAction(Number(e.target.value));
@@ -901,7 +932,7 @@ function Audit() {
         >
           {auditActions.map((name, index) => (
             <option key={name} value={index}>
-              {name}
+              {tr(name)}
             </option>
           ))}
         </select>
@@ -916,11 +947,11 @@ function Audit() {
             <table className="audit-table">
               <thead>
                 <tr>
-                  <th>Action</th>
-                  <th>Time</th>
-                  <th>Actor</th>
-                  <th>Target account</th>
-                  <th>Role</th>
+                  <th>{tr("Action")}</th>
+                  <th>{tr("Time")}</th>
+                  <th>{tr("Actor")}</th>
+                  <th>{tr("Target account")}</th>
+                  <th>{tr("Role")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -928,12 +959,14 @@ function Audit() {
                   <tr key={event.id}>
                     <td>
                       <strong>
-                        {auditActions[event.action] ?? "Administrative action"}
+                        {tr(
+                          auditActions[event.action] ?? "Administrative action",
+                        )}
                       </strong>
                     </td>
                     <td>{dateTime(event.occurredAt)}</td>
                     <td>
-                      <code>{event.actorUserId ?? "Operator"}</code>
+                      <code>{event.actorUserId ?? tr("Operator")}</code>
                     </td>
                     <td>
                       <code>{event.targetUserId ?? "—"}</code>
@@ -948,8 +981,10 @@ function Audit() {
             {!query.data.items.length ? (
               <EmptyState
                 icon={Activity}
-                title="No matching events"
-                description="Administrative changes appear here as metadata only."
+                title={tr("No matching events")}
+                description={tr(
+                  "Administrative changes appear here as metadata only.",
+                )}
               />
             ) : null}
           </div>

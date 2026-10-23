@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { lazy, Suspense, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -71,6 +72,7 @@ function NoteCard({
   draggable: boolean;
   onOrganize: (action: NoteOpenAction) => void;
 }) {
+  useLanguage();
   const {
     setNodeRef,
     transform,
@@ -88,7 +90,7 @@ function NoteCard({
         ),
       )
     : null;
-  const title = note.title?.trim() || "Untitled";
+  const title = note.title?.trim() || tr("Untitled");
   return (
     <article
       ref={setNodeRef}
@@ -110,7 +112,7 @@ function NoteCard({
             type="button"
             className="note-card-identity"
             onClick={onOpen}
-            aria-label={`View ${title}`}
+            aria-label={tr("View {0}", title)}
           >
             {note.iconEmoji ? (
               <span className="note-emoji">{note.iconEmoji}</span>
@@ -125,8 +127,8 @@ function NoteCard({
             <button
               type="button"
               className="icon-button drag-handle"
-              aria-label={`Move ${title}`}
-              title="Drag to move. Keyboard: Space, arrow keys, Space."
+              aria-label={tr("Move {0}", title)}
+              title={tr("Drag to move. Keyboard: Space, arrow keys, Space.")}
               {...attributes}
               {...listeners}
             >
@@ -136,7 +138,9 @@ function NoteCard({
           {!trash ? (
             <IconButton
               icon={note.isPinned ? PinOff : Pin}
-              label={note.isPinned ? `Unpin ${title}` : `Pin ${title}`}
+              label={
+                note.isPinned ? tr("Unpin {0}", title) : tr("Pin {0}", title)
+              }
               active={note.isPinned}
               disabled={busy}
               onClick={() => onAction("pin")}
@@ -148,7 +152,7 @@ function NoteCard({
         type="button"
         className="note-open"
         onClick={onOpen}
-        aria-label={`Open ${title}`}
+        aria-label={tr("Open {0}", title)}
       >
         {note.content ? (
           <p
@@ -158,7 +162,7 @@ function NoteCard({
           </p>
         ) : (
           <p className="note-preview empty-preview">
-            A blank page, full of possibilities.
+            {tr("A blank page, full of possibilities.")}
           </p>
         )}
       </button>
@@ -179,13 +183,16 @@ function NoteCard({
         <span className="note-date">
           {trash
             ? expiry
-              ? `${expiry} ${expiry === 1 ? "day" : "days"} left`
-              : "Retention elapsed"
+              ? tr(expiry === 1 ? "{0} day left" : "{0} days left", expiry)
+              : tr("Retention elapsed")
             : shortDate(note.lastUpdatedTime)}
         </span>
         <div className="row-actions">
           {!trash && note.reminders.some((r) => r.isActive) ? (
-            <span className="reminder-indicator" title="Has active reminders">
+            <span
+              className="reminder-indicator"
+              title={tr("Has active reminders")}
+            >
               <Bell size={13} />
             </span>
           ) : null}
@@ -193,47 +200,47 @@ function NoteCard({
             <>
               <IconButton
                 icon={RotateCcw}
-                label={`Restore ${title}`}
+                label={tr("Restore {0}", title)}
                 disabled={busy || expiry === 0}
                 onClick={() => onAction("restore")}
               />
               <IconButton
                 icon={Trash2}
-                label={`Delete ${title} permanently`}
+                label={tr("Delete {0} permanently", title)}
                 disabled={busy}
                 onClick={() => onAction("delete")}
               />
             </>
           ) : (
             <ActionMenu
-              label={`Actions for ${title}`}
+              label={tr("Actions for {0}", title)}
               items={[
                 {
-                  label: "Add label",
+                  label: tr("Add label"),
                   icon: Tag,
                   action: () => onOrganize("labels"),
                   disabled: busy,
                 },
                 {
-                  label: "Add reminder",
+                  label: tr("Add reminder"),
                   icon: Bell,
                   action: () => onOrganize("reminder"),
                   disabled: busy,
                 },
                 {
-                  label: "Move earlier",
+                  label: tr("Move earlier"),
                   icon: ArrowUp,
                   action: () => onMove(-1),
                   disabled: !draggable || busy,
                 },
                 {
-                  label: "Move later",
+                  label: tr("Move later"),
                   icon: ArrowDown,
                   action: () => onMove(1),
                   disabled: !draggable || busy,
                 },
                 {
-                  label: "Move to trash",
+                  label: tr("Move to trash"),
                   icon: Trash2,
                   danger: true,
                   separator: true,
@@ -255,6 +262,7 @@ export default function NotesPage({
   trash?: boolean;
   reminderView?: boolean;
 }) {
+  useLanguage();
   const { tagId } = useParams();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -336,7 +344,7 @@ export default function NotesPage({
     const note = all.find((n) => n.id === event.active.id),
       over = all.find((n) => n.id === event.over!.id);
     if (!note || !over || note.isPinned !== over.isPinned) {
-      toast.info("Move notes within the same pinned group.");
+      toast.info(tr("Move notes within the same pinned group."));
       return;
     }
     const group = all.filter((n) => n.isPinned === note.isPinned);
@@ -402,48 +410,53 @@ export default function NotesPage({
         }
       >
         {trash
-          ? "Trash"
+          ? tr("Trash")
           : tagId
-            ? (label?.name ?? "Label")
+            ? (label?.name ?? tr("Label"))
             : reminderView
-              ? "Notes with reminders"
+              ? tr("Notes with reminders")
               : q
-                ? "Search results"
-                : "Notes"}
+                ? tr("Search results")
+                : tr("Notes")}
       </h1>
       {trash ? (
         <div className="notice-strip">
           <Trash2 size={16} />
-          Deleted notes are permanently removed after the seven-day retention
-          period.
+          {tr(
+            "Deleted notes are permanently removed after the seven-day retention period.",
+          )}
         </div>
       ) : null}
       <div className="workspace-toolbar">
         {!trash ? (
           <button
             className="quick-capture"
-            aria-label="Take a note"
+            aria-label={tr("Take a note")}
             onClick={() => setEditor({})}
           >
             <span className="quick-capture-icon">
               <Plus size={14} />
             </span>
-            <span>New</span>
+            <span>{tr("New")}</span>
           </button>
         ) : null}
         <div className="row-actions">
           {!trash ? (
             <Select
-              label="Filter pinned notes"
+              label={tr("Filter pinned notes")}
               value={pinFilter}
               onChange={setPinFilter}
             >
-              <option value="all">All notes</option>
-              <option value="pinned">Pinned only</option>
-              <option value="unpinned">Unpinned only</option>
+              <option value="all">{tr("All notes")}</option>
+              <option value="pinned">{tr("Pinned only")}</option>
+              <option value="unpinned">{tr("Unpinned only")}</option>
             </Select>
           ) : null}
-          <div className="view-toggle" role="group" aria-label="Notes view">
+          <div
+            className="view-toggle"
+            role="group"
+            aria-label={tr("Notes view")}
+          >
             {[
               ["grid", LayoutGrid],
               ["list", List],
@@ -453,7 +466,10 @@ export default function NotesPage({
                 <IconButton
                   key={String(name)}
                   icon={Component}
-                  label={`${name} view`}
+                  label={tr(
+                    "{0} view",
+                    tr(name === "grid" ? "Grid" : "List").toLocaleLowerCase(),
+                  )}
                   active={view === name}
                   onClick={() => {
                     setView(String(name));
@@ -478,17 +494,21 @@ export default function NotesPage({
           icon={trash ? Trash2 : q ? Search : FileText}
           title={
             trash
-              ? "A clean slate"
+              ? tr("A clean slate")
               : q
-                ? "No notes found"
-                : "Your next idea starts here"
+                ? tr("No notes found")
+                : tr("Your next idea starts here")
           }
           description={
             trash
-              ? "Nothing in the trash. Your notes are right where they belong."
+              ? tr(
+                  "Nothing in the trash. Your notes are right where they belong.",
+                )
               : q
-                ? "Try another phrase or remove a filter."
-                : "A thought, a list, a plan. Give it a home in your first note."
+                ? tr("Try another phrase or remove a filter.")
+                : tr(
+                    "A thought, a list, a plan. Give it a home in your first note.",
+                  )
           }
         />
       ) : (
@@ -498,16 +518,18 @@ export default function NotesPage({
           onDragEnd={dragEnd}
         >
           {trash ? (
-            renderGroup(all, "Deleted notes")
+            renderGroup(all, tr("Deleted notes"))
           ) : (
             <>
               {renderGroup(
                 all.filter((n) => n.isPinned),
-                "Pinned",
+                tr("Pinned"),
               )}
               {renderGroup(
                 all.filter((n) => !n.isPinned),
-                all.some((n) => n.isPinned) ? "Everything else" : "All notes",
+                all.some((n) => n.isPinned)
+                  ? tr("Everything else")
+                  : tr("All notes"),
               )}
             </>
           )}
@@ -520,15 +542,15 @@ export default function NotesPage({
             busy={query.isFetchingNextPage}
             onClick={() => void query.fetchNextPage()}
           >
-            Load more notes
+            {tr("Load more notes")}
           </Button>
           <span className="field-hint">
-            Load all notes to enable reordering.
+            {tr("Load all notes to enable reordering.")}
           </span>
         </div>
       ) : null}
       {editor || selected ? (
-        <Suspense fallback={<Spinner label="Opening editor…" />}>
+        <Suspense fallback={<Spinner label={tr("Opening editor…")} />}>
           {trash ? (
             <TrashViewer id={editor?.id ?? selected!} onClose={closeEditor} />
           ) : (
@@ -545,16 +567,22 @@ export default function NotesPage({
         <ConfirmDialog
           title={
             confirm.action === "trash"
-              ? "Move to trash?"
-              : "Permanently delete note?"
+              ? tr("Move to trash?")
+              : tr("Permanently delete note?")
           }
           description={
             confirm.action === "trash"
-              ? "You can restore this note for seven days. Future reminders will stop."
-              : "This removes the note and its related reminders permanently. This cannot be undone."
+              ? tr(
+                  "You can restore this note for seven days. Future reminders will stop.",
+                )
+              : tr(
+                  "This removes the note and its related reminders permanently. This cannot be undone.",
+                )
           }
           confirmLabel={
-            confirm.action === "trash" ? "Move to trash" : "Delete permanently"
+            confirm.action === "trash"
+              ? tr("Move to trash")
+              : tr("Delete permanently")
           }
           danger={confirm.action === "delete"}
           onClose={() => setConfirm(undefined)}
@@ -577,6 +605,7 @@ import { useQuery } from "@tanstack/react-query";
 import { notes } from "../../app/runtime";
 import { Modal } from "../../shared/ui";
 function TrashViewer({ id, onClose }: { id: string; onClose: () => void }) {
+  useLanguage();
   const [restoring, setRestoring] = useState(false);
   const [restoreError, setRestoreError] = useState<unknown>();
   const query = useQuery({
@@ -588,8 +617,10 @@ function TrashViewer({ id, onClose }: { id: string; onClose: () => void }) {
       open
       wide
       onClose={onClose}
-      title={query.data?.title || "Untitled"}
-      description="This note is in the trash. Restore it to continue editing."
+      title={query.data?.title || tr("Untitled")}
+      description={tr(
+        "This note is in the trash. Restore it to continue editing.",
+      )}
     >
       <div className="modal-body">
         {restoreError ? <ErrorPanel error={restoreError} /> : null}
@@ -615,7 +646,7 @@ function TrashViewer({ id, onClose }: { id: string; onClose: () => void }) {
               }}
             >
               <RotateCcw size={16} />
-              Restore note
+              {tr("Restore note")}
             </Button>
           </>
         )}

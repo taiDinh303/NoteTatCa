@@ -1,9 +1,11 @@
+import { t as tr, useLanguage } from "./i18n";
 import { useId, useState } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useDisplayZoom } from "./displayZoom";
 import { Button, IconButton, Modal } from "./ui";
 
 export function ZoomDialog({ onClose }: { onClose: () => void }) {
+  useLanguage();
   const { percent, change } = useDisplayZoom();
   const [draft, setDraft] = useState<string | null>(null);
   const inputId = useId();
@@ -12,15 +14,20 @@ export function ZoomDialog({ onClose }: { onClose: () => void }) {
     setDraft(null);
   }
   return (
-    <Modal open title="Interface zoom" className="zoom-panel" onClose={onClose}>
+    <Modal
+      open
+      title={tr("Interface zoom")}
+      className="zoom-panel"
+      onClose={onClose}
+    >
       <div className="modal-body">
         <label className="field-label" htmlFor={inputId}>
-          Zoom percentage
+          {tr("Zoom percentage")}
         </label>
         <div className="zoom-adjustments">
           <IconButton
             icon={Minus}
-            label="Zoom out"
+            label={tr("Zoom out")}
             disabled={percent <= 50}
             onClick={() => change(percent - 10)}
           />
@@ -46,20 +53,20 @@ export function ZoomDialog({ onClose }: { onClose: () => void }) {
           </div>
           <IconButton
             icon={Plus}
-            label="Zoom in"
+            label={tr("Zoom in")}
             disabled={percent >= 150}
             onClick={() => change(percent + 10)}
           />
         </div>
         <p className="zoom-help">
-          50%–150% · Ctrl + mouse wheel · Pinch with two fingers
+          {tr("50%–150% · Ctrl + mouse wheel · Pinch with two fingers")}
         </p>
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={() => change(100)}>
-          Reset to 100%
+          {tr("Reset to 100%")}
         </Button>
-        <Button onClick={onClose}>Done</Button>
+        <Button onClick={onClose}>{tr("Done")}</Button>
       </div>
     </Modal>
   );

@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Check, Paintbrush } from "lucide-react";
@@ -12,13 +13,14 @@ export default function NoteColorPicker({
   color: string;
   onChange: (color: string) => void;
 }) {
+  useLanguage();
   const [open, setOpen] = useState(false);
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
         <IconButton
           icon={Paintbrush}
-          label="Note background color"
+          label={tr("Note background color")}
           active={open}
         />
       </Popover.Trigger>
@@ -29,7 +31,7 @@ export default function NoteColorPicker({
           align="start"
           sideOffset={12}
           collisionPadding={12}
-          aria-label="Note colors"
+          aria-label={tr("Note colors")}
         >
           <div className="note-color-grid">
             {NOTE_COLORS.map((value, index) => (
@@ -42,7 +44,9 @@ export default function NoteColorPicker({
                   background: value || "var(--surface)",
                 }}
                 aria-label={
-                  index === 0 ? "Default note color" : `Note color ${index}`
+                  index === 0
+                    ? tr("Default note color")
+                    : tr("Note color {0}", index)
                 }
                 aria-pressed={color === value}
                 onClick={() => {
@@ -58,12 +62,12 @@ export default function NoteColorPicker({
             <span className="custom-color">
               <input
                 type="color"
-                aria-label="Custom note color"
+                aria-label={tr("Custom note color")}
                 value={color || "#ffffff"}
                 onChange={(event) => onChange(event.target.value)}
               />
             </span>
-            <span>Custom color</span>
+            <span>{tr("Custom color")}</span>
           </label>
         </Popover.Content>
       </Popover.Portal>

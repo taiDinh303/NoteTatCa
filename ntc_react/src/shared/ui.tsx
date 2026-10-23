@@ -1,3 +1,4 @@
+import { t as tr, useLanguage } from "./i18n";
 import {
   Children,
   cloneElement,
@@ -34,6 +35,7 @@ export function Avatar({
   picture?: string | null;
   large?: boolean;
 }) {
+  useLanguage();
   const [failed, setFailed] = useState<string>();
   return (
     <span className={large ? "large-avatar" : "avatar"}>
@@ -52,6 +54,7 @@ export function Avatar({
   );
 }
 export function Logo({ compact = false }: { compact?: boolean }) {
+  useLanguage();
   return (
     <span className="brand">
       <span className="brand-mark">
@@ -75,6 +78,7 @@ export function Button({
   variant?: "primary" | "secondary" | "ghost" | "danger";
   busy?: boolean;
 }) {
+  useLanguage();
   return (
     <button
       type="button"
@@ -99,6 +103,7 @@ export function IconButton({
   label: string;
   active?: boolean;
 }) {
+  useLanguage();
   return (
     <button
       type="button"
@@ -158,6 +163,7 @@ export function Field({
   error?: string;
   children: ReactNode;
 }) {
+  useLanguage();
   const id = useId();
   return (
     <div className="field">
@@ -179,7 +185,8 @@ export function Field({
     </div>
   );
 }
-export function Spinner({ label = "Loading…" }: { label?: string }) {
+export function Spinner({ label = tr("Loading…") }: { label?: string }) {
+  useLanguage();
   return (
     <div className="loading-state" role="status">
       <LoaderCircle size={24} className="spin" />
@@ -188,6 +195,7 @@ export function Spinner({ label = "Loading…" }: { label?: string }) {
   );
 }
 export function ErrorBanner({ error }: { error: unknown }) {
+  useLanguage();
   return error ? (
     <div className="error-banner" role="alert">
       <AlertCircle size={18} />
@@ -202,12 +210,13 @@ export function ErrorPanel({
   error: unknown;
   retry?: () => void;
 }) {
+  useLanguage();
   return (
     <div className="error-panel">
       <ErrorBanner error={error} />
       {retry ? (
         <Button variant="secondary" onClick={retry}>
-          Try again
+          {tr("Try again")}
         </Button>
       ) : null}
     </div>
@@ -224,6 +233,7 @@ export function EmptyState({
   description: string;
   children?: ReactNode;
 }) {
+  useLanguage();
   return (
     <div className="empty-state">
       <div className="empty-art">
@@ -248,6 +258,7 @@ export function PageHeading({
   description: string;
   children?: ReactNode;
 }) {
+  useLanguage();
   return (
     <header className="page-heading">
       <div>
@@ -284,6 +295,7 @@ export function Modal({
   dismissOnOutside?: boolean;
   style?: CSSProperties;
 }) {
+  useLanguage();
   return (
     <Dialog.Root
       open={open}
@@ -310,7 +322,11 @@ export function Modal({
               </Dialog.Description>
             </div>
             {!hideTitle && !hideCloseButton ? (
-              <IconButton icon={X} label="Close dialog" onClick={onClose} />
+              <IconButton
+                icon={X}
+                label={tr("Close dialog")}
+                onClick={onClose}
+              />
             ) : null}
           </div>
           {children}
@@ -322,7 +338,7 @@ export function Modal({
 export function ConfirmDialog({
   title,
   description,
-  confirmLabel = "Confirm",
+  confirmLabel = tr("Confirm"),
   onConfirm,
   onClose,
   danger = false,
@@ -334,6 +350,7 @@ export function ConfirmDialog({
   onClose: () => void;
   danger?: boolean;
 }) {
+  useLanguage();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   return (
@@ -350,7 +367,7 @@ export function ConfirmDialog({
       </div>
       <div className="modal-footer">
         <Button variant="secondary" disabled={busy} onClick={onClose}>
-          Cancel
+          {tr("Cancel")}
         </Button>
         <Button
           variant={danger ? "danger" : "primary"}
@@ -382,13 +399,14 @@ export interface MenuAction {
 }
 export function ActionMenu({
   items,
-  label = "More actions",
+  label = tr("More actions"),
   children,
 }: {
   items: MenuAction[];
   label?: string;
   children?: ReactNode;
 }) {
+  useLanguage();
   return (
     <Dropdown.Root>
       <Dropdown.Trigger asChild>
@@ -435,6 +453,7 @@ export function Select({
   children: ReactNode;
   disabled?: boolean;
 }) {
+  useLanguage();
   return (
     <div className="select-wrap">
       <select
@@ -450,8 +469,9 @@ export function Select({
   );
 }
 export function SkeletonCards() {
+  useLanguage();
   return (
-    <div className="note-grid" aria-label="Loading notes" role="status">
+    <div className="note-grid" aria-label={tr("Loading notes")} role="status">
       {Array.from({ length: 6 }, (_, i) => (
         <div key={i} className="note-skeleton">
           <div />
@@ -478,12 +498,14 @@ export class AppErrorBoundary extends Component<
     return this.state.error ? (
       <main className="crash-page">
         <Logo />
-        <h1>Something didn’t load correctly.</h1>
+        <h1>{tr("Something didn’t load correctly.")}</h1>
         <p>
-          Your saved notes are still on the server. Reopen the app to try again.
+          {tr(
+            "Your saved notes are still on the server. Reopen the app to try again.",
+          )}
         </p>
         <Button onClick={() => location.assign("/notes")}>
-          Reopen NoteTatCa
+          {tr("Reopen NoteTatCa")}
         </Button>
       </main>
     ) : (
