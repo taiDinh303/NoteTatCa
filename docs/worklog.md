@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ "Home" khỏi dropdown avatar — 2026-10-23
+
+- Theo yêu cầu chủ dự án: xóa item "Home" (icon Home) khỏi ShellAccountMenu (dropdown avatar). Dropdown hiện còn: Account settings (gear) / Zoom / Sign out.
+- ShellControls.tsx: bỏ item Home + import icon Home. E2E home.spec.ts: "signed in user can visit Home" đổi từ click menuitem "Home" sang page.goto('/Home') trực tiếp (vẫn kiểm /Home render heading + reload + "Open workspace" quay về /notes).
+- Bằng chứng: typecheck + ESLint max-warnings0 PASS. Frontend-only, .NET không đổi. Chưa chạy Playwright e2e đầy đủ trong lượt này.
+- Publication scope: ShellControls.tsx, e2e/home.spec.ts, docs/worklog.md; giữ hai appsettings local ngoài commit.
+
 ## Mobile header gọn + drawer dùng logo, toolbar notes đồng nhất kích thước — 2026-10-23
 
 - Theo hai ảnh/yêu cầu chủ dự án (mobile):

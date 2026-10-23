@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
-  Home,
   LogOut,
   Settings,
   ZoomIn,
@@ -38,11 +37,6 @@ export function ShellAccountMenu({ onNavigate }: { onNavigate?: () => void } = {
       <ActionMenu
         label="Account menu"
         items={[
-          {
-            label: "Home",
-            icon: Home,
-            action: () => navigateTo("/Home"),
-          },
           {
             label: "Account settings",
             icon: Settings,

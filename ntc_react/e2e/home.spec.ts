@@ -26,8 +26,7 @@ test('signed in user can visit Home and return to workspace', async ({ page }) =
   await page.getByLabel('Password', { exact: true }).fill('Synthetic-password-123!');
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(/\/notes/);
-  await page.getByRole('button', { name: 'Account menu', exact: true }).click();
-  await page.getByRole('menuitem', { name: 'Home', exact: true }).click();
+  await page.goto('/Home');
   await expect(page).toHaveURL(/\/Home/);
   await expect(page.getByRole('heading', { name: 'Clear your mind. Keep your ideas.' })).toBeVisible();
   await page.reload();
