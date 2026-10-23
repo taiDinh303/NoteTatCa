@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Gửi phản hồi đến Gmail chủ dự án qua email provider hiện có — 2026-10-23
+
+- Chủ dự án xác nhận lmht016847@gmail.com là nơi nhận và yêu cầu tiếp tục. POST /api/v1/feedback dùng CustomerWorkspace, BaseApiController/IFeedbackService/BaseService/ICurrentUser/TimeProvider; gửi qua IEmailSender hiện có, không đổi Brevo sender/key/config local. Recipient cố định server, không nhận To/From từ browser. Body HTML encode, kèm email tài khoản xác minh từ UserManager, userId/UTC và nội dung người dùng nhập; không đọc/đính kèm note riêng. Không persistence/queue/migration.
+- Request limit32768bytes, loại phản hồi whitelist, message1–5000không trắng; rate limit5request/giờ/account/process (in-memory, không distributed). Provider failure không trả success; không tự retry gửi trùng. Help thêm Send feedback4ngôn ngữ, khóa input lúc gửi, giữ draft nếu lỗi/xóa sau200, thông báo email tài khoản gửi kèm; giữ Copy/Download.
+- Validation: React Production build và ESLint max-warnings0 PASS; .NET Release solution PASS,0warnings/0errors. Chromium4/4 PASS en1440/vi-zh-ja393, request payload, lỗi500 giữ nội dung và retry200xóa, copy/download/FAQ/link giữ hoạt động. Browser send route giả lập; HTTP FeedbackTests dùng SQLite/TestEmailSender PASS, kiểm401/400/recipient/email HTML escape/provider500/rate429; chạy lại kèm403 và Brevo adapter:7/7 backend focused PASS. git diff --check PASS. Lần compile đầu thiếu namespace ApplicationUser; lượt HTTP đầu phát hiện MVC record-property validation metadata trả500, đã đổi DTO class và chạy lại PASS.
+- Không gửi email thật; chưa xác minh Gmail inbox/delivery hoặc Production, không manual deploy. Scope: Feedback DTO/interface/service/controller, API DI/request policy, FeedbackTests, HelpPage/messages/help.spec.ts, docs/15-api-contract.md,30-user-guide.md,FRONTEND-IMPLEMENTATION.md,worklog. Push main theo quyền đã cấp, đối chiếu remote SHA; giữ appsettings local và .agnes ngoài commit. API inventory cũ chưa export lại, endpoint mới ghi trong contract.
+
 ## Nội dung Help & feedback — 2026-10-23
 
 - Thay placeholder /help bằng3guide,5FAQ và3link nội bộ. Nội dung bám source: autosave và View/Edit, pinned reorder/filter, màu Automatic, lỗi lưu/offline không bền vững, Trash7ngày, Reminders/Inbox, import/export Markdown, ngày note và Account settings. Không hứa email delivery/production/SLA.

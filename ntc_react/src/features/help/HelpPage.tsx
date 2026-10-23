@@ -4,13 +4,15 @@ import {
   Copy,
   Download,
   MessageSquare,
+  Send,
   Settings,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { Button, Field } from "../../shared/ui";
-import { download } from "../../shared/utils";
+import { download, errorMessage } from "../../shared/utils";
+import { api } from "../../app/runtime";
 import "./help.css";
 
 const guides = [
@@ -55,6 +57,7 @@ export default function HelpPage() {
   const [kind, setKind] = useState("Report a problem");
   const [message, setMessage] = useState("");
   const [copying, setCopying] = useState(false);
+  const [sending, setSending] = useState(false);
   const feedback = `NoteTatCa — ${tr(kind)}\n\n${message.trim()}`;
   return (
     <section className="help-page">
@@ -109,13 +112,14 @@ export default function HelpPage() {
         </h2>
         <p>
           {tr(
-            "Describe a problem, suggest an improvement, or ask a question. Copy or download your message to share it; this page does not send it automatically.",
+            "Send a problem, suggestion or question to the NoteTatCa team. Your account email is included so we can reply.",
           )}
         </p>
         <div className="help-feedback-fields">
           <Field label={tr("Feedback type")}>
             <select
               value={kind}
+              disabled={sending}
               onChange={(event) => setKind(event.target.value)}
             >
               {[
@@ -134,6 +138,7 @@ export default function HelpPage() {
               rows={5}
               maxLength={5000}
               value={message}
+              disabled={sending}
               onChange={(event) => setMessage(event.target.value)}
               placeholder={tr(
                 "What happened? What did you expect? For a problem, include the steps and your browser or device.",
@@ -148,6 +153,29 @@ export default function HelpPage() {
         </p>
         <div className="help-feedback-actions">
           <Button
+            disabled={!message.trim()}
+            busy={sending}
+            onClick={async () => {
+              setSending(true);
+              try {
+                await api.request<boolean>("/feedback", {
+                  method: "POST",
+                  body: { kind, message: message.trim() },
+                });
+                setMessage("");
+                toast.success(tr("Feedback sent. Thank you!"));
+              } catch (error) {
+                toast.error(errorMessage(error));
+              } finally {
+                setSending(false);
+              }
+            }}
+          >
+            <Send size={15} />
+            {tr("Send feedback")}
+          </Button>
+          <Button
+            variant="secondary"
             disabled={!message.trim()}
             busy={copying}
             onClick={async () => {

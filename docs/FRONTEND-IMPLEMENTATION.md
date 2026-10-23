@@ -227,3 +227,8 @@ Modal labels-manager dùng flex cột và overflow hidden; header, form thêm/s�
 ### Help & feedback có nội dung — 2026-10-23
 
 /help thay placeholder bằng3hướng dẫn (viết/sửa, sắp xếp, tùy chỉnh),5FAQ bám source (lỗi lưu/offline, trash7ngày, reminders/inbox, Markdown, ngày note/account), link Notes/Reminders/Settings và composer phản hồi3loại. Copy clipboard có catch/fallback download.txt; nút disabled khi chỉ whitespace, giới hạn5000ký tự. Nội dung4ngôn ngữ; grid3cột desktop/1cột mobile, details/summary hỗ trợ keyboard. Không có kênh nhận phản hồi được cấu hình nên không thêm Send/email giả hay ghi dữ liệu backend; trang nêu rõ chỉ soạn/copy/download, không tự gửi. Draft chỉ ở bộ nhớ trang, không tự đính kèm note/account/device.
+
+
+### Gửi phản hồi trực tiếp — 2026-10-23
+
+Chủ dự án xác nhận lmht016847@gmail.com nhận. Help thêm Send feedback gọi POST /feedback bằng ApiClient authenticated; disabled khi trắng/loading, khóa input/type khi gửi, giữ bản nhập khi lỗi và chỉ xóa sau200. UI4ngôn ngữ nêu account email gửi kèm để trả lời. Giữ Copy/Download dự phòng. Backend dùng IFeedbackService/BaseService/ICurrentUser/TimeProvider và IEmailSender hiện có (Brevo ở hosting), recipient không lấy từ client. Các đoạn Help trước nói chưa gửi tự động là lịch sử trước yêu cầu này.

@@ -21,12 +21,25 @@ for (const [language, width, heading] of [['en',1440,'Help & feedback'],['vi',39
     await expect(buttons.first()).toBeDisabled();
     await message.fill('Synthetic feedback: the labels list scrolls correctly.');
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    await buttons.first().click();
+    await buttons.nth(1).click();
     await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toContain('Synthetic feedback');
     const saved = page.waitForEvent('download');
-    await buttons.nth(1).click();
+    await buttons.nth(2).click();
     expect((await saved).suggestedFilename()).toBe('notetatca-feedback.txt');
     expect(await help.evaluate(el => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+    let submitted = 0;
+    await page.route('**/api/v1/feedback', async route => {
+      expect(route.request().postDataJSON()).toEqual({ kind: 'Report a problem', message: 'Synthetic feedback: the labels list scrolls correctly.' });
+      submitted++;
+      await route.fulfill({ status: submitted === 1 ? 500 : 200, contentType: 'application/json', body: JSON.stringify(submitted === 1 ? { message: 'Synthetic failure' } : { data: true }) });
+    });
+    await buttons.first().click();
+    await expect.poll(() => submitted).toBe(1);
+    await expect(message).toHaveValue('Synthetic feedback: the labels list scrolls correctly.');
+    await expect(buttons.first()).toBeEnabled();
+    await buttons.first().click();
+    await expect(message).toHaveValue('');
+    expect(submitted).toBe(2);
     await page.screenshot({ path: `test-results/help-${language}-${width}.png`, fullPage: true });
     await help.locator('a[href="/settings"]').click();
     await expect(page).toHaveURL(/\/settings$/);

@@ -109,3 +109,8 @@ GET notifications/unread-count trả int; PATCH notifications/read-all không bo
 Source/evidence: [SERVICE-CONTROLLER-REVIEW](SERVICE-CONTROLLER-REVIEW.md). Các quy tắc null-clear ở đây không thay đổi Note PATCH đã mô tả phía trên.
 
 Access token chỉ đồng bộ trong memory giữa tabs qua BroadcastChannel sau rotation, không persist vào localStorage. Chỉ nhận message nếu userId/refreshToken khớp credential đang lưu. Web Locks tuần tự login/Google/refresh/logout; chưa kiểm browser thiếu Web Locks/BroadcastChannel.
+
+
+## Feedback — 2026-10-23
+
+POST /api/v1/feedback, policy CustomerWorkspace (login, không Admin). Body {kind,message}; kind: Report a problem / Suggest an improvement / Ask a question; message1–5000ký tự không trắng, request≤32768bytes. Recipient cố định lmht016847@gmail.com, không nhận To/From từ client. Trả BaseResponse<bool>200 sau IEmailSender hoàn tất;400validation,401/403access,429vượt5request/giờ/account/process,500provider lỗi (không xác nhận đã gửi). Giới hạn dùng fixed-window in-memory, reset khi process restart và không chia sẻ giữa instance. Email HTML encode, có account email/userId/UTC để chủ dự án trả lời; không tự kèm nội dung note. Không persistence/migration/queue. Email provider dùng cấu hình hiện có;200 không đảm bảo inbox delivery. API inventory export2026-10-19 là snapshot cũ, endpoint mới ghi tại đây.

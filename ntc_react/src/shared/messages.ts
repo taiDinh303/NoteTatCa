@@ -1,5 +1,9 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Send feedback": ["Gửi phản hồi", "发送反馈", "送信"],
+  "Feedback sent. Thank you!": ["Đã gửi phản hồi. Cảm ơn bạn!", "反馈已发送，谢谢！", "送信しました。ありがとうございます！"],
+  "Send a problem, suggestion or question to the NoteTatCa team. Your account email is included so we can reply.": ["Gửi báo lỗi, đề xuất hoặc câu hỏi đến NoteTatCa. Email tài khoản được gửi kèm để chúng tôi trả lời bạn.", "向 NoteTatCa 团队发送问题或建议。我们会附上您的账户邮箱以便回复。", "問題、改善案、質問を NoteTatCa に送信します。返信のためアカウントのメールアドレスが含まれます。"],
+  "Invalid feedback. Choose a type and enter up to 5000 characters.": ["Chọn loại phản hồi và nhập nội dung tối đa 5000 ký tự.", "请选择类型并输入不超过5000个字符。", "種類を選び、5000文字以内で入力してください。"],
   "Find your way around NoteTatCa, solve common problems, or prepare feedback.": ["Tìm hiểu cách dùng NoteTatCa, xử lý vấn đề thường gặp hoặc soạn phản hồi.","了解 NoteTatCa 的使用方法、解决常见问题或准备反馈。","NoteTatCa の使い方、よくある問題の解決方法、フィードバックの作成をご案内します。"],
   "Getting started": ["Bắt đầu sử dụng","开始使用","はじめに"],
   "Write and edit": ["Viết và chỉnh sửa","编写与编辑","作成と編集"],

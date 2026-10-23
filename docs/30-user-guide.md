@@ -96,3 +96,6 @@ Trong editor, chọn View để quay về chế độ xem ngay. Ứng dụng ch�
 ## Help & feedback — 2026-10-23
 
 Mở Help & feedback từ sidebar để đọc hướng dẫn và mở câu hỏi thường gặp. Phần Feedback cho chọn báo lỗi/đề xuất/câu hỏi, nhập nội dung rồi Copy feedback hoặc Download feedback. Trang chưa tự gửi phản hồi vì chưa cấu hình địa chỉ nhận; nội dung chỉ ở trang đang mở. Không đưa mật khẩu/mã xác minh hoặc ghi chú riêng tư vào phản hồi.
+
+
+Cập nhật2026-10-23: đã có Send feedback gửi đến đội NoteTatCa; email tài khoản gửi kèm để trả lời. Giữ nội dung nếu gửi lỗi, xóa sau khi server chấp nhận gửi. Có thể Copy/Download dự phòng; tối đa5request/giờ/account/process. Địa chỉ nhận do chủ dự án xác nhận: lmht016847@gmail.com.
