@@ -2,6 +2,24 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Tái cấu trúc list view note card: tiêu đề trên, thao tác phải, nội dung dưới — 2026-10-23
+
+- Theo hai ảnh/yêu cầu chủ dự án: list view note card bị "chèn ép" các phần tử do grid 3 cột (60px 1fr auto) ép tiêu đề vào cột hẹp. Tái cấu trúc thành card chồng dọc đúng chuẩn list:
+  - Tiêu đề (h3 + emoji/icon) nằm trên cùng, full-width, font 15px (desktop) / 14px (mobile).
+  - Nội dung preview (2 dòng) + tags nằm dưới tiêu đề, trái.
+  - Thao tác (pin, drag handle, menu "…") đẩy về lề phải cùng hàng tiêu đề.
+  - Footer (date + reminder/menu) tách riêng dưới, có border-top chia cách.
+- styles.css:
+  - `.list-view .note-card` chuyển từ `display:grid; grid-template-columns:60px 1fr auto` → `display:flex; flex-direction:column; padding:0` (thừa kế flex column mặc định của `.note-card`).
+  - `.list-view .note-card-top` padding `14px 18px 0`, không còn grid-row/flex-direction:column.
+  - `.list-view .note-open` padding `8px 18px 0`, h3 font 15px, margin-bottom 4px.
+  - `.list-view .note-preview` line-clamp 2, max-height 44px.
+  - `.list-view .note-tags` padding `0 18px`.
+  - `.list-view .note-card-footer` padding `12px 18px`, border-top 1px var(--border), min-height 0.
+  - Mobile override: padding thu về 11px/14px, h3 14px, preview 11px.
+- Bằng chứng: typecheck + ESLint + Production Vite build PASS; e2e note-view-toggle 2/2 PASS (chromium 393/1280, kiểm cả grid + list); e2e title-ellipsis 2/2 PASS. Frontend-only (CSS), .NET không đổi.
+- Chưa kiểm Firefox/Safari/thiết bị vật lý. Publication scope: styles.css + docs/worklog.md; giữ hai appsettings local ngoài commit.
+
 ## Bỏ "Home" khỏi dropdown avatar — 2026-10-23
 
 - Theo yêu cầu chủ dự án: xóa item "Home" (icon Home) khỏi ShellAccountMenu (dropdown avatar). Dropdown hiện còn: Account settings (gear) / Zoom / Sign out.
