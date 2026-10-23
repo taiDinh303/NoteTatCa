@@ -1,0 +1,34 @@
+.note-card-footer:has(.card-labels) {
+  gap: 8px;
+}
+.note-card .note-card-footer .card-labels {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  padding: 0;
+  overflow: hidden;
+}
+.card-labels .label-chip {
+  flex: 0 0 auto;
+  max-width: none;
+  white-space: nowrap;
+}
+.card-labels .label-chip svg {
+  flex-shrink: 0;
+}
+.card-labels-measure {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  display: flex;
+  gap: 5px;
+  width: max-content;
+}
+.note-card-footer > .row-actions,
+.note-card-footer > .note-date {
+  flex-shrink: 0;
+}

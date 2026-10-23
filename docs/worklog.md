@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Label cùng hàng menu và tự gộp +N — 2026-10-23
+
+- Theo yêu cầu tiếp theo: label bên trái, menu ... bên phải cùng hàng footer cho grid/list. CardLabels đo chip thật bằng ResizeObserver, chỉ hiện prefix vừa chỗ sau khi dành chỗ cho +N; label quá dài cũng vào số ẩn. Cụm thao tác không co, gap8px, không wrap/đè menu. Tooltip và nội dung sr-only chứa tên label ẩn. Observer cleanup, tự đo lại khi đổi view/resize/font; không thêm dependency/API hoặc đổi dữ liệu.
+- React Production build PASS; .NET Release --no-restore PASS, 0 warnings/0 errors. ESLint explicit config/max-warnings0 PASS. Chromium focused 3/3 PASS ở320/393/1440px: nhiều label/tên dài/không label, tổng visible+hidden đúng, chip cùng tâm menu/khoảng cách>=7px, chuyển grid→list→grid tính lại, menu Add label dùng được, không tràn ngang. Regression pointer/keyboard reorder1/1 PASS. Đã xem screenshot list393/grid1440. Không full suite/thiết bị thật/production; fixture SQLite/email giả, không DB/email thật, không manual deploy/migrate.
+- Review theo react-best-practices: component riêng, hooks không điều kiện, observer disconnect khi unmount, không fetch/thư viện mới; trạng thái chỉ số chip vừa chỗ, tên ẩn vẫn có cho screen reader.
+- Publication scope: NotesPage.tsx, CardLabels.tsx/css, e2e/card-label-overflow.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và phần worklog này. Giữ nguyên các thay đổi Inbox/styles/worklog có sẵn và .agnes ngoài commit; push main theo quyền đã cấp, đối chiếu remote SHA.
+
 ## Cân đối khoảng cách label trong list view — 2026-10-23
 
 - Theo ảnh chủ dự án: hàng label dính sát nội dung ở list view. Thêm khoảng đệm trên 12px cho hàng label ở desktop/mobile, bỏ margin 10px trước footer để phân bổ khoảng trắng cân đối; grid giữ nguyên, không thêm divider.

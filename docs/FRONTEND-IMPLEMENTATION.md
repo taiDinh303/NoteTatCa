@@ -4,7 +4,7 @@
 
 ## Phạm vi và kiến trúc
 
-List view (2026-10-23): hàng label cách preview 12px ở desktop/mobile; bỏ margin thừa trước footer để giữ card gọn và cân đối. Grid không đổi. Build React/.NET Release và Chromium list/grid + reorder PASS; đo khoảng cách trên 6 card ở mỗi viewport 1440/393px PASS, đã xem screenshot local. Chi tiết và giới hạn trong worklog.
+Card footer (2026-10-23): label bên trái và menu bên phải cùng một hàng ở grid/list. CardLabels đo chiều rộng chip thực tế bằng ResizeObserver, dành chỗ cho +N và cụm thao tác không co; label không vừa được gộp vào +N, tooltip và screen reader giữ tên label bị ẩn. Tự tính lại khi resize/đổi view/font; không thay dữ liệu hay thứ tự label. Build React/.NET Release, ESLint và Chromium 320/393/1440px cùng regression reorder PASS. Chi tiết và giới hạn trong worklog.
 
 ### Settings ứng dụng và tài khoản — 2026-10-23
 
