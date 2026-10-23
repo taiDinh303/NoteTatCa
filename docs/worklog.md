@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kiểm tra lại nền và animation sidebar điện thoại — 2026-10-23
+
+- Theo2ảnh chủ dự án: local chưa tái hiện dịch chuyển hình học của nền ở75/100/125% zoom, nhưng overlay blur3px làm nền đổi nét đột ngột. Bỏ backdrop-filter chỉ cho overlay navigation, giữ fade tối; đổi mở240→320ms với curve bớt dồn chuyển động đầu, đóng200→280ms và fill both để giữ vị trí ngoài màn hình tới unmount. Không đổi scroll-lock global/layout dữ liệu/modal khác; chưa xác minh thiết bị thật hoặc production.
+- Validation từ root: React Production build PASS; .NET solution Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS. Chromium5/5 PASS gồm dismiss customer/admin (outside/Escape/link) và3ca cảm ứng393x740/list/zoom75/100/125%. Trang cuộn100px: scrollY giữ nguyên, x/y/width/height mọi card lệch<0.5px trước/giữa/sau mở/đóng, overlay không blur, animation mở320/đóng280ms có tọa độ trung gian, closed fill both và unmount đúng, reduced-motion<=0.00001s. Đã xem screenshot đóng giữa chừng75%. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; fixture loopback SQLite/email giả.
+- Publication scope: SidebarMotion.css, e2e/sidebar-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và phần worklog này. Giữ thay đổi Help/AppShell/styles khác và .agnes ngoài commit; push main theo quyền đã cấp, đối chiếu remote SHA.
+
 ## Modal chọn label dạng nút và footer cố định — 2026-10-23
 
 - Theo ảnh/yêu cầu: bỏ title hiển thị Note labels và X, giữ title sr-only cho accessibility; đổi checkbox list thành native toggle button aria-pressed, hàng ngang/wrap, nền/viền/tick cho selected, chưa chọn mờ, disabled khi đủ20 hoặc đang lưu. Tên dài wrap trong nút không tràn khung. NoteLabelsDialog.css scoped modal: chỉ modal-body cuộn, form flex/min-height0, footer Cancel/Save không co; Save labels→Save dùng bản dịch có sẵn. Không đổi API/version/ownership hoặc dữ liệu.

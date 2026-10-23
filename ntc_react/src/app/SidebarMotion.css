@@ -10,17 +10,20 @@
   transition: margin-left 220ms cubic-bezier(0.22, 0.8, 0.25, 1);
 }
 .modal.navigation-drawer[data-state="open"] {
-  animation: sidebar-slide-in 240ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  animation: sidebar-slide-in 320ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
 }
 .modal.navigation-drawer[data-state="closed"] {
-  animation: sidebar-slide-out 200ms cubic-bezier(0.4, 0, 0.6, 1);
+  animation: sidebar-slide-out 280ms cubic-bezier(0.4, 0, 0.6, 1) both;
   pointer-events: none;
 }
+.modal-overlay:has(~ .navigation-drawer) {
+  backdrop-filter: none;
+}
 .modal-overlay:has(~ .navigation-drawer)[data-state="open"] {
-  animation: sidebar-overlay-in 240ms ease-out;
+  animation: sidebar-overlay-in 320ms ease-out both;
 }
 .modal-overlay:has(~ .navigation-drawer)[data-state="closed"] {
-  animation: sidebar-overlay-out 200ms ease-in;
+  animation: sidebar-overlay-out 280ms ease-in both;
 }
 @keyframes sidebar-slide-in {
   from {
