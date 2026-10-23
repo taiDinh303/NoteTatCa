@@ -34,9 +34,6 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
       className="labels-manager"
       onClose={onClose}
       title={tr("Your labels")}
-      description={tr(
-        "A little order for your ideas. Names can repeat; each label stays separate.",
-      )}
     >
       <div className="modal-body">
         <form
@@ -153,7 +150,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={onClose}>
-          {tr("Done")}
+          {tr("Close")}
         </Button>
       </div>
       {deleting ? (

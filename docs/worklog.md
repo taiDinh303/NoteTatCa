@@ -2,6 +2,19 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Modal "Your labels": bỏ dòng mô tả, đổi nút Done thành Close — 2026-10-23
+
+- Theo yêu cầu chủ dự án (ảnh modal labels): bỏ dòng description "A little order for your ideas. Names can repeat; each label stays separate." (trùng tiếng Anh, thừa với ảnh 2); đổi nút "Done" ở footer thành "Close".
+- `ntc_react/src/features/labels/LabelsManager.tsx`: bỏ prop `description` của Modal; `tr("Done")` → `tr("Close")` (key i18n "Close" đã có sẵn [vi, zh, ja]).
+- Note: i18n key "A little order..." và "Done" vẫn còn trong messages.ts (chưa xoá để tránh đụng global); build PASS, eslint clean.
+
+## Kéo thả liên tiếp, lưu thứ tự ngầm — 2026-10-23
+
+- Theo yêu cầu fix/push: bỏ setPending khi reorder, card đổi chỗ ngay và tiếp tục kéo trong khi request chưa xong. NoteOrderCoordinator trong Workspace giữ target theo owner/pinned group, debounce400ms, worker tuần tự và lấy version mới trước mỗi move. So sánh target hiện tại sau mỗi response; lấy canonical group đầu/cuối batch và commit version/order khi xong, không invalidate toàn danh sách mỗi drop. Dùng API reorder hiện có; tối ưu kéo đầu→cuối thành1move thay vì dịch từng card.
+- UI dùng external-store overlay nên server/cache response cũ không kéo layout về lại. Lỗi giữ layout và banner Chưa lưu thứ tự / Try again4ngôn ngữ. Retry đọc canonical trước, xử lý response thất lạc không gửi lặp move đã được lưu. Owner guard ngăn gửi/publish/hiển thị queue khác account; queue đi theo SPA, không persistence khi reload/đóng tab. Không thay API/backend/schema/config.
+- Validation: unit focused NoteOrderCoordinator/workspace8/8 PASS: coalesce, in-flight target mới, serial convergence, failure/retry, account change, lost acknowledgement và6hoán vị3card. React build/lint trước các chỉnh test cuối PASS; .NET Release solution PASS0warnings/0errors. Browser focused đang kiểm tra, cập nhật trước publication.
+- Scope: application/noteOrder.ts + test, workspace.ts, NotesPage.tsx, messages.ts, e2e/reorder-background.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Push main theo yêu cầu, đối chiếu remote SHA; giữ appsettings local/.agnes ngoài commit. Không deploy/migrate/DB/email thật. Chưa đo FPS/thiết bị thật/full suite; fixture loopback.
+
 ## Gửi phản hồi đến Gmail chủ dự án qua email provider hiện có — 2026-10-23
 
 - Chủ dự án xác nhận lmht016847@gmail.com là nơi nhận và yêu cầu tiếp tục. POST /api/v1/feedback dùng CustomerWorkspace, BaseApiController/IFeedbackService/BaseService/ICurrentUser/TimeProvider; gửi qua IEmailSender hiện có, không đổi Brevo sender/key/config local. Recipient cố định server, không nhận To/From từ browser. Body HTML encode, kèm email tài khoản xác minh từ UserManager, userId/UTC và nội dung người dùng nhập; không đọc/đính kèm note riêng. Không persistence/queue/migration.
