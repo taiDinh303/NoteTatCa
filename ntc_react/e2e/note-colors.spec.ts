@@ -51,16 +51,21 @@ for (const mobile of [false, true]) {
     await palette.screenshot({
       path: `../artifacts/frontend/note-colors-${mobile ? "mobile" : "desktop"}.png`,
     });
-    await palette.getByLabel("Note color 1", { exact: true }).click();
-    await expect(palette).toBeHidden();
-    await expect(trigger).toBeFocused();
+    await expect(
+      palette.getByText("No saved colors yet.", { exact: true }),
+    ).toBeVisible();
+    await palette
+      .getByRole("textbox", { name: "Hex color", exact: true })
+      .fill("#fff4d4");
+    await palette
+      .getByRole("button", { name: "Save color", exact: true })
+      .click();
     await expect(editor.locator(".editor-heading")).toHaveCSS(
       "background-color",
       "rgb(255, 244, 212)",
     );
-    await trigger.click();
     await expect(
-      palette.getByLabel("Note color 1", { exact: true }),
+      palette.getByRole("button", { name: "Use color #FFF4D4", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await palette
       .getByLabel("Custom note color", { exact: true })
@@ -76,8 +81,17 @@ for (const mobile of [false, true]) {
       "background-color",
       "rgb(174, 98, 98)",
     );
-    await page.keyboard.press("Escape");
+    await palette
+      .getByRole("button", { name: "Save color", exact: true })
+      .click();
+    await expect(
+      palette.getByRole("button", { name: "Color saved", exact: true }),
+    ).toBeDisabled();
+    await palette
+      .getByRole("button", { name: "Use color #AE6262", exact: true })
+      .click();
     await expect(palette).toBeHidden();
+    await expect(trigger).toBeFocused();
     await expect(editor).toBeVisible();
     await expect(
       editor.getByText("All changes saved", { exact: true }),
@@ -85,7 +99,10 @@ for (const mobile of [false, true]) {
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await page.getByText("Palette private note", { exact: true }).click();
-    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "View note", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor.locator(".editor-heading")).toHaveCSS(
       "background-color",
@@ -94,10 +111,20 @@ for (const mobile of [false, true]) {
     await editor
       .getByRole("button", { name: "Note background color", exact: true })
       .click();
-    await page
-      .getByRole("dialog", { name: "Note colors", exact: true })
-      .getByLabel("Default note color", { exact: true })
+    await expect(
+      palette.getByRole("button", { name: "Use color #FFF4D4", exact: true }),
+    ).toBeVisible();
+    await expect(
+      palette.getByRole("button", { name: "Use color #AE6262", exact: true }),
+    ).toBeVisible();
+    await palette
+      .getByRole("button", { name: "Remove saved color #FFF4D4", exact: true })
       .click();
+    await expect(
+      palette.getByRole("button", { name: "Use color #FFF4D4", exact: true }),
+    ).toHaveCount(0);
+    await expect(editor).toHaveCSS("background-color", "rgb(174, 98, 98)");
+    await palette.getByLabel("Default note color", { exact: true }).click();
     await expect(editor.locator(".editor-heading")).not.toHaveCSS(
       "background-color",
       "rgb(174, 98, 98)",

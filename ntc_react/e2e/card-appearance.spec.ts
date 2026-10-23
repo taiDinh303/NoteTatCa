@@ -35,7 +35,9 @@ for (const dark of [false, true]) {
     await editor
       .getByRole("button", { name: "Note background color", exact: true })
       .click();
-    await page.getByLabel("Note color 1", { exact: true }).click();
+    await page.getByRole("textbox", { name: "Hex color", exact: true }).fill("#fff4d4");
+    await page.getByRole("button", { name: "Apply color", exact: true }).click();
+    await page.keyboard.press("Escape");
     await expect(editor).toHaveCSS("background-color", "rgb(255, 244, 212)");
     await expect(editor.locator(".editor-toolbar")).toHaveCSS(
       "background-color",

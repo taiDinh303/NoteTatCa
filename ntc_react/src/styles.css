@@ -1448,13 +1448,10 @@ strong {
   border-radius: 5px;
   flex-shrink: 0;
   font-size: 13px;
-}
-.text-color-picker input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  border-bottom: 3px solid currentColor;
   cursor: pointer;
 }
 .rich-editor {
@@ -4449,7 +4446,8 @@ td {
   .customer-shell > .main-column { min-height: calc(100dvh / var(--interface-scale) - 66px); }
 }
 
-.note-color-menu {
+.note-color-menu,
+.text-color-menu {
   z-index: 160;
   width: min(300px, calc(100vw / var(--interface-scale) - 24px));
   padding: 14px;
@@ -4458,40 +4456,56 @@ td {
   border: 1px solid var(--border);
   border-radius: 14px;
   box-shadow: 0 8px 30px #0003;
+  max-height: min(480px, calc(100dvh / var(--interface-scale) - 32px));
+  overflow: auto;
 }
-.note-color-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-.note-color-menu .color-swatch {
-  width: 44px;
-  height: 44px;
-  justify-self: center;
-}
-.note-color-menu .color-swatch:focus-visible {
+.note-color-menu button:focus-visible,
+.text-color-menu button:focus-visible {
   outline: 2px solid var(--text);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
-.note-custom-color {
+.color-default-button {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
-  padding: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
   font-size: 12px;
+  text-align: left;
   cursor: pointer;
 }
-.note-custom-color .custom-color {
-  display: block;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
+.color-default-button:hover,
+.saved-color-apply:hover { background: var(--hover); }
+.color-default-button > svg:last-child { margin-left: auto; }
+.color-default-swatch,
+.saved-color-swatch,
+.automatic-color-symbol {
+  display: grid; place-items: center; width: 28px; height: 28px;
+  flex-shrink: 0; border: 1px solid var(--border); border-radius: 6px;
 }
-.note-custom-color:focus-within {
-  outline: 2px solid var(--text);
-  border-radius: 8px;
+.color-default-swatch { background: linear-gradient(135deg, var(--surface) 48%, var(--muted) 49%, var(--muted) 51%, var(--surface) 52%); }
+.color-entry { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
+.color-entry input[type="color"],
+.text-custom-color input { width: 36px; height: 36px; flex-shrink: 0; padding: 2px; cursor: pointer; }
+.color-entry input[type="text"] { min-width: 0; width: 100%; font-family: monospace; font-size: 13px; }
+.color-entry .icon-button { flex-shrink: 0; }
+.save-note-color { width: 100%; justify-content: center; }
+.saved-colors-heading { margin: 18px 0 8px; font-size: 12px; }
+.saved-note-colors { display: grid; gap: 4px; max-height: 200px; overflow-y: auto; }
+.saved-note-color { display: flex; align-items: center; gap: 6px; }
+.saved-color-apply {
+  display: flex; align-items: center; flex: 1; min-width: 0; gap: 10px;
+  min-height: 40px; padding: 5px; border: 0; border-radius: 6px;
+  background: transparent; color: var(--text); font: 12px monospace; cursor: pointer;
 }
+.saved-note-color > .icon-button { flex-shrink: 0; }
+.saved-colors-empty, .saved-colors-hint { margin: 8px 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.text-custom-color { display: flex; gap: 10px; align-items: center; font-size: 12px; margin-top: 12px; cursor: pointer; }
 
 .note-editor-modal .editor-heading { gap: 12px; flex-wrap: nowrap; }
 .note-editor-modal .editor-heading .editor-title-wrap { padding: 0; flex: 1; min-width: 0; }

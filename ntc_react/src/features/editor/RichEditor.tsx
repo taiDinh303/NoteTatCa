@@ -1,6 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
+import * as Popover from "@radix-ui/react-popover";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
@@ -130,6 +131,7 @@ export default function RichEditor({
   const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
   const [error, setError] = useState<unknown>();
   const [source, setSource] = useState("");
+  const [textColorOpen, setTextColorOpen] = useState(false);
   const editor = useEditor({
     extensions,
     content: JSON.parse(initial),
@@ -203,6 +205,7 @@ export default function RichEditor({
       quote: editor?.isActive("blockquote"),
       code: editor?.isActive("codeBlock"),
       highlight: editor?.isActive("highlight"),
+      textColor: editor?.getAttributes("textStyle").color as string | undefined,
     }),
   });
   const fontSizeValue = state?.fontSize
@@ -368,17 +371,69 @@ export default function RichEditor({
           label={tr("Insert link")}
           onClick={() => setLink(true)}
         />
-        <label className="text-color-picker" title={tr("Text color")}>
-          <span>A</span>
-          <input
-            type="color"
-            aria-label={tr("Text color")}
-            defaultValue="#374151"
-            onChange={(e) =>
-              editor.chain().focus().setColor(e.target.value).run()
-            }
-          />
-        </label>
+        <Popover.Root open={textColorOpen} onOpenChange={setTextColorOpen}>
+          <Popover.Trigger asChild>
+            <button
+              type="button"
+              className="text-color-picker"
+              aria-label={tr("Text color")}
+              title={tr("Text color")}
+              style={{ borderBottomColor: state?.textColor || "currentColor" }}
+            >
+              <span aria-hidden="true">A</span>
+            </button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              className="text-color-menu"
+              side="bottom"
+              align="start"
+              sideOffset={8}
+              collisionPadding={12}
+              aria-label={tr("Text color")}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                editor.commands.focus();
+              }}
+            >
+              <button
+                type="button"
+                className="color-default-button"
+                aria-pressed={!state?.textColor}
+                onClick={() => {
+                  editor.chain().focus().unsetColor().run();
+                  setTextColorOpen(false);
+                }}
+              >
+                <span className="automatic-color-symbol" aria-hidden="true">
+                  A
+                </span>
+                {tr("Automatic")}
+                {!state?.textColor ? <Check size={16} /> : null}
+              </button>
+              <p className="saved-colors-hint">
+                {tr(
+                  "Follows the note background. Applies to selected text or new typing.",
+                )}
+              </p>
+              <label className="text-custom-color">
+                <input
+                  type="color"
+                  aria-label={tr("Custom text color")}
+                  value={
+                    /^#[\da-f]{6}$/i.test(state?.textColor ?? "")
+                      ? state!.textColor
+                      : "#000000"
+                  }
+                  onChange={(event) =>
+                    editor.chain().setColor(event.target.value).run()
+                  }
+                />
+                {tr("Custom color")}
+              </label>
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
         <IconButton
           icon={Highlighter}
           label={tr("Highlight text")}

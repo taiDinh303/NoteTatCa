@@ -6,11 +6,19 @@
 
 ### Settings ứng dụng và tài khoản — 2026-10-23
 
-Theo yêu cầu chủ dự án, sidebar Settings mở `/settings` với ba hàng Language, Privacy và Appearance. `/settings/language` có radio English/Tiếng Việt/中文/日本語, đổi ngay giao diện ứng dụng và định dạng ngày giờ/số, mặc định English. `shared/i18n.ts` dùng external store với một storage listener chung, lưu `ntc.language.v1`, gán `html.lang`, giữ lựa chọn trong memory nếu storage bị chặn. `shared/messages.ts` có 742 source messages cùng bản Việt/Trung/Nhật; dịch ở render, không sửa DOM text hay remount editor. Menu/form/editor/auth/startup/admin được nối vào store, dữ liệu note/nhãn/tên tài khoản vẫn nguyên văn; lỗi API/provider không có trong catalog được giữ nguyên thay vì đoán nghĩa.
+Theo yêu cầu chủ dự án, sidebar Settings mở `/settings` với ba hàng Language, Privacy và Appearance. `/settings/language` có radio English/Tiếng Việt/中文/日本語, đổi ngay giao diện ứng dụng và định dạng ngày giờ/số, mặc định English. `shared/i18n.ts` dùng external store với một storage listener chung, lưu `ntc.language.v1`, gán `html.lang`, giữ lựa chọn trong memory nếu storage bị chặn. `shared/messages.ts` có 755 source messages cùng bản Việt/Trung/Nhật; dịch ở render, không sửa DOM text hay remount editor. Menu/form/editor/auth/startup/admin được nối vào store, dữ liệu note/nhãn/tên tài khoản vẫn nguyên văn; lỗi API/provider không có trong catalog được giữ nguyên thay vì đoán nghĩa.
 
 `/settings/privacy` hiển thị nội dung đúng chức năng NoteTatCa: quyền truy cập note theo owner, tài khoản/phiên, browser storage, email nhắc và thời hạn khôi phục; liên kết thực tới account/sessions/trash và `/privacy`. Tham khảo cách tổ chức từ [Joplin](https://joplinapp.org/privacy/), [Notion](https://www.notion.com/help/privacy), [Standard Notes](https://standardnotes.com/help/1/who-can-read-my-private-notes), không sao chép các cam kết E2EE/chứng nhận/chính sách bên thứ ba. Operator contact/legal notice/backup retention vẫn chưa chốt, không biến trang này thành chính sách pháp lý đã phê duyệt.
 
 `/settings/appearance` có switch Dark mode chung `ntc.theme.v1` với nút desktop. Mobile Settings dùng header ← + tên trang, ẩn search/avatar/hamburger và breadcrumb nội dung; trang con quay về `/settings`, trang chính quay về `/notes`. PC giữ header/sidebar và breadcrumb. Mobile drawer không còn nút theme. Avatar Account settings tiếp tục mở `/settings/profile`, các tab Profile, Account & security, Active sessions giữ luồng riêng; mobile account pages cũng có header quay lại. Admin có App settings tại `/admin/preferences/{language,privacy,appearance}`, link security/session vào `/admin/settings/*`, không có link Trash khách. Các alias `/settings` ứng dụng của admin chuyển vào `/admin/preferences`, alias account/profile cũ vẫn vào `/admin/settings`. Backend/API/schema/config không đổi. Bằng chứng kiểm tra tại worklog.
+
+### Màu ghi chú và màu chữ tự động — 2026-10-23
+
+Theo yêu cầu chủ dự án, NoteColorPicker bỏ dãy preset: có Default note color, native picker + mã hex + Apply color, Save color, danh sách Saved colors gồm mã màu và nút xóa. Mã 3/6 chữ số được chuẩn hóa thành #RRGGBB, không lưu trùng; `shared/savedColors.ts` lưu theo userId tại `ntc.saved-note-colors.v1:{userId}` trên trình duyệt, không gọi API hoặc sửa note khi chỉ xóa màu đã lưu. Có listener storage và cảnh báo nếu browser không lưu được; không hứa đồng bộ màu giữa thiết bị.
+
+Menu Text color có Automatic và Custom color. Automatic dùng unsetColor để bỏ đúng thuộc tính màu của đoạn đang chọn hoặc stored marks cho lần gõ tiếp; giữ font size/bold/italic và các marks khác. Chữ không có màu thủ công kế thừa notePalette theo nền note trong editor/viewer. Để reset toàn note, chọn toàn bộ nội dung rồi Text color → Automatic. Đổi nền không tự ghi đè các màu chữ thủ công.
+
+PROPOSED, chưa triển khai: card preview cùng màu nền và giữ màu chữ/đậm/nghiêng để nhận diện nội dung, nhưng giới hạn cỡ chữ và số dòng; note mở hiển thị đầy đủ định dạng gốc. CURRENT card vẫn dùng plain-text projection và typography card riêng. Phần đánh giá ảnh 1–3 chưa được biến thành yêu cầu sửa preview.
 
 ### Khu quản trị độc lập — 2026-10-19
 

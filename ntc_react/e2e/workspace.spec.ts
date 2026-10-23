@@ -1339,7 +1339,9 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await editor
     .getByRole("button", { name: "Note background color", exact: true })
     .click();
-  await page.getByLabel("Note color 3", { exact: true }).click();
+  await page.getByRole("textbox", { name: "Hex color", exact: true }).fill("#e8e4fc");
+  await page.getByRole("button", { name: "Apply color", exact: true }).click();
+  await page.keyboard.press("Escape");
   await editor
     .getByRole("button", { name: "Note labels", exact: true })
     .click();

@@ -2351,4 +2351,41 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "現在の自分の管理者アカウントはロックできません。",
   ],
   "{0} day left": ["Còn {0} ngày", "剩余 {0} 天", "残り {0} 日"],
+  "Hex color": ["Mã màu hex", "十六进制颜色", "HEX カラー"],
+  "Apply color": ["Áp dụng màu", "应用颜色", "色を適用"],
+  "Save color": ["Lưu màu", "保存颜色", "色を保存"],
+  "Color saved": ["Đã lưu màu", "颜色已保存", "色を保存しました"],
+  "Saved colors": ["Màu đã lưu", "已保存的颜色", "保存した色"],
+  "Use color {0}": ["Dùng màu {0}", "使用颜色 {0}", "色 {0} を使用"],
+  "Remove saved color {0}": [
+    "Xóa màu đã lưu {0}",
+    "移除已保存的颜色 {0}",
+    "保存した色 {0} を削除",
+  ],
+  "No saved colors yet.": [
+    "Chưa có màu đã lưu.",
+    "暂无已保存的颜色。",
+    "保存した色はまだありません。",
+  ],
+  "Colors are saved for your account in this browser.": [
+    "Màu được lưu cho tài khoản của bạn trên trình duyệt này.",
+    "颜色按账户保存在此浏览器中。",
+    "色はこのブラウザーにアカウントごとに保存されます。",
+  ],
+  Automatic: ["Tự động", "自动", "自動"],
+  "Follows the note background. Applies to selected text or new typing.": [
+    "Tự tương phản theo nền ghi chú. Áp dụng cho chữ đang chọn hoặc gõ tiếp.",
+    "跟随笔记背景调整，应用于所选文字或后续输入。",
+    "ノートの背景に合わせます。選択したテキストや次の入力に適用します。",
+  ],
+  "Custom text color": [
+    "Màu chữ tùy chỉnh",
+    "自定义文字颜色",
+    "カスタム文字色",
+  ],
+  "Colors could not be saved in this browser.": [
+    "Không thể lưu màu trên trình duyệt này.",
+    "无法在此浏览器中保存颜色。",
+    "このブラウザーに色を保存できませんでした。",
+  ],
 };

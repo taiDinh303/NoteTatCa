@@ -2,6 +2,16 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Màu nền tự lưu và Automatic cho màu chữ — 2026-10-23
+
+- Theo ảnh/yêu cầu chủ dự án: bỏ dãy màu nền preset trong NoteColorPicker, thay bằng Default, native color picker, mã hex và Apply, Save color, danh sách mã màu đã lưu có nút dùng/xóa. Chuẩn hóa 3/6 ký tự hex thành #RRGGBB, bỏ trùng, key browser riêng theo userId `ntc.saved-note-colors.v1:{userId}`; đọc dữ liệu hỏng an toàn, nhận storage event và báo nếu lưu browser lỗi. Không thêm API/schema/migration hoặc đồng bộ giữa thiết bị.
+- Text color mở popover có Automatic + Custom color; Automatic bỏ riêng color của text đang chọn/stored marks để chữ lại kế thừa foreground theo notePalette. Giữ font size/bold/italic, không thay màu chữ thủ công khi đổi nền; muốn reset toàn note phải chọn toàn bộ rồi Automatic. Có nhãn/trợ giúp Việt/Anh/Trung/Nhật, catalog hiện755 messages.
+- Đánh giá hình1–3 giữ PROPOSED: preview nên cùng màu nền/inline color/bold/italic, clamp cỡ chữ/số dòng; note mở giữ nguyên định dạng thật. Không đổi code preview trong lượt này.
+- Root validation: React TypeScript/Production Vite build + ESLint max-warnings0 PASS. `npm --prefix ntc_react test` 70/70 unit +4/4 config PASS, gồm4 saved-colors tests mới (normalize/invalid, persist/dedup/remove, tách account/dữ liệu hỏng, blocked storage). 7 color tests của thay đổi màu nhãn khác vẫn ngoài commit. Test seed ban đầu dùng chuỗi bad vốn là hex3 hợp lệ đã sửa thành invalid; implementation không đổi vì lỗi seed.
+- Chromium focused6/6 PASS (2.4m): automatic-text-color 393/1280, card-appearance mobile-dark/desktop-light, note-colors mobile-dark/desktop-light. Kiểm lưu/xóa/dùng màu/reload/default, panel vừa viewport, reset màu đỏ→Automatic, đổi trắng/đen, giữ bold+24px và save/reopen vẫn auto, modal View/Edit giữ nền. Đã xem ảnh Automatic393px; native picker được điều khiển bằng input/change event, chưa kiểm thao tác OS picker thật. Updated workspace spec preset cũ sang hex; không chạy full workspace suite.
+- `dotnet build ntc_aspnet/NTC.sln --configuration Release --no-restore --verbosity minimal` PASS0warnings/0errors. Không chạy full backend/browser suites, Safari/Firefox/thiết bị thật/production; fixture SQLite/email giả loopback, không DB/email thật. Không manual deploy/migrate.
+- Publication scope: NoteColorPicker/RichEditor/styles/messages, shared/savedColors + unit, focused automatic/note-colors/card-appearance/workspace test cập nhật, FRONTEND-IMPLEMENTATION và entry worklog này. Giữ hai appsettings local, `.agnes/`, domain/color + color.test, NotesPage và entry worklog màu nhãn ngoài commit. Push main theo quyền đã cấp và đối chiếu remote SHA.
+
 ## Bốn ngôn ngữ toàn giao diện, nội dung Privacy và header Settings mobile — 2026-10-23
 
 - Chủ dự án chọn đổi ngay toàn bộ giao diện bằng Việt/Anh/Trung/Nhật và chọn mobile Settings dùng header ← + tên trang; PC giữ header/sidebar. Ghi quyết định DEC-024 và cập nhật tài liệu chủ quản.
