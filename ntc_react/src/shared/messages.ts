@@ -1,5 +1,6 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  Default: ["Mặc định", "默认", "デフォルト"],
   Administration: ["Quản trị", "管理", "管理"],
   "System management": ["Quản lý hệ thống", "系统管理", "システム管理"],
   Overview: ["Tổng quan", "概览", "概要"],

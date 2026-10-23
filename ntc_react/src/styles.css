@@ -4489,12 +4489,14 @@ td {
   flex-shrink: 0; border: 1px solid var(--border); border-radius: 6px;
 }
 .color-default-swatch { background: linear-gradient(135deg, var(--surface) 48%, var(--muted) 49%, var(--muted) 51%, var(--surface) 52%); }
-.color-entry { display: flex; align-items: center; gap: 8px; margin: 12px 0; }
-.color-entry input[type="color"],
+.color-entry { display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; margin: 0; }
 .text-custom-color input { width: 36px; height: 36px; flex-shrink: 0; padding: 2px; cursor: pointer; }
 .color-entry input[type="text"] { min-width: 0; width: 100%; font-family: monospace; font-size: 13px; }
-.color-entry .icon-button { flex-shrink: 0; }
-.save-note-color { width: 100%; justify-content: center; }
+.color-entry .color-entry-action { flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border: 1px solid var(--border); border-radius: 6px; }
+.color-input-swatch { position: relative; overflow: hidden; }
+.color-entry .color-input-swatch input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; padding: 0; cursor: pointer; }
+.color-input-swatch:focus-within { outline: 2px solid var(--text); outline-offset: 2px; }
+.saved-color-default > svg:last-child { margin-left: auto; }
 .saved-colors-heading { margin: 18px 0 8px; font-size: 12px; }
 .saved-note-colors { display: grid; gap: 4px; max-height: 200px; overflow-y: auto; }
 .saved-note-color { display: flex; align-items: center; gap: 6px; }

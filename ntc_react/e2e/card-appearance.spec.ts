@@ -102,7 +102,7 @@ for (const dark of [false, true]) {
     await editor
       .getByRole("button", { name: "Note background color", exact: true })
       .click();
-    await page.getByLabel("Default note color", { exact: true }).click();
+    await page.getByLabel("Default", { exact: true }).click();
     await expect(editor).not.toHaveCSS("background-color", "rgb(32, 40, 36)");
   });
 }

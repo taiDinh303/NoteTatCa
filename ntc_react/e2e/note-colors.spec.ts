@@ -41,8 +41,20 @@ for (const mobile of [false, true]) {
       exact: true,
     });
     await expect(palette).toBeVisible();
+    await expect(palette.getByText("Colors are saved for your account in this browser.", { exact: true })).toHaveCount(0);
+    const row = palette.locator(".color-entry");
+    const swatch = (await row.locator(".color-input-swatch").boundingBox())!;
+    const hexInput = (await row.getByRole("textbox", { name: "Hex color", exact: true }).boundingBox())!;
+    const save = (await row.getByRole("button", { name: "Save color", exact: true }).boundingBox())!;
+    const apply = (await row.getByRole("button", { name: "Apply color", exact: true }).boundingBox())!;
+    for (const bounds of [hexInput, save, apply]) expect(Math.abs(bounds.y + bounds.height / 2 - swatch.y - swatch.height / 2)).toBeLessThan(1);
+    expect(save.width).toBe(apply.width);
+    expect(save.height).toBe(apply.height);
+    expect(swatch.x).toBeLessThan(hexInput.x);
+    expect(hexInput.x).toBeLessThan(save.x);
+    expect(save.x).toBeLessThan(apply.x);
     await expect(
-      palette.getByLabel("Default note color", { exact: true }),
+      palette.getByLabel("Default", { exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     const box = (await palette.boundingBox())!;
     expect(box.x).toBeGreaterThanOrEqual(0);
@@ -124,7 +136,7 @@ for (const mobile of [false, true]) {
       palette.getByRole("button", { name: "Use color #FFF4D4", exact: true }),
     ).toHaveCount(0);
     await expect(editor).toHaveCSS("background-color", "rgb(174, 98, 98)");
-    await palette.getByLabel("Default note color", { exact: true }).click();
+    await palette.getByLabel("Default", { exact: true }).click();
     await expect(editor.locator(".editor-heading")).not.toHaveCSS(
       "background-color",
       "rgb(174, 98, 98)",

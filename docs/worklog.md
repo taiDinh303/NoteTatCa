@@ -2,6 +2,14 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Palette màu gọn một hàng, Default chung Saved colors — 2026-10-23
+
+- Theo ảnh/yêu cầu chủ dự án: bỏ dòng Colors are saved... trong popup; đổi Default note color thành Default và đưa vào đầu danh sách Saved colors. Giữ thông báo lỗi chỉ khi browser thực sự không lưu được.
+- Color entry xếp một hàng không wrap: swatch chọn màu vuông28px/bo góc cùng kiểu swatch đã lưu → mã hex → icon Save → icon Apply (✓). Hai nút cùng kiểu/kích thước28px; bỏ nút Save color dạng full-width. Nhãn tooltip/accessibility vẫn nêu rõ hành động; giữ save/dedup/remove/persist/default hiện tại. Thêm bản dịch Default ở cả4ngôn ngữ, catalog756 messages.
+- Validation root: `npm --prefix ntc_react run build` TypeScript/Production Vite PASS; ESLint max-warnings0 PASS. Chromium focused4/4 PASS (2.1m) gồm note-colors và card-appearance ở393px dark/1280px light: kiểm cùng hàng/thứ tự/centers, hai nút cùng kích thước, không dòng mô tả cũ, lưu/xóa/reload/default và màu toàn editor. Đã xem screenshot popup mobile.
+- `dotnet build ntc_aspnet/NTC.sln --configuration Release --no-restore --verbosity minimal` PASS,0warnings/0errors. Không chạy lại unit/full browser/backend suite hoặc Safari/thiết bị thật; fixture SQLite/email giả, native picker điều khiển qua input/change event, chưa xác minh production. Không đổi API/config/data và không manual deploy/migrate.
+- Publication scope: NoteColorPicker.tsx, styles.css, messages.ts, e2e/note-colors.spec.ts, e2e/card-appearance.spec.ts, docs/FRONTEND-IMPLEMENTATION.md, docs/worklog.md. Giữ hai appsettings local và `.agnes/` ngoài commit. Push main theo quyền đã cấp và đối chiếu remote SHA.
+
 ## Chip label trên note card dùng màu label (icon + tint nền, chữ giữ trung tính) — 2026-10-23
 
 - Theo trao đổi với chủ dự án: chip label trong note card (list view) trước đó dùng CSS cứng `.label-chip` (nền `#757f8510`, chữ `var(--subtle)`) nên không phản ánh màu label đã chọn trong sidebar. Thoả thuận: đổi màu **icon + nền vùng chip**, **giữ màu chữ trung tính** để tránh khó đọc khi màu label trùng tông nền card; label chưa có màu thì giữ fallback xám cũ.

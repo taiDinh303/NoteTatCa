@@ -1,7 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { Check, Paintbrush, X } from "lucide-react";
+import { Check, Paintbrush, Save, X } from "lucide-react";
 import { notePalette } from "../../domain/color";
 import { IconButton } from "../../shared/ui";
 import { useAuth } from "../../shared/hooks";
@@ -66,20 +66,6 @@ function ColorChoices({
   const saved = !!candidate && palette.colors.includes(candidate);
   return (
     <>
-      <button
-        type="button"
-        className="color-default-button"
-        aria-label={tr("Default note color")}
-        aria-pressed={!color}
-        onClick={() => {
-          onChange("");
-          onClose();
-        }}
-      >
-        <span className="color-default-swatch" aria-hidden="true" />
-        {tr("Default note color")}
-        {!color ? <Check size={16} /> : null}
-      </button>
       <form
         className="color-entry"
         onSubmit={(event) => {
@@ -90,15 +76,20 @@ function ColorChoices({
           }
         }}
       >
-        <input
-          type="color"
-          aria-label={tr("Custom note color")}
-          value={candidate ?? "#ffffff"}
-          onChange={(event) => {
-            setHex(event.target.value);
-            onChange(event.target.value);
-          }}
-        />
+        <span
+          className="saved-color-swatch color-input-swatch"
+          style={{ backgroundColor: candidate ?? "#ffffff" }}
+        >
+          <input
+            type="color"
+            aria-label={tr("Custom note color")}
+            value={candidate ?? "#ffffff"}
+            onChange={(event) => {
+              setHex(event.target.value);
+              onChange(event.target.value);
+            }}
+          />
+        </span>
         <input
           type="text"
           aria-label={tr("Hex color")}
@@ -110,8 +101,24 @@ function ColorChoices({
           onChange={(event) => setHex(event.target.value)}
         />
         <button
+          type="button"
+          className="icon-button color-entry-action"
+          aria-label={saved ? tr("Color saved") : tr("Save color")}
+          title={saved ? tr("Color saved") : tr("Save color")}
+          disabled={!candidate || saved}
+          onClick={() => {
+            if (candidate) {
+              palette.save(candidate);
+              onChange(candidate);
+              setHex(candidate);
+            }
+          }}
+        >
+          <Save size={17} />
+        </button>
+        <button
           type="submit"
-          className="icon-button"
+          className="icon-button color-entry-action"
           aria-label={tr("Apply color")}
           title={tr("Apply color")}
           disabled={!candidate}
@@ -119,22 +126,24 @@ function ColorChoices({
           <Check size={17} />
         </button>
       </form>
-      <button
-        type="button"
-        className="button secondary save-note-color"
-        disabled={!candidate || saved}
-        onClick={() => {
-          if (candidate) {
-            palette.save(candidate);
-            onChange(candidate);
-            setHex(candidate);
-          }
-        }}
-      >
-        {saved ? tr("Color saved") : tr("Save color")}
-      </button>
       <h3 className="saved-colors-heading">{tr("Saved colors")}</h3>
       <div className="saved-note-colors">
+        <div className="saved-note-color">
+          <button
+            type="button"
+            className="saved-color-apply saved-color-default"
+            aria-label={tr("Default")}
+            aria-pressed={!color}
+            onClick={() => {
+              onChange("");
+              onClose();
+            }}
+          >
+            <span className="color-default-swatch" aria-hidden="true" />
+            <span>{tr("Default")}</span>
+            {!color ? <Check size={16} /> : null}
+          </button>
+        </div>
         {palette.colors.length ? (
           palette.colors.map((value) => (
             <div className="saved-note-color" key={value}>
@@ -170,15 +179,13 @@ function ColorChoices({
           <p className="saved-colors-empty">{tr("No saved colors yet.")}</p>
         )}
       </div>
-      <p className="saved-colors-hint">
-        {palette.storageError ? (
+      {palette.storageError ? (
+        <p className="saved-colors-hint">
           <span role="status">
             {tr("Colors could not be saved in this browser.")}
           </span>
-        ) : (
-          tr("Colors are saved for your account in this browser.")
-        )}
-      </p>
+        </p>
+      ) : null}
     </>
   );
 }
