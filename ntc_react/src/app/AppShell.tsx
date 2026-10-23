@@ -1,4 +1,5 @@
 import { t as tr, useLanguage } from "../shared/i18n";
+import "./SidebarMotion.css";
 import type { ReactNode } from "react";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
@@ -322,7 +323,12 @@ export default function AppShell() {
           </div>
         </div>
       </header>
-      <aside className="sidebar" id="workspace-navigation">
+      <aside
+        className="sidebar"
+        id="workspace-navigation"
+        inert={sidebarHidden}
+        aria-hidden={sidebarHidden}
+      >
         <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
       </aside>
       <div className="main-column">
@@ -330,42 +336,40 @@ export default function AppShell() {
           <Outlet />
         </main>
       </div>
-      {mobile ? (
-        <Modal
-          open
-          onClose={() => setMobile(false)}
-          title={<Logo />}
-          hideCloseButton
-          dismissOnOutside
-          className="navigation-drawer"
-        >
-          <Sidebar
-            onLabels={() => setManageLabels(true)}
-            onNavigate={() => setMobile(false)}
-            accountControls={
-              <div className="drawer-account-controls">
-                <button
-                  type="button"
-                  className="settings-link drawer-inbox"
-                  aria-label={tr("Open inbox")}
-                  onClick={() => {
-                    navigate("/notifications");
-                    setMobile(false);
-                  }}
-                >
-                  <Bell size={18} />
-                  {tr("Notifications")}
-                  {(unread.data ?? 0) > 0 ? (
-                    <span className="drawer-unread">
-                      {unread.data! > 9 ? "9+" : unread.data}
-                    </span>
-                  ) : null}
-                </button>
-              </div>
-            }
-          />
-        </Modal>
-      ) : null}
+      <Modal
+        open={mobile}
+        onClose={() => setMobile(false)}
+        title={<Logo />}
+        hideCloseButton
+        dismissOnOutside
+        className="navigation-drawer"
+      >
+        <Sidebar
+          onLabels={() => setManageLabels(true)}
+          onNavigate={() => setMobile(false)}
+          accountControls={
+            <div className="drawer-account-controls">
+              <button
+                type="button"
+                className="settings-link drawer-inbox"
+                aria-label={tr("Open inbox")}
+                onClick={() => {
+                  navigate("/notifications");
+                  setMobile(false);
+                }}
+              >
+                <Bell size={18} />
+                {tr("Notifications")}
+                {(unread.data ?? 0) > 0 ? (
+                  <span className="drawer-unread">
+                    {unread.data! > 9 ? "9+" : unread.data}
+                  </span>
+                ) : null}
+              </button>
+            </div>
+          }
+        />
+      </Modal>
       {manageLabels ? (
         <Suspense fallback={<Spinner />}>
           <LabelsManager onClose={() => setManageLabels(false)} />

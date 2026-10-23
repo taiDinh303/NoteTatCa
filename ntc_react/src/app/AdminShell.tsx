@@ -1,4 +1,5 @@
 import { t as tr, useLanguage } from "../shared/i18n";
+import "./SidebarMotion.css";
 import { useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
@@ -159,18 +160,16 @@ export default function AdminShell() {
           <Outlet />
         </main>
       </div>
-      {mobile ? (
-        <Modal
-          open
-          onClose={() => setMobile(false)}
-          title={tr("Administration navigation")}
-          hideCloseButton
-          dismissOnOutside
-          className="navigation-drawer"
-        >
-          <AdminNavigation onNavigate={() => setMobile(false)} />
-        </Modal>
-      ) : null}
+      <Modal
+        open={mobile}
+        onClose={() => setMobile(false)}
+        title={tr("Administration navigation")}
+        hideCloseButton
+        dismissOnOutside
+        className="navigation-drawer"
+      >
+        <AdminNavigation onNavigate={() => setMobile(false)} />
+      </Modal>
       <SessionExpiredDialog administration />
     </div>
   );

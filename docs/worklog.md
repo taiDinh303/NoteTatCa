@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar trượt nhẹ khi mở/đóng — 2026-10-23
+
+- Desktop: thay display:none bằng translateX/visibility có delay, trượt220ms cùng margin-left nội dung; inert/aria-hidden ngăn focus vào sidebar ẩn. Mobile customer/admin: giữ Modal mounted với open state để Radix Presence chạy animation đóng200ms, mở240ms; overlay fade cùng nhịp, CSS scoped navigation-drawer, không đổi modal khác. Chế độ reduced-motion bỏ delay ẩn và dùng duration tối thiểu hiện có.
+- Validation từ root: React Production build PASS; .NET Release --no-restore PASS, 0warnings/0errors; ESLint max-warnings0 PASS. Chromium header1440/1024/393/320 và dismiss customer/admin (outside/Escape/link)6ca PASS. Lượt393 đầu timeout trong lúc format source/HMR; chạy lại riêng393 PASS. Kiểm tra runtime riêng: desktop midpoint x=-226.8px với sidebar242px, margin nội dung15.2px/inert=true; mobile mở240ms/đóng200ms và fade overlay đúng, drawer unmount sau đóng; reduced-motion duration0.00001s/delay0s. Đã xem screenshot đóng mobile giữa animation trong artifacts/frontend. Không full suite/thiết bị thật/production; fixture SQLite/email giả, không DB/email thật/manual deploy/migrate.
+- Review react-best-practices: không thêm hooks/dependency/timer, CSS animation và Radix lifecycle; không remount shell/đổi state nội dung khi toggle. Scope publication: AppShell.tsx, AdminShell.tsx, SidebarMotion.css, riêng rule sidebar-hidden trong styles.css, docs/FRONTEND-IMPLEMENTATION.md và phần worklog này. Giữ nguyên Inbox/Preferences/styles/worklog khác và .agnes ngoài commit; push main theo quyền đã cấp, đối chiếu SHA remote.
+
 ## Label cùng hàng menu và tự gộp +N — 2026-10-23
 
 - Theo yêu cầu tiếp theo: label bên trái, menu ... bên phải cùng hàng footer cho grid/list. CardLabels đo chip thật bằng ResizeObserver, chỉ hiện prefix vừa chỗ sau khi dành chỗ cho +N; label quá dài cũng vào số ẩn. Cụm thao tác không co, gap8px, không wrap/đè menu. Tooltip và nội dung sr-only chứa tên label ẩn. Observer cleanup, tự đo lại khi đổi view/resize/font; không thêm dependency/API hoặc đổi dữ liệu.
