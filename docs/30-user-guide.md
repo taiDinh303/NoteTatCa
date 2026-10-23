@@ -91,3 +91,8 @@ Bấm thẻ note đã lưu để xem nội dung. Màn hình xem chỉ có nội 
 Menu ba chấm trên thẻ có Add label (chọn nhãn rồi Save labels) và Add reminder (mở nhắc lịch của note). Không còn Open note/Pin/Unpin note trong menu; bấm thẻ để xem và dùng nút ghim riêng. Move earlier/later và Move to trash vẫn giữ.
 
 Trong editor, chọn View để quay về chế độ xem ngay. Ứng dụng chờ lưu thay đổi trước khi chuyển; nếu lưu lỗi, bản nháp vẫn nằm trong editor để thử lại hoặc xử lý xung đột. Chọn Edit để sửa tiếp, không cần Close/mở lại.
+
+
+## Help & feedback — 2026-10-23
+
+Mở Help & feedback từ sidebar để đọc hướng dẫn và mở câu hỏi thường gặp. Phần Feedback cho chọn báo lỗi/đề xuất/câu hỏi, nhập nội dung rồi Copy feedback hoặc Download feedback. Trang chưa tự gửi phản hồi vì chưa cấu hình địa chỉ nhận; nội dung chỉ ở trang đang mở. Không đưa mật khẩu/mã xác minh hoặc ghi chú riêng tư vào phản hồi.

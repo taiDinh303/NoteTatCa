@@ -222,3 +222,8 @@ Card thường không hiển thị lastUpdatedTime; Trash giữ retention. View 
 ### Labels Manager: header/form/footer cố định — 2026-10-23
 
 Modal labels-manager dùng flex cột và overflow hidden; header, form thêm/sửa label, thông báo lỗi và footer Done ở ngoài vùng cuộn. Chỉ labels-manager-scroll (danh sách, trạng thái loading/error/empty, Load more) có overflow-y auto, min-height0 và overscroll contain. Max-height theo viewport/zoom của Modal hiện có; các modal khác giữ nguyên. Không đổi API/CRUD/pagination.
+
+
+### Help & feedback có nội dung — 2026-10-23
+
+/help thay placeholder bằng3hướng dẫn (viết/sửa, sắp xếp, tùy chỉnh),5FAQ bám source (lỗi lưu/offline, trash7ngày, reminders/inbox, Markdown, ngày note/account), link Notes/Reminders/Settings và composer phản hồi3loại. Copy clipboard có catch/fallback download.txt; nút disabled khi chỉ whitespace, giới hạn5000ký tự. Nội dung4ngôn ngữ; grid3cột desktop/1cột mobile, details/summary hỗ trợ keyboard. Không có kênh nhận phản hồi được cấu hình nên không thêm Send/email giả hay ghi dữ liệu backend; trang nêu rõ chỉ soạn/copy/download, không tự gửi. Draft chỉ ở bộ nhớ trang, không tự đính kèm note/account/device.

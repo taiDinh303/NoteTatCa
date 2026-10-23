@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nội dung Help & feedback — 2026-10-23
+
+- Thay placeholder /help bằng3guide,5FAQ và3link nội bộ. Nội dung bám source: autosave và View/Edit, pinned reorder/filter, màu Automatic, lỗi lưu/offline không bền vững, Trash7ngày, Reminders/Inbox, import/export Markdown, ngày note và Account settings. Không hứa email delivery/production/SLA.
+- Composer chọn báo lỗi/đề xuất/câu hỏi,5000ký tự, Copy feedback với toast lỗi/fallback Download feedback.txt, disabled khi trắng. Không tự gửi; chưa có support destination trong repo và đã hỏi chủ dự án qua async, chưa nhận câu trả lời. Không tự thêm email/URL hoặc external submission. Có bản dịch en/vi/zh/ja và responsive; không lưu draft qua reload, không đính kèm thông tin riêng tự động.
+- Validation: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors. ESLint max-warnings0 PASS; Chromium4/4 PASS (en1440,vi/zh/ja393):3guide/5FAQ, mở FAQ, nút disabled khi rỗng, copy clipboard, download filename, không tràn ngang và Settings link. Đã xem screenshot mobile tiếng Việt. git diff --check PASS. Không full suite/thiết bị thật; fixture loopback5199, không DB/email thật.
+- Scope: HelpPage.tsx/help.css, messages.ts, e2e/help.spec.ts, docs/30-user-guide.md, docs/FRONTEND-IMPLEMENTATION.md và worklog. Push main theo quyền đã cấp, đối chiếu remote SHA; giữ appsettings local/.agnes ngoài commit. Không manual deploy/migrate.
+
 ## Labels Manager giữ cố định header/form và Done — 2026-10-23
 
 - Theo2yêu cầu liên tiếp kèm ảnh: giữ Done ở đáy, tiêu đề/mô tả và New label + màu + Add/Save ở trên. Chỉ danh sách label và Load more cuộn riêng, không cần kéo tới cuối để đóng hoặc thêm/sửa. CSS scoped labels-manager; giữ max-height/zoom/responsive Modal hiện có, không đổi các modal khác/API/CRUD.

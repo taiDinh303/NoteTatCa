@@ -1,12 +1,112 @@
 .help-page {
-  max-width: 720px;
+  max-width: 1080px;
   margin: 0 auto;
+  padding-bottom: 24px;
+}
+.help-heading {
+  margin-bottom: 28px;
 }
 .help-page h1 {
-  margin: 0 0 24px;
-  font-size: 22px;
+  margin: 0 0 10px;
+  font-size: 24px;
 }
-.help-page .help-placeholder {
-  color: var(--muted);
+.help-page p {
+  color: var(--subtle);
+  font-size: 13px;
+  line-height: 1.75;
+  margin: 0;
+}
+.help-section {
+  margin-top: 30px;
+}
+.help-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 17px;
+  margin: 0 0 16px;
+}
+.help-guides {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.help-guide,
+.help-faq,
+.help-feedback {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.help-guide {
+  padding: 20px;
+}
+.help-guide h3 {
   font-size: 14px;
+  margin: 0 0 10px;
+}
+.help-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+  margin-top: 16px;
+}
+.help-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.help-faq details + details {
+  border-top: 1px solid var(--border);
+}
+.help-faq summary {
+  padding: 17px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.help-faq details p {
+  padding: 0 20px 18px;
+}
+.help-feedback {
+  padding: 24px;
+}
+.help-feedback-fields {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.help-feedback-fields select {
+  max-width: 300px;
+}
+.help-feedback-fields textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 120px;
+}
+.help-feedback .help-feedback-note {
+  font-size: 12px;
+  margin-top: 12px;
+}
+.help-feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+@container viewport (max-width: 800px) {
+  .help-guides {
+    grid-template-columns: 1fr;
+  }
+  .help-guide,
+  .help-feedback {
+    padding: 18px;
+  }
+  .help-heading {
+    margin-bottom: 20px;
+  }
 }
