@@ -16,6 +16,7 @@ import {
   CalendarDays,
   FileText,
   Hash,
+  LifeBuoy,
   Menu,
   Moon,
   Search,
@@ -126,6 +127,14 @@ function Sidebar({
         >
           <Settings size={18} />
           {tr("Settings")}
+        </NavLink>
+        <NavLink
+          className={`settings-link ${pathname === "/help" ? "active" : ""}`}
+          to="/help"
+          onClick={onNavigate}
+        >
+          <LifeBuoy size={18} />
+          {tr("Help & feedback")}
         </NavLink>
         <div className="sidebar-footer">
           {tr("A little space. All yours.")}

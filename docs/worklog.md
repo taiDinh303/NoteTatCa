@@ -2,6 +2,16 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thêm mục "Trợ giúp và phản hồi" vào sidebar (chỉ link, chưa có nội dung) — 2026-10-23
+
+- Theo yêu cầu chủ dự án (ảnh): thêm mục "Trợ giúp và phản hồi" ở dưới Settings trong sidebar; chỉ cần mục + link tới trang, chưa cần nội dung.
+- `ntc_react/src/features/help/HelpPage.tsx` (mới): trang placeholder, `<h1>` "Help & feedback" + một dòng "Trang này sẽ sớm có mặt."; import `./help.css`.
+- `ntc_react/src/features/help/help.css` (mới): style tối giản (max-width 720, h1 22px như preferences, placeholder dùng var(--muted)).
+- `ntc_react/src/app/router.tsx`: lazy import `HelpPage` + route `{ path: "/help", element: <HelpPage /> }` trong nhánh workspace (cùng AppShell).
+- `ntc_react/src/app/AppShell.tsx`: thêm `<NavLink to="/help">` (icon `LifeBuoy`) ngay dưới Settings trong `sidebar-bottom`, tái dùng class `settings-link`, active khi `/help`.
+- `ntc_react/src/shared/messages.ts`: thêm 2 key i18n [vi, zh, ja]: "Help & feedback" và "This page is coming soon.".
+- Validation từ repository root: `npm --prefix ntc_react run build` (tsc + Vite) PASS; eslint 4 file trên clean. Chưa chạy e2e, chưa xác minh visual trên trình duyệt thật.
+
 ## Ẩn tiêu đề "Search results" ở list view khi có search query — 2026-10-23
 
 - Theo yêu cầu chủ dự án (ảnh): chữ "Search results" hiển thị trên đầu list khi gõ tìm kiếm gây thừa. Bỏ hiển thị visible của tiêu đề này; chỉ còn "Notes with reminders" giữ visible, trường hợp search/trash/label chuyển về `sr-only` (còn đọc cho screen reader).

@@ -50,6 +50,12 @@ export const messages: Record<string, readonly [string, string, string]> = {
   "All notes": ["Tất cả ghi chú", "所有笔记", "すべてのノート"],
   Reminders: ["Nhắc nhở", "提醒", "リマインダー"],
   Inbox: ["Hộp thư", "收件箱", "受信トレイ"],
+  "Help & feedback": ["Trợ giúp và phản hồi", "帮助与反馈", "ヘルプとフィードバック"],
+  "This page is coming soon.": [
+    "Trang này sẽ sớm có mặt.",
+    "此页面即将推出。",
+    "このページはまもなく公開予定です。",
+  ],
   Trash: ["Thùng rác", "回收站", "ゴミ箱"],
   "Manage labels": ["Quản lý nhãn", "管理标签", "ラベルを管理"],
   "YOUR LABELS": ["NHÃN CỦA BẠN", "你的标签", "ラベル"],
