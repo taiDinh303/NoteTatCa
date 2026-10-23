@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Ổn định cuối reveal (2026-10-24): giữ400ms; drawer có clip-path mặc định khớp keyframe kết thúc, isolation và will-change:clip-path; desktop giữ will-change để tránh đổi lớp vẽ sau transition. Live rAF kiểm5frame cuối x/opacity/clip ổn định và mobile mở lại2lần ở cả2media PASS; chưa tái hiện/đo raster flicker trên GPU/thiết bị thật. Xem worklog.
+
 Sidebar reveal (2026-10-24): chủ dự án yêu cầu mở như rèm/PowerPoint, thay slide/fade bằng clip-path inset: mép phải quét trái→phải, nội dung/sidebar và nền mobile không di chuyển; đóng thu ngược lại.400ms linear/delay0/fill both, desktop margin đồng bộ400ms. Yêu cầu chuyển động rõ ràng này áp dụng cả media reduced-motion, override scoped sidebar/overlay; không đổi Windows hoặc animation modal khác.12ca Chromium PASS gồm live rAF393/1440px với cả2media, mốc25/50/75% và nền/scroll ở3zoom, dismiss và label-scroll; build React/.NET Release và ESLint PASS. Xem worklog.
 
 Sidebar layout (2026-10-23): desktop customer/mobile workspace drawer chỉ label-nav cuộn; logo/menu chính/Manage labels và sidebar-bottom giữ cố định trong flex layout. Notifications mobile là NavLink/settings-link cùng font/màu/padding/icon/chiều cao với Settings, Help & feedback, giữ badge và đóng drawer sau điều hướng. Chromium9ca header/dismiss/scroll PASS (38labels ở320/393/1440px); build React/.NET Release, ESLint PASS. Xem worklog.

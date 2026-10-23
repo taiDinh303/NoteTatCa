@@ -7,6 +7,7 @@
     clip-path 400ms linear,
     visibility 0s linear;
   transition-duration: 400ms, 0s !important;
+  will-change: clip-path;
 }
 .customer-shell.sidebar-hidden > .sidebar {
   clip-path: inset(0 100% 0 0);
@@ -15,6 +16,12 @@
 .customer-shell > .main-column {
   transition: margin-left 400ms linear;
   transition-duration: 400ms !important;
+}
+.modal.navigation-drawer {
+  /* Keep the same clip and compositor layer before, during and after reveal. */
+  clip-path: inset(0 0% 0 0);
+  will-change: clip-path;
+  isolation: isolate;
 }
 .modal.navigation-drawer[data-state="open"] {
   animation: sidebar-slide-in 400ms linear 0s both;

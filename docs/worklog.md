@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Giữ0.4s và ổn định cuối animation sidebar — 2026-10-24
+
+- Chủ dự án đồng ý reveal, yêu cầu0.4s và báo đôi lúc chớp/rung khi mở xong. Duration đã400ms và giữ nguyên. Thêm clip-path mặc định cho navigation-drawer khớp keyframe cuối, will-change:clip-path cho sidebar/drawer và isolation drawer để giữ trạng thái/lớp vẽ ổn định. Đây là sửa phòng tránh chuyển trạng thái vẽ cuối animation; chưa tái hiện chắc chắn raster flicker/GPU trên thiết bị thật, không khẳng định nguyên nhân duy nhất.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS. Chromium9ca unique PASS sau sửa test parser: dismiss2, live-motion4 và geometry3zoom. Mobile mở lại2lần mỗi media:5frame cuối clip0/x0/opacity1; desktop show5frame cuối tương tự. Lượt đầu2ca desktop fail vì computed inset(0px) rút gọn bị parser đọc NaN; sửa parser inset1/4giá trị và chạy lại2/2 PASS. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; fixture loopback SQLite/email giả. Test đo geometry/styles qua rAF, không chứng minh hết paint artifact.
+- Scope publication: SidebarMotion.css, e2e/sidebar-live-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog; giữ .agnes ngoài commit. Push main theo quyền đã cấp, đối chiếu remote SHA.
+
 ## Sidebar mở màn từ trái sang phải — 2026-10-24
 
 - Chủ dự án nhắc Cover/Uncover PowerPoint và yêu cầu rõ chuyển động: đổi translate/fade thành clip-path inset(0 100% 0 0)→inset(0 0% 0 0), đóng ngược lại. Logo/menu đứng nguyên vị trí, mép phải mở dần như rèm, không kéo nền mobile.400ms linear/delay0/fill both, desktop margin400ms. Theo chỉ dẫn người dùng hiện hành, sidebar dùng hiệu ứng này cả khi media reduced-motion; duration override scoped nav/overlay, không sửa Windows/global modal. Tham khảo [MDN clip-path](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/clip-path) và [Microsoft CoverTransition](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.presentation.covertransition); đây là hiệu ứng reveal cho web, không khẳng định sao chép nguyên bản PowerPoint.

@@ -37,8 +37,9 @@ for (const reduced of [false, true]) {
                     getComputedStyle(element).visibility !== "hidden"
                   ) {
                     const css = getComputedStyle(element);
+            const edges = css.clipPath.slice(6, -1).split(/\s+/);
                     frames.push({
-                      right: parseFloat(css.clipPath.split(" ")[1]),
+              right: parseFloat(edges[1] ?? edges[0]),
                       x: element.getBoundingClientRect().x,
                       opacity: Number(css.opacity),
                     });
@@ -77,12 +78,33 @@ for (const reduced of [false, true]) {
       ]);
       assertReveal(opening);
       if (width < 800) {
+        for (const frame of opening.slice(-5)) {
+          expect(frame.right).toBe(0);
+          expect(frame.x).toBe(0);
+          expect(frame.opacity).toBe(1);
+        }
         const [closing] = await Promise.all([
           capture(),
           page.keyboard.press("Escape"),
         ]);
         assertReveal(closing);
         await expect(page.locator(selector)).toHaveCount(0);
+        for (let repeat = 0; repeat < 2; repeat++) {
+          const [reopened] = await Promise.all([
+            capture(),
+            page
+              .getByRole("button", { name: "Open navigation", exact: true })
+              .click(),
+          ]);
+          assertReveal(reopened);
+          for (const frame of reopened.slice(-5)) {
+            expect(frame.right).toBe(0);
+            expect(frame.x).toBe(0);
+            expect(frame.opacity).toBe(1);
+          }
+          await page.keyboard.press("Escape");
+          await expect(page.locator(selector)).toHaveCount(0);
+        }
       } else {
         await expect(page.locator(selector)).toBeHidden();
         const [showing] = await Promise.all([
@@ -92,6 +114,11 @@ for (const reduced of [false, true]) {
             .click(),
         ]);
         assertReveal(showing);
+        for (const frame of showing.slice(-5)) {
+          expect(frame.right).toBe(0);
+          expect(frame.x).toBe(0);
+          expect(frame.opacity).toBe(1);
+        }
         await expect(page.locator(selector)).toBeVisible();
       }
     });
