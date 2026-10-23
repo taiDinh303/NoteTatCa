@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Settings ứng dụng và tài khoản — 2026-10-23
+
+Theo yêu cầu chủ dự án, sidebar Settings mở `/settings` với ba hàng Language, Privacy và Appearance. `/settings/language` và `/settings/privacy` chỉ tạo trang với tiêu đề; chức năng ngôn ngữ/quyền riêng tư chưa triển khai. `/settings/appearance` có switch Dark mode dùng chung preference `ntc.theme.v1` với nút theme desktop, cập nhật ngay giữa các thành phần và khi nhận storage event. Mobile drawer bỏ nút Use light/dark theme; desktop giữ nút trên topbar. Avatar Account settings tiếp tục mở `/settings/profile`, với các tab Profile, Account & security, Active sessions. Trang public `/privacy` giữ vai trò thông tin riêng. Backend/API/schema không đổi. Bằng chứng kiểm tra tại worklog.
+
 ### Khu quản trị độc lập — 2026-10-19
 
 Theo DEC-017, `/login` dùng chung; `homePath` chọn `/admin/overview` khi có role Admin, còn lại `/notes`. Admin+User lịch sử vẫn là quản trị. Router có hai layout/guards riêng: AdminShell chỉ tải metadata account/admin modules, AppShell chỉ dành non-Admin. Direct links `/notes`, `/trash`, `/labels/*`, `/reminders`, `/notifications` của admin chuyển về overview; non-admin vào `/admin/*` chuyển về notes. `/admin` có index, deep-link reload dùng session refresh; `/settings/*` cũ của admin chuyển sang `/admin/settings/*` giữ query.

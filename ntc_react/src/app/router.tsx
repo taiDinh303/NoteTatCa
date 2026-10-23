@@ -26,6 +26,7 @@ const NotesPage = lazy(() => import("../features/notes/NotesPage"));
 const RemindersPage = lazy(() => import("../features/reminders/RemindersPage"));
 const InboxPage = lazy(() => import("../features/inbox/InboxPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
+const PreferencesPage = lazy(() => import("../features/settings/PreferencesPage"));
 const AdminPage = lazy(() => import("../features/admin/AdminPage"));
 function Root() {
   useEffect(() => {
@@ -217,8 +218,11 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: "/settings",
-                element: <Navigate to="/settings/profile" replace />,
+                element: <PreferencesPage />,
               },
+              { path: "/settings/language", element: <PreferencesPage section="language" /> },
+              { path: "/settings/privacy", element: <PreferencesPage section="privacy" /> },
+              { path: "/settings/appearance", element: <PreferencesPage section="appearance" /> },
               {
                 path: "/settings/profile",
                 element: <SettingsPage section="profile" />,

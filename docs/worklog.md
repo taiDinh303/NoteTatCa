@@ -2,6 +2,15 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Settings ứng dụng: Language, Privacy, Appearance và theme mobile — 2026-10-23
+
+- Theo yêu cầu chủ dự án: sidebar Settings mở `/settings`, danh sách ba mục Language, Privacy, Appearance. Language/Privacy chỉ tạo trang tiêu đề với liên kết quay lại; chưa thêm lựa chọn hoặc xử lý dữ liệu. Appearance có switch Dark mode. Avatar Account settings tiếp tục vào profile/account/security/sessions.
+- Bỏ Use light/dark theme khỏi drawer mobile; giữ nút đổi theme trên topbar PC. `useTheme` dùng external store chung và preference `ntc.theme.v1`, đồng bộ hai control trong cùng trang; có listener storage event cho tab khác và fallback khi storage bị chặn. Không đổi backend/API/schema/config.
+- Validation từ repository root: `npm --prefix ntc_react run build` (TypeScript + Production Vite) PASS; `npm --prefix ntc_react run lint -- --max-warnings 0` PASS; `dotnet build ntc_aspnet/NTC.sln --configuration Release --no-restore --verbosity minimal` PASS, 0 warnings/0 errors.
+- Chromium fixture: `node ntc_react/node_modules/@playwright/test/cli.js test --config ntc_react/playwright.config.ts --grep 'workspace header layout' --project chromium` 4/4 PASS tại 1440/1024/393/320px. Kiểm sidebar Settings, Language/Privacy, Appearance, bỏ theme drawer, đồng bộ Appearance↔desktop header, reload nhớ dark theme, giữ Account settings và không overflow. Đã xem screenshot Appearance mobile393px. Fixture SQLite/email giả loopback, không DB/email thật.
+- Lượt gọi Playwright đầu chọn dư editor-header và bị ngắt; lượt gọi đồng thời mất dev server nên lỗi kết nối, không tính kết quả sản phẩm. Chạy lại duy nhất bộ focused nêu trên thành công. Chưa chạy full browser/backend test suite, Firefox/Safari/thiết bị thật hoặc cross-tab/blocked-storage runtime. Chưa xác minh production; không manual deploy/migrate.
+- Publication scope: AppShell.tsx, router.tsx, useTheme.ts, PreferencesPage.tsx, preferences.css, e2e/header.spec.ts, docs/FRONTEND-IMPLEMENTATION.md, docs/worklog.md. Push main theo quyền đã cấp; xác minh remote SHA sau push. Hai appsettings local và `.agnes/` nằm ngoài commit.
+
 ## Tái cấu trúc list view note card: tiêu đề trên, thao tác phải, nội dung dưới — 2026-10-23
 
 - Theo hai ảnh/yêu cầu chủ dự án: list view note card bị "chèn ép" các phần tử do grid 3 cột (60px 1fr auto) ép tiêu đề vào cột hẹp. Tái cấu trúc thành card chồng dọc đúng chuẩn list:

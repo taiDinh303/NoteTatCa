@@ -52,7 +52,11 @@ for (const width of [1440, 1024, 393, 320]) {
       }
       await page.evaluate(() => document.documentElement.style.removeProperty('--interface-scale'));
       await page.screenshot({ path: `test-results/drawer-${width}.png` });
-      await drawer.getByRole('button', { name: 'Use dark theme' }).click();
+      await expect(drawer.getByRole('button', { name: /Use (light|dark) theme/ })).toHaveCount(0);
+      await drawer.getByRole('link', { name: 'Settings', exact: true }).click();
+      await expect(drawer).toBeHidden();
+      await page.getByRole('link', { name: 'Appearance', exact: true }).click();
+      await page.getByRole('switch', { name: 'Dark mode' }).click();
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
       await page.keyboard.press('Escape');
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
@@ -75,6 +79,35 @@ for (const width of [1440, 1024, 393, 320]) {
       await expect(page.getByRole('heading', { name: 'Notes', exact: true })).toBeAttached();
       await expect(drawer).toBeHidden();
     }
+    if (width > 800) {
+      await page.locator('#workspace-navigation').getByRole('link', { name: 'Settings', exact: true }).click();
+    } else {
+      await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+      await page.getByRole('dialog', { name: 'NoteTatCa.' }).getByRole('link', { name: 'Settings', exact: true }).click();
+    }
+    await expect(page).toHaveURL(/\/settings$/);
+    for (const name of ['Language', 'Privacy']) {
+      await page.getByRole('link', { name, exact: true }).click();
+      await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
+      await expect(page.locator('.preferences-page').getByRole('switch')).toHaveCount(0);
+      await page.locator('.preferences-back').click();
+    }
+    await page.getByRole('link', { name: 'Appearance', exact: true }).click();
+    const themeSwitch = page.getByRole('switch', { name: 'Dark mode' });
+    await themeSwitch.setChecked(true);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    if (width > 800) {
+      await header.getByRole('button', { name: 'Use light theme', exact: true }).click();
+      await expect(themeSwitch).not.toBeChecked();
+      await themeSwitch.click();
+      await expect(header.getByRole('button', { name: 'Use light theme', exact: true })).toBeVisible();
+    }
+    await page.reload();
+    await expect(themeSwitch).toBeChecked();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(layout);
+    await page.screenshot({ path: `test-results/appearance-${width}.png`, fullPage: true });
+    await page.goto('/notes');
     await page.getByRole('textbox', { name: 'Search your notes', exact: true }).fill('Welcome');
     await expect(page).toHaveURL(/q=Welcome/);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(layout);

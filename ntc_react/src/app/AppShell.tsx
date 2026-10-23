@@ -114,8 +114,9 @@ function Sidebar({
       <div className="sidebar-bottom">
         {accountControls}
         <NavLink
-          className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
-          to="/settings/profile"
+          className={`settings-link ${["/settings", "/settings/language", "/settings/privacy", "/settings/appearance"].includes(pathname) ? "active" : ""}`}
+          to="/settings"
+          end
           onClick={onNavigate}
         >
           <Settings size={18} />
@@ -302,10 +303,6 @@ export default function AppShell() {
                   <Bell size={18} />
                   Notifications
                   {(unread.data ?? 0) > 0 ? <span className="drawer-unread">{unread.data! > 9 ? "9+" : unread.data}</span> : null}
-                </button>
-                <button type="button" className="settings-link" onClick={toggleTheme}>
-                  {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-                  {theme === "dark" ? "Use light theme" : "Use dark theme"}
                 </button>
               </div>
             }

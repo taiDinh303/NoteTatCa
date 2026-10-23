@@ -1,0 +1,72 @@
+.preferences-page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+.preferences-page h1 {
+  margin: 0 0 24px;
+  font-size: 22px;
+}
+.preferences-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.preferences-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.preferences-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 64px;
+  padding: 14px 20px;
+  color: var(--text);
+  font-size: 14px;
+}
+.preferences-row + .preferences-row {
+  border-top: 1px solid var(--border);
+}
+a.preferences-row:hover {
+  background: var(--hover);
+}
+.preferences-row > svg:last-child,
+.theme-switch {
+  margin-left: auto;
+}
+.preferences-row > svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.theme-switch {
+  flex-shrink: 0;
+  width: 44px;
+  height: 26px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--hover);
+  cursor: pointer;
+}
+.theme-switch span {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+}
+.theme-switch[aria-checked="true"] {
+  background: var(--accent);
+}
+.theme-switch[aria-checked="true"] span {
+  transform: translateX(18px);
+}
+.theme-switch:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+}

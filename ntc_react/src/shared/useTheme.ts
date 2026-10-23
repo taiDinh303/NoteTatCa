@@ -1,24 +1,43 @@
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+
+const themeKey = "ntc.theme.v1";
+const themeEvent = "ntc:theme-change";
+
+function getTheme() {
+  try {
+    return localStorage.getItem(themeKey) === "dark" ? "dark" : "light";
+  } catch {
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  }
+}
+
+function subscribe(onChange: () => void) {
+  function onStorage(event: StorageEvent) {
+    if (event.key === themeKey || event.key === null) onChange();
+  }
+  window.addEventListener(themeEvent, onChange);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener(themeEvent, onChange);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+function toggleTheme() {
+  const next = getTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try {
+    localStorage.setItem(themeKey, next);
+  } catch {
+    // The document retains the preference when storage is blocked.
+  }
+  window.dispatchEvent(new Event(themeEvent));
+}
 
 export function useTheme() {
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem("ntc.theme.v1") === "dark" ? "dark" : "light";
-    } catch {
-      return "light";
-    }
-  });
+  const theme = useSyncExternalStore(subscribe, getTheme);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    try {
-      localStorage.setItem("ntc.theme.v1", theme);
-    } catch {
-      // A blocked preference store must not prevent using the app.
-    }
   }, [theme]);
-  return {
-    theme,
-    toggleTheme: () =>
-      setTheme((current) => (current === "dark" ? "light" : "dark")),
-  };
+  return { theme, toggleTheme };
 }
