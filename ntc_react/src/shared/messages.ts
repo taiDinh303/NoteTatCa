@@ -1,5 +1,6 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Note order is not saved.": ["Chưa lưu thứ tự ghi chú.", "笔记顺序尚未保存。", "ノートの順序は保存されていません。"],
   "Send feedback": ["Gửi phản hồi", "发送反馈", "送信"],
   "Feedback sent. Thank you!": ["Đã gửi phản hồi. Cảm ơn bạn!", "反馈已发送，谢谢！", "送信しました。ありがとうございます！"],
   "Send a problem, suggestion or question to the NoteTatCa team. Your account email is included so we can reply.": ["Gửi báo lỗi, đề xuất hoặc câu hỏi đến NoteTatCa. Email tài khoản được gửi kèm để chúng tôi trả lời bạn.", "向 NoteTatCa 团队发送问题或建议。我们会附上您的账户邮箱以便回复。", "問題、改善案、質問を NoteTatCa に送信します。返信のためアカウントのメールアドレスが含まれます。"],

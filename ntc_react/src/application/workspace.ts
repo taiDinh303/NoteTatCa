@@ -2,16 +2,45 @@ import type { InfiniteData, QueryClient } from "@tanstack/react-query";
 import type { Note, NoteFilter, Page } from "../domain/models";
 import { matchesNote, sortNotes } from "../domain/models";
 import { NotesRepository } from "../infrastructure/repositories";
+import { NoteOrderCoordinator } from "./noteOrder";
 export class WorkspaceService {
+  readonly order: NoteOrderCoordinator;
   constructor(
     readonly notes: NotesRepository,
     readonly cache: QueryClient,
     private readonly identity: () => string | undefined,
-  ) {}
+  ) {
+    this.order = new NoteOrderCoordinator(
+      identity,
+      async (pinned) => {
+        const items: Note[] = [];
+        for (let page = 1; ; page++) {
+          const result = await notes.list({ pinned }, page);
+          items.push(...result.items);
+          if (!result.hasNextPage) return sortNotes(items);
+        }
+      },
+      async (id, previous, next) => {
+        const owner = identity();
+        const note = await notes.find(id);
+        if (!owner || identity() !== owner || note.userId !== owner)
+          throw new Error("Account changed");
+        await notes.reorder(id, note.version, previous, next);
+      },
+      (items) => {
+        // Cancel list reads started before this acknowledgement so they cannot
+        // overwrite canonical order after the optimistic overlay is released.
+        void cache.cancelQueries({ queryKey: this.key("notes") });
+        items.forEach(this.commit);
+      },
+    );
+  }
   key(resource: string, ...parts: unknown[]) {
     return ["private", this.identity() ?? "none", resource, ...parts];
   }
-  cachedNotes(filter: NoteFilter): InfiniteData<Page<Note>, number> | undefined {
+  cachedNotes(
+    filter: NoteFilter,
+  ): InfiniteData<Page<Note>, number> | undefined {
     const key = this.key("notes", filter.trash ? { trash: true } : {});
     const state = this.cache.getQueryState<InfiniteData<Page<Note>>>(key);
     const data = state?.data;
@@ -127,26 +156,7 @@ export class WorkspaceService {
     this.cache.removeQueries({ queryKey: this.key("trash-note", note.id) });
     await this.refreshNotes();
   }
-  async reorder(group: Note[], from: number, to: number) {
-    const ordered = [...group];
-    const [dragged] = ordered.splice(from, 1);
-    ordered.splice(to, 0, dragged);
-    await this.cache.cancelQueries({ queryKey: this.key("notes") });
-    const old = group.map((n) => ({ ...n }));
-    ordered.forEach((n, i) => this.commit({ ...n, sortOrder: (i + 1) * 1000 }));
-    try {
-      await this.notes.reorder(
-        dragged.id,
-        dragged.version,
-        ordered[to - 1]?.id ?? null,
-        ordered[to + 1]?.id ?? null,
-      );
-      this.commit(await this.notes.find(dragged.id));
-      await this.cache.invalidateQueries({ queryKey: this.key("notes") });
-    } catch (error) {
-      old.forEach(this.commit);
-      await this.cache.invalidateQueries({ queryKey: this.key("notes") });
-      throw error;
-    }
+  reorder(group: Note[], from: number, to: number) {
+    this.order.reorder(group, from, to);
   }
 }

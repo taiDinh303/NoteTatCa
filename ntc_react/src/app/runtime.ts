@@ -95,6 +95,14 @@ export const workspace = new WorkspaceService(
   cache,
   () => auth.getSnapshot().session?.userId,
 );
+let orderOwner = auth.getSnapshot().session?.userId;
+auth.subscribe(() => {
+  const next = auth.getSnapshot().session?.userId;
+  if (next !== orderOwner) {
+    orderOwner = next;
+    workspace.order.reset();
+  }
+});
 export const preparation = new WorkspacePreparation(
   cache,
   { notes, labels, reminders, inbox, account, admin },

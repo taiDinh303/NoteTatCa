@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState, useSyncExternalStore } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DndContext,
@@ -323,7 +323,20 @@ export default function NotesPage({
     action: "trash" | "delete";
   }>();
   const [pending, setPending] = useState<string>();
-  const all = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
+  const order = useSyncExternalStore(
+    workspace.order.subscribe,
+    workspace.order.getSnapshot,
+  );
+  const stored = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
+  const all = [true, false].flatMap((pinned) => {
+    const group = stored.filter((note) => note.isPinned === pinned);
+    const desired = order.groups.get(pinned);
+    if (!desired) return group;
+    const ranks = new Map(desired.ids.map((id, index) => [id, index]));
+    return group.sort(
+      (a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity),
+    );
+  });
   const label = labels.data?.pages
     .flatMap((p) => p.items)
     .find((l) => l.id === tagId);
@@ -356,16 +369,9 @@ export default function NotesPage({
       setPending(undefined);
     }
   }
-  async function reorder(group: Note[], from: number, to: number) {
+  function reorder(group: Note[], from: number, to: number) {
     if (from === to || to < 0 || to >= group.length) return;
-    setPending(group[from].id);
-    try {
-      await workspace.reorder(group, from, to);
-    } catch (error) {
-      toast.error(errorMessage(error));
-    } finally {
-      setPending(undefined);
-    }
+    workspace.reorder(group, from, to);
   }
   function dragEnd(event: DragEndEvent) {
     if (!event.over || event.active.id === event.over.id) return;
@@ -445,6 +451,14 @@ export default function NotesPage({
                 ? tr("Search results")
                 : tr("Notes")}
       </h1>
+      {[...order.groups.values()].some((group) => group.error) ? (
+        <div className="notice-strip" role="alert">
+          <span>{tr("Note order is not saved.")}</span>
+          <Button variant="ghost" onClick={workspace.order.retry}>
+            {tr("Try again")}
+          </Button>
+        </div>
+      ) : null}
       {trash ? (
         <div className="notice-strip">
           <Trash2 size={16} />

@@ -232,3 +232,8 @@ Modal labels-manager dùng flex cột và overflow hidden; header, form thêm/s�
 ### Gửi phản hồi trực tiếp — 2026-10-23
 
 Chủ dự án xác nhận lmht016847@gmail.com nhận. Help thêm Send feedback gọi POST /feedback bằng ApiClient authenticated; disabled khi trắng/loading, khóa input/type khi gửi, giữ bản nhập khi lỗi và chỉ xóa sau200. UI4ngôn ngữ nêu account email gửi kèm để trả lời. Giữ Copy/Download dự phòng. Backend dùng IFeedbackService/BaseService/ICurrentUser/TimeProvider và IEmailSender hiện có (Brevo ở hosting), recipient không lấy từ client. Các đoạn Help trước nói chưa gửi tự động là lịch sử trước yêu cầu này.
+
+
+### Reorder lưu ngầm, không khóa thao tác — 2026-10-23
+
+Workspace giữ NoteOrderCoordinator theo tài khoản, snapshot thứ tự mong muốn theo pinned group; NotesPage dùng useSyncExternalStore để áp dụng thứ tự ngay, không setPending cho reorder. Debounce400ms trước batch; một worker gửi tuần tự theo thứ tự server, chọn move ít hơn cho thao tác đầu→cuối. Đọc canonical group đầu batch, lấy version mới của card trước từng POST /notes/reorder; không invalidate/refetch toàn bộ notes mỗi lần drop. Trong lúc lưu vẫn nhận target mới và hội tụ về target cuối; chỉ publish canonical notes/version khi batch xong. Query refetch không đè layout đang pending. Lỗi giữ target và banner Try again; retry đọc server trước để tránh lặp khi response mất. Không auto retry write, không API/schema mới. Queue tồn tại khi điều hướng SPA nhưng chỉ trong bộ nhớ, reload/đóng tab trước khi lưu xong không bảo đảm giữ target. Identity guard không gửi tiếp/publish/expose order của tài khoản trước. Membership mới được đối chiếu với server; thay đổi cạnh tranh có thể yêu cầu retry. Giữ translate/zoom160ms, keyboard/mobile, pinned-group/filter/pagination giới hạn hiện có.
