@@ -2,6 +2,21 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Trang Settings (PreferencesPage) full width, đồng bộ font/kích cỡ với Help & feedback — 2026-10-23
+
+- Theo ảnh chủ dự án: trang `/settings` (PreferencesPage, hiển thị "Settings" + các hàng Language/Privacy/Appearance) bị giới hạn `max-width: 720px`, nhỏ hơn Help & feedback. Đổi `.preferences-page` thành `width: 100%`, bỏ max-width, thêm `padding-bottom: 24px` như `.help-page`.
+- Đồng bộ font size heading: `.preferences-page h1` từ 22px → 24px (khớp `.help-page h1`); margin `0 0 28px` (khớp `.help-heading`). Thêm rule `.preferences-page > p` (subheading, 13px, --subtle, line-height 1.75) dự phòng cho subtitle nếu sau này có — hiện PreferencesPage không có `<p>` nên rule an toàn, không impact UI.
+- Không đổi API/i18n/PreferencesPage.tsx logic; chỉ CSS.
+- Validation: React Production build PASS; ESLint PASS. Không full suite/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/features/settings/preferences.css, docs/worklog.md.
+
+## "Mark all as read" cùng hàng tab inbox, font & style đồng bộ — 2026-10-23
+
+- Theo ảnh chủ dự án: nút "Mark all as read" nằm riêng hàng phía trên tab "All notifications / Unread". Đưa nút về cùng hàng (flex: tabs trái, nút phải); bỏ wrapper `.inbox-actions` và nút Button riêng, đổi thành `<button class="inbox-mark-read">` để cùng style tab (font 14px/weight 600, border-bottom, padding) — hover/focus/disabled riêng; chỉ giữ icon `CheckCheck` 16px. Mobile `@container viewport (max-width: 480px)` thêm override `.inbox-mark-read { font-size: 11px; }` song song `.inbox-tabs button`.
+- Không đổi API/`inbox.readAll()`, i18n keys, test e2e (locator `getByRole("button", { name: "Mark all as read" })` vẫn hoạt động — nút giờ là native button, không phải Button component).
+- Validation từ root: React Production build PASS; ESLint max-warnings 0 PASS. Không full suite/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/features/inbox/InboxPage.tsx, ntc_react/src/styles.css, docs/worklog.md.
+
 ## Sidebar trượt nhẹ khi mở/đóng — 2026-10-23
 
 - Desktop: thay display:none bằng translateX/visibility có delay, trượt220ms cùng margin-left nội dung; inert/aria-hidden ngăn focus vào sidebar ẩn. Mobile customer/admin: giữ Modal mounted với open state để Radix Presence chạy animation đóng200ms, mở240ms; overlay fade cùng nhịp, CSS scoped navigation-drawer, không đổi modal khác. Chế độ reduced-motion bỏ delay ẩn và dùng duration tối thiểu hiện có.

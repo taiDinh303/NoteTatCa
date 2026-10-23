@@ -1,10 +1,17 @@
 .preferences-page {
-  max-width: 720px;
+  width: 100%;
   margin: 0 auto;
+  padding-bottom: 24px;
 }
 .preferences-page h1 {
-  margin: 0 0 24px;
-  font-size: 22px;
+  margin: 0 0 28px;
+  font-size: 24px;
+}
+.preferences-page > p {
+  color: var(--subtle);
+  font-size: 13px;
+  line-height: 1.75;
+  margin: -18px 0 28px;
 }
 .preferences-back {
   display: inline-flex;

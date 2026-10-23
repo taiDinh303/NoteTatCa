@@ -35,10 +35,25 @@ export default function InboxPage() {
   return (
     <>
       <h1 className="sr-only">{tr("Your inbox")}</h1>
-      <div className="inbox-actions">
-        <Button
-          variant="secondary"
-          busy={busy}
+      <div className="inbox-header">
+        <div className="inbox-tabs">
+          <button
+            className={!unreadOnly ? "active" : ""}
+            onClick={() => setUnreadOnly(false)}
+          >
+            {tr("All notifications")}
+          </button>
+          <button
+            className={unreadOnly ? "active" : ""}
+            onClick={() => setUnreadOnly(true)}
+          >
+            {tr("Unread")}
+          </button>
+        </div>
+        <button
+          type="button"
+          className="inbox-mark-read"
+          disabled={busy}
           onClick={() => {
             setBusy(true);
             void inbox
@@ -55,22 +70,8 @@ export default function InboxPage() {
               .finally(() => setBusy(false));
           }}
         >
-          <CheckCheck size={17} />
+          <CheckCheck size={16} aria-hidden />
           {tr("Mark all as read")}
-        </Button>
-      </div>
-      <div className="inbox-tabs">
-        <button
-          className={!unreadOnly ? "active" : ""}
-          onClick={() => setUnreadOnly(false)}
-        >
-          {tr("All notifications")}
-        </button>
-        <button
-          className={unreadOnly ? "active" : ""}
-          onClick={() => setUnreadOnly(true)}
-        >
-          {tr("Unread")}
         </button>
       </div>
       {query.isPending ? (
