@@ -457,7 +457,7 @@ test("renders responsive workspace without console errors or navigation reloads"
   ).toBeVisible();
   await page.getByRole("button", { name: "Open navigation" }).click();
   await page
-    .getByRole("dialog", { name: "Your workspace" })
+    .getByRole("dialog", { name: "NoteTatCa." })
     .getByRole("link", { name: "Trash", exact: true })
     .click();
   await expect(
@@ -567,7 +567,7 @@ test("scales the interface without reloads, preserves notes and fits desktop and
     .click();
   await inViewport(".navigation-drawer");
   await page
-    .getByRole("dialog", { name: "Your workspace", exact: true })
+    .getByRole("dialog", { name: "NoteTatCa.", exact: true })
     .getByRole("link", { name: "All notes", exact: true })
     .click();
   await page.screenshot({

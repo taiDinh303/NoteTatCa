@@ -2,6 +2,21 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mobile header gọn + drawer dùng logo, toolbar notes đồng nhất kích thước — 2026-10-23
+
+- Theo hai ảnh/yêu cầu chủ dự án (mobile):
+  1. Header mobile chỉ còn: nút toggle sidebar (hamburger) + ô search + avatar (menu tài khoản). Ẩn logo/icon + chữ "NoteTatCa" (`.header-brand`) ở màn hình nhỏ.
+  2. Drawer mobile (mở bằng hamburger): thay tiêu đề "Your workspace" bằng logo + chữ "NoteTatCa" (thành phần `Logo`). Modal `title` mở rộng nhận `ReactNode`.
+  3. Thanh toolbar notes: đổi "Take a note…" thành "New" (icon dấu cộng) và đồng nhất kích thước/kiểu dáng của 3 control: nút New, select "All notes" và nút view-toggle (cùng chiều cao 34px, radius 8px, viền 1px).
+- Thay đổi source:
+  - `NotesPage.tsx`: nhãn `quick-capture` "Take a note…" → "New", icon Plus 18→14.
+  - `ui.tsx`: `Modal` prop `title` từ `string` → `ReactNode` (vẫn giữ `sr-only` description khi không có description).
+  - `AppShell.tsx`: drawer mobile `title={<Logo />}` thay vì "Your workspace".
+  - `styles.css`: `.quick-capture`/`.select-wrap`/`.view-toggle` chiều cao 34px, radius 8px, align-items center; mobile header ẩn `.header-brand`.
+- E2E cập nhật: drawer accessible name "Your workspace" → "NoteTatCa." (Logo) trong header.spec, workspace.spec, sidebar-dismiss.spec; header.spec: brand link "NoteTatCa home" hiện trên desktop (width>800), ẩn trên mobile (width<=800).
+- Bằng chứng: typecheck + ESLint max-warnings0 + Production Vite build PASS. .NET Release không liên quan (frontend-only).
+- Chưa kiểm browser e2e chạy đầy đủ trong lượt này; scope React/CSS/e2e, .NET không đổi.
+- Publication scope: NotesPage.tsx, ui.tsx, AppShell.tsx, styles.css, e2e/header.spec.ts, e2e/workspace.spec.ts, e2e/sidebar-dismiss.spec.ts, docs/worklog.md; giữ hai appsettings local ngoài commit.
 ## Dropdown account: "Your profile" -> "Account settings" (gear), bỏ "Account & security" và "Sessions" — 2026-10-23
 
 - Theo yêu cầu chủ dự án: đổi item "Your profile" (icon Users) thành "Account settings" (icon gear Settings) trong ShellAccountMenu; xóa hai item "Account & security" và "Sessions" khỏi dropdown. Các tab Settings trong trang /settings (SettingsPage tabs: Profile / Account & security / Active sessions) giữ nguyên — chỉ bỏ shortcut riêng từ dropdown.

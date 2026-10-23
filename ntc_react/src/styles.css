@@ -828,15 +828,17 @@ strong {
 .quick-capture {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 9px;
+  border-radius: 8px;
   text-align: left;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  color: #8a939d;
+  color: var(--text);
+  min-width: 90px;
   margin-right: auto;
   cursor: pointer;
   transition:
@@ -848,15 +850,15 @@ strong {
   box-shadow: 0 3px 17px #28374b08;
 }
 .quick-capture > span:nth-child(2) {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
 }
 .quick-capture-icon {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   background: #fcf7ee;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #dcb66e;
   display: grid;
   place-items: center;
@@ -873,14 +875,16 @@ strong {
 
 .view-toggle {
   display: flex;
+  align-items: center;
+  height: 34px;
   background: #eef0f3;
   border: 1px solid #e9ecf1;
   padding: 3px;
-  border-radius: 7px;
+  border-radius: 8px;
   margin-left: 10px;
 }
 .view-toggle .icon-button {
-  width: 28px;
+  width: 26px;
   height: 26px;
   border-radius: 5px;
   color: #a0a7b2;
@@ -895,13 +899,17 @@ strong {
 }
 .select-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  height: 34px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
 }
 .select-wrap select {
   appearance: none;
-  padding: 7px 26px 7px 10px !important;
+  height: 32px;
+  padding: 0 26px 0 10px !important;
   border: 0;
   background: transparent !important;
   font-size: 12px;
@@ -4428,9 +4436,8 @@ td {
   .customer-shell > .topbar .header-theme-toggle,
   .customer-shell > .topbar .notification-button,
   .customer-shell > .topbar .topbar-divider,
-  .customer-shell > .topbar .private-badge { display: none; }
-  .customer-shell .header-brand .brand > span:last-child:not(.brand-mark) { display: none; }
-  .customer-shell .header-brand .brand-mark { width: 32px; height: 32px; }
+  .customer-shell > .topbar .private-badge,
+  .customer-shell > .topbar .header-brand { display: none; }
   .customer-shell .topbar-brand { gap: 6px; }
   .customer-shell > .topbar .global-search {
     grid-column: 2;

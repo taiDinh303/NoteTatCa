@@ -13,7 +13,11 @@ for (const width of [1440, 1024, 393, 320]) {
     expect(box.x).toBe(0);
     expect(box.y).toBe(0);
     expect(box.width).toBe(layout);
-    await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
+    if (width > 800) {
+      await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
+    } else {
+      await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeHidden();
+    }
     const search = page.getByRole('search');
     const searchBox = (await search.boundingBox())!;
     await expect(search).toHaveCSS("border-top-width", "1px");
@@ -33,7 +37,7 @@ for (const width of [1440, 1024, 393, 320]) {
       await expect(header.getByRole('button', { name: 'Use dark theme' })).toBeHidden();
       await expect(header.getByRole('button', { name: 'Open inbox' })).toBeHidden();
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
-      const drawer = page.getByRole('dialog', { name: 'Your workspace' });
+      const drawer = page.getByRole('dialog', { name: 'NoteTatCa.' });
       await expect(drawer).toBeVisible();
       await expect.poll(async () => (await drawer.boundingBox())!.x).toBeCloseTo(0);
       for (const scale of [0.9, 1, 1.1]) {

@@ -280,7 +280,7 @@ export default function AppShell() {
         <Modal
           open
           onClose={() => setMobile(false)}
-          title="Your workspace"
+          title={<Logo />}
           hideCloseButton
           dismissOnOutside
           className="navigation-drawer"

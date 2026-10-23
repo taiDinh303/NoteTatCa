@@ -20,7 +20,7 @@ for (const admin of [false, true]) {
     });
     await trigger.click();
     const drawer = page.getByRole("dialog", {
-      name: admin ? "Administration navigation" : "Your workspace",
+      name: admin ? "Administration navigation" : "NoteTatCa.",
       exact: true,
     });
     await expect(drawer).toBeVisible();

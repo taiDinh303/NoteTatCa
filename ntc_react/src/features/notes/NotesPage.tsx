@@ -426,9 +426,9 @@ export default function NotesPage({
             onClick={() => setEditor({})}
           >
             <span className="quick-capture-icon">
-              <Plus size={18} />
+              <Plus size={14} />
             </span>
-            <span>Take a note…</span>
+            <span>New</span>
           </button>
         ) : null}
         <div className="row-actions">
