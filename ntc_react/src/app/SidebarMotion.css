@@ -59,6 +59,29 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .customer-shell > .sidebar {
-    transition-delay: 0s !important;
+    transform: none !important;
+    opacity: 1;
+    transition:
+      opacity 180ms ease-out,
+      visibility 0s linear;
+    transition-duration: 180ms, 0s !important;
+    transition-delay: 0s, 0s !important;
+  }
+  .customer-shell.sidebar-hidden > .sidebar {
+    opacity: 0;
+    transition-delay: 0s, 180ms !important;
+  }
+  .modal.navigation-drawer[data-state="open"] {
+    animation-name: sidebar-overlay-in;
+    animation-duration: 180ms !important;
+    animation-timing-function: ease-out;
+  }
+  .modal.navigation-drawer[data-state="closed"] {
+    animation-name: sidebar-overlay-out;
+    animation-duration: 180ms !important;
+    animation-timing-function: ease-out;
+  }
+  .modal-overlay:has(~ .navigation-drawer) {
+    animation-duration: 180ms !important;
   }
 }

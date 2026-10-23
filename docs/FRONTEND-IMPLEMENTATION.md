@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Sidebar reduced-motion fallback (2026-10-23): máy local báo ClientAreaAnimation=False, MinimizeAnimation=False và MinAnimate=0. Rule global reduce rút animation0.01ms trước đây khiến sidebar hiện tức thì khi browser nhận reduced-motion. Riêng sidebar/overlay giờ fade opacity180ms ở reduce, desktop không translate; normal giữ slide. Không đổi Windows/global modal. Live rAF capture9ca tổng PASS, có nhiều vị trí/opacity trung gian thực tế mà không tua timeline; xem worklog.
+
 Sidebar layout (2026-10-23): desktop customer/mobile workspace drawer chỉ label-nav cuộn; logo/menu chính/Manage labels và sidebar-bottom giữ cố định trong flex layout. Notifications mobile là NavLink/settings-link cùng font/màu/padding/icon/chiều cao với Settings, Help & feedback, giữ badge và đóng drawer sau điều hướng. Chromium9ca header/dismiss/scroll PASS (38labels ở320/393/1440px); build React/.NET Release, ESLint PASS. Xem worklog.
 
 Note labels modal (2026-10-23): ẩn tiêu đề/X, giữ tên dialog cho screen reader; label là toggle button aria-pressed, xếp ngang/wrap, selected có nền/viền/tick rõ, chưa chọn mờ và disabled khi đủ20. Tên dài wrap trong nút; chỉ vùng label cuộn, footer Cancel/Save cố định. Regression Chromium320dark/1440light với40labels và viewer393/1280 PASS (scroll, save/cancel, cap20, keyboard, lỗi/retry); build React/.NET Release và ESLint PASS. Chi tiết worklog.

@@ -137,7 +137,11 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) =>
         parseFloat(getComputedStyle(element).animationDuration),
       );
-    expect(duration).toBeLessThanOrEqual(0.00001);
+    expect(duration).toBe(0.18);
+    await expect(page.locator(".navigation-drawer")).toHaveCSS(
+      "animation-name",
+      "sidebar-overlay-in",
+    );
     await page.keyboard.press("Escape");
     await page.locator(".navigation-drawer").waitFor({ state: "detached" });
     await unchanged();

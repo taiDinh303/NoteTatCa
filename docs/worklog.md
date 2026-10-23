@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa sidebar mất hiệu ứng khi hệ thống giảm chuyển động — 2026-10-23
+
+- Theo phản hồi vẫn bật ra ngay: đọc setting Windows local (chỉ đọc) cho ClientAreaAnimation=False, MinimizeAnimation=False, MinAnimate=0. Source global prefers-reduced-motion ép animation/transition0.01ms; kiểm tra cũ đã coi đây là expected, bỏ sót yêu cầu UX rõ dần của chủ dự án. Không xác minh media query trên tab production/điện thoại thật, nên setting local là bằng chứng môi trường, không suy diễn mọi thiết bị.
+- Riêng navigation drawer/customer desktop: normal giữ slide400/320ms; reduce chuyển opacity fade180ms thay vì mất effect, không translate ở desktop và delay visibility chỉ để fade xong mới ẩn; mobile/overlay dùng keyframe opacity. Override duration scoped thắng rule global !important; không sửa Windows, không bật lại positional motion ở reduce, không đổi modal khác/scroll/data.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS; Chromium9/9 PASS gồm dismiss2, live-motion4 (393/1440px × slide/fade) và motion/geometry3zoom75/100/125%. Live-motion lấy requestAnimationFrame tự chạy sau click, không pause/tua timeline: normal có>2vị trí x trung gian, reduce có>1frame opacity giữa0.02..0.98, x không đổi khi fade; mobile đóng/unmount và desktop hide/show đúng. Giữ assertions nền/scroll ổn định và fallback180ms. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; fixture loopback SQLite/email giả.
+- Scope publication: SidebarMotion.css, e2e/sidebar-live-motion.spec.ts, cập nhật reduced assertion trong e2e/sidebar-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog; giữ .agnes ngoài commit. Push main theo quyền đã cấp, kiểm SHA remote.
+
 ## Sidebar chỉ cuộn label, đồng bộ Notifications — 2026-10-23
 
 - Theo3ảnh: SidebarLayout.css scoped customer sidebar/workspace-drawer, overflow parent hidden, label-nav flex1/min-height0/overflow-y:auto; header/logo/primary-nav/Manage labels và sidebar-bottom không co/không cuộn. Áp dụng desktop/mobile, không đổi admin drawer. Notifications chuyển từ button trong wrapper riêng thành NavLink settings-link cùng kiểu Settings/Help & feedback, giữ icon18px/badge/đóng drawer và route notifications.
