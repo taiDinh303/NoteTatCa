@@ -3,8 +3,8 @@
 .customer-shell > .sidebar {
   transform: none !important;
   clip-path: inset(0 0 0 0);
-  transition: clip-path 400ms linear;
-  transition-duration: 400ms !important;
+  transition: clip-path 200ms linear;
+  transition-duration: 200ms !important;
   will-change: clip-path;
 }
 .customer-shell.sidebar-hidden > .sidebar {
@@ -12,8 +12,8 @@
   pointer-events: none;
 }
 .customer-shell > .main-column {
-  transition: margin-left 400ms linear;
-  transition-duration: 400ms !important;
+  transition: margin-left 200ms linear;
+  transition-duration: 200ms !important;
 }
 .modal.navigation-drawer {
   /* Keep the same clip and compositor layer before, during and after reveal. */
@@ -22,23 +22,23 @@
   isolation: isolate;
 }
 .modal.navigation-drawer[data-state="open"] {
-  animation: sidebar-slide-in 400ms linear 0s both;
-  animation-duration: 400ms !important;
+  animation: sidebar-slide-in 200ms linear 0s both;
+  animation-duration: 200ms !important;
 }
 .modal.navigation-drawer[data-state="closed"] {
-  animation: sidebar-slide-out 400ms linear 0s both;
-  animation-duration: 400ms !important;
+  animation: sidebar-slide-out 200ms linear 0s both;
+  animation-duration: 200ms !important;
   pointer-events: none;
 }
 .modal-overlay:has(~ .navigation-drawer) {
   backdrop-filter: none;
-  animation-duration: 400ms !important;
+  animation-duration: 200ms !important;
 }
 .modal-overlay:has(~ .navigation-drawer)[data-state="open"] {
-  animation: sidebar-overlay-in 400ms linear both;
+  animation: sidebar-overlay-in 200ms linear both;
 }
 .modal-overlay:has(~ .navigation-drawer)[data-state="closed"] {
-  animation: sidebar-overlay-out 400ms linear both;
+  animation: sidebar-overlay-out 200ms linear both;
 }
 @keyframes sidebar-slide-in {
   from {

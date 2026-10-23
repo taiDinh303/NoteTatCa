@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar0.2s và push theo yêu cầu — 2026-10-24
+
+- Đổi toàn bộ duration sidebar reveal/đóng, desktop margin và fade overlay400→200ms; giữ sửa flash/clip/inert và chỉ cuộn label. Cập nhật timing/midpoint trong regression tương ứng.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; Chromium4/4 PASS gồm motion/nền ổn định ở75/100/125% và desktop6chu kỳ mở/đóng clip100% khi ẩn. git diff --check PASS. Không full suite/thiết bị thật/production/manual deploy/migrate; fixture loopback SQLite/email giả. Không chạy lại phân tích pixel video cho thay đổi duration này.
+- Publication scope: SidebarMotion.css, e2e/sidebar-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog; giữ .agnes ngoài commit. Commit/push main theo yêu cầu trực tiếp, đối chiếu SHA remote.
+
 ## Sửa flash desktop có bằng chứng video — 2026-10-24
 
 - Đọc video chủ dự án (440x880,15.253s,328frame) bằng PyAV local trong artifacts/video-tools, xem contact sheet và các frame liên tiếp. Dò mép vùng trắng sidebar: ở1.800s và7.467s có chuỗi gần đóng→full-width một frame→ẩn; đã xem frame1.800s xác nhận đúng sidebar, không phải dữ liệu note tải lại. Không đưa video/nội dung người dùng vào Git.

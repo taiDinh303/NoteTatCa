@@ -63,11 +63,11 @@ for (const scale of [0.75, 1, 1.25]) {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
-          animation.currentTime = 400 * progress;
+          animation.currentTime = 200 * progress;
           const right = getComputedStyle(element).clipPath.split(" ")[1];
           return { progress, fraction: parseFloat(right) / 100 };
         });
-        animation.currentTime = 200;
+        animation.currentTime = 100;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
@@ -79,7 +79,7 @@ for (const scale of [0.75, 1, 1.25]) {
         };
       });
     expect(opening.name).toBe("sidebar-slide-in");
-    expect(opening.duration).toBe(400);
+    expect(opening.duration).toBe(200);
     expect(opening.delay).toBe(0);
     for (const sample of opening.samples) {
       expect(sample.fraction).toBeCloseTo(1 - sample.progress, 2);
@@ -100,11 +100,11 @@ for (const scale of [0.75, 1, 1.25]) {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
-          animation.currentTime = 400 * progress;
+          animation.currentTime = 200 * progress;
           const right = getComputedStyle(element).clipPath.split(" ")[1];
           return { progress, fraction: parseFloat(right) / 100 };
         });
-        animation.currentTime = 200;
+        animation.currentTime = 100;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
@@ -117,7 +117,7 @@ for (const scale of [0.75, 1, 1.25]) {
         };
       });
     expect(closing.name).toBe("sidebar-slide-out");
-    expect(closing.duration).toBe(400);
+    expect(closing.duration).toBe(200);
     expect(closing.delay).toBe(0);
     for (const sample of closing.samples) {
       expect(sample.fraction).toBeCloseTo(sample.progress, 2);
@@ -137,7 +137,7 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) =>
         parseFloat(getComputedStyle(element).animationDuration),
       );
-    expect(duration).toBe(0.4);
+    expect(duration).toBe(0.2);
     await expect(page.locator(".navigation-drawer")).toHaveCSS(
       "animation-name",
       "sidebar-slide-in",

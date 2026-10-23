@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Duration sidebar hiện hành (2026-10-24): theo yêu cầu mới, mọi reveal mở/đóng, desktop margin và overlay từ400ms→200ms (0.2s). Giữ sửa flash/clip/inert. Regression motion3zoom và desktop6chu kỳ4/4 PASS; React/.NET Release PASS. Các mốc400ms bên dưới là lịch sử trước cập nhật này.
+
 Sửa flash cuối đóng desktop (2026-10-24): video chủ dự án có full-width flash một frame ở1.800s/7.467s. Bỏ visibility:hidden/delay ở desktop, chỉ transition clip-path400ms tới100%, giữ inert/aria-hidden/pointer-events:none khi ẩn. Không đổi cơ chế mobile hoặc data loading. Quay6chu kỳ sau sửa, dò345frame không có lại mẫu flash (video gốc328frame có2); regression13ca PASS. Chi tiết/phạm vi môi trường trong worklog.
 
 Ổn định cuối reveal (2026-10-24): giữ400ms; drawer có clip-path mặc định khớp keyframe kết thúc, isolation và will-change:clip-path; desktop giữ will-change để tránh đổi lớp vẽ sau transition. Live rAF kiểm5frame cuối x/opacity/clip ổn định và mobile mở lại2lần ở cả2media PASS; chưa tái hiện/đo raster flicker trên GPU/thiết bị thật. Xem worklog.
