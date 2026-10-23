@@ -1270,6 +1270,13 @@ strong {
 .modal.wide {
   max-width: 840px;
 }
+.modal.labels-manager { display: flex; flex-direction: column; overflow: hidden; }
+.labels-manager > .modal-header,
+.labels-manager > .modal-footer { flex-shrink: 0; }
+.labels-manager > .modal-body { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.labels-manager .label-form,
+.labels-manager .error-banner { flex-shrink: 0; }
+.labels-manager-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .modal-header {
   display: flex;
   align-items: flex-start;

@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Labels Manager giữ cố định header/form và Done — 2026-10-23
+
+- Theo2yêu cầu liên tiếp kèm ảnh: giữ Done ở đáy, tiêu đề/mô tả và New label + màu + Add/Save ở trên. Chỉ danh sách label và Load more cuộn riêng, không cần kéo tới cuối để đóng hoặc thêm/sửa. CSS scoped labels-manager; giữ max-height/zoom/responsive Modal hiện có, không đổi các modal khác/API/CRUD.
+- Thêm regression fixture24labels bổ sung, kiểm header/input/Done không đổi tọa độ khi cuộn, sửa label cuối danh sách và đóng không cuộn về đầu ở320/1440px; thêm chạy lại luồng quản lý label hiện có.
+- React Production build PASS; ESLint max-warnings0 PASS; .NET Release --no-restore PASS,0warnings/0errors; git diff --check PASS. Chromium:2/2 ca fixed ở320/1440px PASS; regression quản lý label/reorder hiện có1/1 PASS. Lượt đầu2test fail do đo lúc animation mở modal và locator textbox trùng color input; tắt animation trong test, chọn Edit label chính xác, chạy lại2/2 PASS. Đã xem screenshot mobile với form/header/Done và danh sách cuộn.
+- Scope: LabelsManager.tsx, styles.css, e2e/labels-fixed.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Push main theo quyền đã cấp và đối chiếu remote SHA. Giữ appsettings local/.agnes ngoài commit; không deploy/migrate/DB/email thật. Browser fixture loopback; không full suite hoặc thiết bị thật.
+
 ## Thời gian chỉ ở View và đồng bộ cụm cỡ chữ toolbar — 2026-10-23
 
 - Theo lựa chọn cuối chủ dự án: card thường bỏ ngày, Edit không thêm ngày. View: nút Edited + ngày/giờ ở trái footer, Edit/Close bên phải; click thời gian mở Created/Last edited từ dữ liệu note thật, định dạng4ngôn ngữ và timezone tài khoản. Không thêm số ký tự vào View. Trash giữ số ngày retention; menu card vẫn căn phải.

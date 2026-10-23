@@ -217,3 +217,8 @@ Theo ảnh/yêu cầu mới: bỏ heading/eyebrow/description đầu trang Setti
 ### Thời gian chỉ trong View và toolbar cỡ chữ đồng bộ — 2026-10-23
 
 Card thường không hiển thị lastUpdatedTime; Trash giữ retention. View đặt Edited + ngày/giờ ở trái footer, Edit/Close ở phải. Nhấn thời gian mở popover Created/Last edited theo locale và timezone tài khoản; không thêm thời gian vào Edit. Menu card giữ bên phải. Cụm cỡ chữ bỏ border/nền bao riêng, nút± và ô nhập cao29px như các nút toolbar, nền hover/focus và màu chữ theo theme/note; giữ hành vi nhập/tăng/giảm hiện có.
+
+
+### Labels Manager: header/form/footer cố định — 2026-10-23
+
+Modal labels-manager dùng flex cột và overflow hidden; header, form thêm/sửa label, thông báo lỗi và footer Done ở ngoài vùng cuộn. Chỉ labels-manager-scroll (danh sách, trạng thái loading/error/empty, Load more) có overflow-y auto, min-height0 và overscroll contain. Max-height theo viewport/zoom của Modal hiện có; các modal khác giữ nguyên. Không đổi API/CRUD/pagination.

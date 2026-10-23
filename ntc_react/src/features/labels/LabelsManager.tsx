@@ -31,6 +31,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
   return (
     <Modal
       open
+      className="labels-manager"
       onClose={onClose}
       title={tr("Your labels")}
       description={tr(
@@ -102,48 +103,53 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           ) : null}
         </form>
         <ErrorBanner error={error} />
-        {query.isPending ? (
-          <Spinner />
-        ) : query.isError ? (
-          <ErrorPanel error={query.error} retry={() => void query.refetch()} />
-        ) : items.length === 0 ? (
-          <EmptyState
-            icon={Tag}
-            title={tr("Everything in its place")}
-            description={tr("Create a label to start organizing your notes.")}
-          />
-        ) : (
-          <div className="label-list">
-            {items.map((label) => (
-              <div className="label-row" key={label.id}>
-                <Tag size={17} style={{ color: label.color ?? undefined }} />
-                <span>{label.name}</span>
-                <IconButton
-                  icon={Pencil}
-                  label={tr("Edit label {0}", label.name)}
-                  onClick={() => {
-                    setEditing(label);
-                    setFormKey((k) => k + 1);
-                  }}
-                />
-                <IconButton
-                  icon={Trash2}
-                  label={tr("Delete label {0}", label.name)}
-                  onClick={() => setDeleting(label)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-        {query.hasNextPage ? (
-          <Button
-            variant="ghost"
-            busy={query.isFetchingNextPage}
-            onClick={() => void query.fetchNextPage()}
-          >
-            {tr("Load more labels")}
-          </Button>
-        ) : null}
+        <div className="labels-manager-scroll">
+          {query.isPending ? (
+            <Spinner />
+          ) : query.isError ? (
+            <ErrorPanel
+              error={query.error}
+              retry={() => void query.refetch()}
+            />
+          ) : items.length === 0 ? (
+            <EmptyState
+              icon={Tag}
+              title={tr("Everything in its place")}
+              description={tr("Create a label to start organizing your notes.")}
+            />
+          ) : (
+            <div className="label-list">
+              {items.map((label) => (
+                <div className="label-row" key={label.id}>
+                  <Tag size={17} style={{ color: label.color ?? undefined }} />
+                  <span>{label.name}</span>
+                  <IconButton
+                    icon={Pencil}
+                    label={tr("Edit label {0}", label.name)}
+                    onClick={() => {
+                      setEditing(label);
+                      setFormKey((k) => k + 1);
+                    }}
+                  />
+                  <IconButton
+                    icon={Trash2}
+                    label={tr("Delete label {0}", label.name)}
+                    onClick={() => setDeleting(label)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {query.hasNextPage ? (
+            <Button
+              variant="ghost"
+              busy={query.isFetchingNextPage}
+              onClick={() => void query.fetchNextPage()}
+            >
+              {tr("Load more labels")}
+            </Button>
+          ) : null}
+        </div>
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={onClose}>
