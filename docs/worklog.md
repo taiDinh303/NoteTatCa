@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar trượt đều như kéo rèm, không chờ rồi hiện — 2026-10-23
+
+- Theo yêu cầu tiếp: dùng chuyển động linear liên tục, mobile mở/đóng400ms delay0, overlay fade400ms đồng bộ; desktop transform/margin320ms linear và visibility chỉ ẩn sau trượt. Giữ CSS keyframes/Radix Presence, fill both, nền không blur và reduced-motion; không thêm timer/gesture/dependency. Tham khảo chính thức: https://www.radix-ui.com/primitives/docs/guides/animation và https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/animation-timing-function .
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS; Chromium9/9 PASS gồm header1440/1024/393/320, dismiss customer/admin và motion3mức zoom75/100/125%. Đo animation tại25/50/75% thời gian: vị trí đúng25/50/75% quãng đường ở cả hai chiều, delay0/duration400ms, không chỉ kiểm tra trạng thái cuối. Giữ các assertion nền/scroll ổn định<0.5px trên trang đã cuộn100px, reduced-motion và unmount sau đóng. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; fixture loopback SQLite/email giả.
+- Scope publication: SidebarMotion.css, e2e/sidebar-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và phần worklog này; giữ Help/AppShell/styles/worklog khác và .agnes ngoài commit. Push main theo quyền đã cấp và đối chiếu SHA remote.
+
 ## Kiểm tra lại nền và animation sidebar điện thoại — 2026-10-23
 
 - Theo2ảnh chủ dự án: local chưa tái hiện dịch chuyển hình học của nền ở75/100/125% zoom, nhưng overlay blur3px làm nền đổi nét đột ngột. Bỏ backdrop-filter chỉ cho overlay navigation, giữ fade tối; đổi mở240→320ms với curve bớt dồn chuyển động đầu, đóng200→280ms và fill both để giữ vị trí ngoài màn hình tới unmount. Không đổi scroll-lock global/layout dữ liệu/modal khác; chưa xác minh thiết bị thật hoặc production.

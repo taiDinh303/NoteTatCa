@@ -62,17 +62,28 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) => {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
-        animation.currentTime = 160;
+        const samples = [0.25, 0.5, 0.75].map((progress) => {
+          animation.currentTime = 400 * progress;
+          const rect = element.getBoundingClientRect();
+          return { progress, fraction: -rect.x / rect.width };
+        });
+        animation.currentTime = 200;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
           duration: animation.effect!.getTiming().duration,
+          delay: animation.effect!.getTiming().delay,
+          samples,
           x,
           width,
         };
       });
     expect(opening.name).toBe("sidebar-slide-in");
-    expect(opening.duration).toBe(320);
+    expect(opening.duration).toBe(400);
+    expect(opening.delay).toBe(0);
+    for (const sample of opening.samples) {
+      expect(sample.fraction).toBeCloseTo(1 - sample.progress, 2);
+    }
     expect(opening.x).toBeLessThan(-1);
     expect(opening.x).toBeGreaterThan(-opening.width);
     await unchanged();
@@ -88,18 +99,29 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) => {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
-        animation.currentTime = 140;
+        const samples = [0.25, 0.5, 0.75].map((progress) => {
+          animation.currentTime = 400 * progress;
+          const rect = element.getBoundingClientRect();
+          return { progress, fraction: -rect.x / rect.width };
+        });
+        animation.currentTime = 200;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
           duration: animation.effect!.getTiming().duration,
+          delay: animation.effect!.getTiming().delay,
+          samples,
           fill: animation.effect!.getTiming().fill,
           x,
           width,
         };
       });
     expect(closing.name).toBe("sidebar-slide-out");
-    expect(closing.duration).toBe(280);
+    expect(closing.duration).toBe(400);
+    expect(closing.delay).toBe(0);
+    for (const sample of closing.samples) {
+      expect(sample.fraction).toBeCloseTo(sample.progress, 2);
+    }
     expect(closing.fill).toBe("both");
     expect(closing.x).toBeLessThan(-1);
     expect(closing.x).toBeGreaterThan(-closing.width);

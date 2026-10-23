@@ -1,29 +1,29 @@
 .customer-shell > .sidebar {
   transition:
-    transform 220ms cubic-bezier(0.22, 0.8, 0.25, 1),
+    transform 320ms linear,
     visibility 0s linear;
 }
 .customer-shell.sidebar-hidden > .sidebar {
-  transition-delay: 0s, 220ms;
+  transition-delay: 0s, 320ms;
 }
 .customer-shell > .main-column {
-  transition: margin-left 220ms cubic-bezier(0.22, 0.8, 0.25, 1);
+  transition: margin-left 320ms linear;
 }
 .modal.navigation-drawer[data-state="open"] {
-  animation: sidebar-slide-in 320ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  animation: sidebar-slide-in 400ms linear 0s both;
 }
 .modal.navigation-drawer[data-state="closed"] {
-  animation: sidebar-slide-out 280ms cubic-bezier(0.4, 0, 0.6, 1) both;
+  animation: sidebar-slide-out 400ms linear 0s both;
   pointer-events: none;
 }
 .modal-overlay:has(~ .navigation-drawer) {
   backdrop-filter: none;
 }
 .modal-overlay:has(~ .navigation-drawer)[data-state="open"] {
-  animation: sidebar-overlay-in 320ms ease-out both;
+  animation: sidebar-overlay-in 400ms linear both;
 }
 .modal-overlay:has(~ .navigation-drawer)[data-state="closed"] {
-  animation: sidebar-overlay-out 280ms ease-in both;
+  animation: sidebar-overlay-out 400ms linear both;
 }
 @keyframes sidebar-slide-in {
   from {
