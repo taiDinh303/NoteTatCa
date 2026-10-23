@@ -37,9 +37,9 @@ for (const reduced of [false, true]) {
                     getComputedStyle(element).visibility !== "hidden"
                   ) {
                     const css = getComputedStyle(element);
-            const edges = css.clipPath.slice(6, -1).split(/\s+/);
+                    const edges = css.clipPath.slice(6, -1).split(/\s+/);
                     frames.push({
-              right: parseFloat(edges[1] ?? edges[0]),
+                      right: parseFloat(edges[1] ?? edges[0]),
                       x: element.getBoundingClientRect().x,
                       opacity: Number(css.opacity),
                     });
@@ -106,7 +106,15 @@ for (const reduced of [false, true]) {
           await expect(page.locator(selector)).toHaveCount(0);
         }
       } else {
-        await expect(page.locator(selector)).toBeHidden();
+        for (const frame of opening.slice(-5)) {
+          expect(frame.right).toBe(100);
+          expect(frame.x).toBe(0);
+        }
+        await expect(page.locator(selector)).toHaveAttribute("inert", "");
+        await expect(page.locator(selector)).toHaveCSS(
+          "pointer-events",
+          "none",
+        );
         const [showing] = await Promise.all([
           capture(),
           page

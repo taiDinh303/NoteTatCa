@@ -4162,8 +4162,7 @@ td {
   }
 }
 .customer-shell.sidebar-hidden > .sidebar {
-  transform: translateX(-100%);
-  visibility: hidden;
+  pointer-events: none;
 }
 .customer-shell.sidebar-hidden > .main-column {
   margin-left: 0;

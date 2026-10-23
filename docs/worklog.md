@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa flash desktop có bằng chứng video — 2026-10-24
+
+- Đọc video chủ dự án (440x880,15.253s,328frame) bằng PyAV local trong artifacts/video-tools, xem contact sheet và các frame liên tiếp. Dò mép vùng trắng sidebar: ở1.800s và7.467s có chuỗi gần đóng→full-width một frame→ẩn; đã xem frame1.800s xác nhận đúng sidebar, không phải dữ liệu note tải lại. Không đưa video/nội dung người dùng vào Git.
+- Sửa desktop bỏ visibility:hidden và transition visibility0s có delay400ms; giữ một cơ chế clip-path400ms liên tục tới100% để không đổi clipping/visibility/lớp vẽ cùng lúc ở cuối đóng. Sidebar ẩn vẫn inert/aria-hidden/pointer-events:none, không nhận focus/click và giữ preference. Không đổi layout/API/data hoặc hiệu ứng mobile, vẫn chỉ label scroll.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS. Chromium12/12 PASS (header4, live4, geometry3, paint-video1), thêm workspace persistent-sidebar1/1 PASS. Paint test quay6chu kỳ desktop1440x900; dò345frame VP9 không có full-width flash đơn lẻ theo cùng tiêu chí video gốc (2frame lỗi). Assertions cuối đóng clip100%/visibility vẫn visible nhưng inert/aria-hidden/pointer-events none, không transition visibility. Workspace test đầu timeout vì locator Done cũ (Labels Manager đã đổi Close); cập nhật đúng Close và chạy lại PASS. Parser/analysis helper, PyAV và video chỉ là artifact local.
+- Giới hạn: so sánh pixel theo mép trắng và mẫu flash video, không hứa hết mọi GPU/thiết bị; Chromium headless/fixture loopback SQLite/email giả, không full suite/production/thiết bị thật/DB/email thật/manual deploy/migrate. Scope publication: SidebarMotion.css, riêng rule sidebar-hidden styles.css, e2e/sidebar-paint.spec.ts/sidebar-live-motion.spec.ts/header.spec.ts/workspace.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Giữ .agnes ngoài commit; push main theo quyền đã cấp và đối chiếu SHA remote.
+
 ## Giữ0.4s và ổn định cuối animation sidebar — 2026-10-24
 
 - Chủ dự án đồng ý reveal, yêu cầu0.4s và báo đôi lúc chớp/rung khi mở xong. Duration đã400ms và giữ nguyên. Thêm clip-path mặc định cho navigation-drawer khớp keyframe cuối, will-change:clip-path cho sidebar/drawer và isolation drawer để giữ trạng thái/lớp vẽ ổn định. Đây là sửa phòng tránh chuyển trạng thái vẽ cuối animation; chưa tái hiện chắc chắn raster flicker/GPU trên thiết bị thật, không khẳng định nguyên nhân duy nhất.

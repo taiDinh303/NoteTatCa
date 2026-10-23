@@ -3,15 +3,13 @@
 .customer-shell > .sidebar {
   transform: none !important;
   clip-path: inset(0 0 0 0);
-  transition:
-    clip-path 400ms linear,
-    visibility 0s linear;
-  transition-duration: 400ms, 0s !important;
+  transition: clip-path 400ms linear;
+  transition-duration: 400ms !important;
   will-change: clip-path;
 }
 .customer-shell.sidebar-hidden > .sidebar {
   clip-path: inset(0 100% 0 0);
-  transition-delay: 0s, 400ms;
+  pointer-events: none;
 }
 .customer-shell > .main-column {
   transition: margin-left 400ms linear;

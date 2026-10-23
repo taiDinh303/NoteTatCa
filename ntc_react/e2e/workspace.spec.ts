@@ -978,7 +978,7 @@ test("offers a compact workspace with persistent sidebar control and one labels 
   await manageLabels.getByText("YOUR LABELS", { exact: true }).click();
   await page
     .getByRole("dialog", { name: "Your labels", exact: true })
-    .getByRole("button", { name: "Done", exact: true })
+    .getByRole("button", { name: "Close", exact: true })
     .click();
   await page.evaluate(() => {
     (window as Window & { fixtureMarker?: string }).fixtureMarker =
@@ -991,7 +991,8 @@ test("offers a compact workspace with persistent sidebar control and one labels 
       .locator("svg"),
   ).toHaveClass(/lucide-menu/);
   await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
-  await expect(page.locator("#workspace-navigation")).not.toBeVisible();
+  await expect(page.locator("#workspace-navigation")).toHaveAttribute("inert", "");
+  await expect(page.locator("#workspace-navigation")).toHaveCSS("pointer-events", "none");
   expect(
     (await page.locator("#workspace-main").boundingBox())!.width,
   ).toBeGreaterThan(before);

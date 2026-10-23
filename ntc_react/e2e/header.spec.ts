@@ -27,7 +27,8 @@ for (const width of [1440, 1024, 393, 320]) {
       const sidebar = (await page.locator('#workspace-navigation').boundingBox())!;
       expect(sidebar.y).toBeGreaterThanOrEqual(box.y + box.height);
       await page.getByRole('button', { name: 'Hide sidebar', exact: true }).click();
-      await expect(page.locator('#workspace-navigation')).toBeHidden();
+      await expect(page.locator('#workspace-navigation')).toHaveAttribute('inert', '');
+      await expect.poll(() => page.locator('#workspace-navigation').evaluate(el => parseFloat(getComputedStyle(el).clipPath.split(' ')[1]))).toBe(100);
       await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
       await page.getByRole('button', { name: 'Show sidebar', exact: true }).click();
     } else {

@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Sửa flash cuối đóng desktop (2026-10-24): video chủ dự án có full-width flash một frame ở1.800s/7.467s. Bỏ visibility:hidden/delay ở desktop, chỉ transition clip-path400ms tới100%, giữ inert/aria-hidden/pointer-events:none khi ẩn. Không đổi cơ chế mobile hoặc data loading. Quay6chu kỳ sau sửa, dò345frame không có lại mẫu flash (video gốc328frame có2); regression13ca PASS. Chi tiết/phạm vi môi trường trong worklog.
+
 Ổn định cuối reveal (2026-10-24): giữ400ms; drawer có clip-path mặc định khớp keyframe kết thúc, isolation và will-change:clip-path; desktop giữ will-change để tránh đổi lớp vẽ sau transition. Live rAF kiểm5frame cuối x/opacity/clip ổn định và mobile mở lại2lần ở cả2media PASS; chưa tái hiện/đo raster flicker trên GPU/thiết bị thật. Xem worklog.
 
 Sidebar reveal (2026-10-24): chủ dự án yêu cầu mở như rèm/PowerPoint, thay slide/fade bằng clip-path inset: mép phải quét trái→phải, nội dung/sidebar và nền mobile không di chuyển; đóng thu ngược lại.400ms linear/delay0/fill both, desktop margin đồng bộ400ms. Yêu cầu chuyển động rõ ràng này áp dụng cả media reduced-motion, override scoped sidebar/overlay; không đổi Windows hoặc animation modal khác.12ca Chromium PASS gồm live rAF393/1440px với cả2media, mốc25/50/75% và nền/scroll ở3zoom, dismiss và label-scroll; build React/.NET Release và ESLint PASS. Xem worklog.
