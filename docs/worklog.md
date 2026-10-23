@@ -2,6 +2,12 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Ẩn tiêu đề "Search results" ở list view khi có search query — 2026-10-23
+
+- Theo yêu cầu chủ dự án (ảnh): chữ "Search results" hiển thị trên đầu list khi gõ tìm kiếm gây thừa. Bỏ hiển thị visible của tiêu đề này; chỉ còn "Notes with reminders" giữ visible, trường hợp search/trash/label chuyển về `sr-only` (còn đọc cho screen reader).
+- `ntc_react/src/features/notes/NotesPage.tsx`: điều kiện `className` của `<h1>` bỏ `q` (search query) khỏi nhánh visible.
+- Validation: `npm --prefix ntc_react run build` PASS; eslint clean.
+
 ## Palette màu gọn một hàng, Default chung Saved colors — 2026-10-23
 
 - Theo ảnh/yêu cầu chủ dự án: bỏ dòng Colors are saved... trong popup; đổi Default note color thành Default và đưa vào đầu danh sách Saved colors. Giữ thông báo lỗi chỉ khi browser thực sự không lưu được.
