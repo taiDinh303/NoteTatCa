@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 for (const reduced of [false, true]) {
   for (const width of [393, 1440]) {
-    test(`sidebar moves in real frames ${width} ${reduced ? "fade" : "slide"}`, async ({
+    test(`sidebar reveals in real frames ${width} reduced=${reduced}`, async ({
       page,
       request,
     }) => {
@@ -25,28 +25,47 @@ for (const reduced of [false, true]) {
       const capture = () =>
         page.evaluate(
           (target) =>
-            new Promise<{ x: number; opacity: number }[]>((resolve) => {
-              const frames: { x: number; opacity: number }[] = [];
-              const start = performance.now();
-              const sample = () => {
-                const element = document.querySelector(target);
-                if (
-                  element &&
-                  getComputedStyle(element).visibility !== "hidden"
-                ) {
-                  frames.push({
-                    x: element.getBoundingClientRect().x,
-                    opacity: Number(getComputedStyle(element).opacity),
-                  });
-                }
-                if (performance.now() - start < 650)
-                  requestAnimationFrame(sample);
-                else resolve(frames);
-              };
-              requestAnimationFrame(sample);
-            }),
+            new Promise<{ right: number; x: number; opacity: number }[]>(
+              (resolve) => {
+                const frames: { right: number; x: number; opacity: number }[] =
+                  [];
+                const start = performance.now();
+                const sample = () => {
+                  const element = document.querySelector(target);
+                  if (
+                    element &&
+                    getComputedStyle(element).visibility !== "hidden"
+                  ) {
+                    const css = getComputedStyle(element);
+                    frames.push({
+                      right: parseFloat(css.clipPath.split(" ")[1]),
+                      x: element.getBoundingClientRect().x,
+                      opacity: Number(css.opacity),
+                    });
+                  }
+                  if (performance.now() - start < 700)
+                    requestAnimationFrame(sample);
+                  else resolve(frames);
+                };
+                requestAnimationFrame(sample);
+              },
+            ),
           selector,
         );
+      const assertReveal = (
+        frames: { right: number; x: number; opacity: number }[],
+      ) => {
+        const intermediate = frames.filter(
+          (frame) => frame.right > 1 && frame.right < 99,
+        );
+        expect(
+          new Set(intermediate.map((frame) => Math.round(frame.right))).size,
+        ).toBeGreaterThan(2);
+        intermediate.forEach((frame) => {
+          expect(Math.abs(frame.x)).toBeLessThan(0.5);
+          expect(frame.opacity).toBe(1);
+        });
+      };
       const [opening] = await Promise.all([
         capture(),
         page
@@ -56,43 +75,13 @@ for (const reduced of [false, true]) {
           })
           .click(),
       ]);
-      if (reduced) {
-        const intermediate = opening.filter(
-          (frame) => frame.opacity > 0.02 && frame.opacity < 0.98,
-        );
-        expect(intermediate.length).toBeGreaterThan(1);
-        intermediate.forEach((frame) =>
-          expect(Math.abs(frame.x)).toBeLessThan(0.5),
-        );
-      } else {
-        expect(
-          new Set(
-            opening
-              .filter((frame) => frame.x < -1 && frame.x > -240)
-              .map((frame) => Math.round(frame.x)),
-          ).size,
-        ).toBeGreaterThan(2);
-      }
+      assertReveal(opening);
       if (width < 800) {
         const [closing] = await Promise.all([
           capture(),
           page.keyboard.press("Escape"),
         ]);
-        if (reduced) {
-          expect(
-            closing.filter(
-              (frame) => frame.opacity > 0.02 && frame.opacity < 0.98,
-            ).length,
-          ).toBeGreaterThan(1);
-        } else {
-          expect(
-            new Set(
-              closing
-                .filter((frame) => frame.x < -1 && frame.x > -240)
-                .map((frame) => Math.round(frame.x)),
-            ).size,
-          ).toBeGreaterThan(2);
-        }
+        assertReveal(closing);
         await expect(page.locator(selector)).toHaveCount(0);
       } else {
         await expect(page.locator(selector)).toBeHidden();
@@ -102,16 +91,7 @@ for (const reduced of [false, true]) {
             .getByRole("button", { name: "Show sidebar", exact: true })
             .click(),
         ]);
-        if (reduced)
-          expect(
-            showing.filter(
-              (frame) => frame.opacity > 0.02 && frame.opacity < 0.98,
-            ).length,
-          ).toBeGreaterThan(1);
-        else
-          expect(
-            showing.some((frame) => frame.x < -1 && frame.x > -240),
-          ).toBeTruthy();
+        assertReveal(showing);
         await expect(page.locator(selector)).toBeVisible();
       }
     });

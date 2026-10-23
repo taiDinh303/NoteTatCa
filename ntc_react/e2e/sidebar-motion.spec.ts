@@ -64,8 +64,8 @@ for (const scale of [0.75, 1, 1.25]) {
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
           animation.currentTime = 400 * progress;
-          const rect = element.getBoundingClientRect();
-          return { progress, fraction: -rect.x / rect.width };
+          const right = getComputedStyle(element).clipPath.split(" ")[1];
+          return { progress, fraction: parseFloat(right) / 100 };
         });
         animation.currentTime = 200;
         const { x, width } = element.getBoundingClientRect();
@@ -84,7 +84,7 @@ for (const scale of [0.75, 1, 1.25]) {
     for (const sample of opening.samples) {
       expect(sample.fraction).toBeCloseTo(1 - sample.progress, 2);
     }
-    expect(opening.x).toBeLessThan(-1);
+    expect(opening.x).toBeCloseTo(0);
     expect(opening.x).toBeGreaterThan(-opening.width);
     await unchanged();
     await expect(page.locator(".modal-overlay")).toHaveCSS(
@@ -101,8 +101,8 @@ for (const scale of [0.75, 1, 1.25]) {
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
           animation.currentTime = 400 * progress;
-          const rect = element.getBoundingClientRect();
-          return { progress, fraction: -rect.x / rect.width };
+          const right = getComputedStyle(element).clipPath.split(" ")[1];
+          return { progress, fraction: parseFloat(right) / 100 };
         });
         animation.currentTime = 200;
         const { x, width } = element.getBoundingClientRect();
@@ -123,7 +123,7 @@ for (const scale of [0.75, 1, 1.25]) {
       expect(sample.fraction).toBeCloseTo(sample.progress, 2);
     }
     expect(closing.fill).toBe("both");
-    expect(closing.x).toBeLessThan(-1);
+    expect(closing.x).toBeCloseTo(0);
     expect(closing.x).toBeGreaterThan(-closing.width);
     await unchanged();
     await page.screenshot({ path: `test-results/sidebar-exit-${scale}.png` });
@@ -137,10 +137,10 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) =>
         parseFloat(getComputedStyle(element).animationDuration),
       );
-    expect(duration).toBe(0.18);
+    expect(duration).toBe(0.4);
     await expect(page.locator(".navigation-drawer")).toHaveCSS(
       "animation-name",
-      "sidebar-overlay-in",
+      "sidebar-slide-in",
     );
     await page.keyboard.press("Escape");
     await page.locator(".navigation-drawer").waitFor({ state: "detached" });

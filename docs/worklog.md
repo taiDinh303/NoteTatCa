@@ -1,6 +1,12 @@
 ﻿# WORKLOG — NoteTatCa
 
-> 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+> 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+
+## Sidebar mở màn từ trái sang phải — 2026-10-24
+
+- Chủ dự án nhắc Cover/Uncover PowerPoint và yêu cầu rõ chuyển động: đổi translate/fade thành clip-path inset(0 100% 0 0)→inset(0 0% 0 0), đóng ngược lại. Logo/menu đứng nguyên vị trí, mép phải mở dần như rèm, không kéo nền mobile.400ms linear/delay0/fill both, desktop margin400ms. Theo chỉ dẫn người dùng hiện hành, sidebar dùng hiệu ứng này cả khi media reduced-motion; duration override scoped nav/overlay, không sửa Windows/global modal. Tham khảo [MDN clip-path](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/clip-path) và [Microsoft CoverTransition](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.presentation.covertransition); đây là hiệu ứng reveal cho web, không khẳng định sao chép nguyên bản PowerPoint.
+- Validation root: React Production build PASS; .NET Release --no-restore PASS,0warnings/0errors; ESLint max-warnings0 PASS; Chromium12/12 PASS.4live rAF393/1440px × reduced/no-preference có>2giá trị clip trung gian thực tế, x≈0/opacity1 (không translate/fade); mốc25/50/75% ở zoom75/100/125% đúng tỉ lệ mở/thu, nền/scroll giữ nguyên<0.5px, delay0/duration400ms và unmount đúng. Dismiss customer/admin và label-scroll320/393/1440 PASS. Đã xem screenshot đóng50% ở393px. Không full suite/thiết bị thật/production/DB/email thật/manual deploy/migrate; fixture loopback SQLite/email giả.
+- Publication scope: SidebarMotion.css, e2e/sidebar-live-motion.spec.ts, e2e/sidebar-motion.spec.ts, docs/FRONTEND-IMPLEMENTATION.md và worklog. Giữ .agnes ngoài commit; push main theo quyền đã cấp, đối chiếu SHA remote.
 
 ## Sửa sidebar mất hiệu ứng khi hệ thống giảm chuyển động — 2026-10-23
 
