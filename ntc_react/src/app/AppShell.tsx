@@ -158,11 +158,13 @@ export default function AppShell() {
     "/settings/profile": "Profile",
     "/settings/account": "Account & security",
     "/settings/sessions": "Active sessions",
+    "/help": "Help & feedback",
   };
   const settingsTitle = settingsTitles[location.pathname];
   const settingsBack =
     location.pathname === "/settings" ||
-    location.pathname === "/settings/profile"
+    location.pathname === "/settings/profile" ||
+    location.pathname === "/help"
       ? "/notes"
       : location.pathname === "/settings/account" ||
           location.pathname === "/settings/sessions"

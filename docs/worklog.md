@@ -2,6 +2,13 @@
 
 > 2026-10-23 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Help & feedback mobile: dùng mobile-header giống Settings, ẩn h1 riêng — 2026-10-23
+
+- Theo ảnh chủ dự án (mobile): trang Help & feedback hiện vẫn dùng topbar thường (brand/search/actions), trong khi các trang Settings con (Language/Privacy/Appearance) dùng "nút quay lại + tiêu đề" riêng, không có header. Đưa `/help` vào cùng cơ chế: thêm key `"/help": "Help & feedback"` vào `settingsTitles` (AppShell.tsx) và `settingsBack` trỏ về `/notes`; CSS mobile (≤800px) thêm `.help-page > h1 { display: none; }` để ẩn heading riêng, dùng header chung hiển thị "← Help & feedback" — desktop giữ topbar + h1 như cũ.
+- Không đổi API/i18n; HelpPage.tsx không sửa (heading JSX giữ nguyên, chỉ CSS che trên mobile).
+- Validation: React Production build PASS; ESLint PASS. Không full suite/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/app/AppShell.tsx, ntc_react/src/styles.css, docs/worklog.md.
+
 ## Sidebar trượt đều như kéo rèm, không chờ rồi hiện — 2026-10-23
 
 - Theo yêu cầu tiếp: dùng chuyển động linear liên tục, mobile mở/đóng400ms delay0, overlay fade400ms đồng bộ; desktop transform/margin320ms linear và visibility chỉ ẩn sau trượt. Giữ CSS keyframes/Radix Presence, fill both, nền không blur và reduced-motion; không thêm timer/gesture/dependency. Tham khảo chính thức: https://www.radix-ui.com/primitives/docs/guides/animation và https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/animation-timing-function .

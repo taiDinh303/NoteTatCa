@@ -4613,5 +4613,5 @@ td {
   .preferences-mobile-header { display: flex; align-items: center; gap: 12px; width: 100%; }
   .preferences-mobile-header h1 { margin: 0; font-size: 18px; font-weight: 700; }
   .preferences-mobile-header .icon-button { flex-shrink: 0; width: 40px; height: 40px; }
-  .preferences-page > h1, .settings-area .preferences-back { display: none; }
+  .preferences-page > h1, .help-page > h1, .settings-area .preferences-back { display: none; }
 }
