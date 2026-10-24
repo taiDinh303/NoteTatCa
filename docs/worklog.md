@@ -2,6 +2,16 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Account settings: Google button đúng grid + password mask ************ — 2026-10-24
+
+- Theo ảnh chủ dự án (dark mode, /settings/account): nút "Continue with Google" (chưa link) nằm giữa, không cùng trục dọc/ngang với các nút "Change"/"Disconnect" ở cột phải; password hiển thị "A password is set for your account." (text) thay vì dấu *.
+- SettingsPage.tsx: section Password dùng `{"*".repeat(12)}` khi `hasPassword` và `tr("No password set")` khi chưa có; section Connected accounts chuyển `google-signin` vào class `account-action`, cùng grid `account-data-row` (col1 value, col2 action) như email/phone/password; locator "No accounts connected" thay vì "A password is set...".
+- settings.css: thêm `.google-signin.account-action { grid-column:2; align-items:flex-end; }` + `.google-placeholder { width:auto; min-width:220px; }` — nút Google căn phải đúng cột action, không tràn 340px fixed.
+- e2e: settings-actions.spec đổi locator "No password is set..." → "No password set", ".connected-provider" → ".connected-provider-label"; settings-view.spec filter "************".
+- Không đổi API/routing/auth/i18n; chỉ JSX + CSS + test locator.
+- Validation: React Production build PASS; ESLint PASS. Không full e2e/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: SettingsPage.tsx, settings.css, settings-actions.spec.ts, settings-view.spec.ts, docs/worklog.md.
+
 ## Mobile Settings danh sách dọc, múi giờ gọn và xác nhận bỏ avatar — 2026-10-24
 
 - Theo4ảnh/chủ dự án: PC giữ6tab/thứ tự hiện tại. Mobile≤800px theo interface zoom dùng SettingsIndex sáu hàng toàn chiều ngang/icon/chevron, không tab kéo ngang; drawer Settings vào index, chọn mục mở trang con, Back về index rồi notes/admin overview. Root settings/preference chỉ redirect account trên PC. settingsLinks dùng chung route/thứ tự; index nghe resize có cleanup và zoom context. Admin mobile có header tên cho profile/account/sessions, giữ route/ownership/API.

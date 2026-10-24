@@ -44,8 +44,8 @@ for (const width of [320, 393, 1440]) {
     }
     await expect(page.getByText("Connected", { exact: true })).toHaveCount(0);
     await expect(
-      page.getByText("No password is set for your account.", { exact: true }),
-    ).toHaveCount(0);
+      page.getByText("No password set", { exact: true }),
+    ).toBeVisible();
     const setup = page.getByRole("button", {
       name: "Set your password",
       exact: true,
@@ -66,7 +66,7 @@ for (const width of [320, 393, 1440]) {
       }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
-    const provider = await page.locator(".connected-provider").boundingBox();
+    const provider = await page.locator(".connected-provider-label").boundingBox();
     const disconnect = page.getByRole("button", { name: "Disconnect", exact: true });
     const actionBounds = (await disconnect.boundingBox())!;
     const badge = (await page.locator(".provider-badge").boundingBox())!;

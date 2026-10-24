@@ -577,7 +577,7 @@ function AccountSettings({ me }: { me: Me }) {
           ) : (
             <div className="settings-view-field account-data-row">
               <p>{tr("No accounts connected")}</p>
-              <div className="google-signin">
+              <div className="google-signin account-action">
                 <GoogleButton
                   label="continue_with"
                   onCredential={async (token) => {
