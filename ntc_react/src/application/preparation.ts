@@ -54,10 +54,12 @@ export class WorkspacePreparation {
   private controller?: AbortController;
   private flight?: Promise<void>;
   private generation = 0;
+  private resumeBackground?: () => void;
   constructor(
     private readonly cache: QueryClient,
     private readonly ports: PreparationPorts,
     private readonly identity: () => string | undefined,
+    private readonly backgroundEnabled: () => boolean = () => true,
   ) {}
   getSnapshot = () => this.snapshot;
   subscribe = (listener: () => void) => {
@@ -74,6 +76,7 @@ export class WorkspacePreparation {
     this.generation++;
     this.controller?.abort();
     this.flight = undefined;
+    this.resumeBackground = undefined;
     this.snapshot = {
       status: "idle",
       completed: 0,
@@ -85,8 +88,13 @@ export class WorkspacePreparation {
   }
   prepare(session: Session): Promise<void> {
     const identity = this.identity();
-    if (this.snapshot.identity === identity && this.snapshot.status === "ready")
+    if (
+      this.snapshot.identity === identity &&
+      this.snapshot.status === "ready"
+    ) {
+      if (this.backgroundEnabled()) this.resumeBackground?.();
       return Promise.resolve();
+    }
     if (this.snapshot.identity === identity && this.flight) return this.flight;
     this.controller?.abort();
     const generation = ++this.generation;
@@ -140,6 +148,7 @@ export class WorkspacePreparation {
           queryKey: key(resource, ...parts),
           staleTime: WORKSPACE_STALE_TIME,
           retry: false,
+          networkMode: "always",
           queryFn: async ({ signal }) => {
             const combined = AbortSignal.any([signal, controller.signal]);
             const pages: Page<T>[] = [];
@@ -207,36 +216,17 @@ export class WorkspacePreparation {
           single("admin-stats", () => this.ports.admin.stats()),
         ]);
       } else {
-        // Four bounded streams, with sequential pages per stream; no request per label.
-        const [active, trash] = await Promise.all([
+        // Only active notes and labels gate the customer workspace.
+        const [active] = await Promise.all([
           paged("notes", [{}], (page, signal) =>
             this.ports.notes.list({}, page, signal),
-          ),
-          paged(
-            "notes",
-            [{ trash: true }],
-            (page, signal) =>
-              this.ports.notes.list({ trash: true }, page, signal),
-            "trash",
           ),
           paged("labels", [], (page, signal) =>
             this.ports.labels.list(page, signal),
           ),
-          (async () => {
-            await paged("reminders", [], (page, signal) =>
-              this.ports.reminders.list(page, signal),
-            );
-            await paged("inbox", [false], (page, signal) =>
-              this.ports.inbox.list(page, false, signal),
-            );
-            await single("unread", () => this.ports.inbox.count());
-            await single("me", () => this.ports.account.me());
-          })(),
         ]);
         guard();
-        for (const note of [...active.pages, ...trash.pages].flatMap(
-          (page) => page.items,
-        )) {
+        for (const note of active.pages.flatMap((page) => page.items)) {
           if (note.userId !== session.userId)
             throw new Error(
               "The server returned an unexpected account. Please sign in again.",
@@ -250,27 +240,44 @@ export class WorkspacePreparation {
             note.reminders,
           );
         }
-        const allInbox = this.cache.getQueryData<InfiniteData<Page<InboxItem>>>(
-          key("inbox", false),
-        );
-        if (allInbox) {
-          const items = allInbox.pages
-            .flatMap((page) => page.items)
-            .filter((item) => !item.readAt);
-          const count = Math.max(1, Math.ceil(items.length / 50));
-          this.cache.setQueryData(key("inbox", true), {
-            pages: Array.from({ length: count }, (_, index) => ({
-              items: items.slice(index * 50, (index + 1) * 50),
-              currentPage: index + 1,
-              totalPages: count,
-              totalItems: items.length,
-              pageSize: 50,
-              hasNextPage: index + 1 < count,
-              hasPreviousPage: index > 0,
-            })),
-            pageParams: Array.from({ length: count }, (_, index) => index + 1),
-          });
-        }
+        guard();
+        this.emit({ status: "ready" });
+        // Secondary failures belong to their own screens; they never close notes.
+        let backgroundStarted = false;
+        this.resumeBackground = () => {
+          if (backgroundStarted || !this.backgroundEnabled()) return;
+          backgroundStarted = true;
+          void Promise.allSettled([
+            paged(
+              "notes",
+              [{ trash: true }],
+              (page, signal) =>
+                this.ports.notes.list({ trash: true }, page, signal),
+              "trash",
+            ),
+            paged("reminders", [], (page, signal) =>
+              this.ports.reminders.list(page, signal),
+            ),
+            (async () => {
+              const all = await paged<InboxItem>("inbox", [false], (page, signal) =>
+                this.ports.inbox.list(page, false, signal),
+              );
+              guard();
+              const items = all.pages.flatMap(page => page.items).filter(item => !item.readAt);
+              const totalPages = Math.max(1, Math.ceil(items.length / 50));
+              this.cache.setQueryData(key("inbox", true), {
+                pages: Array.from({ length: totalPages }, (_, index) => ({
+                  items: items.slice(index * 50, (index + 1) * 50), currentPage: index + 1,
+                  totalPages, totalItems: items.length, pageSize: 50,
+                  hasNextPage: index + 1 < totalPages, hasPreviousPage: index > 0,
+                })), pageParams: Array.from({ length: totalPages }, (_, index) => index + 1),
+              });
+              await single("unread", () => this.ports.inbox.count());
+            })(),
+            single("me", () => this.ports.account.me()),
+          ]);
+        };
+        this.resumeBackground();
       }
       guard();
       this.emit({ status: "ready" });

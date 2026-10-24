@@ -269,7 +269,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
       setBusy(false);
     }
   }
-  if (mode === "login" && state.status === "authenticated")
+  if (mode === "login" && (state.status === "authenticated" || state.status === "offline"))
     return <Navigate to={homePath(state.session)} replace />;
   return (
     <div className="auth-page">

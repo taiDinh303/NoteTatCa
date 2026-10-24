@@ -32,6 +32,8 @@ User yêu cầu bỏ toast thành công kiểu Note pinned, editor mặc định
 
 ## DEC-019 — Chuẩn bị dữ liệu và trạng thái kết nối (2026-10-20)
 
+Phần tải hết trước khi mở workspace và giới hạn cache memory là CURRENT lịch sử; TARGET mới tại DEC-025/026 ngày2026-10-24 thay các phần này khi triển khai. Giữ nguyên các bảo vệ ownership/session/draft.
+
 Theo yêu cầu chủ dự án, sau login/khôi phục phiên tải đủ các trang notes active/trash, labels, reminders, inbox, unread count và hồ sơ trước khi mở workspace. Tối đa bốn luồng tải, tuần tự từng trang trong mỗi collection; tiến trình dựa trên collection/trang hoàn tất. Cache chỉ trong memory của tab đến logout/đổi account/nhóm quyền; labels/pin/search lấy danh sách ban đầu từ notes đã tải đủ, không gọi một API cho từng label. Cache được làm mới nền và invalidation khi sửa; không cam kết dữ liệu là một snapshot transaction hoặc truy cập offline bền vững. Account có nhiều note/nội dung lớn sẽ mất nhiều thời gian/bộ nhớ ở bước đầu.
 
 Login/Google/refresh kiểm tra GET health trước khi gửi credentials/token: một probe dùng chung, timeout/backoff hữu hạn, không tự retry POST/ghi chú. Có animation khi chuẩn bị/chờ kết nối, thông báo offline/API chậm và nút retry khi thất bại; không khẳng định server chắc chắn ngủ chỉ từ lỗi mạng. Giữ editor/draft khi outage, chỉ hết phiên khi server xác nhận auth không hợp lệ. Không thêm keep-alive định kỳ để chống sleep; polling chức năng inbox/unread hiện có vẫn giữ. Admin chỉ preload me/statistics và module quản trị, không note/label/reminder/inbox. Không migrate/deploy hoặc đổi dữ liệu cloud.
@@ -130,4 +132,46 @@ Chủ dự án xác nhận chọn ngôn ngữ là đổi ngay toàn bộ giao di
 
 Settings có Language/Privacy/Appearance. Privacy mô tả quyền truy cập note, tài khoản/phiên đăng nhập, browser storage, email nhắc và thời hạn khôi phục; liên kết tới các chức năng có thật. Tham khảo bố cục/nội dung Joplin, Notion, Standard Notes, không đưa cam kết mã hóa đầu cuối, chứng nhận hoặc chính sách kinh doanh của sản phẩm khác vào NoteTatCa. Account export/hard delete, retention backup và thông báo pháp lý của đơn vị vận hành vẫn chưa được chốt.
 
+Bổ sung2026-10-24: export/xóa tài khoản đã được chủ dự án chốt tại DEC-027; retention backup và nội dung cam kết vận hành vẫn cần xác định trước khi công bố thời điểm xóa hoàn toàn.
+
 Chủ dự án chọn mobile Settings dùng header gọn ← và tên trang, thay hamburger/search, không lặp breadcrumb trong nội dung. Trang con → Settings → ghi chú; PC giữ header/sidebar. Admin có App settings với đường dẫn và liên kết self phù hợp, không truy cập workspace khách. Không đổi API/schema/config hoặc tự deploy/migrate.
+
+## DEC-025 — Offline và đồng bộ (2026-10-24)
+
+TARGET đã chốt bởi chủ dự án, chưa triển khai: xem/tạo/sửa note offline sau khi đã mở online và tải dữ liệu về thiết bị; tự đồng bộ khi có mạng, đồng thời có nút Sync now. Hiển thị phân biệt lưu trên thiết bị/chờ đồng bộ/đã đồng bộ/xung đột. Đăng xuất khi có thay đổi chưa đồng bộ phải cảnh báo, cho ở lại để đồng bộ hoặc tải bản dự phòng trước khi xóa dữ liệu máy; không tự bỏ draft.
+
+Thiết kế kỹ thuật PROPOSED: app shell/static assets qua service worker, note/labels và hàng đợi ghi qua IndexedDB riêng theo account; không cache tràn lan response auth/security/admin. Version server kiểm xung đột; giữ cả bản local/server để chọn, không âm thầm last-write-wins. Queue có operation ID chống tạo trùng, thứ tự thao tác, retry có giới hạn/backoff và phối hợp nhiều tab; reconnect phải xác nhận đúng account và quyền trước khi gửi. Cache local không phải backup hoặc mã hóa đầu cuối; trình duyệt có thể xóa/thu hồi storage. Chốt chi tiết offline unlock/thời hạn cache và quota sau khảo sát, trước triển khai lưu nội dung bền vững. Khi quyền bị thu hồi mà thiết bị offline, không thể cam kết thu hồi ngay bản đã tải; khi online phải chặn sync và xử lý cache đúng chính sách.
+
+Bản đầu giới hạn xem/tạo/sửa nội dung note; thay đổi account/security, hard delete và gửi reminder cần online. Reminder chưa lên server phải báo chưa được lên lịch. Offline label mutation/reorder/trash, đồng bộ thứ tự label giữa thiết bị và lịch sử phiên bản là backlog mở rộng, chưa tự thêm vào phạm vi bản đầu. Admin tiếp tục không tải nội dung note của người khác.
+
+## DEC-026 — Ưu tiên dữ liệu workspace và độ phản hồi (2026-10-24)
+
+TARGET chủ dự án: notes active và labels ưu tiên trước; vẫn tải đủ dữ liệu còn lại nhưng chạy nền khi đã vào workspace. Dữ liệu tối thiểu xác minh phiên/quyền không được trì hoãn. Lỗi trash/inbox/profile chi tiết không chặn notes; truy cập mục nào ưu tiên mục đó. Không mặc định tải toàn bộ dữ liệu Settings nhạy cảm vào cache offline. Giữ bounded concurrency và kiểm account khi session thay đổi. Optimistic updates và cache bổ sung theo từng thao tác, có rollback hoặc pending draft khi lỗi; không báo đã lưu server trước ACK. CURRENT đã có optimistic pin/reorder, chưa coi các thao tác khác hoặc full offline là hoàn thiện.
+
+Đo baseline trước/sau: từ restore/login tới notes thao tác được, số request/payload, chuyển note/label, tải lạnh/ấm và mạng chậm/API wake. Chưa có số đo production trong lượt phân tích này; không cam kết mức cải thiện hoặc quy lỗi cho hosting khi chưa đo.
+
+## DEC-027 — Export và vòng đời tài khoản (2026-10-24)
+
+TARGET: người dùng tự yêu cầu xóa tài khoản, hệ thống tự xóa vĩnh viễn sau30ngày; admin được xóa ngay để chủ dự án quản lý linh hoạt. Tách rõ vô hiệu hóa (giữ dữ liệu, khôi phục được), lên lịch xóa (hiện ngày hết hạn, có thể hủy trong hạn), xóa ngay/vĩnh viễn (không khôi phục từ ứng dụng). Trash note vẫn7ngày, không dùng lẫn hạn30ngày của account. CURRENT UserService có deactivate/restore và chặn DeleteAsync; chưa có lịch purge account.
+
+Thiết kế PROPOSED: re-auth cho yêu cầu tự xóa/hủy, confirm nguy hiểm riêng cho admin xóa ngay, chống tự xóa admin hiện tại và mất admin cuối cùng. Thu hồi phiên và dừng gửi reminder khi account chờ xóa; cung cấp luồng truy cập hạn chế để hủy/xuất dữ liệu thay vì mở lại workspace bình thường. Email tới địa chỉ đã xác minh khi lên lịch, nhắc trước hạn và thông báo khi admin xóa ngay (không làm trì hoãn xóa30ngày); dùng outbox/retry để email lỗi không làm mất trạng thái xử lý. Nội dung email không chứa note. Job purge idempotent/restart-safe, kiểm lại yêu cầu chưa hủy trước khi xóa. Rà toàn bộ quan hệ dữ liệu, audit tối thiểu/anonymization, cache thiết bị và backup trước khi triển khai; không hứa xóa backup tức thì. Không thể xóa từ xa bản export hoặc cache trên thiết bị đang offline.
+
+Export đã được đồng ý trong trao đổi; JSON đầy đủ và Markdown dễ đọc là đề xuất trước, PDF/ảnh đính kèm để sau. Phải giữ rich content và labels, test round-trip cho JSON; export chỉ dữ liệu chính chủ. Thời điểm email nhắc, retention backup/audit và quyền admin xóa admin khác chưa được chốt, không tự suy ra quyền mới.
+
+## Backlog tiếp theo — 2026-10-24
+
+Tất cả dưới đây là TODO; lượt này chỉ ghi quyết định/tài liệu, không code/deploy/migrate. Làm từng đợt độc lập, mỗi đợt ghi evidence/giới hạn vào worklog.
+
+Cập nhật lượt code tiếp theo2026-10-24 theo yêu cầu chủ dự án: TASK-014 đã tách critical/background; TASK-016/017 có bản offline customer và kiểm local, xem FRONTEND-IMPLEMENTATION/worklog. TASK-015 có coalesce outbox và cache revalidation, chưa audit/đo performance toàn project. TASK-018 mới có backup JSON phục vụ logout, chưa import JSON hoặc export account đầy đủ. TASK-019/admin deletion để sau theo lệnh mới; TASK-020 vẫn TODO. Không coi các acceptance stress/production/backup vận hành đã hoàn tất. Bảng dưới giữ phạm vi kế hoạch, trạng thái hiện hành là cập nhật này.
+
+| ID | Ưu tiên/thứ tự | Công việc | Tiêu chí nghiệm thu |
+| --- | --- | --- | --- |
+| TASK-014 | P1 / 1 | Đo tải và tách critical/background theo DEC-026 | Notes/labels dùng được khi nguồn phụ chậm/lỗi; nền vẫn tải đủ; số đo trước/sau; account switch hủy request cũ |
+| TASK-015 | P1 / 2 | Rà cache, invalidation và optimistic mutations | Không refetch dư có bằng chứng; không mất draft/ghi đè ACK mới; lỗi rollback/pending rõ; multi-tab/account isolation |
+| TASK-016 | P1 / 3 | Offline shell + snapshot riêng theo user | Mở lại offline sau lần online, note/label đã tải xem được; schema upgrade/quota/storage failure không mất draft hoặc lộ account khác |
+| TASK-017 | P1 / 4 | Offline edits/outbox + auto/manual sync | Create/edit sống qua reload; reconnect không tạo trùng; conflict giữ hai bản; logout/export protection; revoke/đổi account không gửi nhầm queue |
+| TASK-018 | P2 / 5 | Export JSON/Markdown | Owner-only, rich content không mất ở JSON, tải bản pending để bảo vệ logout, lỗi/mạng chậm có trạng thái rõ |
+| TASK-019 | P2 / 6 | Self deletion30ngày + admin immediate deletion | Hủy trước hạn không purge; job chạy lại an toàn; confirm/ownership/admin guard/email lỗi được kiểm; không đổi retention note7ngày |
+| TASK-020 | P2 / trước bật xóa thật | Chốt vận hành và kiểm khôi phục | Backup/audit retention, email retry, giám sát job/sync và restore drill có bằng chứng; cập nhật Privacy đúng hành vi |
+
+Đề xuất để sau, chưa giao code: phân trang hiển thị note khi dữ liệu lớn nhưng vẫn tải nền đủ, đồng bộ thứ tự label đa thiết bị, delta sync thay tải lại toàn bộ khi có số đo, lịch sử khôi phục phiên bản. Không refactor lớn/bỏ thư viện/thêm analytics hoặc attachments chỉ dựa trên phỏng đoán. Cloud đang được chủ dự án sử dụng trên Vercel/Render/Supabase; không lấy các dòng cloud TODO lịch sử làm lý do triển khai lại. Brevo có evidence live trong worklog; backup/restore/performance vẫn cần kiểm riêng.

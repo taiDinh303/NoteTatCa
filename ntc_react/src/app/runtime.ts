@@ -1,10 +1,18 @@
 import { QueryClient } from "@tanstack/react-query";
+import { OfflineNotes } from "../application/offline";
+import { IndexedOfflineStore } from "../infrastructure/offlineStore";
+import {
+  OfflineLabelsRepository,
+  OfflineNotesRepository,
+} from "../infrastructure/offlineRepositories";
+import { LogoutProtection } from "../application/logoutProtection";
+import { isAdministrator } from "../application/access";
+import type { Note } from "../domain/models";
 import { ApiClient } from "../infrastructure/http";
 import {
   AccountRepository,
   AdminRepository,
   InboxRepository,
-  LabelsRepository,
   NotesRepository,
   RemindersRepository,
 } from "../infrastructure/repositories";
@@ -31,12 +39,14 @@ export const api = new ApiClient(
   import.meta.env.VITE_API_BASE_URL || "/api/v1",
 );
 export const connection = new ServerConnection(healthUrl(api.baseUrl));
+export const offlineStore = new IndexedOfflineStore();
+export const logoutProtection = new LogoutProtection();
 api.setConnection(connection);
 const sessionChannel =
   typeof BroadcastChannel === "undefined"
     ? undefined
     : new BroadcastChannel("ntc.session.memory.v1");
-export const auth = new AuthService(
+export const auth: AuthService = new AuthService(
   api,
   new SessionVault({
     getItem: (key) => {
@@ -82,10 +92,84 @@ export const auth = new AuthService(
     else await action();
   },
   (session) => sessionChannel?.postMessage(session),
+  async (owner) => {
+    const data = await offlineStore.read(owner);
+    return data.complete &&
+      data.identity?.userId === owner &&
+      Array.isArray(data.identity.roles) &&
+      data.identity.roles.includes("User") &&
+      !data.identity.roles.includes("Admin")
+      ? data.identity
+      : undefined;
+  },
+  () => navigator.onLine,
+  async () => {
+    if (!owner()) return true;
+    try {
+      return (await offline.hasPending()) ? logoutProtection.request() : true;
+    } catch {
+      return logoutProtection.request();
+    }
+  },
+  (owner) => offlineStore.clear(owner),
 );
 api.setAuth(auth);
-export const notes = new NotesRepository(api);
-export const labels = new LabelsRepository(api);
+const owner = (): string | undefined =>
+  isAdministrator(auth.getSnapshot().session)
+    ? undefined
+    : auth.getSnapshot().session?.userId;
+export const onlineWorkspace = () =>
+  navigator.onLine && auth.getSnapshot().status !== "offline";
+const offlineChannel =
+  typeof BroadcastChannel === "undefined"
+    ? undefined
+    : new BroadcastChannel("ntc.offline.changed.v1");
+export const offline: OfflineNotes = new OfflineNotes(
+  offlineStore,
+  owner,
+  new NotesRepository(api),
+  onlineWorkspace,
+  () =>
+    auth.getSnapshot().status === "authenticated" &&
+    preparation.getSnapshot().status === "ready" &&
+    preparation.getSnapshot().identity === auth.identity(),
+  (note, oldId) => {
+    void cache.cancelQueries({ queryKey: workspace.key("notes") });
+    if (oldId && oldId !== note.id) {
+      for (const [key, data] of cache.getQueriesData<
+        import("@tanstack/react-query").InfiniteData<
+          import("../domain/models").Page<Note>
+        >
+      >({ queryKey: workspace.key("notes") })) {
+        if (data)
+          cache.setQueryData(key, {
+            ...data,
+            pages: data.pages.map((p) => ({
+              ...p,
+              items: p.items.filter((n) => n.id !== oldId),
+            })),
+          });
+      }
+      cache.setQueryData(workspace.key("note", oldId), note);
+    }
+    workspace.commit(note);
+  },
+  async (name, action) => {
+    if (!navigator.locks)
+      throw new Error(
+        "Automatic sync needs a browser with Web Locks support. Your changes remain on this device.",
+      );
+    await navigator.locks.request(name, action);
+  },
+  () => offlineChannel?.postMessage(owner()),
+);
+export const notes = new OfflineNotesRepository(api, offline, onlineWorkspace);
+export const labels = new OfflineLabelsRepository(
+  api,
+  offlineStore,
+  owner,
+  onlineWorkspace,
+);
 export const reminders = new RemindersRepository(api);
 export const account = new AccountRepository(api);
 export const inbox = new InboxRepository(api);
@@ -107,7 +191,91 @@ export const preparation = new WorkspacePreparation(
   cache,
   { notes, labels, reminders, inbox, account, admin },
   () => auth.identity(),
+  onlineWorkspace,
 );
+preparation.subscribe(() => {
+  if (preparation.getSnapshot().status === "ready") void offline.sync();
+});
+
+// Persist only customer identity metadata (no access token) and complete active notes/labels.
+let cachedSessionVisible = false;
+auth.subscribe(() => {
+  const state = auth.getSnapshot();
+  const revalidateSnapshot =
+    cachedSessionVisible && state.status === "authenticated";
+  cachedSessionVisible = state.status === "offline";
+  if (state.status === "authenticated" && owner()) {
+    const {
+      userId,
+      userName,
+      givenName,
+      familyName,
+      fullName,
+      picture,
+      roles,
+      timeZoneId,
+    } = state.session!;
+    void offlineStore
+      .change(userId, (data) => {
+        data.identity = {
+          userId,
+          userName,
+          givenName,
+          familyName,
+          fullName,
+          picture,
+          roles,
+          timeZoneId,
+        };
+      })
+      .catch(() => {});
+    void offline.sync();
+    void preparation
+      .prepare(state.session!)
+      .then(async () => {
+        if (!revalidateSnapshot || owner() !== userId) return;
+        await Promise.all([
+          cache.invalidateQueries({
+            queryKey: ["private", userId, "notes"],
+            refetchType: "all",
+          }),
+          cache.invalidateQueries({
+            queryKey: ["private", userId, "labels"],
+            refetchType: "all",
+          }),
+        ]);
+      })
+      .catch(() => {});
+  }
+  void offline.refresh();
+});
+async function reconnectWorkspace() {
+  if (!navigator.onLine || !owner()) return;
+  if (auth.getSnapshot().status === "offline") {
+    try {
+      await auth.refresh();
+    } catch {
+      return;
+    }
+  }
+  await offline.sync();
+}
+window.addEventListener("online", () => {
+  void reconnectWorkspace();
+});
+window.addEventListener("focus", () => {
+  void reconnectWorkspace();
+});
+// Bounded retry cadence only while the app is open and pending work exists.
+window.setInterval(() => {
+  if (offline.getSnapshot().pending) void reconnectWorkspace();
+}, 30_000);
+if (offlineChannel)
+  offlineChannel.onmessage = (event) => {
+    if (event.data !== owner()) return;
+    void offline.refresh();
+    void cache.invalidateQueries({ queryKey: ["private", owner(), "notes"] });
+  };
 
 window.addEventListener("storage", (event) => {
   if (event.key !== "ntc.session.v1" && event.key !== null) return;

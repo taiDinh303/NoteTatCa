@@ -15,6 +15,7 @@ export function useDebounced<T>(value: T, delay = 250) {
 export function useNotes(filter: NoteFilter) {
   const state = useAuth();
   return useInfiniteQuery({
+    networkMode: "always",
     queryKey: workspace.key("notes", filter),
     queryFn: ({ pageParam, signal }) => notes.list(filter, pageParam, signal),
     initialData: () => workspace.cachedNotes(filter),
@@ -25,18 +26,19 @@ export function useNotes(filter: NoteFilter) {
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
-    enabled: state.status === "authenticated",
+    enabled: state.status === "authenticated" || state.status === "offline",
   });
 }
 export function useLabels() {
   const state = useAuth();
   return useInfiniteQuery({
+    networkMode: "always",
     queryKey: workspace.key("labels"),
     queryFn: ({ pageParam, signal }) => labels.list(pageParam, signal),
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
-    enabled: state.status === "authenticated",
+    enabled: state.status === "authenticated" || state.status === "offline",
     staleTime: 120_000,
   });
 }

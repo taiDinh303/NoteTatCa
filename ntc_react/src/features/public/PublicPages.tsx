@@ -22,11 +22,11 @@ export function Landing({
 }) {
   useLanguage();
   const auth = useAuth();
-  if (redirectAuthenticated && auth.status === "authenticated")
+  if (redirectAuthenticated && (auth.status === "authenticated" || auth.status === "offline"))
     return <Navigate to={homePath(auth.session)} replace />;
   if (redirectAuthenticated && auth.status === "loading")
     return <Spinner label={tr("Opening your space…")} />;
-  const signedIn = auth.status === "authenticated";
+  const signedIn = auth.status === "authenticated" || auth.status === "offline";
   const destination = homePath(auth.session);
   return (
     <div className="landing">

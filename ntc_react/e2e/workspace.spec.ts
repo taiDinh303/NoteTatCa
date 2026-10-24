@@ -140,6 +140,14 @@ test("waits for a waking server before sending credentials and shows connection 
 test("preloads all note pages and switches cached workspace collections without loading again", async ({
   page,
 }) => {
+  const warmed = new Set<string>();
+  page.on("response", response => {
+    if (response.ok()) {
+      if (response.url().includes("/api/v1/me")) warmed.add("me");
+      if (response.url().includes("/api/v1/reminders?")) warmed.add("reminders");
+      if (response.url().includes("/api/v1/notifications/unread-count")) warmed.add("inbox");
+    }
+  });
   let release!: () => void;
   const wait = new Promise<void>((resolve) => {
     release = resolve;
@@ -205,7 +213,7 @@ test("preloads all note pages and switches cached workspace collections without 
       tasks.getByText("Loading labels…", { exact: true }),
     ).toBeVisible();
     await expect(
-      tasks.getByText("Account details ready", { exact: true }),
+      tasks.getByText("Waiting for account details…", { exact: true }),
     ).toBeVisible();
     releaseLabels();
     await expect(
@@ -213,7 +221,7 @@ test("preloads all note pages and switches cached workspace collections without 
     ).toBeVisible();
     await expect(
       page.getByRole("progressbar", { name: "Workspace loading" }),
-    ).toHaveAttribute("value", "6");
+    ).toHaveAttribute("value", "1");
     await page.screenshot({
       path: "../artifacts/frontend/preparing-workspace.png",
       fullPage: true,
@@ -245,6 +253,7 @@ test("preloads all note pages and switches cached workspace collections without 
       page.getByRole("heading", { name: "Notes", exact: true }),
     ).toBeVisible();
     expect(pages).toEqual([1, 2, 3]);
+    await expect.poll(() => warmed.size).toBe(3);
     await page.route(
       /\/api\/v1\/(reminders|notifications)\?/,
       async (route) => {
@@ -329,10 +338,7 @@ test("keeps the saved session when offline during restore and reconnects on requ
   });
   await page.reload();
   await expect(
-    page.getByRole("heading", {
-      name: "Unable to restore your session yet",
-      exact: true,
-    }),
+    page.getByText("Offline notes on this device", { exact: true }),
   ).toBeVisible();
   expect(
     await page.evaluate(() => !!localStorage.getItem("ntc.session.v1")),
@@ -344,7 +350,7 @@ test("keeps the saved session when offline during restore and reconnects on requ
     });
   });
   await page
-    .getByRole("button", { name: "Retry connection", exact: true })
+    .getByRole("button", { name: "Sync now", exact: true })
     .click();
   await expect(
     page.getByRole("heading", { name: "Notes", exact: true }),
@@ -2073,7 +2079,7 @@ test("imports safe Markdown with checklists and exports it without a page reload
   expect((await download).suggestedFilename()).toBe("note.md");
 });
 
-test("keeps an unsaved draft after a network failure and retries without duplicates", async ({
+test("keeps a durable draft after a network failure and syncs without duplicates", async ({
   page,
 }) => {
   await login(page);
@@ -2088,24 +2094,13 @@ test("keeps an unsaved draft after a network failure and retries without duplica
   await editor
     .getByRole("textbox", { name: "Note content" })
     .fill("My words are still here.");
-  await expect(editor.getByRole("alert")).toContainText("Unable to reach");
-  await expect(
-    editor.getByRole("textbox", { name: "Note content" }),
-  ).toContainText("My words are still here.");
+  await expect(editor.getByText("Saved on this device; waiting to sync", { exact: true })).toBeVisible();
+  await expect(editor.getByRole("textbox", { name: "Note content" })).toContainText("My words are still here.");
   await editor.getByRole("button", { name: "Close", exact: true }).click();
-  const prompt = page.getByRole("dialog", {
-    name: "Keep your changes?",
-    exact: true,
-  });
-  await prompt
-    .getByRole("button", { name: "Keep editing", exact: true })
-    .click();
+  await expect(page.getByRole("dialog", { name: "Keep your changes?", exact: true })).toHaveCount(0);
   await page.unroute("**/api/v1/notes");
-  await editor.getByRole("button", { name: "Retry save", exact: true }).click();
-  await expect(
-    editor.getByText("All changes saved", { exact: true }),
-  ).toBeVisible();
-  await editor.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Sync now", exact: true }).click();
+  await expect(page.getByText("Notes synced", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", {
       name: "Open Kept after a network error",

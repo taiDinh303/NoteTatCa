@@ -48,7 +48,7 @@ export default function PrivacySettings({
         </p>
         <p>
           {tr(
-            "Signing out clears the in-memory note cache. Use Active sessions to sign out sessions you no longer use.",
+            "Notes and labels are saved on this device for offline use. Pending edits sync when the app is open and connected. Signing out clears local notes after protecting unsynced changes. Browser storage can be cleared by your browser and is not a backup.",
           )}
         </p>
       </section>

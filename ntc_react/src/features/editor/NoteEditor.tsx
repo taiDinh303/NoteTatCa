@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AutosaveCoordinator } from "../../application/autosave";
-import { notes, workspace } from "../../app/runtime";
+import { notes, workspace, offline } from "../../app/runtime";
 import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom, EMOJIS } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
@@ -70,6 +70,7 @@ export default function NoteEditor({
   const [createdId, setCreatedId] = useState<string>();
   const resolvedId = noteId ?? createdId;
   const query = useQuery({
+    networkMode: "always",
     queryKey: workspace.key("note", resolvedId),
     queryFn: () => notes.find(resolvedId!),
     enabled: !!resolvedId,
@@ -367,6 +368,7 @@ function EditorSession({
 }) {
   useLanguage();
   const state = useAuth();
+  const syncState = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const me = useMe();
   const [draft, setDraft] = useState(() => draftFrom(initial));
   const [coordinator] = useState(
@@ -460,7 +462,7 @@ function EditorSession({
   }
   const status =
     snapshot.status === "saved"
-      ? tr("All changes saved")
+      ? syncState.pending ? tr("Saved on this device; waiting to sync") : tr("All changes saved")
       : snapshot.status === "saving"
         ? tr("Saving…")
         : snapshot.status === "dirty"

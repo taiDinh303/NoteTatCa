@@ -189,14 +189,14 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
       : [
           import("./AppShell"),
           import("../features/notes/NotesPage"),
-          import("../features/reminders/RemindersPage"),
-          import("../features/inbox/InboxPage"),
-          import("../features/settings/SettingsPage"),
         ];
     void Promise.all(modules)
       .then(() => {
         if (active) setModulesReady(true);
         if (!administrator) {
+          void import("../features/reminders/RemindersPage").catch(() => {});
+          void import("../features/inbox/InboxPage").catch(() => {});
+          void import("../features/settings/SettingsPage").catch(() => {});
           // The editor is warmed in the background; slow editor chunks never block sign-in.
           void import("../features/editor/NoteEditor").catch(() => {});
           void import("../features/editor/RichEditor").catch(() => {});
@@ -211,7 +211,7 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
     };
   }, [administrator]);
   useEffect(() => {
-    if (state.status === "authenticated" && state.session)
+    if ((state.status === "authenticated" || state.status === "offline") && state.session)
       void preparation.prepare(state.session).catch(() => {});
   }, [state.status, state.session]);
   if (
@@ -321,6 +321,7 @@ function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
   }, []);
   if (
     suppressed ||
+    (!!state.session && !isAdministrator(state.session) && loading.status === "ready") ||
     (!network.slow && !network.problem) ||
     loading.status === "loading"
   )

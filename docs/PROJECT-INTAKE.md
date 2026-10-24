@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-24/DEC-025–027: chủ dự án chốt offline xem/tạo/sửa note đã tải trên thiết bị, tự đồng bộ khi có mạng và có Sync now; cảnh báo đăng xuất khi còn thay đổi chưa đồng bộ, cho ở lại hoặc tải bản dự phòng trước khi xóa dữ liệu máy. Người dùng tự yêu cầu xóa tài khoản với thời gian chờ30ngày; admin có thể xóa ngay với xác nhận riêng. Ưu tiên notes/labels trước khi mở workspace, dữ liệu phụ vẫn tải đủ ở nền. Đây là TARGET, chưa triển khai; xem backlog và tiêu chí tại [01-plan](01-plan.md#dec-025--offline-và-đồng-bộ-2026-10-24). Yêu cầu mới thay phần chặn toàn bộ workspace và cache chỉ memory của DEC-019 khi được triển khai; không khẳng định runtime đã đổi.
+
 2026-10-23/DEC-024: chủ dự án yêu cầu Language có bốn lựa chọn Việt, Anh, Trung, Nhật và chọn là đổi ngay toàn bộ giao diện, ghi nhớ trên trình duyệt; không dịch nội dung ghi chú/nhãn/tên tài khoản do người dùng nhập. Privacy có nội dung phù hợp hành vi NoteTatCa và liên kết quản lý thực, tham khảo ứng dụng ghi chú khác. Đã chọn mobile Settings dùng header gọn với nút ← và tên trang, trang con quay về Settings, Settings quay về ghi chú; PC giữ header/sidebar. Quyết định này thay yêu cầu UI chỉ tiếng Anh trước đó; English vẫn mặc định.
 
 2026-10-20/DEC-019: user yêu cầu tải đầy đủ notes/labels và dữ liệu workspace ngay khi đăng nhập để chuyển trang mượt; thêm animation khi đăng nhập/mất kết nối/chờ API Render khởi động. Chốt tải các trang trước khi mở workspace, cache memory riêng theo account, giữ draft khi lỗi và retry đọc có giới hạn; admin tiếp tục chỉ quản trị. Thiết kế chi tiết/giới hạn tại01-plan và FRONTEND-IMPLEMENTATION.
@@ -79,8 +81,8 @@ Số câu hiển thị trong UI là 9–15; ID tài liệu là Q-019–025 để
 | Q-011 | Quy mô sử dụng và hạn dự kiến? | Public nhỏ | Tải/lịch/nhân lực | Quy mô ĐÃ CHỐT Q-025; hạn CHƯA XÁC ĐỊNH / chủ dự án |
 | Q-012 | UI tiếng Việt/Anh/cả hai? | Việt/Anh/Trung/Nhật | Nội dung UI | ĐÃ CHỐT bổ sung 2026-10-23, DEC-024; mặc định Anh |
 | Q-013 | Nút Save/tự lưu/cả hai? | Cả hai | Xung đột/idempotency/UX | ĐÃ CHỐT Q-023 |
-| Q-014 | Có export note và xóa tài khoản? Yes / No / làm sau | Làm sau khi MVP ổn | Vòng đời dữ liệu | CHƯA XÁC ĐỊNH / chủ dự án |
-| Q-015 | Offline/realtime: A online, tải lại khi cần; B đồng bộ nhiều tab; C sửa offline; D cộng tác realtime? | A bản đầu | Client storage, concurrency | CHƯA XÁC ĐỊNH / chủ dự án |
+| Q-014 | Có export note và xóa tài khoản? Yes / No / làm sau | Làm sau khi MVP ổn | Vòng đời dữ liệu | ĐÃ CHỐT2026-10-24: có export (format còn đề xuất), tự yêu cầu xóa chờ30ngày, admin xóa ngay; DEC-027 |
+| Q-015 | Offline/realtime: A online, tải lại khi cần; B đồng bộ nhiều tab; C sửa offline; D cộng tác realtime? | A bản đầu | Client storage, concurrency | ĐÃ CHỐT2026-10-24: C xem/tạo/sửa offline, auto-sync + Sync now, bảo vệ draft khi logout; không mở cộng tác realtime; DEC-025 |
 | Q-016 | Hạn mức tiêu đề/nội dung/nhãn | Title 150, tag 50, content 100.000 ký tự, rich JSON 1 MiB, 20 tag/note, 5 active reminder/note | Validation/quota | ĐÃ CHỐT 2026-10-17; ý nghĩa Priority còn legacy |
 | Q-017 | Chuyển Git root lên NTC khi bắt đầu React? | Lập kế hoạch giữ lịch sử/config rồi chuyển | Quản lý source React/docs | ĐÃ THỰC HIỆN theo yêu cầu trực tiếp 2026-10-17; docs duy nhất tại root |
 | Q-018 | Đăng nhập email hay username? | Email theo lựa chọn Q-002 | Login DTO/chuyển dữ liệu | ĐÃ TRIỂN KHAI email v1; legacy username fallback |

@@ -37,6 +37,74 @@ const ok = (data: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 describe("session security", () => {
+  it("opens a cached customer session offline without sending credentials or exposing an access token", async () => {
+    const vault = new SessionVault(storage());
+    vault.write(session());
+    const transport = vi.fn(async () => ok(session()));
+    const cached = { ...session(), token: undefined, refreshToken: undefined };
+    const auth = new AuthService(
+      new ApiClient("/api/v1", transport),
+      vault,
+      vi.fn(),
+      undefined,
+      undefined,
+      undefined,
+      async () => cached,
+      () => false,
+    );
+    await auth.bootstrap();
+    expect(auth.getSnapshot()).toMatchObject({
+      status: "offline",
+      session: { userId: "owner-a", token: "" },
+    });
+    expect(auth.accessToken()).toBeUndefined();
+    expect(transport).not.toHaveBeenCalled();
+    expect(vault.read()?.refreshToken).toBe("refresh-old");
+  });
+  it("closes cached access after a confirmed refresh rejection", async () => {
+    const vault = new SessionVault(storage());
+    vault.write(session());
+    const cached = vi.fn(async () => session());
+    const api = new ApiClient(
+      "/api/v1",
+      vi.fn(async () => new Response("{}", { status: 401 })),
+    );
+    const auth = new AuthService(
+      api,
+      vault,
+      vi.fn(),
+      undefined,
+      undefined,
+      undefined,
+      cached,
+    );
+    await auth.bootstrap();
+    expect(auth.getSnapshot().status).toBe("anonymous");
+    expect(cached).toHaveBeenCalledOnce();
+    expect(vault.read()).toBeNull();
+  });
+  it("keeps the session when logout protection is declined", async () => {
+    const vault = new SessionVault(storage());
+    vault.write(session());
+    const transport = vi.fn(async () => ok(session()));
+    const auth = new AuthService(
+      new ApiClient("/api/v1", transport),
+      vault,
+      vi.fn(),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      async () => false,
+    );
+    await auth.bootstrap();
+    transport.mockClear();
+    expect(await auth.logout()).toBe(false);
+    expect(auth.getSnapshot().status).toBe("authenticated");
+    expect(transport).not.toHaveBeenCalled();
+    expect(vault.read()).not.toBeNull();
+  });
   it("does not clear a newer sign-in when an older bootstrap finishes late", async () => {
     const port = storage();
     const vault = new SessionVault(port);

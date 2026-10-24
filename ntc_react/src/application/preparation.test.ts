@@ -70,6 +70,30 @@ function ports() {
   };
 }
 describe("workspace preparation", () => {
+  it("opens notes while profile is blocked and keeps notes ready when profile fails", async () => {
+    const cache = new QueryClient();
+    const source = ports();
+    let reject!: (error: Error) => void;
+    source.account.me.mockImplementation(
+      () =>
+        new Promise((_resolve, fail) => {
+          reject = fail;
+        }),
+    );
+    const loader = new WorkspacePreparation(cache, source, () => "a:member");
+    await loader.prepare(session);
+    expect(loader.getSnapshot().status).toBe("ready");
+    expect(cache.getQueryData(["private", "a", "note", "1"])).toBeDefined();
+    reject(new Error("Profile unavailable"));
+    await vi.waitFor(() =>
+      expect(loader.getSnapshot().tasks).toContainEqual({
+        resource: "me",
+        status: "error",
+      }),
+    );
+    expect(loader.getSnapshot().status).toBe("ready");
+    cache.clear();
+  });
   it("reports the collection actually waiting and loading, then marks it ready", async () => {
     const cache = new QueryClient();
     const source = ports();
@@ -86,22 +110,15 @@ describe("workspace preparation", () => {
       resource: "me",
       status: "waiting",
     });
-    await vi.waitFor(() =>
-      expect(loader.getSnapshot().tasks).toContainEqual({
-        resource: "me",
-        status: "ready",
-      }),
-    );
+    expect(source.account.me).not.toHaveBeenCalled();
+    expect(source.reminders.list).not.toHaveBeenCalled();
     expect(loader.getSnapshot().tasks).toContainEqual({
       resource: "labels",
       status: "loading",
     });
-    expect(loader.getSnapshot().completed).toBe(6);
     release(page(note("1").tags));
     await pending;
-    expect(
-      loader.getSnapshot().tasks.every((task) => task.status === "ready"),
-    ).toBe(true);
+    await vi.waitFor(() => expect(loader.getSnapshot().completed).toBe(7));
     cache.clear();
   });
   it("marks a failed collection and resets task states when retrying it", async () => {
@@ -122,13 +139,12 @@ describe("workspace preparation", () => {
       loader.getSnapshot().tasks.some((task) => task.status === "loading"),
     ).toBe(false);
     await loader.prepare(session);
+    await vi.waitFor(() => expect(loader.getSnapshot().completed).toBe(7));
     expect(loader.getSnapshot()).toMatchObject({
       status: "ready",
       completed: 7,
     });
-    expect(
-      loader.getSnapshot().tasks.every((task) => task.status === "ready"),
-    ).toBe(true);
+    await vi.waitFor(() => expect(loader.getSnapshot().completed).toBe(7));
     loader.reset();
     expect(loader.getSnapshot().tasks).toEqual([]);
     cache.clear();
@@ -138,6 +154,7 @@ describe("workspace preparation", () => {
     const source = ports();
     const loader = new WorkspacePreparation(cache, source, () => "a:member");
     await Promise.all([loader.prepare(session), loader.prepare(session)]);
+    await vi.waitFor(() => expect(loader.getSnapshot().completed).toBe(7));
     expect(loader.getSnapshot()).toMatchObject({
       status: "ready",
       completed: 7,

@@ -4700,3 +4700,11 @@ td {
   .preferences-mobile-header .icon-button { flex-shrink: 0; width: 40px; height: 40px; }
   .preferences-page > h1, .help-page > h1, .settings-area .preferences-back { display: none; }
 }
+/* Sync state wraps on narrow screens and remains separate from note actions. */
+.offline-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 12px; color: var(--muted); font-size: 12px; }
+.offline-toolbar > span { margin-right: auto; }
+.offline-toolbar .button { min-height: 32px; padding: 5px 10px; }
+.offline-conflict { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; overflow-wrap: anywhere; }
+.offline-conflict .button { margin: 4px; }
+.offline-logout-modal .modal-footer { flex-wrap: wrap; }
+.offline-logout-modal .modal-footer .button { max-width: 100%; white-space: normal; }

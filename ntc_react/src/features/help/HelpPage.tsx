@@ -32,7 +32,7 @@ const guides = [
 const questions = [
   [
     "What should I do if saving fails?",
-    "Keep the note open and check your connection. Use Retry save when available. Copy your draft before reloading or closing the tab; unsaved drafts are not stored permanently offline.",
+    "If the status says saved on this device, edits survive a reload but still need syncing. If saving fails, keep the editor open and copy or download your draft before leaving.",
   ],
   [
     "Can I recover a deleted note?",

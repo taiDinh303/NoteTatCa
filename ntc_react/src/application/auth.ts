@@ -63,7 +63,13 @@ export class SessionVault {
   }
 }
 export interface AuthSnapshot {
-  status: "loading" | "unavailable" | "anonymous" | "authenticated" | "expired";
+  status:
+    | "loading"
+    | "unavailable"
+    | "anonymous"
+    | "authenticated"
+    | "offline"
+    | "expired";
   session?: Session;
 }
 export class AuthService {
@@ -84,6 +90,14 @@ export class AuthService {
       action: () => Promise<void>,
     ) => Promise<void> = async (action) => action(),
     private readonly publishSession: (session: Session) => void = () => {},
+    private readonly offlineSession: (
+      owner: string,
+    ) => Promise<Partial<Session> | undefined> = async () => undefined,
+    private readonly online: () => boolean = () => true,
+    private readonly beforeLogout: () => Promise<boolean> = async () => true,
+    private readonly afterLogout: (
+      owner: string,
+    ) => Promise<void> = async () => {},
   ) {
     this.api = api;
     this.vault = vault;
@@ -104,6 +118,9 @@ export class AuthService {
     return this.snapshot.status === "authenticated"
       ? this.snapshot.session?.token
       : undefined;
+  }
+  isOffline() {
+    return this.snapshot.status === "offline";
   }
   identity() {
     const session = this.snapshot.session;
@@ -133,16 +150,54 @@ export class AuthService {
       }
       const generation = this.generation;
       try {
+        // A valid saved refresh credential unlocks only that account's local snapshot.
+        // Server authorization is revalidated in the background before any sync.
+        const saved = this.vault.read();
+        const cached = saved
+          ? await this.offlineSession(saved.userId).catch(() => undefined)
+          : undefined;
+        if (generation !== this.generation) return;
+        if (saved && cached && !isAdministrator(cached as Session)) {
+          this.emit({
+            status: "offline",
+            session: {
+              ...cached,
+              ...saved,
+              token: "",
+              expiredAt: new Date(0).toISOString(),
+            } as Session,
+          });
+          if (!this.online()) return;
+        }
+        if (!this.online()) throw new ApiError(0);
         await this.refresh();
       } catch (error) {
         if (generation !== this.generation) return;
         if (!(
           error instanceof ApiError && [400, 401, 403].includes(error.status)
         )) {
+          const saved = this.vault.read();
+          const offline = saved
+            ? await this.offlineSession(saved.userId).catch(() => undefined)
+            : undefined;
+          if (generation !== this.generation) return;
+          if (saved && offline && !isAdministrator(offline as Session)) {
+            this.emit({
+              status: "offline",
+              session: {
+                ...offline,
+                ...saved,
+                token: "",
+                expiredAt: new Date(0).toISOString(),
+              } as Session,
+            });
+            return;
+          }
           this.emit({ status: "unavailable" });
           return;
         }
         this.vault.clear();
+        this.clearPrivate();
         this.emit({ status: "anonymous" });
       }
     })());
@@ -233,25 +288,28 @@ export class AuthService {
     }
   }
   async logout() {
+    if (!(await this.beforeLogout())) return false;
+    const owner = this.snapshot.session?.userId;
     const generation = ++this.generation;
     try {
-      await this.withSessionLock(async () => {
-        const saved = this.vault.read();
-        if (!saved || generation !== this.generation) return;
-        // Rotate the latest shared token, then revoke it without recursive auth retries.
-        const current = await this.api.request<Session>("/auth/refresh", {
-          method: "POST",
-          body: { refreshToken: saved.refreshToken },
-          authenticated: false,
+      if (this.snapshot.status !== "offline" && this.online())
+        await this.withSessionLock(async () => {
+          const saved = this.vault.read();
+          if (!saved || generation !== this.generation) return;
+          // Rotate the latest shared token, then revoke it without recursive auth retries.
+          const current = await this.api.request<Session>("/auth/refresh", {
+            method: "POST",
+            body: { refreshToken: saved.refreshToken },
+            authenticated: false,
+          });
+          if (generation !== this.generation) return;
+          await this.api.request("/auth/logout", {
+            method: "POST",
+            body: { refreshToken: current.refreshToken },
+            authenticated: false,
+            headers: { Authorization: `Bearer ${current.token}` },
+          });
         });
-        if (generation !== this.generation) return;
-        await this.api.request("/auth/logout", {
-          method: "POST",
-          body: { refreshToken: current.refreshToken },
-          authenticated: false,
-          headers: { Authorization: `Bearer ${current.token}` },
-        });
-      });
     } catch {
       // Local sign-out must also work after server-side revocation or an outage.
     } finally {
@@ -259,7 +317,9 @@ export class AuthService {
         this.clearPrivate();
         this.vault.clear();
         this.emit({ status: "anonymous" });
+        if (owner) await this.afterLogout(owner);
       }
     }
+    return true;
   }
 }

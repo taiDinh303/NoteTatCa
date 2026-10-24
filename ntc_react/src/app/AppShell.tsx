@@ -33,6 +33,7 @@ import { inbox, workspace } from "./runtime";
 import { useAuth, useLabels, useNotes } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
+import { OfflineControls } from "./OfflineControls";
 import { useTheme } from "../shared/useTheme";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 function Sidebar({
@@ -313,6 +314,7 @@ export default function AppShell() {
       </aside>
       <div className="main-column">
         <main className="workspace-main" id="workspace-main">
+          <OfflineControls />
           <Outlet />
         </main>
       </div>

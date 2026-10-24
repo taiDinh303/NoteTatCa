@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 for (const width of [393, 1440]) {
-  test(`one connection presentation during restore and active use ${width}`, async ({
+  test(`cached notes remain usable during session restore and active use ${width}`, async ({
     page,
     request,
   }) => {
@@ -37,22 +37,18 @@ for (const width of [393, 1440]) {
     try {
       await page.reload();
       await expect(
-        page.getByRole("heading", {
-          name: /^Restoring your session/,
-          exact: true,
-        }),
+        page.getByRole("button", { name: "Take a note", exact: true }),
       ).toBeVisible();
       await expect(
-        page
-          .locator(".startup-card")
-          .getByText(/Connecting to server.*Attempt 2/, { exact: true }),
+        page.getByRole("region", { name: "Note synchronization" }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("Offline notes on this device", { exact: true }),
       ).toBeVisible();
       await expect(
         page.getByRole("complementary", { name: "Connection status" }),
       ).toHaveCount(0);
-      await expect(
-        page.getByRole("progressbar", { name: "Session connection progress" }),
-      ).toHaveCount(1);
+      await expect(page.locator(".startup-screen")).toHaveCount(0);
       await page.screenshot({
         path: `../artifacts/frontend/connection-single-${width}.png`,
         animations: "disabled",
@@ -64,6 +60,7 @@ for (const width of [393, 1440]) {
       page.getByRole("button", { name: "Take a note", exact: true }),
     ).toBeVisible();
     await page.unroute("**/health/live");
+    await expect(page.getByRole("region", { name: "Note synchronization" }).getByText("Notes synced", { exact: true })).toBeVisible({ timeout: 30_000 });
     await page.evaluate(() => {
       Object.defineProperty(navigator, "onLine", {
         configurable: true,
@@ -71,11 +68,13 @@ for (const width of [393, 1440]) {
       });
       window.dispatchEvent(new Event("offline"));
     });
-    const notice = page.getByRole("complementary", {
-      name: "Connection status",
+    const notice = page.getByRole("region", {
+      name: "Note synchronization",
     });
     await expect(notice).toBeVisible();
-    await expect(notice.getByText(/^You.re offline$/, { exact: true })).toBeVisible();
+    await expect(
+      notice.getByText("Working offline", { exact: true }),
+    ).toBeVisible();
     await expect(page.locator(".startup-screen")).toHaveCount(0);
     await page.evaluate(() => {
       Object.defineProperty(navigator, "onLine", {
@@ -83,10 +82,10 @@ for (const width of [393, 1440]) {
         get: () => true,
       });
     });
-    await notice
-      .getByRole("button", { name: "Reconnect", exact: true })
-      .click();
-    await expect(notice).toHaveCount(0);
+    await notice.getByRole("button", { name: "Sync now", exact: true }).click();
+    await expect(
+      notice.getByText("Notes synced", { exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Take a note", exact: true }),
     ).toBeVisible();

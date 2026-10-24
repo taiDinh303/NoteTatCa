@@ -27,6 +27,7 @@ export class ApiError extends Error {
   }
 }
 export interface AccessProvider {
+  isOffline?(): boolean;
   accessToken(): string | undefined;
   identity(): string | undefined;
   refresh(): Promise<void>;
@@ -70,6 +71,7 @@ export class ApiClient {
   }
   private async perform<T>(path: string, options: RequestOptions): Promise<T> {
     const authenticated = options.authenticated !== false;
+    if (authenticated && this.auth?.isOffline?.()) throw new ApiError(0);
     const owner = authenticated ? this.auth?.identity() : undefined;
     let lastSentToken: string | undefined;
     const send = async () => {

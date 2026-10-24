@@ -9,6 +9,7 @@ import {
   useParams,
 } from "react-router-dom";
 import { auth } from "./runtime";
+import { LogoutWarning } from "./OfflineControls";
 import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
 import { Spinner } from "../shared/ui";
@@ -49,6 +50,7 @@ function Root() {
       >
         <Outlet />
       </Suspense>
+      <LogoutWarning />
     </ConnectionFeedback>
   );
 }
@@ -160,7 +162,7 @@ function Logout() {
     void auth
       .logout()
       .catch(() => {})
-      .finally(() => navigate("/login", { replace: true }));
+      .then((done) => navigate(done === false ? "/notes" : "/login", { replace: true }));
   }, [navigate]);
   return <Spinner label={tr("Signing out…")} />;
 }
