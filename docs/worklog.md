@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nền header Home — 2026-10-25
+
+- Thêm nền sage nhạt pha surface và border đáy cho header landing; pseudo background trải hết chiều ngang, nội dung vẫn max1200px. Không đổi chiều cao/logo/nút, dùng surface để phù hợp theme.
+- Validation: TypeScript/Vite build/diff check PASS; Chromium320/1440 nền có màu, không document overflow, menu ngôn ngữ vẫn mở. CSS-only, không fullsuite/.NET/API/manual deploy. Push main theo quyền hiện có, đối chiếu SHA remote.
+
 ## Header Home đồng chiều cao — 2026-10-25
 
 - Theo ảnh/yêu cầu: brand mark, nút cờ và Sign in cùng44px, chung mép trên/dưới; giữ căn giữa chữ, scope landing header desktop/mobile. Không thay shared logo/footer/auth.

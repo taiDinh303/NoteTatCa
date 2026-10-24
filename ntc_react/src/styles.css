@@ -2782,12 +2782,25 @@ td {
   overflow: hidden;
 }
 .landing > header {
+  position: relative;
+  isolation: isolate;
   max-width: 1200px;
   margin: auto;
   padding: 32px 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.landing > header::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--surface) 85%, #a3b697);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, #a3b697);
 }
 .landing > header > a {
   display: flex;
