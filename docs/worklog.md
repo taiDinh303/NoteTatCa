@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa Trash account và lỗi sau Save labels — 2026-10-25
+
+- User gửi stack NotesPage undefined.isPinned, Trash guest vẫn tốt, account Save labels báo undefined.id dù server đã lưu. Tái hiện bằng InfiniteQueryObserver + invalidate rồi background preparation: code cũ fetchQuery trả InfiniteData trên infinite key gây pages lồng pages, flatMap(items) sinh undefined. Không phải mất route hoặc mất note.
+- Đổi preload các collection sang fetchInfiniteQuery (queryFn trả Page) và observer.fetchNextPage tải đủ; giữ guard/cancellation/critical/background. Không vá bằng cách bỏ qua note undefined, không đổi API/DB/ownership/retention. Cập nhật frontend docs; sau rollout reload lấy bundle mới, không xóa IndexedDB/draft.
+- Regression mới Trash rỗng/có note, observer đang hoạt động, preload lại sau invalidation, refetch và commit labels không throw; code cũ FAIL đúng cấu trúc pages lồng, code mới PASS. Config4/4, Vitest104/104, TypeScript/Vite build, ESLint và diff check PASS. Không .NET/full E2E/live production/owner DB/email/manual deploy.
+- Lượt E2E đầu7fail:5guest selector Try guest mode trùng do footer mới;2account dùng devserver cũ proxy sai fixture. Đã scope selector guest vào main và khởi động lại devserver đúng fixture; chạy lại7/7PASS (5guest,2account CRUD/labels/trash/restore/reorder). Scope preparation/test, guest locator và2root docs; .agnes và PublicPages đang được sửa song song ngoài scope. Push main theo quyền hiện có và kiểm SHA remote.
+
 ## Duyệt mẫu note, lọc tệp, liên kết và mục lục — 2026-10-25
 
 - Sau giải thích và xác nhận chủ dự án, cập nhật roadmap/intake/plan: TASK-031–034 chuyển từ đề xuất sang PLANNED được duyệt, chưa code. Có phạm vi, ví dụ, acceptance, phụ thuộc và ưu tiên đề xuất.

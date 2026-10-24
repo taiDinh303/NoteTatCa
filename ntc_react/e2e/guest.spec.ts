@@ -3,7 +3,7 @@ import type { Page } from "@playwright/test";
 const fixture = "http://127.0.0.1:5199";
 async function start(page: Page) {
   await page.goto("/Home");
-  await page.getByRole("link", { name: "Try guest mode", exact: true }).click();
+  await page.getByRole("main").getByRole("link", { name: "Try guest mode", exact: true }).click();
   await expect(
     page.getByRole("complementary", { name: "Guest mode", exact: true }),
   ).toBeVisible();

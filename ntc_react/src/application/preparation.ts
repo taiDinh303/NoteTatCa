@@ -1,4 +1,4 @@
-import type { InfiniteData, QueryClient } from "@tanstack/react-query";
+import { InfiniteQueryObserver, type InfiniteData, type QueryClient } from "@tanstack/react-query";
 import type { InboxItem, Page, Session } from "../domain/models";
 import type {
   AccountRepository,
@@ -143,34 +143,55 @@ export class WorkspacePreparation {
       load: (page: number, signal: AbortSignal) => Promise<Page<T>>,
       task: PreparationResource = resource,
     ) => {
-      return runTask(task, () =>
-        this.cache.fetchQuery({
+      return runTask(task, async () => {
+        // Use the same per-page contract as useInfiniteQuery. A normal fetchQuery
+        // returning InfiniteData can be wrapped a second time on an infinite key.
+        const options = {
           queryKey: key(resource, ...parts),
           staleTime: WORKSPACE_STALE_TIME,
-          retry: false,
-          networkMode: "always",
-          queryFn: async ({ signal }) => {
-            const combined = AbortSignal.any([signal, controller.signal]);
-            const pages: Page<T>[] = [];
-            for (let number = 1; ; number++) {
-              guard();
-              const page = await load(number, combined);
-              guard();
-              if (page.currentPage !== number)
-                throw new Error(
-                  "The server returned an unexpected page. Please retry loading.",
-                );
-              pages.push(page);
-              this.emit({ pages: this.snapshot.pages + 1 });
-              if (!page.hasNextPage) break;
-            }
-            return {
-              pages,
-              pageParams: pages.map((page) => page.currentPage),
-            } satisfies InfiniteData<Page<T>>;
+          retry: false as const,
+          networkMode: "always" as const,
+          initialPageParam: 1,
+          getNextPageParam: (last: Page<T>) =>
+            last.hasNextPage ? last.currentPage + 1 : undefined,
+          queryFn: async ({
+            pageParam,
+            signal,
+          }: {
+            pageParam: number;
+            signal: AbortSignal;
+          }) => {
+            guard();
+            const page = await load(
+              pageParam,
+              AbortSignal.any([signal, controller.signal]),
+            );
+            guard();
+            if (page.currentPage !== pageParam)
+              throw new Error(
+                "The server returned an unexpected page. Please retry loading.",
+              );
+            this.emit({ pages: this.snapshot.pages + 1 });
+            return page;
           },
-        }),
-      );
+        };
+        let data: InfiniteData<Page<T>> = await this.cache.fetchInfiniteQuery(options);
+        const observer = new InfiniteQueryObserver(this.cache, {
+          ...options,
+          enabled: false,
+        });
+        try {
+          while (data.pages.at(-1)?.hasNextPage) {
+            guard();
+            const result = await observer.fetchNextPage({ throwOnError: true });
+            data = result.data!;
+          }
+          guard();
+          return data;
+        } finally {
+          observer.destroy();
+        }
+      });
     };
     const single = async <T>(
       resource: "unread" | "me" | "admin-stats",
@@ -259,18 +280,30 @@ export class WorkspacePreparation {
               this.ports.reminders.list(page, signal),
             ),
             (async () => {
-              const all = await paged<InboxItem>("inbox", [false], (page, signal) =>
-                this.ports.inbox.list(page, false, signal),
+              const all = await paged<InboxItem>(
+                "inbox",
+                [false],
+                (page, signal) => this.ports.inbox.list(page, false, signal),
               );
               guard();
-              const items = all.pages.flatMap(page => page.items).filter(item => !item.readAt);
+              const items = all.pages
+                .flatMap((page) => page.items)
+                .filter((item) => !item.readAt);
               const totalPages = Math.max(1, Math.ceil(items.length / 50));
               this.cache.setQueryData(key("inbox", true), {
                 pages: Array.from({ length: totalPages }, (_, index) => ({
-                  items: items.slice(index * 50, (index + 1) * 50), currentPage: index + 1,
-                  totalPages, totalItems: items.length, pageSize: 50,
-                  hasNextPage: index + 1 < totalPages, hasPreviousPage: index > 0,
-                })), pageParams: Array.from({ length: totalPages }, (_, index) => index + 1),
+                  items: items.slice(index * 50, (index + 1) * 50),
+                  currentPage: index + 1,
+                  totalPages,
+                  totalItems: items.length,
+                  pageSize: 50,
+                  hasNextPage: index + 1 < totalPages,
+                  hasPreviousPage: index > 0,
+                })),
+                pageParams: Array.from(
+                  { length: totalPages },
+                  (_, index) => index + 1,
+                ),
               });
               await single("unread", () => this.ports.inbox.count());
             })(),

@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Sửa cache phân trang khi preload nền — 2026-10-25
+
+WorkspacePreparation dùng fetchInfiniteQuery với queryFn trả từng Page, sau đó InfiniteQueryObserver.fetchNextPage tải các trang còn lại; không dùng fetchQuery trả sẵn InfiniteData trên key mà useInfiniteQuery cũng quan sát. Cách cũ có thể lồng pages trong pages khi background gặp query đã bị invalidated/đang có infinite observer: flatMap(page.items) sinh undefined, NotesPage lỗi isPinned và workspace.commit sau Save labels lỗi id dù server đã lưu. Root errorElement hiển thị NotFound nên trông như mất route Trash; route vẫn tồn tại. Regression giữ cả Trash rỗng/có note, invalidate/refetch và commit sau preload; phiên/account guard, cancellation và critical/background được giữ. Sau rollout cần tải lại app để thay bundle/cache memory cũ, không yêu cầu xóa local drafts/IndexedDB.
+
 ### Chế độ khách cho người xem CV — 2026-10-24
 
 - Landing thêm Try guest mode, `/guest` mở workspace mẫu3notes/3labels hoặc tiếp tục bản đã lưu. Database `ntc.guest.v1` riêng hoàn toàn với `ntc.offline.v1` của account. Guest có trạng thái local `guest`/owner sentinel `guest-local`, không token/refresh credential và không tạo Identity account. API client chặn authenticated requests trong guest; repositories điều hướng rõ theo mode, API/backend policies không đổi. Vào `/guest` khi đã đăng nhập giữ workspace/role hiện tại.

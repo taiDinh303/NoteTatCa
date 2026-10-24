@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { QueryClient } from "@tanstack/react-query";
+import { InfiniteQueryObserver, QueryClient } from "@tanstack/react-query";
 import { WorkspacePreparation } from "./preparation";
 import { WorkspaceService } from "./workspace";
 import { NotesRepository } from "../infrastructure/repositories";
@@ -70,6 +70,59 @@ function ports() {
   };
 }
 describe("workspace preparation", () => {
+  it.each([false, true])("keeps trash pages flat during background refresh (empty: %s)", async (empty) => {
+    const cache = new QueryClient();
+    const source = ports();
+    const deleted = { ...note("deleted"), deletedTime: "2026-10-25T00:00:00Z" };
+    const trashed = empty ? [] : [deleted];
+    source.notes.list.mockImplementation(async (filter, number = 1) =>
+      filter.trash
+        ? page(trashed, number)
+        : page([note(String(number))], number, number < 3),
+    );
+    let background = false;
+    const loader = new WorkspacePreparation(
+      cache,
+      source,
+      () => "a:member",
+      () => background,
+    );
+    await loader.prepare(session);
+    const key = ["private", "a", "notes", { trash: true }];
+    const observer = new InfiniteQueryObserver(cache, {
+      queryKey: key,
+      queryFn: ({ pageParam }) => source.notes.list({ trash: true }, pageParam),
+      initialPageParam: 1,
+      getNextPageParam: (last: Page<Note>) =>
+        last.hasNextPage ? last.currentPage + 1 : undefined,
+      staleTime: 300_000,
+    });
+    const stop = observer.subscribe(() => {});
+    await vi.waitFor(() =>
+      expect(observer.getCurrentResult().isSuccess).toBe(true),
+    );
+    await cache.invalidateQueries({ queryKey: key, refetchType: "none" });
+    background = true;
+    await loader.prepare(session);
+    await vi.waitFor(() =>
+      expect(loader.getSnapshot().tasks).toContainEqual({
+        resource: "trash",
+        status: "ready",
+      }),
+    );
+    await cache.invalidateQueries({ queryKey: key });
+    expect(observer.getCurrentResult().data?.pages).toEqual([page(trashed)]);
+    const service = new WorkspaceService(
+      new NotesRepository(new ApiClient("/api/v1")),
+      cache,
+      () => "a",
+    );
+    expect(() => service.commit({ ...note("1"), tags: [] })).not.toThrow();
+    stop();
+    observer.destroy();
+    loader.reset();
+    cache.clear();
+  });
   it("opens notes while profile is blocked and keeps notes ready when profile fails", async () => {
     const cache = new QueryClient();
     const source = ports();
