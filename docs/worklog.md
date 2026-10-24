@@ -1,6 +1,13 @@
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+## Landing header hiện avatar khi đã đăng nhập — 2026-10-25
+
+- Theo yêu cầu/chủ dự án: header trang Home khi đã đăng nhập hiện avatar, bỏ nút "Open workspace" trên header; chưa đăng nhập vẫn giữ nút "Sign in". Avatar liên kết tới workspace, dùng tên/hình từ `useMe` hoặc session; hero CTA "Open your workspace" giữ nguyên.
+- `PublicPages.tsx`: import `useMe`, `Avatar`; `signedIn` bao gồm `guest` theo hiện trạng runtime; header nav render `LandingLanguageSelect`, rồi chưa đăng nhập là `button primary` Sign in, đã đăng nhập/guest là `avatar-menu` với `Avatar` và tên hiển thị. Không đổi routing, i18n store, API, backend hay shell workspace.
+- Validation thực tế: `npm run typecheck` PASS; `npm run lint` PASS; `npm run build` PASS 2184 modules. Chưa chạy E2E Chromium/.NET/device thật; không deploy/migrate/DB/email thật.
+- Scope 2 files: `ntc_react/src/features/public/PublicPages.tsx`, `docs/worklog.md`.
+
 
 ## Sửa Trash account và lỗi sau Save labels — 2026-10-25
 

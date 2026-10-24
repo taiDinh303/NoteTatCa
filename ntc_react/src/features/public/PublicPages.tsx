@@ -18,9 +18,9 @@ import {
   Sparkles,
   Tag,
 } from "lucide-react";
-import { useAuth } from "../../shared/hooks";
+import { useAuth, useMe } from "../../shared/hooks";
 import { homePath } from "../../application/access";
-import { Logo, Spinner } from "../../shared/ui";
+import { Avatar, Logo, Spinner } from "../../shared/ui";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
 function LanguageFlag({ code }: { code: Language }) {
@@ -59,12 +59,22 @@ export function Landing({
 }) {
   useLanguage();
   const auth = useAuth();
+  const me = useMe();
   if (redirectAuthenticated && (auth.status === "authenticated" || auth.status === "offline" || auth.status === "guest"))
     return <Navigate to={homePath(auth.session)} replace />;
   if (redirectAuthenticated && auth.status === "loading")
     return <Spinner label={tr("Opening your space…")} />;
-  const signedIn = auth.status === "authenticated" || auth.status === "offline";
+  const signedIn =
+    auth.status === "authenticated" ||
+    auth.status === "offline" ||
+    auth.status === "guest";
   const destination = homePath(auth.session);
+  const accountName =
+    me.data?.profile?.fullName ||
+    auth.session?.fullName ||
+    auth.session?.givenName ||
+    auth.session?.userName ||
+    tr("Your account");
   return (
     <div className="landing">
       <header>
@@ -73,13 +83,28 @@ export function Landing({
         </Link>
         <nav>
           <LandingLanguageSelect />
-          <Link
-            className="button primary"
-            to={signedIn ? destination : "/login"}
-          >
-            {signedIn ? tr("Open workspace") : tr("Sign in")}
-            <ArrowRight size={15} />
-          </Link>
+          {!signedIn ? (
+            <Link className="button primary" to="/login">
+              {tr("Sign in")}
+              <ArrowRight size={15} />
+            </Link>
+          ) : (
+            <Link
+              className="avatar-menu"
+              to={destination}
+              aria-label={tr("Open workspace")}
+            >
+              <Avatar
+                name={accountName}
+                picture={
+                  me.data
+                    ? me.data.profile?.picture
+                    : auth.session?.picture
+                }
+              />
+              <span className="account-name">{accountName.split(" ")[0]}</span>
+            </Link>
+          )}
         </nav>
       </header>
       <main>
