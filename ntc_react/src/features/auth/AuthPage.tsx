@@ -274,7 +274,7 @@ export default function AuthPage({ mode }: { mode: Mode }) {
   return (
     <div className="auth-page">
       <section className="auth-main">
-        <Link className="auth-brand" to="/">
+        <Link className="auth-brand" to="/Home">
           <Logo />
         </Link>
         <div className="auth-form-wrap">

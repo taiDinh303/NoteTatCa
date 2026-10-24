@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Logo auth về Home — 2026-10-25
+
+- Đổi shared auth-brand từ / sang /Home cho login/register và auth pages chung. Root / có redirect workspace khi đang guest nên logo trước đây có thể đi /notes; /Home giữ landing chủ động. Không đổi redirect sau đăng nhập thành công.
+- Validation: TypeScript/Vite build, ESLint và diff check PASS; Chromium click logo login/register cả anonymous và guest: 4/4 về /Home. Không fullsuite/.NET/backend/config/manual deploy. Scope AuthPage/worklog; push main và kiểm remote SHA theo quyền hiện có.
+
 ## Home: Sign in thay Get started — 2026-10-25
 
 - Theo yêu cầu: bỏ link Sign in phụ, đổi CTA chính header Get started thành Sign in dẫn /login; đã có phiên giữ Open workspace. Bỏ CSS mobile ẩn /login để CTA hiện ở cả điện thoại. Nút cờ giữ cạnh CTA, hero guest/register không đổi.
