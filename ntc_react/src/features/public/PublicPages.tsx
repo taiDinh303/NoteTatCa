@@ -73,12 +73,6 @@ export function Landing({
                   : tr("Find your little space")}
                 <ArrowRight size={18} />
               </Link>
-              <Link
-                className="button secondary large"
-                to={signedIn ? destination : "/login"}
-              >
-                {signedIn ? tr("Back to the app") : tr("Welcome back")}
-              </Link>
             </div>
             <span className="hero-reassurance">
               <LockKeyhole size={13} />

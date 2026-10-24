@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ nút "Back to the app" khỏi hero landing — 2026-10-24
+
+- Theo ảnh chủ dự án: hero landing (`/Home`, LandingPage) hiện có 2 nút "Open your workspace" + "Back to the app"; nút thứ hai trùng chức năng với "Open workspace" ở topbar, gây thừa. Bỏ block `<Link class="button secondary large">` (kèm `tr("Back to the app")`/`tr("Welcome back")`) trong `.hero-actions`; giữ đúng 1 nút primary. Không đổi i18n key "Back to the app" (còn dùng trong Privacy & NotFound).
+- Không đổi routing/API/logic auth; chỉ JSX.
+- Validation: React Production build PASS; ESLint PASS. Không full suite/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/features/public/PublicPages.tsx, docs/worklog.md.
+
 ## Bỏ xác nhận Move to trash — 2026-10-24
 
 - Chủ dự án yêu cầu bỏ cảnh báo khi chuyển note vào thùng rác, giữ xác nhận xóa vĩnh viễn. Card gọi trash ngay trong act với pending/toast lỗi; editor bỏ trashPrompt/ConfirmDialog, giữ flush save trước trash, khóa action khi đang xử lý, ErrorBanner khi lỗi và chỉ đóng sau thành công. Permanent delete vẫn ConfirmDialog/cancel như cũ; không đổi API/retention/ownership.
