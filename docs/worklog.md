@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Giữ card trong tay khi kéo qua nhóm pinned/normal — 2026-10-24
+
+- Chủ dự án báo card bật về khi vẫn cầm qua nhóm khác; mong giữ kéo tự do, chỉ khi thả sai nhóm mới trở về và báo thông tin. Xác định từ useSortable đang dùng: hai SortableContext riêng khiến overIndex=-1 bên nguồn, displaceItem=false và finalTransform=null khi con trỏ tới card nhóm kia. Không phải toast hoặc lưu API cướp thao tác.
+- Gom card vào một SortableContext theo thứ tự render; strategy chỉ nhường chỗ khi active/over/card cùng nhóm. Thẻ active giữ transform con trỏ kể cả ngoài nhóm; normal/pinned đích không đổi chỗ. Giữ dragEnd guard hiện có: thả khác nhóm→toast và animation về chỗ cũ, không đổi pin/gửi reorder. Không sửa API/coordinator/animation duration/config.
+- Actual validation: Chromium CI=true fixture mới11/11 PASS: regression mới2chiều pinned→normal/normal→pinned, giữ350ms rồi kéo thêm vẫn đúng vị trí, không toast trong lúc giữ, các card khác đứng yên, thả→toast/về vị trí và không reorder request, reload giữ thứ tự; drag-shape5ca mouse/touch zoom75/100/125%; background save/retry2ca; workspace reorder controls và pointer/keyboard2ca. TypeScript/Production build PASS; ESLint max-warnings0 PASS; .NET solution Release --no-restore PASS0warnings/0errors; git diff --check PASS. Không rerun full116suite của lượt trước; fixture SQLite/captured-email riêng, không owner data/email thật/production/thiết bị vật lý/deploy/migrate.
+- Publication scope4files: NotesPage.tsx, drag-between-groups.spec.ts mới, FRONTEND-IMPLEMENTATION.md và worklog.md. Push main theo quyền chủ dự án và đối chiếu SHA remote; giữ .agnes ngoài commit. Remote CI/hosting rollout chưa xác minh.
+
 ## Sửa sáu ca CI và thêm animation kéo/thả note — 2026-10-24
 
 - Đọc logs_108418742864.zip (0_verify.txt):108 passed/6 failed/2 skipped. Hai labels-fixed và workspace labels dùng tên Done cũ→Close; compact-sidebar đo width ngay đầu transition→poll điều kiện width; profile vào Preferences qua sidebar→Account menu/Account settings/Profile; admin tìm heading Settings đã bỏ→navigation Settings và mở Password Change, xác nhận input. Giữ assertions dữ liệu, thu hồi phiên, redirect và không truy cập nội dung riêng của admin; không tắt test/workflow.

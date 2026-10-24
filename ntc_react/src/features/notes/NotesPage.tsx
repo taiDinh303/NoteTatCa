@@ -13,6 +13,7 @@ import {
 import type { DragEndEvent } from "@dnd-kit/core";
 import {
   SortableContext,
+  type SortingStrategy,
   rectSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
@@ -385,6 +386,14 @@ export default function NotesPage({
       setParams(next, { replace: true });
     }
   }
+  const groupSortingStrategy: SortingStrategy = (args) => {
+    if (
+      all[args.activeIndex]?.isPinned !== all[args.overIndex]?.isPinned ||
+      all[args.index]?.isPinned !== all[args.activeIndex]?.isPinned
+    )
+      return null;
+    return rectSortingStrategy(args);
+  };
   const renderGroup = (group: Note[], title: string) =>
     group.length ? (
       <section className="notes-section">
@@ -394,33 +403,29 @@ export default function NotesPage({
             <span>{group.length}</span>
           </h2>
         </div>
-        <SortableContext
-          items={group.map((n) => n.id)}
-          strategy={rectSortingStrategy}
-        >
-          <div className={`note-grid ${view === "list" ? "list-view" : ""}`}>
-            {group.map((note, index) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                busy={pending === note.id}
-                trash={trash}
-                draggable={canDrag}
-                onOrganize={(action) => setEditor({ id: note.id, action })}
-                onOpen={() => {
-                  if (trash) {
-                    navigate(`/trash?note=${note.id}`);
-                    setEditor({ id: note.id });
-                  } else setEditor({ id: note.id });
-                }}
-                onAction={(action) => void act(note, action)}
-                onMove={(direction) =>
-                  void reorder(group, index, index + direction)
-                }
-              />
-            ))}
-          </div>
-        </SortableContext>
+
+        <div className={`note-grid ${view === "list" ? "list-view" : ""}`}>
+          {group.map((note, index) => (
+            <NoteCard
+              key={note.id}
+              note={note}
+              busy={pending === note.id}
+              trash={trash}
+              draggable={canDrag}
+              onOrganize={(action) => setEditor({ id: note.id, action })}
+              onOpen={() => {
+                if (trash) {
+                  navigate(`/trash?note=${note.id}`);
+                  setEditor({ id: note.id });
+                } else setEditor({ id: note.id });
+              }}
+              onAction={(action) => void act(note, action)}
+              onMove={(direction) =>
+                void reorder(group, index, index + direction)
+              }
+            />
+          ))}
+        </div>
       </section>
     ) : null;
   return (
@@ -548,22 +553,27 @@ export default function NotesPage({
           onDragCancel={({ active }) => animateNoteDrop(active.id)}
           onDragEnd={dragEnd}
         >
-          {trash ? (
-            renderGroup(all, tr("Deleted notes"))
-          ) : (
-            <>
-              {renderGroup(
-                all.filter((n) => n.isPinned),
-                tr("Pinned"),
-              )}
-              {renderGroup(
-                all.filter((n) => !n.isPinned),
-                all.some((n) => n.isPinned)
-                  ? tr("Everything else")
-                  : tr("All notes"),
-              )}
-            </>
-          )}
+          <SortableContext
+            items={all.map((n) => n.id)}
+            strategy={groupSortingStrategy}
+          >
+            {trash ? (
+              renderGroup(all, tr("Deleted notes"))
+            ) : (
+              <>
+                {renderGroup(
+                  all.filter((n) => n.isPinned),
+                  tr("Pinned"),
+                )}
+                {renderGroup(
+                  all.filter((n) => !n.isPinned),
+                  all.some((n) => n.isPinned)
+                    ? tr("Everything else")
+                    : tr("All notes"),
+                )}
+              </>
+            )}
+          </SortableContext>
         </DndContext>
       )}
       {query.hasNextPage ? (
