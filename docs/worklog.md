@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kế hoạch dài hạn nội dung và cộng tác — 2026-10-25
+
+- Theo yêu cầu lập kế hoạch, chưa code: thêm ROADMAP-CONTENT-COLLABORATION.md, DEC-029 và intake link; TASK-022–030 có thứ tự, acceptance và các câu hỏi cần chốt theo từng đợt. Định hướng gồm ảnh/video/audio/bảng/vẽ bút/comment/mời xem note; realtime Editor/public link/OCR/AI là đề xuất chưa duyệt.
+- Thứ tự đề xuất: củng cố offline/version/export → ảnh/tệp → bảng → audio/video → vẽ → mời Viewer → Commenter → cân nhắc realtime Editor. Đề xuất thêm templates, search file, export/import media, thông báo và note links. Giữ private mặc định/admin không đọc, không thay API ownership hiện hành; thiết kế grant/media ACL sẽ cần review riêng.
+- Ghi rõ storage/quota/security/upload queue, guest copy media, retention/history/trash30ngày, giới hạn offline revoke và URL có hạn; không cam kết chi phí/lịch phát hành/provider. Chưa migrate/deploy/runtime thay đổi.
+- Validation docs-only: rà ID TASK/DEC không trùng, relative links tồn tại, diff check PASS; không chạy build/test vì không thay code. Publication scope4root docs, push main và kiểm remote SHA theo quyền hiện có. Tất cả task mới vẫn PLANNED, chưa đánh DONE.
+
 ## Nút primary nhạt hơn, chữ tối dễ đọc — 2026-10-25
 
 - Theo yêu cầu chủ dự án: chữ đen/nâu trên nền cam đậm (#e9a33c) của nút Sign in, Try guest mode, Create my space (và mọi nút .button.primary) hơi khó đọc; làm nhạt nền 1 bậc cho gần màu logo nhưng dễ đọc hơn.

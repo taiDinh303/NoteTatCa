@@ -4,6 +4,8 @@
 
 ## Quyết định hiện hành
 
+DEC-029 (định hướng chủ dự án2026-10-25): tương lai hỗ trợ ảnh/video/audio, bảng, vẽ bằng bút, bình luận và mời người xem note như chia sẻ bảng tính. Đây là kế hoạch chưa triển khai, không mở quyền API hiện tại. Note mặc định riêng tư và admin không đọc nội dung; chia sẻ là grant rõ ràng của owner. Roadmap TASK-022–030, acceptance, phụ thuộc và các đề xuất cần duyệt tại [ROADMAP-CONTENT-COLLABORATION](ROADMAP-CONTENT-COLLABORATION.md). Editor realtime/link public/OCR/AI chưa được chốt. Yêu cầu tương lai này mở rộng giới hạn không-sharing của bản đầu, không thay runtime/policies trước khi có thiết kế và tests.
+
 DEC-028 (chủ dự án2026-10-24): thêm nút Try guest mode trên landing và route `/guest` cho người xem CV thử không tài khoản. Guest có notes/labels mẫu, editor/CRUD/search/pin/reorder/trash30ngày và local persistence/offline, không server credentials hoặc quyền API anonymous mới. Khi đăng nhập customer, hỏi copy vào account; có thể để sau, bản gốc chỉ clear sau thành công. Chi tiết hiện hành và evidence tại FRONTEND-IMPLEMENTATION/worklog. TASK-021: guest local + copy an toàn, triển khai lượt này; không mở public sharing/cộng tác hoặc tài khoản demo dùng chung.
 
 Cập nhật2026-10-24 theo yêu cầu trực tiếp: trash note đổi từ7sang30ngày, tính từ DeletedTime UTC; restore chỉ trước cutoff, purge khi đủ30ngày. Áp dụng cả note đang trong trash chưa bị purge, không reset DeletedTime hoặc phục hồi note đã xóa hẳn. Chính sách này độc lập với kế hoạch xóa tài khoản30ngày.
