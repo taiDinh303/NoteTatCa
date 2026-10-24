@@ -11,7 +11,7 @@ CURRENT recovery: dùng traceId, không dump env/body. 401 kiểm session/stamp/
 | Việc | Lịch | Bằng chứng / xử lý |
 | --- | --- | --- |
 | Backup DB | Hằng ngày, giờ ít tải | Backup status/checksum, policy file 22 |
-| Purge trash | Worker tick30 giây/batch100 khi bật | Chỉ DeletedTime ≤ nowUTC−7 ngày, metric count |
+| Purge trash | Worker tick30 giây/batch100 khi bật | Chỉ DeletedTime ≤ nowUTC−30 ngày, metric count |
 | Reminder dispatcher | Worker tick30 giây khi bật; cloud uptime chưa chốt | Due lag, occurrence/dedup/SMTP status |
 | Rà lỗi/auth/DB | Hằng ngày | Không đọc note để debug |
 | Restore drill | Hằng tháng đề xuất | DB biệt lập, RPO/RTO thực đo |

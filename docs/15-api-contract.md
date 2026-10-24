@@ -58,7 +58,7 @@ Rich `documentJson` là **JSON string**, không object lồng trực tiếp; doc
 
 Sửa content trên rich note mà không gửi document bị từ chối, trừ `convertToPlainText:true` xác nhận flatten; UI phải cảnh báo. Chưa triển khai Markdown import/export/shortcuts UI trong backend; conversion Markdown tương lai cần cảnh báo mất format.
 
-Trash: POST notes/{id}/trash; restore trước cutoff7 ngày; DELETE notes/{id} chỉ trash. Note trash không sửa/nhắc; restore giữ note/nhãn còn hợp lệ và chỉ lịch tương lai. Tại đúng cutoff không còn restore; worker purge mặc định tắt đến khi review vận hành.
+Trash: POST notes/{id}/trash; restore trước cutoff30 ngày; DELETE notes/{id} chỉ trash. Note trash không sửa/nhắc; restore giữ note/nhãn còn hợp lệ và chỉ lịch tương lai. Tại đúng cutoff không còn restore; worker purge mặc định tắt đến khi review vận hành.
 
 ## Nhãn, lịch nhắc, inbox và admin — API-005/008/010/011
 

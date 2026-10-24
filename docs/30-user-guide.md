@@ -4,7 +4,7 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
-React hiện ở ntc_react; route/chức năng thực tế xem FRONTEND-IMPLEMENTATION, tài liệu dưới giữ ID luồng. Backend cung cấp API cho React; NTC.VIEW đã gỡ theo DEC-020; tên nút/UI dùng English. Lưu conflict phải giữ bản nhập; Untitled hợp lệ; nhãn trùng được phép; trash7 ngày; restore chỉ nhắc tương lai. Markdown conversion cần cảnh báo format. Có export Markdown từng note với cảnh báo mất định dạng; full account export/permanent delete còn chưa chốt doQ014.
+React hiện ở ntc_react; route/chức năng thực tế xem FRONTEND-IMPLEMENTATION, tài liệu dưới giữ ID luồng. Backend cung cấp API cho React; NTC.VIEW đã gỡ theo DEC-020; tên nút/UI dùng English. Lưu conflict phải giữ bản nhập; Untitled hợp lệ; nhãn trùng được phép; trash30 ngày; restore chỉ nhắc tương lai. Markdown conversion cần cảnh báo format. Có export Markdown từng note với cảnh báo mất định dạng; full account export/permanent delete còn chưa chốt doQ014.
 
 ## Bắt đầu
 
@@ -35,7 +35,7 @@ Chọn **Reminder**, giờ và lịch lặp, kiểm timezone tài khoản. Thôn
 
 ## Thùng rác
 
-**Move to trash** chuyển note vào **Trash**, có thể **Restore** hoặc **Delete permanently**. Note tự bị xóa hẳn sau 7 ngày tính từ lúc đưa vào trash. Xóa hẳn không khôi phục qua app. Note trong trash không tiếp tục nhắc lịch.
+**Move to trash** chuyển note vào **Trash**, có thể **Restore** hoặc **Delete permanently**. Note tự bị xóa hẳn sau 30 ngày tính từ lúc đưa vào trash. Xóa hẳn không khôi phục qua app. Note trong trash không tiếp tục nhắc lịch.
 
 ## Tài khoản và hỗ trợ
 

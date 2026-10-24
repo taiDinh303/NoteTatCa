@@ -10,7 +10,7 @@ Dispatch query tối đa100 lịch due hoặc legacy chưa khởi tạo; transac
 
 Email batch100, lease2 phút + version, tối đa5lần với backoff, hết thì Abandoned. SMTP body chỉ nhắc chung/link, không title/content note. Recheck parent/account trước cấp lease. Nếu external send thành công nhưng mất ACK/crash, có thể gửi lại: **at-least-once**, không hứa exactly-once. In-flight send có thể hoàn tất trong race trash/lock sau kiểm tra; inbox/query vẫn scope hiện trạng. Trước scale nhiều replica phải kiểm contention/lease và trusted proxy với tải thật.
 
-Purge batch100 chỉ DeletedTime≤nowUTC−7 ngày, transaction recheck để tránh xóa note restore. Graph gồm NoteTag/Reminder/Notification/Delivery rồi Note; không xóa tài khoản. Prune batch≤500 mỗi nhóm expired refresh/OTP sau grace1ngày; không xóa session còn hạn cần phát hiện reuse.
+Purge batch100 chỉ DeletedTime≤nowUTC−30 ngày, transaction recheck để tránh xóa note restore. Graph gồm NoteTag/Reminder/Notification/Delivery rồi Note; không xóa tài khoản. Prune batch≤500 mỗi nhóm expired refresh/OTP sau grace1ngày; không xóa session còn hạn cần phát hiện reuse.
 
 ## Bật vận hành
 

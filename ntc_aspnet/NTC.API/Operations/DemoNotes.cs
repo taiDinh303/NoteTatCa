@@ -22,7 +22,7 @@ internal static class DemoNotes
         Add("Getting started checklist", null, checklist, "✅", "#DCFCE7", work, 2000);
         Add("Ideas for the weekend", "Visit a new coffee shop.\nRead a chapter of a favorite book.\nTake a photo walk and collect inspiration.", null, "💡", "#FEF3C7", ideas, 3000);
         Add("", "A quick thought does not need a title. Try searching for inspiration to find this note again.", null, "📝", "#F3E8FF", personal, 4000);
-        Add("Restore me from Trash", "This is a sample deleted note. Restore it to the board or delete it permanently. Trash keeps notes for 7 days.", null, "🗑️", "#FCE7F3", personal, 5000, trash: true);
+        Add("Restore me from Trash", "This is a sample deleted note. Restore it to the board or delete it permanently. Trash keeps notes for 30 days.", null, "🗑️", "#FCE7F3", personal, 5000, trash: true);
 
         void Add(string title, string? plain, string? document, string emoji, string color, Tag tag,
             double order, bool pinned = false, bool trash = false)

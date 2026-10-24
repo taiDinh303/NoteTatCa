@@ -29,7 +29,7 @@ Thay đổi 2026-10-19/DEC-017: Admin là nhóm quản trị riêng. Policy `Cus
 - Note: title rỗng được lưu rỗng, UI hiện Untitled; không đặt dữ liệu giả vào title cũ. Nhãn trùng tên hợp lệ, phân biệt theo ID; chỉ composite NoteTag chống gán trùng. Ghim và reorder theo nhóm/owner, finite rank và transaction.
 - Time: UTC instants, IANA timezone user mặc định Asia/Ho_Chi_Minh. Lịch tháng/năm tính theo ngày anchor, không drift sau tháng ngắn. DST thiếu giờ chuyển tới giờ hợp lệ, giờ lặp chọn một instant; đây là lựa chọn kỹ thuật ghi rõ trong test.
 - Reminder/jobs: persisted occurrence/delivery + concurrency lease; inbox unique theo occurrence; email retry có backoff, body chỉ link/nhắc chung không nội dung note. Email có mức at-least-once nếu crash sau provider gửi trước ACK, không hứa exactly-once. Trash/khóa user ngừng nhắc; restore tính lần tương lai.
-- Trash: purge khi DeletedTime ≤ nowUTC−7 ngày; transaction và recheck state; hard delete chỉ trash, xử lý graph note/tag links/reminder/delivery/notification. Chạy worker mặc định **tắt** đến khi review migration và vận hành, tránh tự purge dữ liệu cũ khi startup.
+- Trash: purge khi DeletedTime ≤ nowUTC−30 ngày; transaction và recheck state; hard delete chỉ trash, xử lý graph note/tag links/reminder/delivery/notification. Chạy worker mặc định **tắt** đến khi review migration và vận hành, tránh tự purge dữ liệu cũ khi startup.
 - Admin: danh sách/khóa user và aggregate statistics; không title/content/preview/search note khác owner. Khóa user phải có hiệu lực với token còn hạn; audit metadata tối thiểu.
 - Vận hành: health/live + health/ready, request correlation, no-store API, log tên endpoint/status/latency không body/token. Docker Render, env example không secret, CI build/test; không tự deploy.
 

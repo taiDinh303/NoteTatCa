@@ -47,7 +47,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
   "What should I do if saving fails?": ["Làm gì khi lưu thất bại?","保存失败怎么办？","保存に失敗したら？"],
   "Keep the note open and check your connection. Use Retry save when available. Copy your draft before reloading or closing the tab; unsaved drafts are not stored permanently offline.": ["Giữ ghi chú đang mở và kiểm tra kết nối. Chọn Thử lưu lại nếu có. Sao chép bản nháp trước khi tải lại hoặc đóng tab; bản chưa lưu không được lưu bền vững khi offline.","保持笔记打开并检查网络。如果有重试保存按钮，请点击。刷新或关闭标签页前复制草稿，未保存的草稿不会永久离线保存。","ノートを開いたまま接続を確認し、表示される場合は保存を再試行してください。再読み込みやタブを閉じる前に下書きをコピーしてください。未保存の下書きはオフラインで永続保存されません。"],
   "Can I recover a deleted note?": ["Có khôi phục ghi chú đã xóa được không?","可以恢复已删除的笔记吗？","削除したノートを復元できますか？"],
-  "Open Trash and choose Restore during the 7-day retention period. Permanently deleted notes cannot be restored from the app.": ["Mở Thùng rác và chọn Khôi phục trong thời hạn lưu 7 ngày. Ghi chú đã xóa vĩnh viễn không thể khôi phục từ ứng dụng.","在7天保留期内打开回收站并选择恢复。永久删除的笔记无法在应用中恢复。","7日間の保持期間内にゴミ箱を開き、復元を選んでください。完全に削除されたノートはアプリから復元できません。"],
+  "Open Trash and choose Restore during the 30-day retention period. Permanently deleted notes cannot be restored from the app.": ["Mở Thùng rác và chọn Khôi phục trong thời hạn lưu 30 ngày. Ghi chú đã xóa vĩnh viễn không thể khôi phục từ ứng dụng.","在30天保留期内打开回收站并选择恢复。永久删除的笔记无法在应用中恢复。","30日間の保持期間内にゴミ箱を開き、復元を選んでください。完全に削除されたノートはアプリから復元できません。"],
   "How do reminders work?": ["Dùng lời nhắc thế nào?","如何使用提醒？","リマインダーの使い方は？"],
   "Open a note in Edit and choose the bell to set a reminder. Manage reminders on the Reminders page and check Inbox for notifications.": ["Mở ghi chú ở chế độ Chỉnh sửa, chọn chuông để đặt lời nhắc. Quản lý tại trang Lời nhắc và xem thông báo trong Hộp thư.","编辑笔记时点击铃铛设置提醒。在提醒页面管理提醒，并在收件箱查看通知。","ノートの編集画面でベルを選んでリマインダーを設定します。リマインダーページで管理し、受信箱で通知を確認できます。"],
   "How do I import or export a note?": ["Nhập hoặc xuất ghi chú thế nào?","如何导入或导出笔记？","ノートをインポート・エクスポートするには？"],
@@ -1062,10 +1062,10 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "将此笔记移至回收站？",
     "このノートをゴミ箱に移動しますか？",
   ],
-  "You can restore it for seven days. Future reminders will stop.": [
-    "Bạn có thể khôi phục trong bảy ngày. Nhắc nhở tương lai sẽ dừng.",
-    "可在七天内恢复。未来提醒将停止。",
-    "7 日以内なら復元できます。今後のリマインダーは停止します。",
+  "You can restore it for 30 days. Future reminders will stop.": [
+    "Bạn có thể khôi phục trong 30 ngày. Nhắc nhở tương lai sẽ dừng.",
+    "可在30天内恢复。未来提醒将停止。",
+    "30 日以内なら復元できます。今後のリマインダーは停止します。",
   ],
   "Align left": ["Căn trái", "左对齐", "左揃え"],
   "Align center": ["Căn giữa", "居中对齐", "中央揃え"],
@@ -1262,11 +1262,11 @@ export const messages: Record<string, readonly [string, string, string]> = {
   ],
   "Search results": ["Kết quả tìm kiếm", "搜索结果", "検索結果"],
   Notes: ["Ghi chú", "笔记", "ノート"],
-  "Deleted notes are permanently removed after the seven-day retention period.":
+  "Deleted notes are permanently removed after the 30-day retention period.":
     [
-      "Ghi chú đã xóa sẽ bị xóa vĩnh viễn sau thời hạn giữ lại bảy ngày.",
-      "已删除的笔记将在七天保留期后永久删除。",
-      "削除したノートは 7 日間の保存期間後に完全削除されます。",
+      "Ghi chú đã xóa sẽ bị xóa vĩnh viễn sau thời hạn giữ lại 30 ngày.",
+      "已删除的笔记将在30天保留期后永久删除。",
+      "削除したノートは 30 日間の保存期間後に完全削除されます。",
     ],
   "Take a note": ["Tạo ghi chú", "记一条笔记", "ノートを書く"],
   New: ["Mới", "新建", "新規"],
@@ -1333,10 +1333,10 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "永久删除笔记？",
     "ノートを完全に削除しますか？",
   ],
-  "You can restore this note for seven days. Future reminders will stop.": [
-    "Bạn có thể khôi phục ghi chú trong bảy ngày. Nhắc nhở tương lai sẽ dừng.",
-    "可在七天内恢复此笔记。未来提醒将停止。",
-    "7 日以内なら復元できます。今後のリマインダーは停止します。",
+  "You can restore this note for 30 days. Future reminders will stop.": [
+    "Bạn có thể khôi phục ghi chú trong 30 ngày. Nhắc nhở tương lai sẽ dừng.",
+    "可在30天内恢复此笔记。未来提醒将停止。",
+    "30 日以内なら復元できます。今後のリマインダーは停止します。",
   ],
   "This removes the note and its related reminders permanently. This cannot be undone.":
     [
@@ -1535,11 +1535,11 @@ export const messages: Record<string, readonly [string, string, string]> = {
       "提醒邮件包含应用链接，而非笔记内容。发送取决于服务器的提醒服务和邮件提供商。",
       "リマインダーメールにはノートの内容ではなくアプリへのリンクが含まれます。配信はサーバーのリマインダーサービスとメール事業者に依存します。",
     ],
-  "Notes in trash can be restored during a seven-day retention period, unless you choose to delete them permanently sooner. Backups follow the operator’s separate retention arrangements.":
+  "Notes in trash can be restored during a 30-day retention period, unless you choose to delete them permanently sooner. Backups follow the operator’s separate retention arrangements.":
     [
-      "Ghi chú trong thùng rác có thể khôi phục trong bảy ngày, trừ khi bạn xóa vĩnh viễn sớm hơn. Bản sao lưu tuân theo chính sách lưu giữ riêng của đơn vị vận hành.",
-      "回收站中的笔记可在七天内恢复，除非提前永久删除。备份遵循运营方的独立保留安排。",
-      "ゴミ箱のノートは、先に完全削除しない限り 7 日以内なら復元できます。バックアップは運用者の別の保存方針に従います。",
+      "Ghi chú trong thùng rác có thể khôi phục trong 30 ngày, trừ khi bạn xóa vĩnh viễn sớm hơn. Bản sao lưu tuân theo chính sách lưu giữ riêng của đơn vị vận hành.",
+      "回收站中的笔记可在30天内恢复，除非提前永久删除。备份遵循运营方的独立保留安排。",
+      "ゴミ箱のノートは、先に完全削除しない限り 30 日以内なら復元できます。バックアップは運用者の別の保存方針に従います。",
     ],
   "This browser": ["Trình duyệt này", "此浏览器", "このブラウザー"],
   "Your refresh session is saved in this browser until you sign out or it is revoked. Note caches stay in memory and are cleared on sign-out or account changes. Theme and layout preferences may be saved locally. Avoid using shared browser profiles for private notes.":
@@ -1899,11 +1899,11 @@ export const messages: Record<string, readonly [string, string, string]> = {
       "提醒邮件包含应用链接，而非笔记内容。设置提醒时可选择是否发送邮件。",
       "リマインダーメールにはノート内容ではなくアプリへのリンクが含まれます。設定時にメールを送るか選べます。",
     ],
-  "You can restore notes from Trash for up to seven days. Permanent deletion cannot be undone in the app.":
+  "You can restore notes from Trash for up to 30 days. Permanent deletion cannot be undone in the app.":
     [
-      "Bạn có thể khôi phục ghi chú từ thùng rác trong tối đa bảy ngày. Không thể hoàn tác xóa vĩnh viễn trong ứng dụng.",
-      "可在七天内从回收站恢复笔记。在应用中无法撤销永久删除。",
-      "ゴミ箱から 7 日以内ならノートを復元できます。完全削除はアプリで元に戻せません。",
+      "Bạn có thể khôi phục ghi chú từ thùng rác trong tối đa 30 ngày. Không thể hoàn tác xóa vĩnh viễn trong ứng dụng.",
+      "可在30天内从回收站恢复笔记。在应用中无法撤销永久删除。",
+      "ゴミ箱から 30 日以内ならノートを復元できます。完全削除はアプリで元に戻せません。",
     ],
   "Open Trash": ["Mở thùng rác", "打开回收站", "ゴミ箱を開く"],
   "Read privacy & data": [
@@ -2157,10 +2157,10 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "移除最后一种登录方式前，请先设置密码。",
     "最後のログイン方法を削除する前にパスワードを設定してください。",
   ],
-  "The seven-day recovery period has expired.": [
-    "Đã hết thời hạn khôi phục bảy ngày.",
-    "七天恢复期限已过。",
-    "7 日間の復元期間が過ぎました。",
+  "The 30-day recovery period has expired.": [
+    "Đã hết thời hạn khôi phục 30 ngày.",
+    "30天恢复期限已过。",
+    "30 日間の復元期間が過ぎました。",
   ],
   "This Google account is already linked.": [
     "Tài khoản Google này đã được liên kết.",

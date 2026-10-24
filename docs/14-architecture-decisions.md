@@ -33,7 +33,7 @@
 
 ## ADR-005 — Reminder và purge bền vững
 
-- ACCEPTED nghiệp vụ: trong app + email, có lịch lặp; trash tự xóa sau 7 ngày.
+- ACCEPTED nghiệp vụ: trong app + email, có lịch lặp; trash tự xóa sau 30 ngày.
 - IMPLEMENTED: occurrence/delivery DB, worker lease/dedup trong API default off, tick30 giây. Không dùng timer trong trình duyệt làm cơ chế duy nhất.
 - Các phương án worker riêng/cron trên Render hoặc scheduler DB cần so sánh uptime, chi phí và độ chính xác; chưa chọn plan. Kênh email dùng adapter hiện có sau rà lỗi/retry.
 - Q-024 đã chốt timezone từng user mặc định Việt Nam, gửi bù một lần trong 24 giờ và bỏ cũ hơn. Test crash sau gửi trước ACK, race purge/restore, DST/cuối tháng và retry SMTP; một occurrence gần nhất mỗi lịch trong24 giờ đã chốt DEC-014, có test.

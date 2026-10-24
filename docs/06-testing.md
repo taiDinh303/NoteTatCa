@@ -94,7 +94,7 @@ React browser/unit có evidence riêng tại FRONTEND-IMPLEMENTATION. Không ch�
 | TC-006 | REQ-005 | Pin/unpin rồi tải lại | Nhóm/thứ tự/PinnedAt đúng, server quản lý audit | Integration/E2E |
 | TC-007 | REQ-005 | Reorder neighbor khác owner/nhóm/self; hai request đồng thời | Không sửa dữ liệu khác; thứ tự ổn định hoặc conflict rõ | Integration |
 | TC-008 | REQ-006 | Soft delete→trash→restore→hard delete | Active/trash nhất quán; graph được xử lý nguyên tử | Integration/E2E |
-| TC-009 | REQ-006 | Trash 6d23h59m và đúng 7 ngày, job chạy lặp, race restore | Chỉ purge đủ 7 ngày; không xóa note active; retry an toàn | Integration với clock giả |
+| TC-009 | REQ-006 | Trash 29d23h59m và đúng 30 ngày, job chạy lặp, race restore | Chỉ purge đủ 30 ngày; không xóa note active; retry an toàn | Integration với clock giả |
 | TC-010 | REQ-008/WF-005 | Tới hạn/lặp/timezone; restart; gửi trùng; note trash; SMTP lỗi | Không mất lịch/nhắc note xóa; dedup; retry và tín hiệu lỗi | Worker integration |
 | TC-011 | REQ-009/012 | User sửa profile B; user gọi admin; admin mở note A; khóa A khi còn token | Từ chối; admin không đọc nội dung; khóa có hiệu lực theo policy phiên | Security integration |
 | TC-012 | REQ-011 | Plain/checklist/rich/Markdown; màu chữ/emoji/icon; HTML script/link nguy hiểm | Round-trip đúng format hỗ trợ; không XSS; conversion không âm thầm mất dữ liệu | Contract/E2E |

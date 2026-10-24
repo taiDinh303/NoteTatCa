@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Trash note từ7sang30ngày — 2026-10-24
+
+- Chủ dự án yêu cầu30ngày thay7ngày. Đổi cutoff purge và restore sang nowUTC−30ngày; frontend countdown30ngày, banner/Help/Privacy/public Privacy và4ngôn ngữ, demo text đồng bộ. Note còn trong trash được hưởng hạn mới từ DeletedTime hiện có; không reset ngày xóa, không migrate hoặc khôi phục note đã purge. Account deletion không thuộc scope.
+- Cập nhật Q-006/chính sách hiện hành trong docs nghiệp vụ/API/worker/ops/testing/user guide; giữ worklog và lịch sử yêu cầu cũ, thêm override tại FRONTEND-IMPLEMENTATION. Maintenance test cutoff30ngày−1giây và đúng30ngày; HTTP test bổ sung29ngày restore200/đúng30ngày409. SQLite/captured-email fixture riêng, không owner DB/email thật.
+- Validation: MaintenanceTests+NoteTests18/18 PASS Release; .NET solution strict Release PASS0warnings/0errors; TypeScript/Production build và ESLint PASS; Chromium rich-note/trash/restore/permanent-delete regression1/1 PASS. Không fullsuite/production/thiết bị thật/manual deploy/migration. Giữ thay đổi landing language đang làm song song trong PublicPages ngoài commit; chỉ stage hunk retention của file đó. .agnes giữ ngoài scope. Push policy React/API liên quan theo quyền chủ dự án, đối chiếu remote SHA sau push; hosting rollout chưa xác minh.
+
 ## Thông báo trash cùng hàng với grid/list — 2026-10-24
 
 - Theo ảnh/yêu cầu chủ dự án: chuyển thông báo retention7ngày vào bên trái workspace-toolbar của Trash, toggle grid/list bên phải cùng tâm dọc. Notice flex1/min-width0/margin0, text wrap, SVG và action không co. Không đổi retention, restore/delete confirmation hoặc handler grid/list.

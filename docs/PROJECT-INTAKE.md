@@ -37,7 +37,7 @@
 
 TARGET đã chốt: docs trước rồi hoàn thiện backend (giao 2026-10-17); giữ Razor và định hướng React. Backend source đã triển khai, evidence tại06/worklog.
 
-TARGET bản đầu đã chốt: nhiều user, note riêng; email/mật khẩu + Google và xác minh email; nhãn, màu, ghim, kéo thả, tìm kiếm; editor rich text thống nhất có plain text/checklist/Markdown shortcuts/màu chữ/emoji và emoji đại diện note; autosave + nút Save; trash tự xóa sau 7 ngày; reminder trong app/email có lặp; admin quản lý/khóa user và thống kê nhưng không đọc nội dung note người khác.
+TARGET bản đầu đã chốt: nhiều user, note riêng; email/mật khẩu + Google và xác minh email; nhãn, màu, ghim, kéo thả, tìm kiếm; editor rich text thống nhất có plain text/checklist/Markdown shortcuts/màu chữ/emoji và emoji đại diện note; autosave + nút Save; trash tự xóa sau 30 ngày; reminder trong app/email có lặp; admin quản lý/khóa user và thống kê nhưng không đọc nội dung note người khác.
 
 TARGET tương lai: Supabase PostgreSQL chỉ làm database, giữ .NET Identity; Render cho API, Vercel cho React; giữ tài khoản/note cũ. React TS/Vite ở NTC/ntc_react. UI mặc định Anh, có Việt/Trung/Nhật theo DEC-024; public nhỏ. Git root đã gom lên NTC theo yêu cầu tiếp theo 2026-10-17; một docs duy nhất ở root, backend giữ ntc_aspnet và lịch sử/config được bảo toàn.
 
@@ -54,7 +54,7 @@ Hai vòng phỏng vấn đã được chủ dự án trả lời ngày 2026-10-1
 | Q-003 | Loại nội dung? | Văn bản thường + checklist | Văn bản thường | Rich text | Markdown | ABCD + màu chữ/icon; cụ thể Q-020/021 |
 | Q-004 | Phạm vi ngoài CRUD? | Nhãn, màu, ghim, kéo thả, tìm kiếm, trash, nhắc lịch | Như A + archive | Như B + ảnh/tệp | Nhãn, ghim, tìm kiếm, trash | A — đã xác nhận, chưa archive/attachments |
 | Q-005 | Kênh nhắc lịch? | Trong app + email, có lặp | Trong app, không lặp | Trong app + browser notification, có lặp | Chưa làm | A — đã xác nhận |
-| Q-006 | Thời gian giữ trash? | 30 ngày, có xóa sớm | 7 ngày, có xóa sớm | Đến khi tự xóa | Không dùng | B — đã xác nhận, 7 ngày |
+| Q-006 | Thời gian giữ trash? | 30 ngày, có xóa sớm | 7 ngày, có xóa sớm | Đến khi tự xóa | Không dùng | A — cập nhật30ngày, chủ dự án2026-10-24 |
 | Q-007 | Admin? | Chưa cần trang admin | Khóa user/thống kê, không đọc note | Được xem/sửa mọi note | Không dùng | B — đã xác nhận |
 | Q-008 | Stack và chỗ đặt frontend? | React + TS + Vite ở NTC/ntc_react; giữ .NET/SQL Server | Như A dùng JavaScript | React + TS + Vite, đổi DB (ghi rõ) | Không dùng | A + Supabase/Render/Vercel tương lai; Q-019 |
 

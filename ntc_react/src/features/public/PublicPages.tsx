@@ -221,7 +221,7 @@ export function Privacy() {
       <h2>{tr("Deleted notes")}</h2>
       <p>
         {tr(
-          "Notes in trash can be restored during a seven-day retention period, unless you choose to delete them permanently sooner. Backups follow the operator’s separate retention arrangements.",
+          "Notes in trash can be restored during a 30-day retention period, unless you choose to delete them permanently sooner. Backups follow the operator’s separate retention arrangements.",
         )}
       </p>
       <h2>{tr("This browser")}</h2>

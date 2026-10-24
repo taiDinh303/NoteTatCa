@@ -99,7 +99,7 @@ function NoteCard({
     ? Math.max(
         0,
         Math.ceil(
-          (Date.parse(note.deletedTime) + 7 * 86400000 - now) / 86400000,
+          (Date.parse(note.deletedTime) + 30 * 86400000 - now) / 86400000,
         ),
       )
     : null;
@@ -459,7 +459,7 @@ export default function NotesPage({
           <div className="notice-strip trash-retention">
             <Trash2 size={16} />
             <span>{tr(
-              "Deleted notes are permanently removed after the seven-day retention period.",
+              "Deleted notes are permanently removed after the 30-day retention period.",
             )}</span>
           </div>
         ) : null}

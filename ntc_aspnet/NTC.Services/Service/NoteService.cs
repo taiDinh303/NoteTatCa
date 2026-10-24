@@ -143,7 +143,7 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
         await InTransactionAsync(async () =>
         {
             var note = await Owned(true).FirstOrDefaultAsync(x => x.Id == id) ?? throw DomainErrors.NotFound("Note");
-            if (note.DeletedTime <= UtcNow.AddDays(-7)) throw DomainErrors.Conflict("The seven-day recovery period has expired.");
+            if (note.DeletedTime <= UtcNow.AddDays(-30)) throw DomainErrors.Conflict("The 30-day recovery period has expired.");
             note.DeletedTime = null; note.DeletedBy = null;
             var reminders = await Repository<Reminder>().Entities.Where(x => x.NoteId == id && x.IsActive && x.DeletedTime == null).ToListAsync();
             foreach (var reminder in reminders) ReminderSchedule.AdvancePast(reminder, UtcNow);

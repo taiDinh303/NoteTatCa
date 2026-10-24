@@ -58,19 +58,35 @@ public sealed class MaintenanceTests
         Assert.Single(f.Email.Messages);
     }
     [Fact]
-    public async Task Purge_deletes_only_seven_day_trash_and_removes_the_entire_related_graph()
+    public async Task Purge_deletes_only_thirty_day_trash_and_removes_the_entire_related_graph()
     {
         using var f=new ApiFactory();await f.InitializeAsync();var(c,_)=await f.LoginAsync();using var client=c;
         var expired=(await ApiFactory.Note(c)).GetProperty("id").GetGuid();var recent=(await ApiFactory.Note(c)).GetProperty("id").GetGuid();var active=(await ApiFactory.Note(c)).GetProperty("id").GetGuid();
         await AddReminder(f,expired,f.Clock.GetUtcNow().AddSeconds(-1));
         using(var scope=f.Services.CreateScope())
         {var job=scope.ServiceProvider.GetRequiredService<IBackgroundMaintenanceService>();await job.DispatchRemindersAsync();var db=scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-            (await db.Notes.SingleAsync(x=>x.Id==expired)).DeletedTime=f.Clock.GetUtcNow().AddDays(-7);
-            (await db.Notes.SingleAsync(x=>x.Id==recent)).DeletedTime=f.Clock.GetUtcNow().AddDays(-7).AddSeconds(1);await db.SaveChangesAsync();}
+            (await db.Notes.SingleAsync(x=>x.Id==expired)).DeletedTime=f.Clock.GetUtcNow().AddDays(-30);
+            (await db.Notes.SingleAsync(x=>x.Id==recent)).DeletedTime=f.Clock.GetUtcNow().AddDays(-30).AddSeconds(1);await db.SaveChangesAsync();}
         using(var scope=f.Services.CreateScope())
         {var job=scope.ServiceProvider.GetRequiredService<IBackgroundMaintenanceService>();Assert.Equal(1,await job.PurgeTrashAsync());Assert.Equal(0,await job.PurgeTrashAsync());var db=scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             Assert.False(await db.Notes.AnyAsync(x=>x.Id==expired));Assert.True(await db.Notes.AnyAsync(x=>x.Id==recent));Assert.True(await db.Notes.AnyAsync(x=>x.Id==active));
             Assert.Empty(await db.Reminders.ToListAsync());Assert.Empty(await db.Notifications.ToListAsync());Assert.Empty(await db.ReminderDeliveries.ToListAsync());}
+    }
+    [Fact]
+    public async Task Restore_accepts_29_day_trash_but_rejects_exact_30_day_cutoff()
+    {
+        using var f = new ApiFactory(); await f.InitializeAsync(); var (c, _) = await f.LoginAsync(); using var client = c;
+        var recent = (await ApiFactory.Note(c)).GetProperty("id").GetGuid();
+        var expired = (await ApiFactory.Note(c)).GetProperty("id").GetGuid();
+        using (var scope = f.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            (await db.Notes.SingleAsync(x => x.Id == recent)).DeletedTime = f.Clock.GetUtcNow().AddDays(-29);
+            (await db.Notes.SingleAsync(x => x.Id == expired)).DeletedTime = f.Clock.GetUtcNow().AddDays(-30);
+            await db.SaveChangesAsync();
+        }
+        Assert.True((await c.PostAsync($"/api/v1/notes/{recent}/restore", null)).IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, (await c.PostAsync($"/api/v1/notes/{expired}/restore", null)).StatusCode);
     }
     [Fact]
     public async Task Restoring_a_note_advances_reminders_without_sending_missed_occurrences()

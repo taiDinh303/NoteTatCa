@@ -4,6 +4,8 @@
 
 ## Phạm vi và kiến trúc
 
+Retention hiện hành2026-10-24: trash note giữ30ngày theo yêu cầu mới. Backend restore/purge cutoff30ngày, card tính thời gian còn lại30ngày và các thông báo Trash/Help/Privacy4ngôn ngữ đồng bộ. Các mốc7ngày trong lịch sử triển khai dưới đây đã được thay thế; không thay hạn hoặc triển khai xóa tài khoản trong lượt này.
+
 ### Notes ưu tiên và offline — 2026-10-24
 
 Bổ sung UI cùng ngày: khi sync bình thường, ẩn toàn bộ toolbar để không chiếm một hàng trên notes; “Notes synced” chỉ giữ ở status cho screen reader. Sync now chuyển thêm vào menu avatar customer, không thêm vào admin. Toolbar chỉ hiện khi pending/offline/kết nối có vấn đề/lỗi hoặc thao tác cần chú ý; pending Sync now/Review sync giữ luồng hiện có. Kiểm tra queue rỗng không làm toolbar chớp lên.

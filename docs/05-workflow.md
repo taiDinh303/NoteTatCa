@@ -24,7 +24,7 @@ Pin gửi trạng thái tuyệt đối + version, server quản lý PinnedAt và
 
 ## WF-004 — Trash, restore và xóa hẳn
 
-REQ-006, RULE-002/008. Soft delete → ẩn active/search/inbox và ngừng nhắc → owner xem trash → restore trước7 ngày hoặc xác nhận hard delete. Restore giữ content/nhãn còn hợp lệ, chỉ tính lịch tương lai. Tại cutoff DeletedTime≤nowUTC−7 ngày không còn restore. Purge worker có transaction recheck parent, xóa graph NoteTag/Reminder/Notification/Delivery rồi Note.
+REQ-006, RULE-002/008. Soft delete → ẩn active/search/inbox và ngừng nhắc → owner xem trash → restore trước30 ngày hoặc xác nhận hard delete. Restore giữ content/nhãn còn hợp lệ, chỉ tính lịch tương lai. Tại cutoff DeletedTime≤nowUTC−30 ngày không còn restore. Purge worker có transaction recheck parent, xóa graph NoteTag/Reminder/Notification/Delivery rồi Note.
 
 Worker default off, chưa chạy trên dữ liệu thật; lần bật đầu cần thống kê candidates/backup. Removed không restore trong app; backup recovery là quy trình riêng, không hứa khôi phục từng note.
 

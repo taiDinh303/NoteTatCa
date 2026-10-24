@@ -13,7 +13,7 @@ Bổ sung: Version là Guid concurrency token; Idempotency-Key scoped owner/payl
 | Nhãn | Phân loại một note vào nhiều nhóm | Tag; liên kết NoteTag |
 | Ghim | Ưu tiên nhóm note lên trên | IsPinned/PinnedAt; khác Priority chưa định nghĩa |
 | Kéo thả | Đổi thứ tự trong nhóm | SortOrder; không đổi owner |
-| Thùng rác | Note xóa mềm, giữ tối đa 7 ngày | DeletedTime; không phải archive |
+| Thùng rác | Note xóa mềm, giữ tối đa 30 ngày | DeletedTime; không phải archive |
 | Xóa hẳn/purge | Loại dữ liệu theo policy | Không restore qua UI |
 | Reminder | Lịch nhắc liên quan note | Reminder; khác thông báo đã gửi |
 | Occurrence | Một lần tới hạn của lịch lặp | Đề xuất mới; là đơn vị dedup |

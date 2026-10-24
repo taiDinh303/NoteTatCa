@@ -98,7 +98,7 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
     }
     public async Task<int> PurgeTrashAsync(CancellationToken cancellationToken = default)
     {
-        var cutoff = clock.GetUtcNow().AddDays(-7); var count = 0;
+        var cutoff = clock.GetUtcNow().AddDays(-30); var count = 0;
         var ids = await unitOfWork.GetRepository<Note>().Entities.AsNoTracking().Where(x => x.DeletedTime <= cutoff)
             .OrderBy(x => x.DeletedTime).Select(x => x.Id).Take(100).ToListAsync(cancellationToken);
         foreach (var id in ids)

@@ -23,7 +23,7 @@ Chuyển React không bắt buộc chuyển DB cùng ngày. Chia đợt: ổn đ
 | DateTimeOffset audit/reminder | timestamptz/UTC theo provider | Giữ instant; không cộng 7h lặp; timezone recurring lưu riêng |
 | SortOrder double | double precision hoặc chiến lược rank đã duyệt | Giữ thứ tự; xử lý tie bằng Id; kiểm NaN/Infinity |
 | NoteTag | Composite PK và FK | Giữ relation/owner, loại lỗi theo report có duyệt |
-| DeletedTime | Trash cutoff giữ từ lúc xóa ban đầu | Không tự reset thời gian 7 ngày trong migrate |
+| DeletedTime | Trash cutoff giữ từ lúc xóa ban đầu | Không tự reset thời gian 30 ngày trong migrate |
 
 Mapping C#→Postgres đã có model/DDL checks; Npgsql8.0.11/EF8.0.32, runtime round-trip vẫn cần CI/staging. Không dùng migration SQL Server nguyên trạng trên PostgreSQL.
 
@@ -37,7 +37,7 @@ Mapping C#→Postgres đã có model/DDL checks; Npgsql8.0.11/EF8.0.32, runtime 
 6. Freeze write nếu chọn cutover đơn; backup cuối → migrate delta → smoke → chuyển API connection và worker; không dual-write thiếu thiết kế.
 7. Rollback xác định dữ liệu phát sinh sau cutover; không đơn giản chuyển URL về DB cũ và làm mất ghi mới.
 
-Purge 7 ngày khi bật lần đầu: thống kê note cũ đủ cutoff và review tác động trước chạy. Không xem lựa chọn retention là cho phép xóa dữ liệu ngay trong phiên docs. TC-009 backend fixture PASS; TC-016/017 data-transfer/restore thật NOT RUN.
+Purge 30 ngày khi bật lần đầu: thống kê note cũ đủ cutoff và review tác động trước chạy. Không xem lựa chọn retention là cho phép xóa dữ liệu ngay trong phiên docs. TC-009 backend fixture PASS; TC-016/017 data-transfer/restore thật NOT RUN.
 
 ## Migration rà entities
 

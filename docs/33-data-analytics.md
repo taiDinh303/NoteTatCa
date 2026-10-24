@@ -12,7 +12,7 @@ Q-007 đã chọn admin quản lý user và xem thống kê, không đọc note.
 | --- | --- | --- | --- |
 | Total accounts | Số account tồn tại, tách active/locked/deactivated | Identity metadata tối thiểu | Không đếm user đã loại sai policy |
 | Active users | User có hoạt động đã định trong 7/30 ngày | Cần định nghĩa event/retention, chưa có pipeline | Không gọi total accounts là active users |
-| Note counts | Active/trash, tổng số theo môi trường | Aggregate không nội dung | Scope/state/cutoff 7 ngày |
+| Note counts | Active/trash, tổng số theo môi trường | Aggregate không nội dung | Scope/state/cutoff 30 ngày |
 | Delivery health | Due/sent/retry/fail/dedup | Operational metrics không body/email đầy đủ | Counter/idempotency |
 
 Chốt metric chính xác, timezone bucket, exclusion test users và quyền admin trước endpoint statistics. Đề xuất trả aggregate toàn hệ thống, metadata từng user chỉ trong quản lý tài khoản; không thêm drill-down nội dung note. Rà query/raw SQL/cache/response để không vô tình trả preview.

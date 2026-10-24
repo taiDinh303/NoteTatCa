@@ -64,7 +64,7 @@ export default function PrivacySettings({
         <h2>{tr("Deleted notes")}</h2>
         <p>
           {tr(
-            "You can restore notes from Trash for up to seven days. Permanent deletion cannot be undone in the app.",
+            "You can restore notes from Trash for up to 30 days. Permanent deletion cannot be undone in the app.",
           )}
         </p>
         {!administration ? (

@@ -17,7 +17,7 @@ Giữ account/hash/ID/note/audit; không apply/migrate/reset database thật t�
 Note private; admin không đọc content; untitled và duplicate label hợp lệ.
 Text100k/title150/tag50/rich1MiB/20tag/5active reminder mỗi note.
 Editor rich/checklist/Markdown shortcuts/màu/emoji, autosave+Save.
-Trash7ngày; reminder timezone user Việt Nam, catch-up1lần gần nhất/24h,
+Trash30ngày; reminder timezone user Việt Nam, catch-up1lần gần nhất/24h,
 month clamp giữ anchor, restore tương lai. Worker mặc định tắt.
 
 Docs duy nhất NTC/docs; không tạo lại ntc_aspnet/docs hoặc nested .git.

@@ -25,6 +25,6 @@ TARGET: React gọi API Render quản lý nghiệp vụ, Supabase chỉ DB; khô
 
 Chốt Q và contract → test/build → artifact có commit → backup → migration tương thích → API staging → React staging → smoke browser/API/DB → production theo phạm vi được giao → theo dõi. Không tự migration mỗi lần startup khi nhiều instance cùng chạy.
 
-Worker nhắc lịch và purge 7 ngày cần lịch chạy bền vững. Chốt một nơi chịu trách nhiệm job, không đồng thời API timer/cron/DB scheduler cùng gửi. Plan có ngủ, độ trễ khởi động, lịch cron và quota phải kiểm khi chọn dịch vụ, không giả định tài khoản miễn phí đáp ứng nhắc lịch đúng giờ.
+Worker nhắc lịch và purge 30 ngày cần lịch chạy bền vững. Chốt một nơi chịu trách nhiệm job, không đồng thời API timer/cron/DB scheduler cùng gửi. Plan có ngủ, độ trễ khởi động, lịch cron và quota phải kiểm khi chọn dịch vụ, không giả định tài khoản miễn phí đáp ứng nhắc lịch đúng giờ.
 
 Điều kiện release ở [18](18-release-checklist.md); chi tiết ở [08](08-deploy-detail.md); secret tại [17](17-environment-config.md).

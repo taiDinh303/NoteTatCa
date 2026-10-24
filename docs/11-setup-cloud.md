@@ -14,7 +14,7 @@
 | --- | --- | --- | --- |
 | Supabase project | Chỉ PostgreSQL, giữ Identity tại .NET | DB role riêng cho app; migrations role riêng; SSL; backup | Project/region/plan/quota |
 | Render web service | .NET API bằng Docker đề xuất | Build context đúng repo, PORT, secret env, health path | Service/domain/plan production; Dockerfile đã có |
-| Render worker hoặc scheduler đã chọn | Reminder, email delivery, purge trash 7 ngày | DB lease/dedup; lịch/timeout/monitor | Worker trong API đã có; cần uptime/plan trước bật |
+| Render worker hoặc scheduler đã chọn | Reminder, email delivery, purge trash 30 ngày | DB lease/dedup; lịch/timeout/monitor | Worker trong API đã có; cần uptime/plan trước bật |
 | Vercel project | React TS/Vite | Root frontend, lockfile, public API base URL, routing SPA | Project/URL/domain/team |
 | Google OAuth + SMTP | Login và gửi email | Redirect/origin đúng môi trường; secret server | Credential production/quota |
 

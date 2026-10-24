@@ -40,7 +40,7 @@ Rich document allowlist node/mark/attrs/scheme, size/depth/count và màu/emoji;
 
 PostgreSQL schema app `ntc`, không thêm vào exposed Data API schemas; không cung cấp DB/service secret cho VITE_. Supabase chỉ DB, .NET Identity JWT không tự map `auth.uid()`. Cấp runtime DB role tối thiểu, migration role riêng. Kiểm grants/default privileges theo account thật; nếu bật Data API phải có RLS/grant tests A/B/anon trước dùng. Không coi schema name tự thay thế quyền DB. [Supabase API security](https://supabase.com/docs/guides/api/securing-your-api).
 
-Trash7 ngày không tự xóa backup. Account export/hard delete, backup retention và legal privacy notice còn Q-014/Q-009; hard delete account hiện409. Admin statistics không analytics nội dung. Purge/job mặc định tắt, cần review candidates/backup trước bật; không tự xử lý dữ liệu thật từ task code.
+Trash30 ngày không tự xóa backup. Account export/hard delete, backup retention và legal privacy notice còn Q-014/Q-009; hard delete account hiện409. Admin statistics không analytics nội dung. Purge/job mặc định tắt, cần review candidates/backup trước bật; không tự xử lý dữ liệu thật từ task code.
 
 ## Ràng buộc dữ liệu và nhật ký quản trị
 

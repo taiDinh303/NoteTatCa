@@ -36,7 +36,7 @@ const questions = [
   ],
   [
     "Can I recover a deleted note?",
-    "Open Trash and choose Restore during the 7-day retention period. Permanently deleted notes cannot be restored from the app.",
+    "Open Trash and choose Restore during the 30-day retention period. Permanently deleted notes cannot be restored from the app.",
   ],
   [
     "How do reminders work?",

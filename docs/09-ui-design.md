@@ -17,7 +17,7 @@ React + TypeScript + Vite tại `NTC/ntc_react`; UI mặc định tiếng Anh, c
 | UI-003 | /notes/:id hoặc dialog editor | Title, editor, format, checklist, màu chữ/nền, icon, lưu | REQ-003/011, API-004 |
 | UI-004 | /labels/:id | Note list lọc tag, tạo/sửa/gỡ tag | REQ-004, API-005 |
 | UI-005 | /reminders | Note có lịch, dialog giờ/lặp/kênh | REQ-008, API-008 |
-| UI-006 | /trash | Thời gian còn lại đến 7 ngày, restore, xác nhận xóa hẳn | REQ-006, API-007 |
+| UI-006 | /trash | Thời gian còn lại đến 30 ngày, restore, xác nhận xóa hẳn | REQ-006, API-007 |
 | UI-007 | /settings | Hồ sơ, đổi email/password, liên kết Google, timezone | REQ-009, API-009 |
 | UI-008 | /notifications | Inbox, chưa đọc/đã đọc; mở note còn quyền | REQ-008, API-010 |
 | UI-009 | /admin/users, /admin/overview | Quản lý/khóa user, thống kê không chứa nội dung | REQ-012, API-011 |
@@ -31,7 +31,7 @@ Routes hiện hành được ánh xạ cụ thể ở FRONTEND-IMPLEMENTATION; b
 - Danh sách: loading, rỗng lần đầu, không có kết quả search, lỗi có retry, trang ngoài giới hạn.
 - Editor: sạch/đang sửa/đang lưu/đã lưu/lưu lỗi/conflict. DEC-018 thay Save thường của Q-023 bằng autosave + Retry save chỉ khi lỗi; giữ bản nhập khi401, mất mạng hoặc server lỗi; không báo Saved trước ACK.
 - Notes: một điểm Take a note kể cả empty state; bỏ header giải thích/nút New note/Create your first note trùng. Reminders/Inbox bỏ heading và mô tả đầu trang; Trash/label bỏ heading nhìn thấy, giữ semantic heading cho screen reader và các thao tác/cảnh báo. Sidebar có ẩn/hiện desktop nhớ lựa chọn, mobile drawer, cùng icon ba gạch ngang; YOUR LABELS/icon dùng chung một button, không Create a label trùng. Không routine success toast cho note/label/reminder; lỗi và các xác nhận bảo mật/quản trị giữ nguyên.
-- Trash: cảnh báo tự xóa sau 7 ngày và hậu quả xóa hẳn; restore lỗi không làm mất item khỏi UI vô lý.
+- Trash: cảnh báo tự xóa sau 30 ngày và hậu quả xóa hẳn; restore lỗi không làm mất item khỏi UI vô lý.
 - Nhắc lịch: hiển thị timezone và lịch lần tiếp; gửi email thất bại không báo đã nhận thành công.
 - Admin: không hiển thị preview/title/content, tooltip hay endpoint nội dung note của user khác.
 - Mất quyền/khóa tài khoản: ngừng load/sync, không lộ note cached cho người đăng nhập kế tiếp.

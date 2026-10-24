@@ -307,7 +307,7 @@ test("preloads all note pages and switches cached workspace collections without 
       .click();
     await expect(
       page.getByText(
-        "Deleted notes are permanently removed after the seven-day retention period.",
+        "Deleted notes are permanently removed after the 30-day retention period.",
         { exact: true },
       ),
     ).toBeVisible();
@@ -471,7 +471,7 @@ test("renders responsive workspace without console errors or navigation reloads"
   ).toHaveClass("sr-only");
   await expect(
     page.getByText(
-      "Deleted notes are permanently removed after the seven-day retention period.",
+      "Deleted notes are permanently removed after the 30-day retention period.",
       { exact: true },
     ),
   ).toBeVisible();

@@ -4,6 +4,8 @@
 
 ## Quyết định hiện hành
 
+Cập nhật2026-10-24 theo yêu cầu trực tiếp: trash note đổi từ7sang30ngày, tính từ DeletedTime UTC; restore chỉ trước cutoff, purge khi đủ30ngày. Áp dụng cả note đang trong trash chưa bị purge, không reset DeletedTime hoặc phục hồi note đã xóa hẳn. Chính sách này độc lập với kế hoạch xóa tài khoản30ngày.
+
 | ID | Nội dung | Trạng thái / nguồn | Ảnh hưởng |
 | --- | --- | --- | --- |
 | DEC-001 | Tạo docs theo đủ file docs_mau cho app ghi chú | TARGET, người dùng 2026-10-16 | Bộ tài liệu này |
@@ -15,7 +17,7 @@
 | DEC-007 | Git root NTC, một docs tại root; backend giữ ntc_aspnet | IMPLEMENTED theo yêu cầu trực tiếp 2026-10-17, nối tiếp Q-025 | Giữ HEAD/history/remote và thay đổi đang làm; cập nhật CI/Docker/scripts |
 | DEC-008 | Unified rich editor: plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; conversion cảnh báo | TARGET Q-003/020/021 | Schema version/renderer; bản hiện tại chưa upload ảnh, xem DEC-016 |
 | DEC-009 | Autosave, trạng thái lưu rõ; bỏ Save thường theo DEC-018 | Q-023 cập nhật bởi user2026-10-20 | Version/conflict/idempotency, Retry save khi lỗi |
-| DEC-010 | Trash 7 ngày, restore/xóa hẳn sớm; reminder in-app/email có lặp, timezone user, catch-up 24 giờ | TARGET Q-005/006/024 | Jobs/retention/notifications |
+| DEC-010 | Trash 30 ngày, restore/xóa hẳn sớm; reminder in-app/email có lặp, timezone user, catch-up 24 giờ | TARGET Q-005/006/024 | Jobs/retention/notifications |
 | DEC-011 | Giữ tài khoản/note cũ; mặc định UI tiếng Anh; hướng public nhỏ | TARGET Q-022/025, ngôn ngữ mở rộng tại DEC-024 | Migration an toàn, nội dung UI và vận hành |
 
 ## Quyết định bổ sung 2026-10-18
@@ -49,7 +51,7 @@ Bổ sung cùng ngày theo ảnh user: hiện dòng nhỏ cho từng tác vụ n
 | TASK-003 | P0 | Auth + ownership API | REQ-001/002/009, TASK-002 | 401 đúng; A không đọc/sửa/xóa dữ liệu B ở mọi endpoint | DONE backend; tests file 06, UI/cloud riêng |
 | TASK-004 | P0 | Chuẩn hóa note/tag/trash contract | REQ-003–006, Q-003/004/006/013/016 | Validation, DTO thống nhất, transaction, test âm | DONE backend; tests file 06, UI/cloud riêng |
 | TASK-005 | P1 | Search và loại nội dung đã chọn | REQ-007/011, Q-003/004 | Tìm đúng trong phạm vi user; editor round-trip | DONE backend; tests file 06, UI/cloud riêng |
-| TASK-006 | P1 | Reminder/inbox/email và worker purge 7 ngày | REQ-008, Q-005/006/024 | Gửi đúng, không trùng, restart không mất lịch; purge không xóa note đã restore | DONE backend; tests file 06, UI/cloud riêng |
+| TASK-006 | P1 | Reminder/inbox/email và worker purge 30 ngày | REQ-008, Q-005/006/024 | Gửi đúng, không trùng, restart không mất lịch; purge không xóa note đã restore | DONE backend; tests file 06, UI/cloud riêng |
 | TASK-007 | P1 | React nền tảng + luồng auth/note | DEC-002, Q-008/012/013/017 | Luồng React→API→SQL→UI có test; giữ Razor | Triển khai local; evidence FRONTEND-IMPLEMENTATION |
 | TASK-008 | P1 | Migration/bảo toàn dữ liệu | Q-010 | SQL additive fixture PASS; PG baseline/model/script PASS | PARTIAL: live SQL→PG dry run/restore TODO |
 | TASK-009 | P2 | Hosting/CI/backup/observability | Q-009/011 | Docker/CI/Render assets + telemetry/health | PARTIAL: GitHub/Docker/cloud/restore NOT RUN |
@@ -152,7 +154,7 @@ TARGET chủ dự án: notes active và labels ưu tiên trước; vẫn tải �
 
 ## DEC-027 — Export và vòng đời tài khoản (2026-10-24)
 
-TARGET: người dùng tự yêu cầu xóa tài khoản, hệ thống tự xóa vĩnh viễn sau30ngày; admin được xóa ngay để chủ dự án quản lý linh hoạt. Tách rõ vô hiệu hóa (giữ dữ liệu, khôi phục được), lên lịch xóa (hiện ngày hết hạn, có thể hủy trong hạn), xóa ngay/vĩnh viễn (không khôi phục từ ứng dụng). Trash note vẫn7ngày, không dùng lẫn hạn30ngày của account. CURRENT UserService có deactivate/restore và chặn DeleteAsync; chưa có lịch purge account.
+TARGET: người dùng tự yêu cầu xóa tài khoản, hệ thống tự xóa vĩnh viễn sau30ngày; admin được xóa ngay để chủ dự án quản lý linh hoạt. Tách rõ vô hiệu hóa (giữ dữ liệu, khôi phục được), lên lịch xóa (hiện ngày hết hạn, có thể hủy trong hạn), xóa ngay/vĩnh viễn (không khôi phục từ ứng dụng). Trash note vẫn30ngày, không dùng lẫn hạn30ngày của account. CURRENT UserService có deactivate/restore và chặn DeleteAsync; chưa có lịch purge account.
 
 Thiết kế PROPOSED: re-auth cho yêu cầu tự xóa/hủy, confirm nguy hiểm riêng cho admin xóa ngay, chống tự xóa admin hiện tại và mất admin cuối cùng. Thu hồi phiên và dừng gửi reminder khi account chờ xóa; cung cấp luồng truy cập hạn chế để hủy/xuất dữ liệu thay vì mở lại workspace bình thường. Email tới địa chỉ đã xác minh khi lên lịch, nhắc trước hạn và thông báo khi admin xóa ngay (không làm trì hoãn xóa30ngày); dùng outbox/retry để email lỗi không làm mất trạng thái xử lý. Nội dung email không chứa note. Job purge idempotent/restart-safe, kiểm lại yêu cầu chưa hủy trước khi xóa. Rà toàn bộ quan hệ dữ liệu, audit tối thiểu/anonymization, cache thiết bị và backup trước khi triển khai; không hứa xóa backup tức thì. Không thể xóa từ xa bản export hoặc cache trên thiết bị đang offline.
 
@@ -171,7 +173,7 @@ Cập nhật lượt code tiếp theo2026-10-24 theo yêu cầu chủ dự án: 
 | TASK-016 | P1 / 3 | Offline shell + snapshot riêng theo user | Mở lại offline sau lần online, note/label đã tải xem được; schema upgrade/quota/storage failure không mất draft hoặc lộ account khác |
 | TASK-017 | P1 / 4 | Offline edits/outbox + auto/manual sync | Create/edit sống qua reload; reconnect không tạo trùng; conflict giữ hai bản; logout/export protection; revoke/đổi account không gửi nhầm queue |
 | TASK-018 | P2 / 5 | Export JSON/Markdown | Owner-only, rich content không mất ở JSON, tải bản pending để bảo vệ logout, lỗi/mạng chậm có trạng thái rõ |
-| TASK-019 | P2 / 6 | Self deletion30ngày + admin immediate deletion | Hủy trước hạn không purge; job chạy lại an toàn; confirm/ownership/admin guard/email lỗi được kiểm; không đổi retention note7ngày |
+| TASK-019 | P2 / 6 | Self deletion30ngày + admin immediate deletion | Hủy trước hạn không purge; job chạy lại an toàn; confirm/ownership/admin guard/email lỗi được kiểm; không đổi retention note30ngày |
 | TASK-020 | P2 / trước bật xóa thật | Chốt vận hành và kiểm khôi phục | Backup/audit retention, email retry, giám sát job/sync và restore drill có bằng chứng; cập nhật Privacy đúng hành vi |
 
 Đề xuất để sau, chưa giao code: phân trang hiển thị note khi dữ liệu lớn nhưng vẫn tải nền đủ, đồng bộ thứ tự label đa thiết bị, delta sync thay tải lại toàn bộ khi có số đo, lịch sử khôi phục phiên bản. Không refactor lớn/bỏ thư viện/thêm analytics hoặc attachments chỉ dựa trên phỏng đoán. Cloud đang được chủ dự án sử dụng trên Vercel/Render/Supabase; không lấy các dòng cloud TODO lịch sử làm lý do triển khai lại. Brevo có evidence live trong worklog; backup/restore/performance vẫn cần kiểm riêng.
