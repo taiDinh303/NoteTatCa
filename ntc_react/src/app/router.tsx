@@ -28,6 +28,7 @@ const RemindersPage = lazy(() => import("../features/reminders/RemindersPage"));
 const InboxPage = lazy(() => import("../features/inbox/InboxPage"));
 const HelpPage = lazy(() => import("../features/help/HelpPage"));
 const SettingsPage = lazy(() => import("../features/settings/SettingsPage"));
+const SettingsIndex = lazy(() => import("../features/settings/SettingsIndex"));
 const PreferencesPage = lazy(
   () => import("../features/settings/PreferencesPage"),
 );
@@ -244,7 +245,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: "/settings",
-                element: <Navigate to="/settings/account" replace />,
+                element: <SettingsIndex />,
               },
               {
                 path: "/settings/language",
@@ -301,7 +302,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "/admin/settings",
-                    element: <Navigate to="/admin/settings/account" replace />,
+                    element: <SettingsIndex administration />,
                   },
                   {
                     path: "/admin/settings/profile",
@@ -309,7 +310,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "/admin/preferences",
-                    element: <Navigate to="/admin/settings/account" replace />,
+                    element: <SettingsIndex administration />,
                   },
                   {
                     path: "/admin/preferences/language",

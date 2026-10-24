@@ -80,6 +80,7 @@ for (const width of [320, 393, 1440]) {
       fullPage: true,
       animations: "disabled",
     });
+    if (width < 800) await page.locator(".preferences-mobile-header a").click();
     await page
       .getByRole("link", { name: "Active sessions", exact: true })
       .click();

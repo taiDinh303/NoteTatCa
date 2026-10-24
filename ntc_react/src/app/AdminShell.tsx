@@ -94,6 +94,10 @@ export default function AdminShell() {
   useLanguage();
   const location = useLocation();
   const preferenceTitles: Record<string, string> = {
+    "/admin/settings": "Settings",
+    "/admin/settings/profile": "Profile",
+    "/admin/settings/account": "Account & security",
+    "/admin/settings/sessions": "Active sessions",
     "/admin/preferences": "Settings",
     "/admin/preferences/language": "Language",
     "/admin/preferences/privacy": "Privacy",
@@ -119,7 +123,8 @@ export default function AdminShell() {
               <Link
                 className="icon-button"
                 to={
-                  location.pathname === "/admin/preferences"
+                  location.pathname === "/admin/preferences" ||
+                  location.pathname === "/admin/settings"
                     ? "/admin/overview"
                     : "/admin/preferences"
                 }

@@ -39,10 +39,12 @@ function Sidebar({
   onLabels,
   onNavigate,
   accountControls,
+  mobile = false,
 }: {
   onLabels: () => void;
   onNavigate: () => void;
   accountControls?: ReactNode;
+  mobile?: boolean;
 }) {
   useLanguage();
   const query = useLabels();
@@ -113,7 +115,7 @@ function Sidebar({
         {accountControls}
         <NavLink
           className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
-          to="/settings/account"
+          to={mobile ? "/settings" : "/settings/account"}
           end
           onClick={onNavigate}
         >
@@ -152,7 +154,10 @@ export default function AppShell() {
     "/help": "Help & feedback",
   };
   const settingsTitle = settingsTitles[location.pathname];
-  const settingsBack = "/notes";
+  const settingsBack =
+    location.pathname === "/settings" || location.pathname === "/help"
+      ? "/notes"
+      : "/settings";
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
@@ -320,6 +325,7 @@ export default function AppShell() {
         className="navigation-drawer workspace-drawer"
       >
         <Sidebar
+          mobile
           onLabels={() => setManageLabels(true)}
           onNavigate={() => setMobile(false)}
           accountControls={

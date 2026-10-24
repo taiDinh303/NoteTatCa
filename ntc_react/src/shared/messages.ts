@@ -2440,6 +2440,8 @@ export const messages: Record<string, readonly [string, string, string]> = {
   "Choose avatar": ["Chọn ảnh đại diện", "选择头像", "アバターを選択"],
   "Change avatar": ["Đổi ảnh đại diện", "更换头像", "アバターを変更"],
   "Remove avatar": ["Xóa ảnh đại diện", "移除头像", "アバターを削除"],
+  "Remove avatar?": ["Xóa ảnh đại diện?", "移除头像？", "アバターを削除しますか？"],
+  "Your avatar will be removed when you save your profile.": ["Ảnh đại diện sẽ được xóa khi bạn lưu hồ sơ.", "保存个人资料后将移除头像。", "プロフィールを保存するとアバターが削除されます。"],
   "PNG, JPG or WebP, up to 5 MB. Saved with your profile.": [
     "PNG, JPG hoặc WebP, tối đa 5 MB. Lưu cùng hồ sơ của bạn.",
     "PNG、JPG 或 WebP，最大 5 MB。随个人资料保存。",

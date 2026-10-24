@@ -45,7 +45,7 @@ for (const scenario of [
     await expect(
       main.getByText("Personal details", { exact: true }),
     ).toHaveCount(0);
-    const tabs = await page.locator(".settings-tabs").boundingBox();
+    const tabs = await main.evaluate(el => { const r = el.getBoundingClientRect(), s = getComputedStyle(el); return { x: r.x + parseFloat(s.paddingLeft), width: r.width - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight) }; });
     const profile = await page.locator(".profile-card").boundingBox();
     expect(Math.abs(profile!.x - tabs!.x)).toBeLessThan(2);
     expect(Math.abs(profile!.width - tabs!.width)).toBeLessThan(2);
@@ -104,6 +104,7 @@ for (const scenario of [
       fullPage: true,
       animations: "disabled",
     });
+    if (scenario.width < 800) await page.locator(".preferences-mobile-header a").click();
     await page
       .getByRole("navigation", { name: "Settings", exact: true })
       .getByRole("link", { name: "Account & security", exact: true })

@@ -4,6 +4,7 @@ for (const [width, admin] of [
   [320, false],
   [1440, false],
   [1440, true],
+  [393, true],
 ] as const) {
   test(`shared settings navigation ${width} admin=${admin}`, async ({
     page,
@@ -31,7 +32,9 @@ for (const [width, admin] of [
         .click();
     } else await page.goto("/admin/settings");
     const base = admin ? "/admin/settings" : "/settings";
-    await expect(page).toHaveURL(new RegExp(base + "/account$"));
+    await expect(page).toHaveURL(
+      new RegExp(base + (width < 800 ? "$" : "/account$")),
+    );
     const nav = page.getByRole("navigation", { name: "Settings", exact: true });
     await expect(nav.getByRole("link")).toHaveText([
       "Profile",
@@ -49,9 +52,10 @@ for (const [width, admin] of [
       "Profile",
     ]) {
       await nav.getByRole("link", { name, exact: true }).click();
-      await expect(
-        nav.getByRole("link", { name, exact: true }),
-      ).toHaveAttribute("aria-current", "page");
+      if (width > 800)
+        await expect(
+          nav.getByRole("link", { name, exact: true }),
+        ).toHaveAttribute("aria-current", "page");
       if (name === "Language")
         await expect(
           page.getByRole("radio", { name: "English", exact: true }),
@@ -70,8 +74,17 @@ for (const [width, admin] of [
             document.documentElement.scrollWidth > document.body.clientWidth,
         ),
       ).toBe(false);
+      if (width < 800) {
+        await expect(page.locator(".settings-tabs")).toBeHidden();
+        await page
+          .locator(".preferences-mobile-header")
+          .getByRole("link", { name: "Back", exact: true })
+          .click();
+        await expect(page).toHaveURL(new RegExp(admin ? "/admin/preferences$" : base + "$"));
+      }
     }
-    await nav.getByRole("link", { name: "Language", exact: true }).click();
+    if (width > 800)
+      await nav.getByRole("link", { name: "Language", exact: true }).click();
     await page.screenshot({
       path: `../artifacts/frontend/settings-unified-${width}-${admin}.png`,
       fullPage: true,

@@ -104,6 +104,7 @@ for (const width of [393, 1440]) {
       await expect(
         page.getByRole("radio", { name: language.name, exact: true }),
       ).toBeChecked();
+      if (width < 800) await page.locator(".preferences-mobile-header a").click();
       await page
         .getByRole("link", { name: language.privacy, exact: true })
         .click();
@@ -132,6 +133,7 @@ for (const width of [393, 1440]) {
         path: `test-results/privacy-${language.code}-${width}.png`,
         fullPage: true,
       });
+      if (width < 800) await page.locator(".preferences-mobile-header a").click();
       await page
         .getByRole("link", { name: language.appearance, exact: true })
         .click();
@@ -143,6 +145,7 @@ for (const width of [393, 1440]) {
         await expect(
           page.getByRole("button", { name: "Open navigation", exact: true }),
         ).toHaveCount(0);
+        await page.locator(".preferences-mobile-header a").click();
         await page.locator(".preferences-mobile-header a").click();
       } else {
         await expect(page.getByRole("search")).toBeVisible();
@@ -163,7 +166,7 @@ for (const width of [393, 1440]) {
         .getByRole("menuitem", { name: language.accountMenu, exact: true })
         .click();
       await expect(
-        page.getByRole("link", { name: language.profile, exact: true }),
+        width < 800 ? page.getByRole("heading", { name: language.profile, exact: true }) : page.getByRole("link", { name: language.profile, exact: true }),
       ).toBeVisible();
       await page.goto("/notes");
       await page

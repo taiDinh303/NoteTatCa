@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { t as tr } from "../../shared/i18n";
-import { Button, Field } from "../../shared/ui";
+import { Button, ConfirmDialog } from "../../shared/ui";
 
 export function AvatarPicker({
   picture,
@@ -17,6 +18,7 @@ export function AvatarPicker({
 }) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
   return (
     <div className="avatar-actions">
       <input
@@ -54,7 +56,7 @@ export function AvatarPicker({
         <Button
           variant="ghost"
           disabled={busy || disabled}
-          onClick={() => onChange("")}
+          onClick={() => setRemoveOpen(true)}
         >
           {tr("Remove avatar")}
         </Button>
@@ -62,6 +64,18 @@ export function AvatarPicker({
       <span className="field-hint">
         {tr("PNG, JPG or WebP, up to 5 MB. Saved with your profile.")}
       </span>
+      {removeOpen ? (
+        <ConfirmDialog
+          title={tr("Remove avatar?")}
+          description={tr(
+            "Your avatar will be removed when you save your profile.",
+          )}
+          confirmLabel={tr("Remove avatar")}
+          danger
+          onClose={() => setRemoveOpen(false)}
+          onConfirm={() => onChange("")}
+        />
+      ) : null}
     </div>
   );
 }
@@ -126,6 +140,7 @@ function zoneName(zone: string) {
   }
 }
 export function TimezoneField({ initial }: { initial: string }) {
+  const id = useId();
   const [value, setValue] = useState(initial || deviceZone());
   const zones = [
     ...new Set(
@@ -139,27 +154,36 @@ export function TimezoneField({ initial }: { initial: string }) {
     ),
   ].sort();
   return (
-    <Field label={tr("Timezone")}>
-      <select
-        name="timeZoneId"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        required
-      >
-        {zones.map((zone) => (
-          <option value={zone} key={zone}>
-            {zoneName(zone)}
-          </option>
-        ))}
-      </select>
-      <Button variant="ghost" onClick={() => setValue(deviceZone())}>
-        {tr("Use device timezone")}
-      </Button>
+    <div className="field timezone-field">
+      <div className="timezone-heading">
+        <label className="field-label" htmlFor={id}>
+          {tr("Timezone")}
+        </label>
+        <Button variant="ghost" onClick={() => setValue(deviceZone())}>
+          {tr("Use device timezone")}
+        </Button>
+      </div>
+      <div className="timezone-select">
+        <select
+          id={id}
+          name="timeZoneId"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          required
+        >
+          {zones.map((zone) => (
+            <option value={zone} key={zone}>
+              {zoneName(zone)}
+            </option>
+          ))}
+        </select>
+        <ChevronDown size={16} aria-hidden="true" />
+      </div>
       <span className="field-hint">
         {tr(
           "Used for reminder times and dates. Choose where you live, or use your device timezone.",
         )}
       </span>
-    </Field>
+    </div>
   );
 }

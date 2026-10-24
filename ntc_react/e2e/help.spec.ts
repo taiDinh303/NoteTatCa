@@ -42,6 +42,6 @@ for (const [language, width, heading] of [['en',1440,'Help & feedback'],['vi',39
     expect(submitted).toBe(2);
     await page.screenshot({ path: `test-results/help-${language}-${width}.png`, fullPage: true });
     await help.locator('a[href="/settings"]').click();
-    await expect(page).toHaveURL(/\/settings\/account$/);
+    await expect(page).toHaveURL(width > 800 ? /\/settings\/account$/ : /\/settings$/);
   });
 }

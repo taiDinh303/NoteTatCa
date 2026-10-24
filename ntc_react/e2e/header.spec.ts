@@ -61,6 +61,8 @@ for (const width of [1440, 1024, 393, 320]) {
       await expect(header.getByRole('search')).toBeHidden();
       await expect(page.locator('.preferences-back')).toBeHidden();
       await header.getByRole('link', { name: 'Back', exact: true }).click();
+      await expect(page).toHaveURL(/\/settings$/);
+      await header.getByRole('link', { name: 'Back', exact: true }).click();
       await expect(page).toHaveURL(/\/notes$/);
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Zoom (100%)', exact: true }).click();
@@ -71,6 +73,7 @@ for (const width of [1440, 1024, 393, 320]) {
       await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
       await expect(drawer).toBeHidden();
       await expect(page).toHaveURL(/settings\/profile/);
+      await header.getByRole('link', { name: 'Back', exact: true }).click();
       await header.getByRole('link', { name: 'Back', exact: true }).click();
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       await expect(drawer.getByRole('button', { name: 'Account menu', exact: true })).toHaveCount(0);
@@ -89,11 +92,12 @@ for (const width of [1440, 1024, 393, 320]) {
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       await page.getByRole('dialog', { name: 'NoteTatCa.' }).getByRole('link', { name: 'Settings', exact: true }).click();
     }
-    await expect(page).toHaveURL(/\/settings\/account$/);
+    await expect(page).toHaveURL(width > 800 ? /\/settings\/account$/ : /\/settings$/);
     for (const name of ['Language', 'Privacy']) {
       await page.getByRole('link', { name, exact: true }).click();
       await expect(page.getByRole('heading', { name, exact: true })).toBeVisible();
       await expect(page.locator('.preferences-page').getByRole('switch')).toHaveCount(0);
+      if (width < 800) await header.getByRole('link', { name: 'Back', exact: true }).click();
     }
     await page.getByRole('link', { name: 'Appearance', exact: true }).click();
     const themeSwitch = page.getByRole('switch', { name: 'Dark mode' });

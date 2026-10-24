@@ -6,6 +6,18 @@
 }
 .settings-tabs { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
 .settings-tabs a { flex-shrink: 0; }
+.timezone-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 24px; }
+.timezone-heading .field-label { margin: 0; }
+.profile-card .form-grid:has(.timezone-field) > .field > .field-label { min-height: 24px; display: flex; align-items: center; }
+.profile-card .timezone-heading .button { min-height: 24px; padding: 0 4px; font-size: 11px; }
+.timezone-select { position: relative; min-width: 0; }
+.timezone-select select { appearance: none; padding-right: 40px; }
+.timezone-select > svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
+@container viewport (max-width: 800px) {
+  .settings-tabs { display: none; }
+  .settings-index > h1 { display: none; }
+  .settings-index .preferences-row { min-height: 56px; }
+}
 .settings-readonly dt {
   color: var(--subtle);
   font-size: 12px;

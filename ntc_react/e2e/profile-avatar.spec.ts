@@ -63,6 +63,29 @@ for (const [width, admin] of [
       .poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth))
       .toBe(128);
     const src = await avatar.getAttribute("src");
+    const zoneLabel = (await page
+      .locator(".timezone-heading .field-label")
+      .boundingBox())!;
+    const deviceButton = (await page
+      .getByRole("button", { name: "Use device timezone", exact: true })
+      .boundingBox())!;
+    expect(
+      Math.abs(
+        zoneLabel.y +
+          zoneLabel.height / 2 -
+          deviceButton.y -
+          deviceButton.height / 2,
+      ),
+    ).toBeLessThan(2);
+    await expect(zone).toHaveCSS("appearance", "none");
+    if (width > 800) {
+      const locale = (await page.getByLabel("Locale", { exact: true }).boundingBox())!;
+      expect(Math.abs((await zone.boundingBox())!.y - locale.y)).toBeLessThan(2);
+    }
+    await expect(page.locator(".timezone-select > svg")).toHaveCSS(
+      "right",
+      "12px",
+    );
     await page.screenshot({
       path: `../artifacts/frontend/profile-avatar-edit-${width}-${admin}.png`,
       fullPage: true,
@@ -110,6 +133,19 @@ for (const [width, admin] of [
     await page
       .getByRole("button", { name: "Remove avatar", exact: true })
       .click();
+    const removal = page.getByRole("dialog", {
+      name: "Remove avatar?",
+      exact: true,
+    });
+    await expect(removal).toBeVisible();
+    await removal.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(avatar).toHaveAttribute("src", src!);
+    await page
+      .getByRole("button", { name: "Remove avatar", exact: true })
+      .click();
+    await removal
+      .getByRole("button", { name: "Remove avatar", exact: true })
+      .click();
     await expect(avatar).toHaveCount(0);
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(avatar).toHaveAttribute("src", src!);
@@ -125,6 +161,9 @@ for (const [width, admin] of [
       ),
     );
     await page
+      .getByRole("button", { name: "Remove avatar", exact: true })
+      .click();
+    await removal
       .getByRole("button", { name: "Remove avatar", exact: true })
       .click();
     await page
