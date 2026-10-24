@@ -1,3 +1,4 @@
+import { SidebarLabels } from "../features/labels/SidebarLabels";
 import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
 import "./SidebarLayout.css";
@@ -17,7 +18,6 @@ import {
   Bell,
   CalendarDays,
   FileText,
-  Hash,
   LifeBuoy,
   Menu,
   Moon,
@@ -94,17 +94,7 @@ function Sidebar({
         <span>{tr("YOUR LABELS")}</span>
         <Tag size={14} />
       </button>
-      <nav className="label-nav" aria-label={tr("Labels")}>
-        {allLabels.map((label) => (
-          <NavLink
-            key={label.id}
-            to={`/labels/${label.id}`}
-            onClick={onNavigate}
-          >
-            <Hash size={17} style={{ color: label.color ?? undefined }} />
-            <span>{label.name}</span>
-          </NavLink>
-        ))}
+      <SidebarLabels labels={allLabels} onNavigate={onNavigate}>
         {allLabels.length === 0 ? (
           <p className="sidebar-hint">
             {tr("A place for every kind of idea.")}
@@ -118,7 +108,7 @@ function Sidebar({
             {tr("Load more labels")}
           </button>
         ) : null}
-      </nav>
+      </SidebarLabels>
       <div className="sidebar-bottom">
         {accountControls}
         <NavLink

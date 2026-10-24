@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kéo sắp xếp label sidebar — 2026-10-24
+
+- Chủ dự án muốn kéo label ưu tiên lên/xuống. Thêm SidebarLabels với dnd-kit hiện có, mouse/touch/keyboard, translate dọc200ms bù zoom, tay nắm hiện hover/focus/touch; giữ link navigation và chỉ vùng label cuộn. Lưu localStorage riêng theo userId, subscribe storage/custom event để desktop/drawer cùng thứ tự, label mới ở cuối và bỏ ID không còn. Đã nêu rõ với chủ dự án: lưu trên trình duyệt, chưa đồng bộ máy khác. Không API/schema/migration/dependency mới; backend hiện vẫn sort tên.
+- Actual validation cuối: Chromium CI=true fixture mới7/7 PASS: desktop mouse kéo Work lên đầu→không navigation→reload giữ thứ tự→keyboard đổi tiếp→reload→click link mở đúng; mobile long-press/touch kéo→drawer giữ mở→reload/order/link; sidebar scroll320/393/1440 và dismiss customer/admin. Các lượt đầu tìm thấy native click anchor sau mouse drag và mobile thao tác trước reveal xong; sửa document click-capture preventDefault (scope nav/guard, effect cleanup), test chờ computed clip cuối đúng dạng inset có %. Không nới assertions thứ tự/navigation. Sau refactor tên Ref/helper để đạt React lint, TypeScript/Production build và ESLint max-warnings0 PASS; .NET solution Release --no-restore PASS0warnings/0errors; diff check PASS. Rà React: hooks unconditional, subscription/listener cleanup, snapshot string ổn định, không fetch/waterfall mới, handle keyboard/aria.
+- Giới hạn: không full suite/thiết bị thật/production/đồng bộ thiết bị; fixture SQLite/captured email riêng, không owner data/email thật/deploy/migrate. Không kiểm thử đổi tài khoản hoặc tab thật riêng; key/subscription được review.
+- Publication scope6files: AppShell.tsx, SidebarLabels.tsx/.css mới, sidebar-label-order.spec.ts mới, FRONTEND-IMPLEMENTATION.md và worklog.md. Push main theo quyền hiện có, kiểm SHA remote; giữ .agnes ngoài commit. Giữ commit landing e65a43b từ công việc khác có sẵn trong lịch sử; không sửa landing. Remote CI/hosting rollout chưa xác minh.
+
 ## Bỏ nút "Back to the app" khỏi hero landing — 2026-10-24
 
 - Theo ảnh chủ dự án: hero landing (`/Home`, LandingPage) hiện có 2 nút "Open your workspace" + "Back to the app"; nút thứ hai trùng chức năng với "Open workspace" ở topbar, gây thừa. Bỏ block `<Link class="button secondary large">` (kèm `tr("Back to the app")`/`tr("Welcome back")`) trong `.hero-actions`; giữ đúng 1 nút primary. Không đổi i18n key "Back to the app" (còn dùng trong Privacy & NotFound).

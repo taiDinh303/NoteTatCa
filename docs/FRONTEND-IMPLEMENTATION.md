@@ -263,3 +263,9 @@ Pinned và normal dùng chung SortableContext theo đúng thứ tự render. Str
 ### Chuyển vào thùng rác không xác nhận — 2026-10-24
 
 Theo yêu cầu chủ dự án, Move to trash ở card/editor chạy ngay, không mở modal xác nhận. Editor vẫn flush autosave trước, khóa action lúc đang xử lý, giữ editor và ErrorBanner nếu save/trash lỗi; chỉ đóng khi thành công. Card dùng pending và toast lỗi hiện có. Khôi phục/retention7ngày/API giữ nguyên; Delete permanently trong Trash vẫn cần xác nhận và hỗ trợ Cancel.
+
+### Thứ tự label trên sidebar — 2026-10-24
+
+SidebarLabels dùng DndContext riêng, vertical sortable200ms, MouseSensor7px, touch giữ220ms/tolerance6px; kéo trên cả hàng hoặc tay nắm, click bình thường vẫn mở label. Tay nắm có tên accessible Move {label}, Space→ArrowUp/Down→Space để sắp xếp, Escape hủy. Chặn native click phát sinh sau drag ở document capture vì dnd-kit chặn propagation nhưng không prevent default của anchor; listener chỉ trong nav tương ứng và có cleanup. Transform bù interface zoom, chỉ translate dọc.
+
+Thứ tự lưu localStorage ntc.sidebar-label-order.v1:{userId}, theo tài khoản/trình duyệt, chưa đồng bộ thiết bị hoặc đổi thứ tự API/Labels Manager. useSyncExternalStore nghe storage/custom event đồng bộ drawer/desktop và tab khác. Dữ liệu sai định dạng bỏ qua, ID đã xóa không được render; label mới chưa có rank giữ thứ tự API và nằm cuối. Storage ghi lỗi báo Could not save, giữ thứ tự cũ. Chỉ vùng label vẫn cuộn, không thay primary/footer/sidebar motion/backend/schema.

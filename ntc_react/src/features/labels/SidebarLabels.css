@@ -1,0 +1,40 @@
+.sidebar-label-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.sidebar-label-row > a {
+  flex: 1;
+  min-width: 0;
+}
+.sidebar-label-row.sorting {
+  z-index: 2;
+  background: var(--surface, var(--bg));
+  box-shadow: 0 4px 12px #0002;
+}
+.label-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  align-self: stretch;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+  opacity: 0;
+}
+.sidebar-label-row:hover .label-drag-handle,
+.label-drag-handle:focus-visible {
+  opacity: 1;
+}
+.sidebar-label-row.sorting .label-drag-handle {
+  opacity: 1;
+  cursor: grabbing;
+}
+@media (hover: none) {
+  .label-drag-handle {
+    opacity: 0.6;
+  }
+}
