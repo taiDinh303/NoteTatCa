@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Ưu tiên tab, che thông tin account và gọn Google — 2026-10-24
+
+- Theo2ảnh/chủ dự án: tab đổi thành Profile→Account & security→Appearance→Language→Privacy→Active sessions. Hai mục tài khoản trước, tùy chỉnh tiếp theo, thông tin quyền riêng tư rồi quản lý phiên cuối; áp dụng chung customer/admin/mobile, giữ route và cuộn active tab.
+- Account & security readonly email giữ tối đa2ký tự local-part đầu rồi•••@domain; local-part ngắn vẫn che. Phone giữ4số cuối (số ngắn≤4giữ số cuối), không có vẫn Not provided. Không sửa dữ liệu/API, không gắn raw vào title/aria; input edit phone giữ raw để sửa. Profile identity email không thuộc phần che của yêu cầu Hình2, giữ nguyên. Google linked có badge G/Google nhỏ dùng theme; Disconnect giữ mép phải/căn giữa nhờ flex label hiện có, không thay login/link/unlink/confirmation.
+- Actual validation: Chromium CI=true synthetic fixture final13/13 PASS: action3viewport320/393/1440 kiểm masked email/phone, không full email, badge/button cùng centerY và right edge<2px, Disconnect→confirm→Cancel, password setup/signout confirmation; shared-nav3ca320customer/1440customer/admin kiểm thứ tự mới/route; settings-view7viewport-role kiểm profile503→retry/save, email Cancel, phone save→masked4567→mở edit vẫn raw0901234567→Cancel, password Cancel. Lượt đầu6PASS/7FAIL vì settings-view vẫn đòi full email; cập nhật expected mask và thêm raw edit check, không nới assertion persistence; final13PASS. Đã xem screenshot Google desktop1440/mobile320 (phone đã che), layout không tràn; không chụp dark riêng.
+- TypeScript/Production build, ESLint max-warnings0, .NET solution Release --no-restore PASS0warnings/0errors và diff check PASS. Không full suite/backend HTTP suite riêng/thiết bị thật/production/DB-email thật/Google OAuth thật/deploy/migrate; synthetic Google linked state chỉ kiểm UI và Cancel, không unlink account thật. Không thêm unit test mirror cho render/masking nhỏ.
+- Publication scope8files: SettingsNav, SettingsPage, settings.css, settings-actions/settings-view/settings-unified specs, FRONTEND-IMPLEMENTATION và worklog. Giữ .agnes ngoài commit; push main theo quyền hiện có, đối chiếu remote SHA. Remote CI/hosting rollout chưa xác minh.
+
 ## Editor phân biệt chưa gắn icon với emoji thật — 2026-10-24
 
 - Theo2ảnh/chủ dự án: bỏ fallback 📝 trên emoji-trigger khi draft.iconEmoji rỗng. Thay bằng nút Plus SVG18px trong ô36px nét đứt, màu subtle/nền trong, title Add icon có4ngôn ngữ; giữ aria Choose note icon và popover hiện có. Emoji chỉ hiện khi draft thật sự có icon. Không gán Plus hoặc emoji mặc định vào draft/save/API; View/card/render icon dữ liệu giữ nguyên, clear icon tiếp tục dùng picker hiện có.

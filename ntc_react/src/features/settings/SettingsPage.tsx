@@ -33,6 +33,15 @@ import {
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 import { GoogleButton } from "../auth/GoogleButton";
+function maskedEmail(email: string) {
+  const at = email.lastIndexOf("@");
+  if (at < 1) return "•••";
+  return email.slice(0, Math.min(2, at - 1)) + "•••" + email.slice(at);
+}
+function maskedPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return "•••• " + digits.slice(digits.length > 4 ? -4 : -1);
+}
 export default function SettingsPage({
   section,
   administration = false,
@@ -346,7 +355,7 @@ function AccountSettings({ me }: { me: Me }) {
           ) : (
             <div className="settings-view-field account-data-row">
               <div className="account-email-value">
-                <span>{me.account.email}</span>
+                <span>{maskedEmail(me.account.email)}</span>
                 <span className="secure-pill">
                   <CheckCircle2 size={13} />
                   {me.account.emailConfirmed
@@ -411,7 +420,11 @@ function AccountSettings({ me }: { me: Me }) {
             </form>
           ) : (
             <div className="settings-view-field account-data-row">
-              <p>{me.account.phoneNumber || tr("Not provided")}</p>
+              <p>
+                {me.account.phoneNumber
+                  ? maskedPhone(me.account.phoneNumber)
+                  : tr("Not provided")}
+              </p>
               <Button
                 variant="secondary"
                 disabled={!!busy}
@@ -545,7 +558,14 @@ function AccountSettings({ me }: { me: Me }) {
           />
         ) : linked.data.some((l) => l.provider === "Google") ? (
           <div className="connected-provider">
-            <div className="connected-provider-label">Google</div>
+            <div className="connected-provider-label">
+              <span className="provider-badge">
+                <span className="provider-mark" aria-hidden="true">
+                  G
+                </span>
+                Google
+              </span>
+            </div>
             <Button variant="secondary" onClick={() => setUnlink(true)}>
               <Unlink size={15} />
               {tr("Disconnect")}

@@ -20,12 +20,16 @@ for (const width of [320, 393, 1440]) {
       const response = await route.fetch();
       const body = await response.json();
       body.data.account.hasPassword = false;
+      body.data.account.phoneNumber = "0901234567";
       await route.fulfill({ response, json: body });
     });
     await page.route("**/api/v1/me/logins", (route) =>
       route.fulfill({ json: { data: [{ provider: "Google" }] } }),
     );
     await page.goto("/settings/account");
+    await expect(page.locator(".account-email-value > span").first()).toHaveText("•••@example.test");
+    await expect(page.locator(".settings-account").getByText("a@example.test", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("•••• 4567", { exact: true })).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Account details", exact: true }),
     ).toHaveCount(0);
@@ -61,6 +65,15 @@ for (const width of [320, 393, 1440]) {
         exact: true,
       }),
     ).toBeVisible();
+    await page.getByRole("button", { name: "Cancel", exact: true }).click();
+    const provider = await page.locator(".connected-provider").boundingBox();
+    const disconnect = page.getByRole("button", { name: "Disconnect", exact: true });
+    const actionBounds = (await disconnect.boundingBox())!;
+    const badge = (await page.locator(".provider-badge").boundingBox())!;
+    expect(Math.abs(provider!.x + provider!.width - actionBounds.x - actionBounds.width)).toBeLessThan(2);
+    expect(Math.abs(badge.y + badge.height / 2 - actionBounds.y - actionBounds.height / 2)).toBeLessThan(2);
+    await disconnect.click();
+    await expect(page.getByRole("dialog", { name: "Disconnect Google?", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await page.screenshot({
       path: `../artifacts/frontend/settings-actions-${width}.png`,

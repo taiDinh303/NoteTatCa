@@ -119,7 +119,7 @@ for (const scenario of [
     expect(Math.abs(accountCard!.width - tabs!.width)).toBeLessThan(2);
     await expect(main.locator("input, select")).toHaveCount(0);
     await expect(
-      main.getByText(scenario.admin ? "admin@example.test" : "a@example.test", {
+      main.getByText(scenario.admin ? "ad•••@example.test" : "•••@example.test", {
         exact: true,
       }),
     ).toHaveCount(1);
@@ -159,7 +159,12 @@ for (const scenario of [
         .filter({ hasText: "Phone number" })
         .getByRole("button", { name: "Change", exact: true }),
     ).toBeVisible();
-    await expect(main.getByText("0901234567", { exact: true })).toBeVisible();
+    await expect(main.getByText("•••• 4567", { exact: true })).toBeVisible();
+    await expect(main.getByText("0901234567", { exact: true })).toHaveCount(0);
+    await main.locator(".account-section").filter({ hasText: "Phone number" })
+      .getByRole("button", { name: "Change", exact: true }).click();
+    await expect(page.getByLabel("Phone number", { exact: true })).toHaveValue("0901234567");
+    await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await main
       .locator(".account-data-row")
       .filter({ hasText: "A password is set" })

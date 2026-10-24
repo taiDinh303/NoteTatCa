@@ -36,10 +36,10 @@ for (const [width, admin] of [
     await expect(nav.getByRole("link")).toHaveText([
       "Profile",
       "Account & security",
-      "Active sessions",
+      "Appearance",
       "Language",
       "Privacy",
-      "Appearance",
+      "Active sessions",
     ]);
     for (const name of [
       "Language",

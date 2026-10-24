@@ -18,10 +18,10 @@ export function SettingsNav({ base }: { base: string }) {
       {[
         [base + "/profile", "Profile"],
         [base + "/account", "Account & security"],
-        [base + "/sessions", "Active sessions"],
+        [preferences + "/appearance", "Appearance"],
         [preferences + "/language", "Language"],
         [preferences + "/privacy", "Privacy"],
-        [preferences + "/appearance", "Appearance"],
+        [base + "/sessions", "Active sessions"],
       ].map(([to, label]) => (
         <NavLink key={to} to={to}>
           {tr(label)}
