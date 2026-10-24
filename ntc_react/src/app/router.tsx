@@ -244,7 +244,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: "/settings",
-                element: <PreferencesPage />,
+                element: <Navigate to="/settings/account" replace />,
               },
               {
                 path: "/settings/language",
@@ -301,7 +301,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "/admin/settings",
-                    element: <Navigate to="/admin/settings/profile" replace />,
+                    element: <Navigate to="/admin/settings/account" replace />,
                   },
                   {
                     path: "/admin/settings/profile",
@@ -309,7 +309,7 @@ export const router = createBrowserRouter([
                   },
                   {
                     path: "/admin/preferences",
-                    element: <PreferencesPage administration />,
+                    element: <Navigate to="/admin/settings/account" replace />,
                   },
                   {
                     path: "/admin/preferences/language",

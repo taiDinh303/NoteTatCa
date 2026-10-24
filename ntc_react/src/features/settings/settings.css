@@ -4,6 +4,8 @@
   gap: 24px;
   margin: 0 0 28px;
 }
+.settings-tabs { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
+.settings-tabs a { flex-shrink: 0; }
 .settings-readonly dt {
   color: var(--subtle);
   font-size: 12px;

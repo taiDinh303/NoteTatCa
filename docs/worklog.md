@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Gộp cài đặt vào thanh tab account — 2026-10-24
+
+- Theo4ảnh/yêu cầu chủ dự án: dùng SettingsNav chung6tab Profile/Account & security/Active sessions/Language/Privacy/Appearance; bỏ màn menu Settings3hàng và heading/back lớn của preferences. Giữ route nội dung preferences; /settings, /admin/settings, /admin/preferences redirect account tương ứng. Sidebar customer Settings vào account, active trên toàn khu settings; menu avatar giữ vào profile đúng role như trước. Mobile cùng thanh tab cuộn ngang, tự đưa tab active vào tầm nhìn, Back customer về notes vì sáu mục cùng cấp. Không thay auth/API/profile/session/avatar/theme/language/privacy logic.
+- Actual validation: Chromium CI=true fixture mới37/37 PASS trong4.7phút: shared-nav3ca320customer/1440customer/1440admin kiểm6tab/active/routes/linkavatar/không tràn ngang; header4ca320/393/1024/1440 kiểmsidebaraccount/avatarprofile/back/theme; editor-header5ca được pattern chọn kèm; Help4ngôn ngữ với Settings link tới account; avatar3ca logout/login/PNG-JPEG-WebP/503retry; settings-view7viewport-role; translations11ca gồm3ngôn ngữ×2viewport, admin3ngôn ngữ, giữ draft và chuyển lặp sau reload. Cập nhật assertions back/index cũ theo navigation mới, không bỏ assertions chức năng. Đã xem screenshot unified desktop1440 và mobile320.
+- TypeScript/Production build, ESLint max-warnings0, .NET solution Release --no-restore PASS0warnings/0errors và git diff --check PASS. Rà React: shared nav tách module, hook unconditional, effect chỉ scroll active element, không fetch/waterfall/dependency mới. Không full suite/backend HTTP suite riêng/thiết bị thật/production/owner DB/email thật/manual deploy/migrate; chỉ synthetic SQLite/captured email fixture.
+- Publication scope12files: AppShell/router, SettingsNav mới, SettingsPage/PreferencesPage/settings.css, e2e/settings-unified mới/header/help/translations, FRONTEND-IMPLEMENTATION và worklog. Giữ .agnes ngoài commit; push main theo quyền hiện có và đối chiếu remote SHA. Remote CI/hosting rollout chưa xác minh.
+
 ## Căn hàng Mark all as read trong Inbox — 2026-10-24
 
 - Theo ảnh/yêu cầu chủ dự án: đưa border-bottom từ inbox-tabs ra inbox-header, bỏ overflow-x auto và margin âm gây thanh cuộn dọc nhỏ; stretch cùng hàng để hai tab và action có cùng y/height/font/padding. Giữ action ở mép phải, text cùng phong cách tab; icon không co, text ellipsis khi thiếu chỗ và title giữ tên đầy đủ. Mobile gap nhỏ hơn để giữ cùng hàng. Handler readAll/busy/toast/refetch, filter Unread và API giữ nguyên.

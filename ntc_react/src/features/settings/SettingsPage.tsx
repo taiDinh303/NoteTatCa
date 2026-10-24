@@ -1,8 +1,9 @@
+import { SettingsNav } from "./SettingsNav";
 import { AvatarPicker, TimezoneField } from "./ProfileMedia";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./settings.css";
 import { useState } from "react";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   CheckCircle2,
@@ -32,16 +33,6 @@ import {
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 import { GoogleButton } from "../auth/GoogleButton";
-function SettingsNav({ base }: { base: string }) {
-  useLanguage();
-  return (
-    <nav className="settings-tabs" aria-label={tr("Settings")}>
-      <NavLink to={base + "/profile"}>{tr("Profile")}</NavLink>
-      <NavLink to={base + "/account"}>{tr("Account & security")}</NavLink>
-      <NavLink to={base + "/sessions"}>{tr("Active sessions")}</NavLink>
-    </nav>
-  );
-}
 export default function SettingsPage({
   section,
   administration = false,

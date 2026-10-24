@@ -1,11 +1,4 @@
-import {
-  ArrowLeft,
-  ChevronRight,
-  Languages,
-  Palette,
-  ShieldCheck,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import { SettingsNav } from "./SettingsNav";
 import { useTheme } from "../../shared/useTheme";
 import {
   languages,
@@ -16,45 +9,25 @@ import {
 import PrivacySettings from "./PrivacySettings";
 import "./preferences.css";
 
-const sections = [
-  { id: "language", label: "Language", icon: Languages },
-  { id: "privacy", label: "Privacy", icon: ShieldCheck },
-  { id: "appearance", label: "Appearance", icon: Palette },
-] as const;
-
 export default function PreferencesPage({
   section,
   administration = false,
 }: {
-  section?: "language" | "privacy" | "appearance";
+  section: "language" | "privacy" | "appearance";
   administration?: boolean;
 }) {
   const { theme, toggleTheme } = useTheme();
   const language = useLanguage();
-  const base = administration ? "/admin/preferences" : "/settings";
   const title = tr(
-    sections.find((item) => item.id === section)?.label ?? "Settings",
+    { language: "Language", privacy: "Privacy", appearance: "Appearance" }[
+      section
+    ],
   );
   return (
     <section className="preferences-page">
-      {section ? (
-        <Link className="preferences-back" to={base}>
-          <ArrowLeft size={16} aria-hidden="true" />
-          {tr("Settings")}
-        </Link>
-      ) : null}
-      <h1>{title}</h1>
-      {!section ? (
-        <nav className="preferences-list" aria-label={tr("App settings")}>
-          {sections.map(({ id, label, icon: Icon }) => (
-            <Link key={id} className="preferences-row" to={`${base}/${id}`}>
-              <Icon size={19} aria-hidden="true" />
-              <span>{tr(label)}</span>
-              <ChevronRight size={17} aria-hidden="true" />
-            </Link>
-          ))}
-        </nav>
-      ) : section === "language" ? (
+      <SettingsNav base={administration ? "/admin/settings" : "/settings"} />
+      <h1 className="sr-only">{title}</h1>
+      {section === "language" ? (
         <fieldset className="preferences-list language-options">
           <legend className="sr-only">{tr("App language")}</legend>
           {languages.map(({ code, name }) => (

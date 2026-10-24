@@ -104,12 +104,6 @@ for (const width of [393, 1440]) {
       await expect(
         page.getByRole("radio", { name: language.name, exact: true }),
       ).toBeChecked();
-      const back =
-        width <= 800
-          ? page.locator(".preferences-mobile-header a")
-          : page.locator(".preferences-back");
-      await back.click();
-      await expect(page).toHaveURL(/\/settings$/);
       await page
         .getByRole("link", { name: language.privacy, exact: true })
         .click();
@@ -138,7 +132,6 @@ for (const width of [393, 1440]) {
         path: `test-results/privacy-${language.code}-${width}.png`,
         fullPage: true,
       });
-      await back.click();
       await page
         .getByRole("link", { name: language.appearance, exact: true })
         .click();
@@ -150,7 +143,6 @@ for (const width of [393, 1440]) {
         await expect(
           page.getByRole("button", { name: "Open navigation", exact: true }),
         ).toHaveCount(0);
-        await page.locator(".preferences-mobile-header a").click();
         await page.locator(".preferences-mobile-header a").click();
       } else {
         await expect(page.getByRole("search")).toBeVisible();
@@ -309,7 +301,6 @@ test("language menu can switch repeatedly after reload", async ({ page, request 
   await page.reload();
   for (const language of scenarios) {
     await page.getByRole("radio", { name: language.name, exact: true }).check();
-    await page.locator(".preferences-back").click();
     await expect(page.getByRole("link", { name: language.privacy, exact: true })).toBeVisible();
     await page.getByRole("link", { name: language.language, exact: true }).click();
   }

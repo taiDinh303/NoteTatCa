@@ -112,8 +112,8 @@ function Sidebar({
       <div className="sidebar-bottom">
         {accountControls}
         <NavLink
-          className={`settings-link ${["/settings", "/settings/language", "/settings/privacy", "/settings/appearance"].includes(pathname) ? "active" : ""}`}
-          to="/settings"
+          className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
+          to="/settings/account"
           end
           onClick={onNavigate}
         >
@@ -152,15 +152,7 @@ export default function AppShell() {
     "/help": "Help & feedback",
   };
   const settingsTitle = settingsTitles[location.pathname];
-  const settingsBack =
-    location.pathname === "/settings" ||
-    location.pathname === "/settings/profile" ||
-    location.pathname === "/help"
-      ? "/notes"
-      : location.pathname === "/settings/account" ||
-          location.pathname === "/settings/sessions"
-        ? "/settings/profile"
-        : "/settings";
+  const settingsBack = "/notes";
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
