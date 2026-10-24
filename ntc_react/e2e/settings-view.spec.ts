@@ -168,7 +168,7 @@ for (const scenario of [
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await main
       .locator(".account-data-row")
-      .filter({ hasText: "A password is set" })
+      .filter({ hasText: "************" })
       .getByRole("button", { name: "Change", exact: true })
       .click();
     await expect(
@@ -181,7 +181,7 @@ for (const scenario of [
     await expect(main.locator("input, select")).toHaveCount(0);
     await main
       .locator(".account-data-row")
-      .filter({ hasText: "A password is set" })
+      .filter({ hasText: "************" })
       .getByRole("button", { name: "Change", exact: true })
       .click();
     await expect(

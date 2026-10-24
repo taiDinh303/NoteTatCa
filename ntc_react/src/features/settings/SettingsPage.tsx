@@ -448,8 +448,10 @@ function AccountSettings({ me }: { me: Me }) {
         {editing !== "password" ? (
           <div className="settings-view-field account-data-row">
             {me.account.hasPassword ? (
-              <p>{tr("A password is set for your account.")}</p>
-            ) : null}
+              <p>{"*".repeat(12)}</p>
+            ) : (
+              <p>{tr("No password set")}</p>
+            )}
             <Button
               variant="secondary"
               disabled={!!busy}
@@ -549,38 +551,47 @@ function AccountSettings({ me }: { me: Me }) {
             <h2>{tr("Connected accounts")}</h2>
           </div>
         </div>
-        {linked.isPending ? (
-          <Spinner />
-        ) : linked.isError ? (
-          <ErrorPanel
-            error={linked.error}
-            retry={() => void linked.refetch()}
-          />
-        ) : linked.data.some((l) => l.provider === "Google") ? (
-          <div className="connected-provider">
-            <div className="connected-provider-label">
-              <span className="provider-badge">
-                <span className="provider-mark" aria-hidden="true">
-                  G
+        <div className="form-grid account-forms">
+          {linked.isPending ? (
+            <Spinner />
+          ) : linked.isError ? (
+            <ErrorPanel
+              error={linked.error}
+              retry={() => void linked.refetch()}
+            />
+          ) : linked.data.some((l) => l.provider === "Google") ? (
+            <div className="settings-view-field account-data-row">
+              <div className="connected-provider-label">
+                <span className="provider-badge">
+                  <span className="provider-mark" aria-hidden="true">
+                    G
+                  </span>
+                  Google
                 </span>
-                Google
-              </span>
+              </div>
+              <Button variant="secondary" onClick={() => setUnlink(true)}>
+                <Unlink size={15} />
+                {tr("Disconnect")}
+              </Button>
             </div>
-            <Button variant="secondary" onClick={() => setUnlink(true)}>
-              <Unlink size={15} />
-              {tr("Disconnect")}
-            </Button>
-          </div>
-        ) : (
-          <GoogleButton
-            label="continue_with"
-            onCredential={async (token) => {
-              await account.link(token);
-              toast.success(tr("Google account connected. Sign in again."));
-              await auth.logout();
-            }}
-          />
-        )}
+          ) : (
+            <div className="settings-view-field account-data-row">
+              <p>{tr("No accounts connected")}</p>
+              <div className="google-signin">
+                <GoogleButton
+                  label="continue_with"
+                  onCredential={async (token) => {
+                    await account.link(token);
+                    toast.success(
+                      tr("Google account connected. Sign in again."),
+                    );
+                    await auth.logout();
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </section>
       {unlink ? (
         <ConfirmDialog
