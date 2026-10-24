@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nút primary nhạt hơn, chữ tối dễ đọc — 2026-10-25
+
+- Theo yêu cầu chủ dự án: chữ đen/nâu trên nền cam đậm (#e9a33c) của nút Sign in, Try guest mode, Create my space (và mọi nút .button.primary) hơi khó đọc; làm nhạt nền 1 bậc cho gần màu logo nhưng dễ đọc hơn.
+- styles.css: thêm biến --accent-button:#f2bd66 / --accent-button-hover:#e9ac4f; .button.primary dùng --accent-button + chữ #3e2d15 (thay vì #fff), hover dùng --accent-button-hover. Xóa block thừa .button.primary { color:#3e2d15 } ở cuối file (redundant sau khi merge). Logo .brand-mark giữ nguyên #f5b447. Dark theme không có override riêng cho button primary → vẫn đọc tốt.
+- Validation: typecheck PASS; ESLint PASS; Vite production build PASS. Chưa chạy E2E Chromium/.NET/device thật; không deploy/migrate/DB/email thật.
+- Scope 2 files: ntc_react/src/styles.css, docs/worklog.md.
+
+
 ## Header Home gọn và sticky — 2026-10-25
 
 - Giảm padding dọc header còn16px desktop/12px mobile, tổng76px/68px; giữ hit area44px. Sticky top0/z30, landing overflow clip thay hidden để không tạo scroll container cản sticky; nền sage giữ toàn chiều ngang.

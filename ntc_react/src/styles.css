@@ -25,6 +25,8 @@
   --hover: #f4f5f7;
   --accent: #e9a33c;
   --accent-soft: #fff4dd;
+  --accent-button: #f2bd66;
+  --accent-button-hover: #e9ac4f;
   --green: #4b7965;
   --red: #b84f50;
   --shadow: 0 12px 50px #2932400c;
@@ -226,12 +228,12 @@ strong {
   transform: translateY(1px);
 }
 .button.primary {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-button);
+  color: #3e2d15;
   box-shadow: 0 3px 8px #c58a3320;
 }
 .button.primary:hover:not(:disabled) {
-  background: #df982f;
+  background: var(--accent-button-hover);
   box-shadow: 0 4px 12px #c58a3333;
 }
 .button.secondary {
@@ -4106,9 +4108,6 @@ td {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-.button.primary {
-  color: #3e2d15;
 }
 
 /* Content-first notes: one capture entry, optional title, fixed editor footer. */
