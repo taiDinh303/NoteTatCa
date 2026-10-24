@@ -2793,10 +2793,17 @@ td {
   display: flex;
   align-items: center;
 }
+.landing > header .brand-mark {
+  width: 44px;
+  height: 44px;
+}
+.landing > header nav .button {
+  min-height: 44px;
+}
 .landing-language {
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -3951,8 +3958,8 @@ td {
     gap: 8px;
   }
   .landing > header .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
   }
   .landing > header {
     padding: 24px 21px;
@@ -3963,7 +3970,7 @@ td {
   .landing > header nav .button {
     font-size: 11px;
     padding: 7px 10px;
-    min-height: 33px;
+    min-height: 44px;
   }
   .landing-hero {
     padding: 43px 21px 20px;

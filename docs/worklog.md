@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Header Home đồng chiều cao — 2026-10-25
+
+- Theo ảnh/yêu cầu: brand mark, nút cờ và Sign in cùng44px, chung mép trên/dưới; giữ căn giữa chữ, scope landing header desktop/mobile. Không thay shared logo/footer/auth.
+- Validation: TypeScript/Vite build và diff check PASS; Chromium320/393/1440 đo cả3height44px, top/bottom trùng và nằm trong viewport. CSS-only, không fullsuite/.NET/API/manual deploy. Push main theo quyền hiện có và đối chiếu remote SHA.
+
 ## Footer landing — 2026-10-25
 
 - Theo yêu cầu làm footer, chưa làm trang con: thêm brand/mô tả, Explore với guest/login/register hoặc workspace khi đã login, Resources có About/Help/Terms dạng text Coming soon không giả link. Privacy dùng route có sẵn; dòng copyright theo năm và signoff. Bốn ngôn ngữ, grid desktop và hai cột mobile.
