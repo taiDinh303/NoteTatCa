@@ -309,7 +309,7 @@ export default function NotesPage({
   });
   const [confirm, setConfirm] = useState<{
     note: Note;
-    action: "trash" | "delete";
+    action: "delete";
   }>();
   const [pending, setPending] = useState<string>();
   const order = useSyncExternalStore(
@@ -344,13 +344,14 @@ export default function NotesPage({
     note: Note,
     action: "pin" | "trash" | "restore" | "delete",
   ) {
-    if (action === "trash" || action === "delete") {
+    if (action === "delete") {
       setConfirm({ note, action });
       return;
     }
     setPending(note.id);
     try {
       if (action === "pin") await workspace.pin(note);
+      else if (action === "trash") await workspace.trash(note);
       else await workspace.restore(note);
     } catch (error) {
       toast.error(errorMessage(error));
@@ -606,33 +607,17 @@ export default function NotesPage({
       ) : null}
       {confirm ? (
         <ConfirmDialog
-          title={
-            confirm.action === "trash"
-              ? tr("Move to trash?")
-              : tr("Permanently delete note?")
-          }
-          description={
-            confirm.action === "trash"
-              ? tr(
-                  "You can restore this note for seven days. Future reminders will stop.",
-                )
-              : tr(
-                  "This removes the note and its related reminders permanently. This cannot be undone.",
-                )
-          }
-          confirmLabel={
-            confirm.action === "trash"
-              ? tr("Move to trash")
-              : tr("Delete permanently")
-          }
-          danger={confirm.action === "delete"}
+          title={tr("Permanently delete note?")}
+          description={tr(
+            "This removes the note and its related reminders permanently. This cannot be undone.",
+          )}
+          confirmLabel={tr("Delete permanently")}
+          danger
           onClose={() => setConfirm(undefined)}
           onConfirm={async () => {
             setPending(confirm.note.id);
             try {
-              if (confirm.action === "trash")
-                await workspace.trash(confirm.note);
-              else await workspace.delete(confirm.note);
+              await workspace.delete(confirm.note);
             } finally {
               setPending(undefined);
             }

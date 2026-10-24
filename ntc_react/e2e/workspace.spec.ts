@@ -1386,10 +1386,9 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await page
     .getByRole("menuitem", { name: "Move to trash", exact: true })
     .click();
-  await page
-    .getByRole("dialog", { name: "Move to trash?", exact: true })
-    .getByRole("button", { name: "Move to trash", exact: true })
-    .click();
+  await expect(
+    page.getByRole("dialog", { name: "Move to trash?", exact: true }),
+  ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Open Browser note", exact: true }),
   ).not.toBeVisible();
@@ -1409,6 +1408,43 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await expect(
     page.getByRole("button", { name: "Open Browser note", exact: true }),
   ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Open Browser note", exact: true })
+    .click();
+  await page
+    .getByRole("dialog", { name: "View note", exact: true })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
+  const editAgain = page.getByRole("dialog", {
+    name: "Edit note",
+    exact: true,
+  });
+  await editAgain
+    .getByRole("button", { name: "Note options", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Move to trash", exact: true })
+    .click();
+  await expect(editAgain).not.toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("link", { name: "Trash", exact: true }).click();
+  const deleteButton = page.getByRole("button", {
+    name: "Delete Browser note permanently",
+    exact: true,
+  });
+  await deleteButton.click();
+  const permanent = page.getByRole("dialog", {
+    name: "Permanently delete note?",
+    exact: true,
+  });
+  await expect(permanent).toBeVisible();
+  await permanent.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(deleteButton).toBeVisible();
+  await deleteButton.click();
+  await permanent
+    .getByRole("button", { name: "Delete permanently", exact: true })
+    .click();
+  await expect(deleteButton).not.toBeVisible();
 });
 
 test("keeps a local draft when another session changes the note", async ({

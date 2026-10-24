@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ xác nhận Move to trash — 2026-10-24
+
+- Chủ dự án yêu cầu bỏ cảnh báo khi chuyển note vào thùng rác, giữ xác nhận xóa vĩnh viễn. Card gọi trash ngay trong act với pending/toast lỗi; editor bỏ trashPrompt/ConfirmDialog, giữ flush save trước trash, khóa action khi đang xử lý, ErrorBanner khi lỗi và chỉ đóng sau thành công. Permanent delete vẫn ConfirmDialog/cancel như cũ; không đổi API/retention/ownership.
+- Actual validation: Chromium CI=true fixture mới1/1 PASS luồng create/rich text/autosave/label→card trash không dialog→Trash xem/restore→editor trash không dialog→permanent delete Cancel giữ note→Confirm xóa. TypeScript/Production build, ESLint max-warnings0 và .NET solution Release --no-restore PASS0warnings/0errors; git diff --check PASS. Rà React: state/action unconditional, promise catch và finally, không fetch/dependency mới. Không full suite/thiết bị thật/production/owner DB/email thật/manual deploy/migrate; SQLite/captured-email fixture riêng.
+- Publication scope5files: NotesPage.tsx, NoteEditor.tsx, workspace.spec.ts, FRONTEND-IMPLEMENTATION.md và worklog.md. Push main theo quyền hiện có, kiểm SHA remote; giữ .agnes ngoài commit. Remote CI/hosting rollout chưa xác minh.
+
 ## Giữ card trong tay khi kéo qua nhóm pinned/normal — 2026-10-24
 
 - Chủ dự án báo card bật về khi vẫn cầm qua nhóm khác; mong giữ kéo tự do, chỉ khi thả sai nhóm mới trở về và báo thông tin. Xác định từ useSortable đang dùng: hai SortableContext riêng khiến overIndex=-1 bên nguồn, displaceItem=false và finalTransform=null khi con trỏ tới card nhóm kia. Không phải toast hoặc lưu API cướp thao tác.

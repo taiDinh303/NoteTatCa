@@ -38,7 +38,6 @@ import { dateTime } from "../../shared/utils";
 import {
   ActionMenu,
   Button,
-  ConfirmDialog,
   ErrorBanner,
   ErrorPanel,
   IconButton,
@@ -393,7 +392,7 @@ function EditorSession({
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(false);
   const [closePrompt, setClosePrompt] = useState(false);
-  const [trashPrompt, setTrashPrompt] = useState(false);
+  const [trashBusy, setTrashBusy] = useState(false);
   const [otherError, setOtherError] = useState<unknown>();
   const [copyBusy, setCopyBusy] = useState(false);
   const fork = useRef<AutosaveCoordinator | undefined>(undefined);
@@ -801,9 +800,21 @@ function EditorSession({
                   label: tr("Move to trash"),
                   icon: Trash2,
                   danger: true,
-                  disabled: !snapshot.note,
+                  disabled: !snapshot.note || trashBusy,
                   separator: true,
-                  action: () => setTrashPrompt(true),
+                  action: () => {
+                    setTrashBusy(true);
+                    void (async () => {
+                      const note = await save();
+                      if (note) {
+                        await workspace.trash(note);
+                        coordinator.dispose();
+                        onClose();
+                      }
+                    })()
+                      .catch((error) => setOtherError(error))
+                      .finally(() => setTrashBusy(false));
+                  },
                 },
               ]}
             />
@@ -891,24 +902,6 @@ function EditorSession({
             </div>
           </div>
         </Modal>
-      ) : null}
-      {trashPrompt && snapshot.note ? (
-        <ConfirmDialog
-          title={tr("Move this note to trash?")}
-          description={tr(
-            "You can restore it for seven days. Future reminders will stop.",
-          )}
-          confirmLabel={tr("Move to trash")}
-          onClose={() => setTrashPrompt(false)}
-          onConfirm={async () => {
-            const note = await save();
-            if (note) {
-              await workspace.trash(note);
-              coordinator.dispose();
-              onClose();
-            }
-          }}
-        />
       ) : null}
       {reminderOpen && snapshot.note ? (
         <ReminderDialog
