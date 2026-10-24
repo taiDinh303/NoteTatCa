@@ -73,12 +73,11 @@ export function Landing({
         </Link>
         <nav>
           <LandingLanguageSelect />
-          {!signedIn && <Link to="/login">{tr("Sign in")}</Link>}
           <Link
             className="button primary"
-            to={signedIn ? destination : "/register"}
+            to={signedIn ? destination : "/login"}
           >
-            {signedIn ? tr("Open workspace") : tr("Get started")}
+            {signedIn ? tr("Open workspace") : tr("Sign in")}
             <ArrowRight size={15} />
           </Link>
         </nav>

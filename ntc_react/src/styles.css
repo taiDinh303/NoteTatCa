@@ -3531,9 +3531,6 @@ td {
   .landing > header nav {
     gap: 10px;
   }
-  .landing > header nav > a[href="/login"] {
-    display: none;
-  }
   .landing-bottom {
     padding: 50px 20px;
   }

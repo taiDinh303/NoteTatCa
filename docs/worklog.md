@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Home: Sign in thay Get started — 2026-10-25
+
+- Theo yêu cầu: bỏ link Sign in phụ, đổi CTA chính header Get started thành Sign in dẫn /login; đã có phiên giữ Open workspace. Bỏ CSS mobile ẩn /login để CTA hiện ở cả điện thoại. Nút cờ giữ cạnh CTA, hero guest/register không đổi.
+- Validation: TypeScript/Vite build, ESLint và diff check PASS. Chromium320/1440 xác nhận Sign in visible đúng /login và không còn Get started trong header. Không backend/API/config, không fullsuite/.NET hoặc manual deploy. Scope PublicPages/styles/worklog; push main theo quyền hiện có, đối chiếu remote sau publication.
+
 ## Home: nút ngôn ngữ lá cờ — 2026-10-24
 
 - Chuyển selector từ giữa header vào nav bên phải, trước Sign in/Get started. Trigger vuông 40×40, SVG cờ Anh/Việt/Trung/Nhật không phụ thuộc emoji hệ điều hành; menu có tên bản ngữ, radio selected/check, bàn phím/focus và collision padding. Dùng i18n store hiện hành, nhớ lựa chọn sau reload. Mobile ẩn Sign in bằng href thay selector first-child để không lệch khi thêm nút; giảm gap/padding cho 320px.
