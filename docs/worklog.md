@@ -9,6 +9,7 @@
 - Validation: config 4/4 + Vitest 102/102 PASS; TypeScript/Vite build và ESLint PASS; .NET 8 Release --no-restore -warnaserror -m:1 PASS, 0 warnings/errors. Chromium guest và hồi quy tài khoản chạy riêng; production offline shell 2/2 PASS (guest offline reload/create/reload không API và account offline tự sync). Chromium 10/10 PASS: 5 guest cases (320/1440, route/API isolation, copy retry/trash, decline/reopen) và 5 account/admin regressions (CRUD, conflict, profile/session, isolation, search/pin).
 - Giới hạn: chưa thử Safari/device thật/full E2E suite/live deployment; guest phụ thuộc storage browser, xóa dữ liệu trình duyệt sẽ mất bản chưa copy; copy cần Web Locks. Chưa có sync guest giữa thiết bị, reminders guest hoặc account/admin deletion. Không migrate/deploy thủ công, không DB/email thật. Sửa locator hồi quy Timezone từ fill sang selectOption theo select hiện hành.
 - Publication scope: React guest implementation, related tests và root docs; push main sau validation, kiểm tra SHA remote. Giữ riêng thay đổi landing language/CSS/worklog có sẵn và .agnes/, không đưa vào commit guest.
+- Publication xác nhận: commit 9572cac đã push origin/main; git ls-remote trả đúng 9572cac2a86ea5bfc2e0da9038c9af1601d41fb1. Chưa xác minh Vercel production rollout.
 
 ## Trash note từ7sang30ngày — 2026-10-24
 
