@@ -53,6 +53,7 @@ export default function InboxPage() {
         <button
           type="button"
           className="inbox-mark-read"
+          title={tr("Mark all as read")}
           disabled={busy}
           onClick={() => {
             setBusy(true);
@@ -71,7 +72,7 @@ export default function InboxPage() {
           }}
         >
           <CheckCheck size={16} aria-hidden />
-          {tr("Mark all as read")}
+          <span>{tr("Mark all as read")}</span>
         </button>
       </div>
       {query.isPending ? (

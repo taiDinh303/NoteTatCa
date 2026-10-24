@@ -1888,24 +1888,23 @@ strong {
 }
 .inbox-header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
 }
 .inbox-tabs {
   display: flex;
   gap: 20px;
   flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  border-bottom: 1px solid var(--border);
+  min-width: max-content;
 }
 .inbox-tabs button {
   border: 0;
   border-bottom: 2px solid transparent;
   padding: 0 2px 14px;
-  margin-bottom: -1px;
+  margin-bottom: 0;
   background: transparent;
   font-size: 14px;
   font-weight: 600;
@@ -1924,18 +1923,20 @@ strong {
   border: 0;
   border-bottom: 2px solid transparent;
   padding: 0 2px 14px;
-  margin-bottom: -1px;
+  margin-bottom: 0;
   background: transparent;
   font-size: 14px;
   font-weight: 600;
   color: var(--muted);
   white-space: nowrap;
-  flex-shrink: 0;
+  min-width: 0;
   transition:
     background 0.15s,
     color 0.15s,
     border-color 0.15s;
 }
+.inbox-mark-read svg { flex-shrink: 0; }
+.inbox-mark-read span { overflow: hidden; text-overflow: ellipsis; }
 .inbox-mark-read:hover:not(:disabled) {
   color: var(--text);
 }
@@ -3805,6 +3806,8 @@ td {
   .inbox-tabs button {
     font-size: 11px;
   }
+  .inbox-header { gap: 8px; }
+  .inbox-tabs { gap: 12px; }
   .inbox-mark-read {
     font-size: 11px;
   }

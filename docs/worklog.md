@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Căn hàng Mark all as read trong Inbox — 2026-10-24
+
+- Theo ảnh/yêu cầu chủ dự án: đưa border-bottom từ inbox-tabs ra inbox-header, bỏ overflow-x auto và margin âm gây thanh cuộn dọc nhỏ; stretch cùng hàng để hai tab và action có cùng y/height/font/padding. Giữ action ở mép phải, text cùng phong cách tab; icon không co, text ellipsis khi thiếu chỗ và title giữ tên đầy đủ. Mobile gap nhỏ hơn để giữ cùng hàng. Handler readAll/busy/toast/refetch, filter Unread và API giữ nguyên.
+- Actual validation: Chromium workspace flow creates reminders and reads resulting inbox notification1/1 PASS: tạo reminder/dispatch thật trong synthetic fixture→Mark all as read→Unread empty. Visual QA standalone ở320/393/1440:3button cùng y/height/font (mobile32px/11px, desktop34px/14px), không tabs scroll hoặc document overflow; đã xem screenshot320/1440. Lượt đo đầu resize320 ngay giữa transition sidebar báo overflow tạm; chờ250ms sau resize trước capture, final cả3PASS; không sửa sidebar. Helper/screenshot chỉ ignored artifacts, không thêm test mirror cho CSS nhỏ.
+- TypeScript/Production build, ESLint max-warnings0 và .NET solution Release --no-restore PASS0warnings/0errors; diff check PASS. Không full suite/thiết bị thật/production/manual deploy/migrate/owner DB/email thật; chỉ SQLite/captured email fixture riêng.
+- Publication scope3files: InboxPage.tsx, styles.css và entry worklog. Giữ .agnes ngoài commit; push main theo quyền hiện có, đối chiếu remote SHA. Remote CI/hosting rollout chưa xác minh.
+
 ## Đồng bộ hero landing với style card note/label của workspace — 2026-10-24
 
 - Theo ảnh chủ dự án (light + dark): hero landing (`/Home`) dùng card note nền olive/xem, label không có màu, chưa đồng bộ với note card thật trong workspace (nền màu NOTE_COLORS pastel, label chip có màu tint + icon). Đổi `.hero-note` nền `#fcf5dc`→`#fce4e5` (pink NOTE_COLORS), `.hero-checklist` `#e7edde`→`#dff0e6` (mint NOTE_COLORS), `.mini-label` → style `label-chip` (font 11px, nền tint `#757f8510`, icon Tag có màu amber/green), dark mode card note dùng `--surface` + override nền pastel đậm (màu text `--text`/`--subtle`). JSX: `ideas`/`just for me` có `Tag` icon màu theo `--accent`/`--green`.
