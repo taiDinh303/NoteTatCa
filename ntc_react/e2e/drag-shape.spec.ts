@@ -12,6 +12,7 @@ for (const [width, zoom, touch] of [
     request,
   }) => {
     const fixture = "http://127.0.0.1:5199";
+    await page.emulateMedia({ reducedMotion: "no-preference" });
     await request.post(fixture + "/__fixture/reset");
     const credentials = {
       email: "a@example.test",
@@ -161,6 +162,7 @@ for (const [width, zoom, touch] of [
       expect(scale).toEqual([1, 1]);
     }
     await expect(tall).toHaveCSS("opacity", "0.95");
+    await expect(short).toHaveCSS("transition-duration", "0.22s");
     await page.screenshot({
       path: `../artifacts/frontend/drag-unequal-${width}-${zoom}.png`,
       fullPage: false,
@@ -169,8 +171,30 @@ for (const [width, zoom, touch] of [
       (r) =>
         r.url().endsWith("/notes/reorder") && r.request().method() === "POST",
     );
+    const inspectDrop = width === 1440 && zoom === 1 && !touch;
+    if (inspectDrop) {
+      await page.mouse.move(
+        target.x + target.width / 2 + 28,
+        target.y + target.height / 2 + 16,
+        { steps: 3 },
+      );
+    }
     if (touch) await touchAt("touchEnd");
     else await page.mouse.up();
+    if (inspectDrop) {
+      await expect
+        .poll(() =>
+          tall.evaluate(
+            (element) =>
+              element
+                .getAnimations()
+                .find((animation) => animation.id === "note-drop")
+                ?.effect?.getTiming().duration ?? null,
+          ),
+        )
+        .toBe(220);
+      await expect(tall).not.toHaveAttribute("data-dropping", "true");
+    }
     expect((await reordered).ok()).toBeTruthy();
     await expect(group.locator("h3").first()).toHaveText("Tall card");
     await page.reload();

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 for (const width of [320, 1440]) {
-  test(`labels header form and Done stay fixed ${width}`, async ({ page, request }) => {
+  test(`labels header form and Close stay fixed ${width}`, async ({ page, request }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const base = 'http://127.0.0.1:5199';
     await request.post(base + '/__fixture/reset');
@@ -22,7 +22,7 @@ for (const width of [320, 1440]) {
     if (width < 800) await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
     await page.getByRole('button', { name: 'Manage labels', exact: true }).click();
     const modal = page.getByRole('dialog', { name: 'Your labels', exact: true });
-    const done = modal.getByRole('button', { name: 'Done', exact: true });
+    const done = modal.getByRole('button', { name: 'Close', exact: true });
     const input = modal.getByLabel('New label', { exact: true });
     const heading = modal.getByRole('heading', { name: 'Your labels', exact: true });
     await expect(modal.locator('.label-row')).toHaveCount(27);

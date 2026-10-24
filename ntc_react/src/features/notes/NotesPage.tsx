@@ -37,6 +37,8 @@ import type { Note, NoteFilter } from "../../domain/models";
 import { sortNotes } from "../../domain/models";
 import { notePalette } from "../../domain/color";
 import { CardLabels } from "./CardLabels";
+import { animateNoteDrop, cancelNoteDrop } from "./noteMotion";
+import "./NoteMotion.css";
 import { workspace } from "../../app/runtime";
 import { useDebounced, useLabels, useNotes } from "../../shared/hooks";
 import {
@@ -83,7 +85,7 @@ function NoteCard({
   } = useSortable({
     id: note.id,
     disabled: !draggable,
-    transition: { duration: 160, easing: "ease-out" },
+    transition: { duration: 220, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
   });
   // The title/preview buttons are also drag surfaces. Keep action controls
   // independent, and leave keyboard activation on the accessible handle.
@@ -117,6 +119,11 @@ function NoteCard({
       }}
       className={`note-card ${draggable ? "draggable" : ""} ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}
+      data-sort-animating={
+        transition && !transition.startsWith("transform 0ms")
+          ? "true"
+          : undefined
+      }
       onMouseDown={(event) => {
         if (canStartDrag(event.target)) listeners?.onMouseDown?.(event);
       }}
@@ -355,6 +362,7 @@ export default function NotesPage({
     workspace.reorder(group, from, to);
   }
   function dragEnd(event: DragEndEvent) {
+    animateNoteDrop(event.active.id);
     if (!event.over || event.active.id === event.over.id) return;
     const note = all.find((n) => n.id === event.active.id),
       over = all.find((n) => n.id === event.over!.id);
@@ -536,6 +544,8 @@ export default function NotesPage({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={({ active }) => cancelNoteDrop(active.id)}
+          onDragCancel={({ active }) => animateNoteDrop(active.id)}
           onDragEnd={dragEnd}
         >
           {trash ? (

@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa sáu ca CI và thêm animation kéo/thả note — 2026-10-24
+
+- Đọc logs_108418742864.zip (0_verify.txt):108 passed/6 failed/2 skipped. Hai labels-fixed và workspace labels dùng tên Done cũ→Close; compact-sidebar đo width ngay đầu transition→poll điều kiện width; profile vào Preferences qua sidebar→Account menu/Account settings/Profile; admin tìm heading Settings đã bỏ→navigation Settings và mở Password Change, xác nhận input. Giữ assertions dữ liệu, thu hồi phiên, redirect và không truy cập nội dung riêng của admin; không tắt test/workflow.
+- NoteCard dùng sortable transition220ms easing cubic-bezier(0.2,0.8,0.2,1), giữ setup0ms và theo con trỏ tức thì. FLIP thẻ vừa thả/hủy bằng Web Animations API220ms (reduced motion140ms), bù zoom, hủy hiệu ứng cũ khi kéo tiếp và cleanup khi xong. Giữ kích thước thẻ, pinned grouping, keyboard/touch và coordinator lưu ngầm/retry. Không API/backend/config/dependency mới.
+- Actual validation: toàn bộ Chromium với CI=true, một worker, fixture mới:114 PASS/2 SKIP,10.8phút; hai skip Google reauth có điều kiện NTC_TEST_GOOGLE từ trước. Cả sáu ca lỗi log đã PASS trong lượt tổng. Drag-shape5/5 PASS riêng và trong full suite (chuột/cảm ứng, zoom75/100/125%, không scale, neighbour220ms, drop WAAPI220ms kết thúc, lưu/reload); background reorder/retry, pointer/keyboard và sidebar paint/motion cũng PASS. Đã xem screenshot thẻ kéo1440px. TypeScript, ESLint max-warnings0 (chạy từ frontend để áp đúng config), config4/4, Vitest79/79, Production build và .NET solution Release --no-restore PASS0warnings/0errors; git diff --check PASS. Lệnh lint đầu từ root báo18warning router vì đường dẫn override tương đối không khớp; rerun đúng cwd PASS, không sửa config để né lỗi.
+- Giới hạn: Chromium headless Windows/SQLite/captured-email fixture riêng; không owner DB/email thật/Google OAuth thật/thiết bị vật lý/manual deploy/migrate. Remote Linux CI sau push chưa được xác minh ở thời điểm ghi. Rà React: không hook có điều kiện/fetch mới, giữ accessible drag handle, guard animation khi unmount/kéo mới và không chặn save.
+- Publication scope8files: NotesPage.tsx, noteMotion.ts, NoteMotion.css, drag-shape.spec.ts, labels-fixed.spec.ts, workspace.spec.ts, FRONTEND-IMPLEMENTATION.md và worklog.md. Push main theo quyền chủ dự án, đối chiếu SHA remote sau push; giữ .agnes ngoài commit. Hosting rollout chưa xác minh.
+
 ## Sidebar0.2s và push theo yêu cầu — 2026-10-24
 
 - Đổi toàn bộ duration sidebar reveal/đóng, desktop margin và fade overlay400→200ms; giữ sửa flash/clip/inert và chỉ cuộn label. Cập nhật timing/midpoint trong regression tương ứng.

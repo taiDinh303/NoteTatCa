@@ -1,0 +1,12 @@
+.note-card[data-sort-animating="true"] {
+  transition-duration: 220ms !important;
+}
+.note-card[data-dropping="true"] {
+  z-index: 30;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .note-card[data-sort-animating="true"] {
+    transition-duration: 140ms !important;
+  }
+}

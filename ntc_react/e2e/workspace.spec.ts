@@ -728,8 +728,11 @@ test("zooms with Ctrl wheel within bounds and briefly shows a bottom-center perc
   await expect(hud).toHaveText("150%");
   const bounds = (await hud.boundingBox())!;
   const viewport = page.viewportSize()!;
-  const bodyBox = (await page.locator('body').boundingBox())!;
-  expect(bounds.x + bounds.width / 2).toBeCloseTo(bodyBox.x + bodyBox.width / 2, 0);
+  const bodyBox = (await page.locator("body").boundingBox())!;
+  expect(bounds.x + bounds.width / 2).toBeCloseTo(
+    bodyBox.x + bodyBox.width / 2,
+    0,
+  );
   expect(viewport.height - bounds.y - bounds.height).toBeCloseTo(24, 0);
   expect(await page.evaluate(() => devicePixelRatio)).toBe(originalDpr);
   await page.screenshot({
@@ -991,11 +994,19 @@ test("offers a compact workspace with persistent sidebar control and one labels 
       .locator("svg"),
   ).toHaveClass(/lucide-menu/);
   await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
-  await expect(page.locator("#workspace-navigation")).toHaveAttribute("inert", "");
-  await expect(page.locator("#workspace-navigation")).toHaveCSS("pointer-events", "none");
-  expect(
-    (await page.locator("#workspace-main").boundingBox())!.width,
-  ).toBeGreaterThan(before);
+  await expect(page.locator("#workspace-navigation")).toHaveAttribute(
+    "inert",
+    "",
+  );
+  await expect(page.locator("#workspace-navigation")).toHaveCSS(
+    "pointer-events",
+    "none",
+  );
+  await expect
+    .poll(
+      async () => (await page.locator("#workspace-main").boundingBox())!.width,
+    )
+    .toBeGreaterThan(before);
   expect(
     await page.evaluate(
       () => (window as Window & { fixtureMarker?: string }).fixtureMarker,
@@ -1043,7 +1054,9 @@ test("edits content in a full viewport with an optional title and fixed characte
   const initialBounds = (await editor.boundingBox())!;
   expect(initialBounds.width).toBeLessThan(page.viewportSize()!.width);
   expect(initialBounds.height).toBeLessThan(page.viewportSize()!.height);
-  await editor.getByRole("button", { name: "Enter full screen", exact: true }).click();
+  await editor
+    .getByRole("button", { name: "Enter full screen", exact: true })
+    .click();
   await expect(editor.getByLabel("Note title", { exact: true })).toBeVisible();
   await expect(
     editor.getByRole("button", { name: "Save", exact: true }),
@@ -1109,7 +1122,9 @@ test("edits content in a full viewport with an optional title and fixed characte
     fullPage: false,
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(editor.getByRole("button", { name: /full screen/ })).toHaveCount(0);
+  await expect(editor.getByRole("button", { name: /full screen/ })).toHaveCount(
+    0,
+  );
   await expect(content).toContainText("contentonly");
   await expect(
     editor.getByRole("button", { name: "Close", exact: true }),
@@ -1157,7 +1172,10 @@ test("edits content in a full viewport with an optional title and fixed characte
   await card
     .getByRole("button", { name: "Open Untitled", exact: true })
     .click();
-  await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "View note", exact: true })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
   const reopened = page.getByRole("dialog", { name: "Edit note", exact: true });
   await expect(
     reopened.getByLabel("Note title", { exact: true }),
@@ -1212,7 +1230,10 @@ test("keeps the optional title focused when the rich editor loads slowly", async
         exact: true,
       })
       .click();
-    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "View note", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
     const reopened = page.getByRole("dialog", {
       name: "Edit note",
       exact: true,
@@ -1298,7 +1319,10 @@ for (const theme of ["light", "dark"]) {
     await page
       .getByRole("button", { name: `Open ${title}`, exact: true })
       .click();
-    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "View note", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
     const reopened = page.getByRole("dialog", {
       name: "Edit note",
       exact: true,
@@ -1340,7 +1364,9 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await editor
     .getByRole("button", { name: "Note background color", exact: true })
     .click();
-  await page.getByRole("textbox", { name: "Hex color", exact: true }).fill("#e8e4fc");
+  await page
+    .getByRole("textbox", { name: "Hex color", exact: true })
+    .fill("#e8e4fc");
   await page.getByRole("button", { name: "Apply color", exact: true }).click();
   await page.keyboard.press("Escape");
   await editor
@@ -1431,7 +1457,7 @@ test("manages labels and reorders notes through keyboard-friendly controls", asy
   await dialog.getByLabel("New label", { exact: true }).fill("Research");
   await dialog.getByRole("button", { name: "Add", exact: true }).click();
   await expect(dialog.getByText("Research", { exact: true })).toBeVisible();
-  await dialog.getByRole("button", { name: "Done", exact: true }).click();
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("link", { name: "Research", exact: true }),
   ).toBeVisible();
@@ -1457,7 +1483,10 @@ test("creates reminders and reads the resulting inbox notification", async ({
   await page
     .getByRole("button", { name: "Open Project notes", exact: true })
     .click();
-  await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "View note", exact: true })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
   let editor = page.getByRole("dialog", { name: "Edit note", exact: true });
   await editor
     .getByRole("button", { name: "Note reminders", exact: true })
@@ -1502,7 +1531,11 @@ test("creates reminders and reads the resulting inbox notification", async ({
 
 test("updates profile and revokes another session", async ({ page }) => {
   await login(page);
-  await page.getByRole("link", { name: "Settings", exact: true }).click();
+  await openAccountMenu(page);
+  await page
+    .getByRole("menuitem", { name: "Account settings", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/settings\/profile$/);
   await page.getByRole("button", { name: "Edit profile", exact: true }).click();
   await page.getByLabel("First name", { exact: true }).fill("Browser");
   await page.getByLabel("Last name", { exact: true }).fill("Tester");
@@ -1694,8 +1727,16 @@ test("administrator has a separate responsive area with no personal workspace re
   await page.goto("/settings/account?edit=password");
   await expect(page).toHaveURL(/\/admin\/settings\/account\?edit=password$/);
   await expect(
-    page.getByRole("heading", { name: "Settings", exact: true }),
+    page.getByRole("navigation", { name: "Settings", exact: true }),
   ).toBeVisible();
+  await page
+    .locator("section.account-section")
+    .filter({
+      has: page.getByRole("heading", { name: "Password", exact: true }),
+    })
+    .getByRole("button", { name: "Change", exact: true })
+    .click();
+  await expect(page.getByLabel("New password", { exact: true })).toBeVisible();
   await page.goto("/login");
   await expect(page).toHaveURL(/\/admin\/overview$/);
   await page.reload();
@@ -1901,14 +1942,21 @@ test("reorders the pinned group with pointer and keyboard dragging", async ({
   await login(page);
   await expect(page.locator(".drag-handle svg")).toHaveCount(0);
   await page.getByRole("button", { name: "list view", exact: true }).click();
-  await expect(page.locator(".note-card-footer").first()).toHaveCSS("border-top-width", "0px");
+  await expect(page.locator(".note-card-footer").first()).toHaveCSS(
+    "border-top-width",
+    "0px",
+  );
   await page.getByRole("button", { name: "grid view", exact: true }).click();
   const second = page.getByRole("button", {
     name: "Move Little things, lately",
     exact: true,
   });
-  const a = (await page.getByRole("button", { name: "Open An idea worth exploring", exact: true }).boundingBox())!;
-  const b = (await page.getByRole("button", { name: "Open Little things, lately", exact: true }).boundingBox())!;
+  const a = (await page
+    .getByRole("button", { name: "Open An idea worth exploring", exact: true })
+    .boundingBox())!;
+  const b = (await page
+    .getByRole("button", { name: "Open Little things, lately", exact: true })
+    .boundingBox())!;
   const moved = page.waitForResponse(
     (r) =>
       r.url().endsWith("/notes/reorder") && r.request().method() === "POST",
@@ -2109,7 +2157,9 @@ for (const mobile of [false, true]) {
       path: `../artifacts/frontend/editor-alignment-${mobile ? "mobile" : "desktop"}.png`,
       animations: "disabled",
     });
-    for (const name of mobile ? ["Pin note"] : ["Pin note", "Enter full screen"]) {
+    for (const name of mobile
+      ? ["Pin note"]
+      : ["Pin note", "Enter full screen"]) {
       const button = editor.getByRole("button", { name, exact: true });
       await page.mouse.move(0, 0);
       await expect(button).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
@@ -2121,7 +2171,10 @@ for (const mobile of [false, true]) {
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await page.getByText("Centered private text", { exact: true }).click();
-    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "View note", exact: true })
+      .getByRole("button", { name: "Edit", exact: true })
+      .click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(
       editor
@@ -2153,7 +2206,10 @@ for (const mobile of [false, true]) {
       await editor.getByRole("button", { name: "Close", exact: true }).click();
       await page.reload();
       await page.getByText("Centered private text", { exact: true }).click();
-      await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+      await page
+        .getByRole("dialog", { name: "View note", exact: true })
+        .getByRole("button", { name: "Edit", exact: true })
+        .click();
       editor = page.getByRole("dialog", { name: "Edit note", exact: true });
       await expect(
         editor
