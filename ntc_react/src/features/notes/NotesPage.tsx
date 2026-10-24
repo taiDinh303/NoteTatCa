@@ -41,7 +41,7 @@ import { CardLabels } from "./CardLabels";
 import { animateNoteDrop, cancelNoteDrop } from "./noteMotion";
 import "./NoteMotion.css";
 import { workspace } from "../../app/runtime";
-import { useDebounced, useLabels, useNotes } from "../../shared/hooks";
+import { useAuth, useDebounced, useLabels, useNotes } from "../../shared/hooks";
 import {
   ActionMenu,
   Button,
@@ -76,6 +76,7 @@ function NoteCard({
   onOrganize: (action: NoteOpenAction) => void;
 }) {
   useLanguage();
+  const guestMode = useAuth().status === "guest";
   const {
     setNodeRef,
     transform,
@@ -239,7 +240,7 @@ function NoteCard({
                   label: tr("Add reminder"),
                   icon: Bell,
                   action: () => onOrganize("reminder"),
-                  disabled: busy,
+                  disabled: busy || guestMode,
                 },
                 {
                   label: tr("Move earlier"),

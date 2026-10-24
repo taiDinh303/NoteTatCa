@@ -3,6 +3,23 @@ test.skip(
   !process.env.NTC_TEST_OFFLINE_SHELL,
   "Requires a production build and playwright.offline.config.ts",
 );
+test("guest production shell reopens offline without an account or backend", async ({ page, context }) => {
+  const requests: string[] = []; page.on("request", request => { if (/\/api\/|\/health\//.test(request.url())) requests.push(request.url()); });
+  await page.goto("/guest"); await expect(page.getByRole("complementary", { name: "Guest mode", exact: true })).toBeVisible();
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+  await context.setOffline(true); await page.reload();
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await editor.getByLabel("Note title", { exact: true }).click(); await editor.getByLabel("Note title", { exact: true }).fill("Guest offline note");
+  await editor.getByRole("textbox", { name: "Note content" }).fill("No account, no backend, still saved locally.");
+  await expect(editor.getByText("Saved on this device", { exact: true })).toBeVisible();
+  await editor.getByRole("button", { name: "Close", exact: true }).click(); await page.reload();
+  await expect(page.getByRole("button", { name: "Open Guest offline note", exact: true })).toBeVisible();
+  await context.setOffline(false);
+  await expect(page.getByRole("complementary", { name: "Guest mode", exact: true })).toBeVisible();
+  expect(requests).toEqual([]); expect(await page.evaluate(() => localStorage.getItem("ntc.session.v1"))).toBeNull();
+});
 test("production shell opens with no network and preserves offline notes through reload", async ({
   page,
   context,

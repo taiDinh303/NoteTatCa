@@ -1,0 +1,41 @@
+.guest-entry {
+  max-width: 500px;
+  margin: 15vh auto;
+  padding: 24px;
+}
+.guest-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 12px;
+}
+.guest-banner > div:first-child {
+  flex: 1 1 230px;
+  min-width: 0;
+}
+.guest-banner p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.guest-banner .select-wrap {
+  width: 120px;
+}
+.guest-banner .button {
+  min-height: 34px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.guest-import-footer {
+  flex-wrap: wrap;
+}
+.guest-import-footer .button {
+  max-width: 100%;
+  white-space: normal;
+}

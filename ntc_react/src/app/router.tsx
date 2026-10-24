@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { auth } from "./runtime";
 import { LogoutWarning } from "./OfflineControls";
+import { GuestEntry, GuestImportOffer } from "./GuestControls";
 import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
 import { Spinner } from "../shared/ui";
@@ -51,6 +52,7 @@ function Root() {
         <Outlet />
       </Suspense>
       <LogoutWarning />
+      <GuestImportOffer />
     </ConnectionFeedback>
   );
 }
@@ -79,6 +81,8 @@ function Authenticated() {
     );
   if (!state.session || state.status === "anonymous")
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  if (state.status === "guest" && !/^\/(notes(?:\/[^/]+)?|labels\/[^/]+|trash)$/.test(location.pathname))
+    return <Navigate to="/notes" replace />;
   return (
     <div key={auth.identity()}>
       <WorkspaceReady>
@@ -156,13 +160,14 @@ function Logout() {
   useLanguage();
   const navigate = useNavigate();
   const started = useRef(false);
+  const wasGuest = useRef(auth.getSnapshot().status === "guest");
   useEffect(() => {
     if (started.current) return;
     started.current = true;
     void auth
       .logout()
       .catch(() => {})
-      .then((done) => navigate(done === false ? "/notes" : "/login", { replace: true }));
+      .then((done) => navigate(done === false ? "/notes" : wasGuest.current ? "/Home" : "/login", { replace: true }));
   }, [navigate]);
   return <Spinner label={tr("Signing out…")} />;
 }
@@ -192,6 +197,7 @@ export const router = createBrowserRouter([
       { path: "/", element: <Landing redirectAuthenticated /> },
       { path: "/Home", element: <Landing /> },
       { path: "/privacy", element: <Privacy /> },
+      { path: "/guest", element: <GuestEntry /> },
       { path: "/login", element: <AuthPage key="login" mode="login" /> },
       {
         path: "/register",

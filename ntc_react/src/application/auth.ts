@@ -69,6 +69,7 @@ export interface AuthSnapshot {
     | "anonymous"
     | "authenticated"
     | "offline"
+    | "guest"
     | "expired";
   session?: Session;
 }
@@ -98,6 +99,10 @@ export class AuthService {
     private readonly afterLogout: (
       owner: string,
     ) => Promise<void> = async () => {},
+    private readonly guests?: {
+      restore(): Promise<Session | undefined>;
+      setActive(active: boolean): void;
+    },
   ) {
     this.api = api;
     this.vault = vault;
@@ -120,7 +125,16 @@ export class AuthService {
       : undefined;
   }
   isOffline() {
-    return this.snapshot.status === "offline";
+    return (
+      this.snapshot.status === "offline" || this.snapshot.status === "guest"
+    );
+  }
+  enterGuest(session: Session) {
+    if (this.snapshot.session && this.snapshot.status !== "guest") return;
+    this.generation++;
+    this.clearPrivate();
+    this.guests?.setActive(true);
+    this.emit({ status: "guest", session });
   }
   identity() {
     const session = this.snapshot.session;
@@ -129,6 +143,7 @@ export class AuthService {
       : undefined;
   }
   private accept(session: Session, publish = true) {
+    this.guests?.setActive(false);
     if (
       this.snapshot.session?.userId !== session.userId ||
       isAdministrator(this.snapshot.session) !== isAdministrator(session)
@@ -145,6 +160,13 @@ export class AuthService {
     }
     return (this.boot ??= (async () => {
       if (!this.vault.read()) {
+        const generation = this.generation;
+        const guest = await this.guests?.restore().catch(() => undefined);
+        if (generation !== this.generation) return;
+        if (guest) {
+          this.enterGuest(guest);
+          return;
+        }
         this.emit({ status: "anonymous" });
         return;
       }
@@ -292,7 +314,11 @@ export class AuthService {
     const owner = this.snapshot.session?.userId;
     const generation = ++this.generation;
     try {
-      if (this.snapshot.status !== "offline" && this.online())
+      if (
+        this.snapshot.status !== "offline" &&
+        this.snapshot.status !== "guest" &&
+        this.online()
+      )
         await this.withSessionLock(async () => {
           const saved = this.vault.read();
           if (!saved || generation !== this.generation) return;
@@ -316,6 +342,7 @@ export class AuthService {
       if (generation === this.generation) {
         this.clearPrivate();
         this.vault.clear();
+        this.guests?.setActive(false);
         this.emit({ status: "anonymous" });
         if (owner) await this.afterLogout(owner);
       }

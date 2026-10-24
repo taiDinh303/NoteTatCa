@@ -259,7 +259,7 @@ function NoteViewer({
     minute: "2-digit",
     timeZone: zone,
   }).format(new Date(note.lastUpdatedTime));
-  if (reminderOpen)
+  if (reminderOpen && auth.status !== "guest")
     return (
       <ReminderDialog
         noteId={note.id}
@@ -462,7 +462,7 @@ function EditorSession({
   }
   const status =
     snapshot.status === "saved"
-      ? syncState.pending ? tr("Saved on this device; waiting to sync") : tr("All changes saved")
+      ? state.status === "guest" ? tr("Saved on this device") : syncState.pending ? tr("Saved on this device; waiting to sync") : tr("All changes saved")
       : snapshot.status === "saving"
         ? tr("Saving…")
         : snapshot.status === "dirty"
@@ -764,6 +764,7 @@ function EditorSession({
             <IconButton
               icon={Bell}
               label={tr("Note reminders")}
+              disabled={state.status === "guest"}
               onClick={() => {
                 void save()
                   .then((note) => {
@@ -831,7 +832,7 @@ function EditorSession({
             {snapshot.status === "error" ? (
               <Button
                 variant="secondary"
-                disabled={state.status !== "authenticated"}
+                disabled={state.status !== "authenticated" && state.status !== "guest"}
                 onClick={() => {
                   void save().catch(() => {});
                 }}

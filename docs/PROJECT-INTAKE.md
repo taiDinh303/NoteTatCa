@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-24/DEC-028: chủ dự án duyệt và giao thực hiện guest mode cho người xem CV: landing có nút Thử ngay/chế độ khách, vài note/label mẫu, dữ liệu lưu riêng trên trình duyệt. Đã đồng ý phương án đề xuất copy guest notes/labels vào tài khoản sau login với lựa chọn để sau và bảo toàn bản local khi lỗi. Guest không có tài khoản/credentials/server ownership, không cấp quyền API notes anonymous; reminders/email/security/admin cần tài khoản. Không hỏi lại ba quyết định này.
+
 2026-10-24/DEC-025–027: chủ dự án chốt offline xem/tạo/sửa note đã tải trên thiết bị, tự đồng bộ khi có mạng và có Sync now; cảnh báo đăng xuất khi còn thay đổi chưa đồng bộ, cho ở lại hoặc tải bản dự phòng trước khi xóa dữ liệu máy. Người dùng tự yêu cầu xóa tài khoản với thời gian chờ30ngày; admin có thể xóa ngay với xác nhận riêng. Ưu tiên notes/labels trước khi mở workspace, dữ liệu phụ vẫn tải đủ ở nền. Đây là TARGET, chưa triển khai; xem backlog và tiêu chí tại [01-plan](01-plan.md#dec-025--offline-và-đồng-bộ-2026-10-24). Yêu cầu mới thay phần chặn toàn bộ workspace và cache chỉ memory của DEC-019 khi được triển khai; không khẳng định runtime đã đổi.
 
 2026-10-23/DEC-024: chủ dự án yêu cầu Language có bốn lựa chọn Việt, Anh, Trung, Nhật và chọn là đổi ngay toàn bộ giao diện, ghi nhớ trên trình duyệt; không dịch nội dung ghi chú/nhãn/tên tài khoản do người dùng nhập. Privacy có nội dung phù hợp hành vi NoteTatCa và liên kết quản lý thực, tham khảo ứng dụng ghi chú khác. Đã chọn mobile Settings dùng header gọn với nút ← và tên trang, trang con quay về Settings, Settings quay về ghi chú; PC giữ header/sidebar. Quyết định này thay yêu cầu UI chỉ tiếng Anh trước đó; English vẫn mặc định.

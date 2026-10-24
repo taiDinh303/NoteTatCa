@@ -26,7 +26,7 @@ export function useNotes(filter: NoteFilter) {
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
-    enabled: state.status === "authenticated" || state.status === "offline",
+    enabled: ["authenticated", "offline", "guest"].includes(state.status),
   });
 }
 export function useLabels() {
@@ -38,7 +38,7 @@ export function useLabels() {
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,
-    enabled: state.status === "authenticated" || state.status === "offline",
+    enabled: ["authenticated", "offline", "guest"].includes(state.status),
     staleTime: 120_000,
   });
 }

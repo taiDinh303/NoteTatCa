@@ -211,7 +211,7 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
     };
   }, [administrator]);
   useEffect(() => {
-    if ((state.status === "authenticated" || state.status === "offline") && state.session)
+    if ((state.status === "authenticated" || state.status === "offline" || state.status === "guest") && state.session)
       void preparation.prepare(state.session).catch(() => {});
   }, [state.status, state.session]);
   if (
@@ -305,6 +305,7 @@ function ConnectionNotice({ suppressed }: { suppressed: boolean }) {
   useEffect(() => {
     const offline = () => connection.reportOffline();
     const online = () => {
+      if (auth.getSnapshot().status === "guest") return;
       // Revalidate reads only. A failed save still requires the explicit Retry save action.
       void connection
         .ensureReady()

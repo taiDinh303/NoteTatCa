@@ -1581,7 +1581,7 @@ test("updates profile and revokes another session", async ({ page }) => {
   await page.getByRole("button", { name: "Edit profile", exact: true }).click();
   await page.getByLabel("First name", { exact: true }).fill("Browser");
   await page.getByLabel("Last name", { exact: true }).fill("Tester");
-  await page.getByLabel("Timezone", { exact: true }).fill("UTC");
+  await page.getByLabel("Timezone", { exact: true }).selectOption("UTC");
   await page.getByRole("button", { name: "Save profile", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Account menu" }),

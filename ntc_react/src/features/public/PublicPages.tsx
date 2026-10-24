@@ -15,6 +15,7 @@ import {
 import { useAuth } from "../../shared/hooks";
 import { homePath } from "../../application/access";
 import { Logo, Spinner } from "../../shared/ui";
+
 export function Landing({
   redirectAuthenticated = false,
 }: {
@@ -22,7 +23,7 @@ export function Landing({
 }) {
   useLanguage();
   const auth = useAuth();
-  if (redirectAuthenticated && (auth.status === "authenticated" || auth.status === "offline"))
+  if (redirectAuthenticated && (auth.status === "authenticated" || auth.status === "offline" || auth.status === "guest"))
     return <Navigate to={homePath(auth.session)} replace />;
   if (redirectAuthenticated && auth.status === "loading")
     return <Spinner label={tr("Opening your space…")} />;
@@ -64,8 +65,9 @@ export function Landing({
               )}
             </p>
             <div className="hero-actions">
+              {!signedIn ? <Link className="button primary large" to="/guest">{tr("Try guest mode")}<ArrowRight size={18} /></Link> : null}
               <Link
-                className="button primary large"
+                className={`button ${signedIn ? "primary" : "secondary"} large`}
                 to={signedIn ? destination : "/register"}
               >
                 {signedIn
@@ -206,6 +208,8 @@ export function Privacy() {
           "Each account has its own notes, labels and reminders. Administrators can manage accounts and view system totals; administrative access does not grant access to note content.",
         )}
       </p>
+      <h2>{tr("Guest mode")}</h2>
+      <p>{tr("Guest notes and labels stay on this browser without an account. Anyone using this browser profile can access them. Sign in and choose Copy to my account to store a copy online.")}</p>
       <h2>{tr("Your account")}</h2>
       <p>
         {tr(
@@ -227,7 +231,7 @@ export function Privacy() {
       <h2>{tr("This browser")}</h2>
       <p>
         {tr(
-          "Your refresh session is saved in this browser until you sign out or it is revoked. Note caches stay in memory and are cleared on sign-out or account changes. Theme and layout preferences may be saved locally. Avoid using shared browser profiles for private notes.",
+          "Account notes and labels are cached on this browser for offline use. Signing out protects pending changes before clearing the account cache. Guest data is separate and stays until you reset the demo, copy it successfully, or clear browser data.",
         )}
       </p>
       <h2>{tr("Service-specific details")}</h2>

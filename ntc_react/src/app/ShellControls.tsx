@@ -1,8 +1,23 @@
 import { t as tr, useLanguage } from "../shared/i18n";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Settings, ZoomIn, RefreshCw } from "lucide-react";
-import { auth, offline, cache, workspace, onlineWorkspace } from "./runtime";
+import {
+  ChevronDown,
+  LogOut,
+  Settings,
+  ZoomIn,
+  RefreshCw,
+  LogIn,
+  Copy,
+} from "lucide-react";
+import {
+  auth,
+  offline,
+  cache,
+  workspace,
+  onlineWorkspace,
+  guest,
+} from "./runtime";
 import { settingsPath, isAdministrator } from "../application/access";
 import { toast } from "sonner";
 import { errorMessage } from "../shared/utils";
@@ -17,6 +32,8 @@ export function ShellAccountMenu({
 }: { onNavigate?: () => void } = {}) {
   useLanguage();
   const state = useAuth();
+  const guestData = useSyncExternalStore(guest.subscribe, guest.getSnapshot);
+  const guestMode = state.status === "guest";
   const me = useMe();
   const navigate = useNavigate();
   const base = settingsPath(state.session);
@@ -38,7 +55,19 @@ export function ShellAccountMenu({
       <ActionMenu
         label={tr("Account menu")}
         items={[
-          ...(!isAdministrator(state.session)
+          ...(guestMode
+            ? [
+                {
+                  label: tr("Sign in"),
+                  icon: LogIn,
+                  action: () => {
+                    guest.requestImport();
+                    navigateTo("/login");
+                  },
+                },
+              ]
+            : []),
+          ...(!guestMode && !isAdministrator(state.session)
             ? [
                 {
                   label: tr("Sync now"),
@@ -57,18 +86,31 @@ export function ShellAccountMenu({
                 },
               ]
             : []),
-          {
-            label: tr("Account settings"),
-            icon: Settings,
-            action: () => navigateTo(base + "/profile"),
-          },
+          ...(!guestMode && !isAdministrator(state.session) && guestData.exists
+            ? [
+                {
+                  label: tr("Copy guest notes"),
+                  icon: Copy,
+                  action: () => guest.requestImport(),
+                },
+              ]
+            : []),
+          ...(!guestMode
+            ? [
+                {
+                  label: tr("Account settings"),
+                  icon: Settings,
+                  action: () => navigateTo(base + "/profile"),
+                },
+              ]
+            : []),
           {
             label: tr("Zoom ({0}%)", zoom.percent),
             icon: ZoomIn,
             action: () => setZoomOpen(true),
           },
           {
-            label: tr("Sign out"),
+            label: tr(guestMode ? "Leave guest mode" : "Sign out"),
             icon: LogOut,
             separator: true,
             action: () => navigateTo("/logout"),

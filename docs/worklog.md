@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Chế độ khách dùng thử từ CV — 2026-10-24
+
+- Chủ dự án duyệt triển khai: nút Try guest mode trên landing, có mẫu và tự chọn cách chuyển dữ liệu. Thêm /guest với 3 notes/3 labels, tạo/sửa/search/pin/reorder/labels/trash 30 ngày, reset có xác nhận, đổi ngôn ngữ, rời guest vẫn giữ dữ liệu. IndexedDB guest tách account; không tạo tài khoản demo chung, không token hoặc API/health request trong workspace guest. Chặn settings/reminders/inbox/admin cho guest.
+- Đăng nhập thật có lựa chọn copy thành mục mới hoặc giữ local để sau; menu avatar mở lại Copy guest notes. Không ghi đè notes có sẵn. Transfer có owner guard, Web Lock, stable create key và tiến độ retry; chỉ xóa nguồn khi tất cả ACK và không có edit mới. Trash được copy với hạn 30 ngày mới. Lỗi giữ nguồn; các bản đã copy trên server không rollback.
+- Validation: config 4/4 + Vitest 102/102 PASS; TypeScript/Vite build và ESLint PASS; .NET 8 Release --no-restore -warnaserror -m:1 PASS, 0 warnings/errors. Chromium guest và hồi quy tài khoản chạy riêng; production offline shell 2/2 PASS (guest offline reload/create/reload không API và account offline tự sync). Chromium 10/10 PASS: 5 guest cases (320/1440, route/API isolation, copy retry/trash, decline/reopen) và 5 account/admin regressions (CRUD, conflict, profile/session, isolation, search/pin).
+- Giới hạn: chưa thử Safari/device thật/full E2E suite/live deployment; guest phụ thuộc storage browser, xóa dữ liệu trình duyệt sẽ mất bản chưa copy; copy cần Web Locks. Chưa có sync guest giữa thiết bị, reminders guest hoặc account/admin deletion. Không migrate/deploy thủ công, không DB/email thật. Sửa locator hồi quy Timezone từ fill sang selectOption theo select hiện hành.
+- Publication scope: React guest implementation, related tests và root docs; push main sau validation, kiểm tra SHA remote. Giữ riêng thay đổi landing language/CSS/worklog có sẵn và .agnes/, không đưa vào commit guest.
+
 ## Trash note từ7sang30ngày — 2026-10-24
 
 - Chủ dự án yêu cầu30ngày thay7ngày. Đổi cutoff purge và restore sang nowUTC−30ngày; frontend countdown30ngày, banner/Help/Privacy/public Privacy và4ngôn ngữ, demo text đồng bộ. Note còn trong trash được hưởng hạn mới từ DeletedTime hiện có; không reset ngày xóa, không migrate hoặc khôi phục note đã purge. Account deletion không thuộc scope.

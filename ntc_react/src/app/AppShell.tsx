@@ -34,6 +34,7 @@ import { useAuth, useLabels, useNotes } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 import { OfflineControls } from "./OfflineControls";
+import { GuestBanner } from "./GuestControls";
 import { useTheme } from "../shared/useTheme";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 function Sidebar({
@@ -48,6 +49,7 @@ function Sidebar({
   mobile?: boolean;
 }) {
   useLanguage();
+  const guestMode = useAuth().status === "guest";
   const query = useLabels();
   const notesQuery = useNotes({});
   const trashQuery = useNotes({ trash: true });
@@ -67,14 +69,18 @@ function Sidebar({
             </span>
           ) : null}
         </NavLink>
-        <NavLink to="/reminders" onClick={onNavigate}>
-          <CalendarDays size={19} />
-          {tr("Reminders")}
-        </NavLink>
-        <NavLink to="/notifications" onClick={onNavigate}>
-          <Bell size={19} />
-          {tr("Inbox")}
-        </NavLink>
+        {!guestMode ? (
+          <>
+            <NavLink to="/reminders" onClick={onNavigate}>
+              <CalendarDays size={19} />
+              {tr("Reminders")}
+            </NavLink>
+            <NavLink to="/notifications" onClick={onNavigate}>
+              <Bell size={19} />
+              {tr("Inbox")}
+            </NavLink>
+          </>
+        ) : null}
         <NavLink to="/trash" onClick={onNavigate}>
           <Trash2 size={19} />
           {tr("Trash")}
@@ -113,24 +119,28 @@ function Sidebar({
         ) : null}
       </SidebarLabels>
       <div className="sidebar-bottom">
-        {accountControls}
-        <NavLink
-          className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
-          to={mobile ? "/settings" : "/settings/account"}
-          end
-          onClick={onNavigate}
-        >
-          <Settings size={18} />
-          {tr("Settings")}
-        </NavLink>
-        <NavLink
-          className={`settings-link ${pathname === "/help" ? "active" : ""}`}
-          to="/help"
-          onClick={onNavigate}
-        >
-          <LifeBuoy size={18} />
-          {tr("Help & feedback")}
-        </NavLink>
+        {!guestMode ? (
+          <>
+            {accountControls}
+            <NavLink
+              className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
+              to={mobile ? "/settings" : "/settings/account"}
+              end
+              onClick={onNavigate}
+            >
+              <Settings size={18} />
+              {tr("Settings")}
+            </NavLink>
+            <NavLink
+              className={`settings-link ${pathname === "/help" ? "active" : ""}`}
+              to="/help"
+              onClick={onNavigate}
+            >
+              <LifeBuoy size={18} />
+              {tr("Help & feedback")}
+            </NavLink>
+          </>
+        ) : null}
         <div className="sidebar-footer">
           {tr("A little space. All yours.")}
           <span>NoteTatCa</span>
@@ -288,7 +298,11 @@ export default function AppShell() {
         <div className="topbar-actions">
           <span className="private-badge">
             <ShieldCheck size={13} />
-            {tr("Private workspace")}
+            {tr(
+              state.status === "guest"
+                ? "Guest workspace"
+                : "Private workspace",
+            )}
           </span>
           <IconButton
             className="header-theme-toggle"
@@ -314,7 +328,8 @@ export default function AppShell() {
       </aside>
       <div className="main-column">
         <main className="workspace-main" id="workspace-main">
-          <OfflineControls />
+          <GuestBanner />
+          {state.status !== "guest" ? <OfflineControls /> : null}
           <Outlet />
         </main>
       </div>

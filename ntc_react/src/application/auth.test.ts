@@ -37,6 +37,16 @@ const ok = (data: unknown) =>
     headers: { "Content-Type": "application/json" },
   });
 describe("session security", () => {
+  it("restores guest mode without a refresh credential and never authorizes guest API requests", async () => {
+    const transport = vi.fn(async () => ok(session())); const vault = new SessionVault(storage());
+    const api = new ApiClient("/api/v1", transport); const active = vi.fn();
+    const guest = { ...session(), userId: "guest-local", roles: ["Guest"], token: "", refreshToken: "" };
+    const auth = new AuthService(api, vault, vi.fn(), undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+      { restore: async () => guest, setActive: active }); api.setAuth(auth);
+    await auth.bootstrap(); expect(auth.getSnapshot().status).toBe("guest"); expect(vault.read()).toBeNull();
+    await expect(api.request("/notes")).rejects.toMatchObject({ status: 0 }); expect(transport).not.toHaveBeenCalled();
+    await auth.logout(); expect(transport).not.toHaveBeenCalled(); expect(active).toHaveBeenLastCalledWith(false);
+  });
   it("opens a cached customer session offline without sending credentials or exposing an access token", async () => {
     const vault = new SessionVault(storage());
     vault.write(session());

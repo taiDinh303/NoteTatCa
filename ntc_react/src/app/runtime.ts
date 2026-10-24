@@ -2,9 +2,13 @@ import { QueryClient } from "@tanstack/react-query";
 import { OfflineNotes } from "../application/offline";
 import { IndexedOfflineStore } from "../infrastructure/offlineStore";
 import {
-  OfflineLabelsRepository,
-  OfflineNotesRepository,
-} from "../infrastructure/offlineRepositories";
+  GuestNotesRepository,
+  GuestLabelsRepository,
+} from "../infrastructure/guestRepositories";
+import { GuestWorkspace, guestSession } from "../application/guest";
+import { IndexedGuestStore, GUEST_OWNER } from "../infrastructure/guestStore";
+import { GuestTransferService } from "../application/guestTransfer";
+import { t } from "../shared/i18n";
 import { LogoutProtection } from "../application/logoutProtection";
 import { isAdministrator } from "../application/access";
 import type { Note } from "../domain/models";
@@ -13,6 +17,7 @@ import {
   AccountRepository,
   AdminRepository,
   InboxRepository,
+  LabelsRepository,
   NotesRepository,
   RemindersRepository,
 } from "../infrastructure/repositories";
@@ -41,6 +46,37 @@ export const api = new ApiClient(
 export const connection = new ServerConnection(healthUrl(api.baseUrl));
 export const offlineStore = new IndexedOfflineStore();
 export const logoutProtection = new LogoutProtection();
+const guestChannel =
+  typeof BroadcastChannel === "undefined"
+    ? undefined
+    : new BroadcastChannel("ntc.guest.changed.v1");
+export const guest = new GuestWorkspace(
+  new IndexedGuestStore(),
+  () => guestChannel?.postMessage("changed"),
+  t,
+  (open) => {
+    try {
+      if (open) localStorage.setItem("ntc.guest.copy.offer.v1", "true");
+      else localStorage.removeItem("ntc.guest.copy.offer.v1");
+    } catch {
+      /* Memory fallback */
+    }
+  },
+);
+try {
+  if (localStorage.getItem("ntc.guest.copy.offer.v1") === "true")
+    guest.requestImport();
+} catch {
+  /* Memory fallback */
+}
+function setGuestActive(active: boolean) {
+  try {
+    if (active) localStorage.setItem("ntc.guest.active.v1", "true");
+    else localStorage.removeItem("ntc.guest.active.v1");
+  } catch {
+    /* Session remains usable in this tab. */
+  }
+}
 api.setConnection(connection);
 const sessionChannel =
   typeof BroadcastChannel === "undefined"
@@ -112,14 +148,23 @@ export const auth: AuthService = new AuthService(
     }
   },
   (owner) => offlineStore.clear(owner),
+  {
+    setActive: setGuestActive,
+    restore: async () => {
+      if (localStorage.getItem("ntc.guest.active.v1") !== "true") return;
+      await guest.ensure();
+      return guestSession();
+    },
+  },
 );
 api.setAuth(auth);
 const owner = (): string | undefined =>
-  isAdministrator(auth.getSnapshot().session)
+  isAdministrator(auth.getSnapshot().session) ||
+  auth.getSnapshot().status === "guest"
     ? undefined
     : auth.getSnapshot().session?.userId;
 export const onlineWorkspace = () =>
-  navigator.onLine && auth.getSnapshot().status !== "offline";
+  navigator.onLine && !["offline", "guest"].includes(auth.getSnapshot().status);
 const offlineChannel =
   typeof BroadcastChannel === "undefined"
     ? undefined
@@ -163,13 +208,35 @@ export const offline: OfflineNotes = new OfflineNotes(
   },
   () => offlineChannel?.postMessage(owner()),
 );
-export const notes = new OfflineNotesRepository(api, offline, onlineWorkspace);
-export const labels = new OfflineLabelsRepository(
+export const notes = new GuestNotesRepository(
+  api,
+  offline,
+  onlineWorkspace,
+  guest,
+  () => auth.getSnapshot().status === "guest",
+);
+export const labels = new GuestLabelsRepository(
   api,
   offlineStore,
   owner,
   onlineWorkspace,
+  guest,
+  () => auth.getSnapshot().status === "guest",
 );
+export const guestTransfer = new GuestTransferService(
+  guest.store,
+  new NotesRepository(api),
+  new LabelsRepository(api),
+  () => (auth.getSnapshot().status === "authenticated" ? owner() : undefined),
+  async (action) => {
+    if (!navigator.locks)
+      throw new Error(
+        "Copying guest notes needs a browser with Web Locks support.",
+      );
+    return navigator.locks.request("ntc.guest.transfer.v1", action);
+  },
+);
+void guest.refresh();
 export const reminders = new RemindersRepository(api);
 export const account = new AccountRepository(api);
 export const inbox = new InboxRepository(api);
@@ -248,7 +315,16 @@ auth.subscribe(() => {
       .catch(() => {});
   }
   void offline.refresh();
+  void guest.refresh();
 });
+guest.subscribe(() => {
+  if (auth.getSnapshot().status !== "guest") return;
+  void cache.invalidateQueries({ queryKey: ["private", GUEST_OWNER] });
+});
+if (guestChannel)
+  guestChannel.onmessage = () => {
+    void guest.refresh();
+  };
 async function reconnectWorkspace() {
   if (!navigator.onLine || !owner()) return;
   if (auth.getSnapshot().status === "offline") {
