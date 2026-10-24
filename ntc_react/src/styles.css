@@ -1374,6 +1374,17 @@ strong {
   padding: 4px 7px;
   font-size: 22px;
 }
+.emoji-trigger.empty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px dashed currentColor;
+  color: var(--subtle);
+}
 .save-indicator {
   display: flex;
   gap: 5px;

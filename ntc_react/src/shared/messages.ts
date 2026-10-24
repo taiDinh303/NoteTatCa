@@ -930,6 +930,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
   ],
   "Note icons": ["Biểu tượng ghi chú", "笔记图标", "ノートのアイコン"],
   "Remove icon": ["Bỏ biểu tượng", "移除图标", "アイコンを削除"],
+  "Add icon": ["Thêm biểu tượng", "添加图标", "アイコンを追加"],
   "Custom note emoji": [
     "Emoji ghi chú tùy chỉnh",
     "自定义笔记表情",

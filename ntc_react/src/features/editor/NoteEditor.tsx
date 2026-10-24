@@ -21,6 +21,7 @@ import {
   Pencil,
   Pin,
   PinOff,
+  Plus,
   RotateCcw,
   Tag,
   Trash2,
@@ -496,10 +497,11 @@ function EditorSession({
               <Popover.Trigger asChild>
                 <button
                   type="button"
-                  className="emoji-trigger"
+                  className={`emoji-trigger ${draft.iconEmoji ? "" : "empty"}`}
                   aria-label={tr("Choose note icon")}
+                  title={tr(draft.iconEmoji ? "Choose note icon" : "Add icon")}
                 >
-                  {draft.iconEmoji || "📝"}
+                  {draft.iconEmoji || <Plus size={18} aria-hidden="true" />}
                 </button>
               </Popover.Trigger>
               <Popover.Portal>

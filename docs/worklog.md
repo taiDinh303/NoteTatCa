@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Editor phân biệt chưa gắn icon với emoji thật — 2026-10-24
+
+- Theo2ảnh/chủ dự án: bỏ fallback 📝 trên emoji-trigger khi draft.iconEmoji rỗng. Thay bằng nút Plus SVG18px trong ô36px nét đứt, màu subtle/nền trong, title Add icon có4ngôn ngữ; giữ aria Choose note icon và popover hiện có. Emoji chỉ hiện khi draft thật sự có icon. Không gán Plus hoặc emoji mặc định vào draft/save/API; View/card/render icon dữ liệu giữ nguyên, clear icon tiếp tục dùng picker hiện có.
+- Actual validation: Chromium editor-header5/5 PASS tại320/393/430/768/1280: heading gọn, mở picker không đổi chiều cao, chọn emoji→save/close/reload/reopen giữ emoji và Escape không đóng editor. Đã xem screenshot393 với ô+ nét đứt và lựa chọn Remove icon đang active cho note chưa có icon. Không thêm test mirror cho đổi render nhỏ; không kiểm riêng clear→reload lần này. TypeScript/Production build, ESLint max-warnings0 và .NET solution Release --no-restore PASS0warnings/0errors; git diff --check PASS. Không full suite/thiết bị thật/production/owner DB/email thật/deploy/migrate; synthetic SQLite/captured email fixture riêng.
+- Publication scope4files: NoteEditor.tsx, styles.css, shared/messages.ts và entry worklog; giữ .agnes ngoài commit. Push main theo quyền hiện có và đối chiếu remote SHA; remote CI/hosting rollout chưa xác minh.
+
 ## Gộp cài đặt vào thanh tab account — 2026-10-24
 
 - Theo4ảnh/yêu cầu chủ dự án: dùng SettingsNav chung6tab Profile/Account & security/Active sessions/Language/Privacy/Appearance; bỏ màn menu Settings3hàng và heading/back lớn của preferences. Giữ route nội dung preferences; /settings, /admin/settings, /admin/preferences redirect account tương ứng. Sidebar customer Settings vào account, active trên toàn khu settings; menu avatar giữ vào profile đúng role như trước. Mobile cùng thanh tab cuộn ngang, tự đưa tab active vào tầm nhìn, Back customer về notes vì sáu mục cùng cấp. Không thay auth/API/profile/session/avatar/theme/language/privacy logic.
