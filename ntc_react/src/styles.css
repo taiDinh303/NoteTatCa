@@ -891,24 +891,84 @@ strong {
   border-radius: 8px;
   background: var(--surface);
 }
-.select-wrap select {
-  appearance: none;
-  height: 32px;
-  padding: 0 26px 0 10px !important;
+.select-trigger {
+  flex: 1;
+  height: 100%;
+  min-width: 90px;
+  padding: 0 26px 0 10px;
   border: 0;
-  background: transparent !important;
+  background: transparent;
+  font: inherit;
   font-size: 12px;
   font-weight: 500;
   color: var(--text);
-  min-width: 90px;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.select-wrap svg {
+.select-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.select-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.select-chevron {
   position: absolute;
   right: 5px;
   top: 50%;
-  transform: translateY(-50%);
+  margin-top: -7px;
   pointer-events: none;
-  color: #a5acb4;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 260px;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.select-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  border: 0;
+  background: transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+}
+.select-option:hover {
+  background: var(--hover);
+}
+.select-option.selected {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--accent-soft);
+}
+.select-option-check {
+  width: 12px;
+  flex-shrink: 0;
 }
 .notes-section {
   margin-bottom: 31px;

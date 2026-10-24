@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Custom Select dropdown đồng bộ theme (nền/viền/bo góc), dark mode — 2026-10-24
+
+- Theo 2 ảnh chủ dự án: native `<select>` (component `Select` trong shared/ui.tsx, dùng ở pin filter NotesPage) render dropdown list theo OS (nền trắng, bo góc/viền lệch theme) và dark mode trigger nền vẫn sáng → chữ trùng khó đọc. Thay native `<select>` bằng custom listbox (button trigger + menu role="listbox" option), dùng đúng `--surface`/`--border`/`--text`/`--muted`/`--hover`/`--accent`/`--accent-soft`/`--shadow` — trigger giữ 8px bo góc như cũ, menu bo 10px + shadow đồng bộ; option đã chọn có nền `--accent-soft` + tick; chevron xoay 180° khi mở; hỗ trợ Escape/Tab/pointerdown outside; aria-haspopup/expanded/selected. CSS cũ `.select-wrap select` + `.select-wrap svg` thay bằng `.select-trigger`/`.select-menu`/`.select-option`/`.select-chevron`. Không đổi i18n/API/routing; native `<select>` khác (AdminPage, ReminderDialog, HelpPage, ProfileMedia, SettingsPage) giữ nguyên.
+- Validation: React Production build PASS; ESLint PASS. Không full e2e/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/shared/ui.tsx, ntc_react/src/styles.css, docs/worklog.md.
+
 ## Ưu tiên tab, che thông tin account và gọn Google — 2026-10-24
 
 - Theo2ảnh/chủ dự án: tab đổi thành Profile→Account & security→Appearance→Language→Privacy→Active sessions. Hai mục tài khoản trước, tùy chỉnh tiếp theo, thông tin quyền riêng tư rồi quản lý phiên cuối; áp dụng chung customer/admin/mobile, giữ route và cuộn active tab.

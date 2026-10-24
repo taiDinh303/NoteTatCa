@@ -5,6 +5,9 @@ import {
   Component,
   isValidElement,
   useId,
+  useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -456,17 +459,113 @@ export function Select({
   disabled?: boolean;
 }) {
   useLanguage();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const options = useMemo(
+    () =>
+      Children.toArray(children).filter(
+        (child): child is React.ReactElement<{ value?: string; children?: ReactNode }> =>
+          isValidElement(child) && child.type === "option",
+      ),
+    [children],
+  );
+  const selectedOption =
+    options.find((o) => o.props.value === value) ?? options[0];
+  const selectedLabel =
+    selectedOption != null
+      ? Children.toArray(selectedOption.props.children).join("").trim() ||
+        String(selectedOption.props.value ?? "")
+      : value;
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (
+        rootRef.current &&
+        !rootRef.current.contains(event.target as Node)
+      )
+        setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  function onKeyDown(event: React.KeyboardEvent) {
+    if (event.key === "Escape") {
+      setOpen(false);
+      event.stopPropagation();
+      return;
+    }
+    if (!open) {
+      if (event.key === "Enter" || event.key === " " || event.key === "ArrowDown") {
+        event.preventDefault();
+        setOpen(true);
+        requestAnimationFrame(() => triggerRef.current?.focus());
+      }
+      return;
+    }
+    if (event.key === "Tab") {
+      setOpen(false);
+      return;
+    }
+  }
+
   return (
-    <div className="select-wrap">
-      <select
+    <div
+      ref={rootRef}
+      className="select-wrap"
+      onKeyDown={onKeyDown}
+    >
+      <button
+        ref={triggerRef}
+        type="button"
+        className="select-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
         aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
+        onClick={() => setOpen((o) => !o)}
       >
-        {children}
-      </select>
-      <ChevronDown size={14} />
+        {selectedLabel}
+      </button>
+      {open ? (
+        <div
+          className="select-menu"
+          role="listbox"
+          aria-label={label}
+          aria-activedescendant={`${label}-option-${value}`}
+        >
+          {options.map((option, index) => {
+            const optValue = option.props.value ?? String(index);
+            const selected = optValue === value;
+            return (
+              <button
+                key={optValue}
+                type="button"
+                id={`${label}-option-${optValue}`}
+                role="option"
+                aria-selected={selected}
+                className={`select-option ${selected ? "selected" : ""}`}
+                onClick={() => {
+                  onChange(optValue);
+                  setOpen(false);
+                  requestAnimationFrame(() => triggerRef.current?.focus());
+                }}
+              >
+                {selected ? <Check size={12} /> : <span className="select-option-check" />}
+                {Children.toArray(option.props.children).join("").trim() || optValue}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+      <ChevronDown
+        size={14}
+        className="select-chevron"
+        style={{ transform: open ? "rotate(180deg)" : undefined }}
+      />
     </div>
   );
 }
