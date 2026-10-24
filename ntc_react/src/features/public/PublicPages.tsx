@@ -101,8 +101,14 @@ export function Landing({
                 {tr("Great things start somewhere.")}
               </p>
               <div className="hero-note-line" />
-              <span className="mini-label">{tr("ideas")}</span>
-              <span className="mini-label">{tr("just for me")}</span>
+              <span className="mini-label" style={{ background: "#e9a33c1f", color: "#a0721f" }}>
+                <Tag size={10} style={{ color: "#e9a33c" }} />
+                {tr("ideas")}
+              </span>
+              <span className="mini-label" style={{ background: "#4b79651f", color: "#3a6152" }}>
+                <Tag size={10} style={{ color: "#4b7965" }} />
+                {tr("just for me")}
+              </span>
             </div>
             <div className="paper-card hero-checklist">
               <span>🌿</span>

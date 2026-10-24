@@ -2603,14 +2603,16 @@ td {
   margin-bottom: 14px;
 }
 .mini-label {
-  display: inline-block;
-  font-size: 8px;
-  background: #6f7b5c0e;
-  color: #969d7d;
-  border-radius: 4px;
-  padding: 5px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #757f8510;
+  color: var(--subtle);
+  border-radius: 5px;
+  padding: 4px 7px;
   margin: 3px 5px 0 0;
-  letter-spacing: 0.1px;
 }
 .art-note-two {
   position: absolute;
@@ -2787,7 +2789,8 @@ td {
   left: 40px;
   top: 3px;
   padding: 28px;
-  background: #fcf5dc;
+  background: #fce4e5;
+  color: #30373d;
   z-index: 2;
 }
 .hero-note-icons {
@@ -2795,21 +2798,23 @@ td {
   justify-content: space-between;
   align-items: center;
   font-size: 27px;
-  color: #c9c7aa;
+  color: #b5914a;
   margin-bottom: 18px;
 }
 .hero-note h2 {
   font-size: 20px;
   line-height: 1.6;
   margin: 17px 0 13px;
+  color: #30373d;
 }
 .hero-note-line {
   height: 1px;
-  background: #eee6ca;
+  background: #f4b8bd;
   margin: 19px 0 10px;
 }
 .hero-note p {
   font-size: 11px;
+  color: #75807a;
 }
 .hero-checklist {
   position: absolute;
@@ -2819,10 +2824,13 @@ td {
   width: 270px;
   transform: rotate(7deg);
   padding: 24px;
-  background: #e7edde;
+  background: #dff0e6;
 }
 .hero-checklist > span {
   font-size: 24px;
+}
+.hero-checklist h3 {
+  color: #30373d;
 }
 .hero-checklist div {
   font-size: 11px;
@@ -2830,53 +2838,54 @@ td {
   gap: 8px;
   align-items: center;
   margin: 12px 0;
-  color: #98a388;
+  color: #5c6a62;
 }
 .hero-checklist div > svg {
   width: 11px;
+  color: #4b7965;
 }
 .fake-checkbox {
   width: 11px;
   height: 11px;
-  border: 1px solid #b9c3a9;
+  border: 1px solid #9fb8a8;
   border-radius: 3px;
 }
 .hero-floating-tag {
   position: absolute;
   top: -26px;
   right: 30px;
-  border: 1px solid #e4e7de;
+  border: 1px solid var(--border);
   border-radius: 20px;
   padding: 11px 17px;
   display: flex;
   align-items: center;
   gap: 9px;
   font-size: 11px;
-  color: #9da68f;
+  color: var(--subtle);
   z-index: 5;
-  background: #fff;
-  box-shadow: 0 5px 18px #6770560a;
+  background: var(--surface);
+  box-shadow: 0 5px 18px #2734440c;
   transform: rotate(5deg);
 }
 .hero-reminder {
   display: flex;
   gap: 12px;
   align-items: center;
-  background: white;
-  border: 1px solid #e8e9df;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 15px 22px;
   position: absolute;
   left: 0;
   top: 350px;
   z-index: 4;
-  box-shadow: 0 10px 30px #67705614;
+  box-shadow: 0 10px 30px #2734440c;
   transform: rotate(-3deg);
-  color: #c7b58b;
+  color: var(--muted);
 }
 .hero-reminder > span {
   font-size: 11px;
-  color: #909b87;
+  color: var(--text);
 }
 .hero-reminder small {
   display: block;
@@ -3154,7 +3163,25 @@ td {
 [data-theme="dark"] .paper-card,
 [data-theme="dark"] .hero-reminder,
 [data-theme="dark"] .hero-floating-tag {
-  color: #505b49;
+  background: var(--surface);
+  color: var(--text);
+}
+[data-theme="dark"] .hero-note {
+  background: #3a3034;
+}
+[data-theme="dark"] .hero-note-line {
+  background: #4a4044;
+}
+[data-theme="dark"] .hero-checklist {
+  background: #2d3a34;
+}
+[data-theme="dark"] .hero-note h2,
+[data-theme="dark"] .hero-checklist h3 {
+  color: var(--text);
+}
+[data-theme="dark"] .hero-note p,
+[data-theme="dark"] .hero-checklist div {
+  color: var(--subtle);
 }
 [data-theme="dark"] .hero-copy h1 {
   color: #d1d9cb;

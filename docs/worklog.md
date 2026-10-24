@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Đồng bộ hero landing với style card note/label của workspace — 2026-10-24
+
+- Theo ảnh chủ dự án (light + dark): hero landing (`/Home`) dùng card note nền olive/xem, label không có màu, chưa đồng bộ với note card thật trong workspace (nền màu NOTE_COLORS pastel, label chip có màu tint + icon). Đổi `.hero-note` nền `#fcf5dc`→`#fce4e5` (pink NOTE_COLORS), `.hero-checklist` `#e7edde`→`#dff0e6` (mint NOTE_COLORS), `.mini-label` → style `label-chip` (font 11px, nền tint `#757f8510`, icon Tag có màu amber/green), dark mode card note dùng `--surface` + override nền pastel đậm (màu text `--text`/`--subtle`). JSX: `ideas`/`just for me` có `Tag` icon màu theo `--accent`/`--green`.
+- Không đổi routing/API/i18n; chỉ CSS + JSX hero.
+- Validation: React Production build PASS; ESLint PASS. Không full suite/thiết bị thật; không deploy/migrate/DB/email thật.
+- Scope: ntc_react/src/features/public/PublicPages.tsx, ntc_react/src/styles.css, docs/worklog.md.
+
 ## Avatar lưu máy chủ và chọn múi giờ — 2026-10-24
 
 - Theo yêu cầu chủ dự án: Edit profile thêm chọn/xóa avatar, preview, Save profile mới ghi; nhận PNG/JPG/WebP≤5MiB, canvas crop giữa128×128 PNG, bỏ metadata/animation. Hủy trả ảnh cũ; khóa submit/cancel khi xử lý ảnh, preview giữ khi lưu503 để retry. Shared Avatar nhận PNG data URI hoặc HTTPS và fallback initials; header/profile dùng dữ liệu me mới, login đọc Picture đã lưu. Không chỉ lưu ảnh ở browser hoặc file tạm Render.
