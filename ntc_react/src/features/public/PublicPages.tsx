@@ -1,4 +1,10 @@
-import { t as tr, useLanguage } from "../../shared/i18n";
+import {
+  languages,
+  setLanguage,
+  type Language,
+  t as tr,
+  useLanguage,
+} from "../../shared/i18n";
 import { Link, Navigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -14,8 +20,26 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../shared/hooks";
 import { homePath } from "../../application/access";
-import { Logo, Spinner } from "../../shared/ui";
+import { Logo, Select, Spinner } from "../../shared/ui";
 
+function LandingLanguageSelect() {
+  const language = useLanguage();
+  return (
+    <Select
+      label={tr("App language")}
+      value={language}
+      onChange={(code) => {
+        setLanguage(code as Language);
+      }}
+    >
+      {languages.map(({ code, name }) => (
+        <option key={code} value={code} lang={code}>
+          {name}
+        </option>
+      ))}
+    </Select>
+  );
+}
 export function Landing({
   redirectAuthenticated = false,
 }: {
@@ -35,8 +59,10 @@ export function Landing({
         <Link to="/Home">
           <Logo />
         </Link>
+        <div className="landing-language">
+          <LandingLanguageSelect />
+        </div>
         <nav>
-          <Link to="/privacy">{tr("Your privacy")}</Link>
           {!signedIn && <Link to="/login">{tr("Sign in")}</Link>}
           <Link
             className="button primary"

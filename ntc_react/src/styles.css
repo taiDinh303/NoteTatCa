@@ -2789,6 +2789,11 @@ td {
   align-items: center;
   justify-content: space-between;
 }
+.landing-language {
+  flex-shrink: 0;
+  width: 118px;
+  margin: 0 10px;
+}
 .landing > header nav {
   display: flex;
   gap: 27px;
@@ -3504,6 +3509,10 @@ td {
   }
   .landing > header {
     padding: 25px 25px;
+  }
+  .landing-language {
+    width: 94px;
+    margin: 0 4px;
   }
   .landing > header nav {
     gap: 18px;

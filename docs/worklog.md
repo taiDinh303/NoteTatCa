@@ -1,4 +1,4 @@
-﻿# WORKLOG — NoteTatCa
+# WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
@@ -10,6 +10,16 @@
 - Giới hạn: chưa thử Safari/device thật/full E2E suite/live deployment; guest phụ thuộc storage browser, xóa dữ liệu trình duyệt sẽ mất bản chưa copy; copy cần Web Locks. Chưa có sync guest giữa thiết bị, reminders guest hoặc account/admin deletion. Không migrate/deploy thủ công, không DB/email thật. Sửa locator hồi quy Timezone từ fill sang selectOption theo select hiện hành.
 - Publication scope: React guest implementation, related tests và root docs; push main sau validation, kiểm tra SHA remote. Giữ riêng thay đổi landing language/CSS/worklog có sẵn và .agnes/, không đưa vào commit guest.
 - Publication xác nhận: commit 9572cac đã push origin/main; git ls-remote trả đúng 9572cac2a86ea5bfc2e0da9038c9af1601d41fb1. Chưa xác minh Vercel production rollout.
+
+## Landing thêm ô ngôn ngữ nhỏ — 2026-10-24
+
+- Theo yêu cầu chủ dự án: thêm ô nhỏ chọn ngôn ngữ trên trang Home (Landing), chức năng tương đương mục Language trong Settings; chọn trực tiếp đổi app language, không cần vào /settings/language.
+- PublicPages.tsx: import languages/setLanguage/Language; thêm LandingLanguageSelect dùng shared Select, options 4 ngôn ngữ (EN/VI/ZH/JA), onChange gọi setLanguage; component đặt trong header giữa logo và nav, wrap .landing-language; khôi phục import Spinner bị thiếu. Không đổi routing/auth/i18n store/settings page/backend/API.
+- styles.css: .landing-language width 118px/margin 10px, responsive 800px width 94px/margin 4px; giữ alignment landing header hiện có.
+- Validation thực tế: typecheck PASS; npm test (config 4/4 + Vitest 12 files/92 tests) PASS; ESLint PASS; Vite production build PASS. Chưa chạy E2E Chromium/.NET/device thật; không deploy/migrate/DB/email thật.
+- Scope 3 files: ntc_react/src/features/public/PublicPages.tsx, ntc_react/src/styles.css, docs/worklog.md. Chưa commit/push; cần review UI visual trước khi publication.
+- Bỏ link "Your privacy" trong header Landing theo yêu cầu; giữ route /privacy, messages, privacy page và footer không đổi. Lint/typecheck/build PASS sau khi bỏ. Không thêm/remove E2E locator landing privacy vì không có spec kiểm link này.
+
 
 ## Trash note từ7sang30ngày — 2026-10-24
 
