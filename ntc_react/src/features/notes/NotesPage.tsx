@@ -454,15 +454,15 @@ export default function NotesPage({
           </Button>
         </div>
       ) : null}
-      {trash ? (
-        <div className="notice-strip">
-          <Trash2 size={16} />
-          {tr(
-            "Deleted notes are permanently removed after the seven-day retention period.",
-          )}
-        </div>
-      ) : null}
-      <div className="workspace-toolbar">
+      <div className={`workspace-toolbar${trash ? " trash-toolbar" : ""}`}>
+        {trash ? (
+          <div className="notice-strip trash-retention">
+            <Trash2 size={16} />
+            <span>{tr(
+              "Deleted notes are permanently removed after the seven-day retention period.",
+            )}</span>
+          </div>
+        ) : null}
         {!trash ? (
           <button
             className="quick-capture"

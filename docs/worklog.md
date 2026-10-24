@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thông báo trash cùng hàng với grid/list — 2026-10-24
+
+- Theo ảnh/yêu cầu chủ dự án: chuyển thông báo retention7ngày vào bên trái workspace-toolbar của Trash, toggle grid/list bên phải cùng tâm dọc. Notice flex1/min-width0/margin0, text wrap, SVG và action không co. Không đổi retention, restore/delete confirmation hoặc handler grid/list.
+- Actual validation: TypeScript/Production build và ESLint PASS; Chromium workspace rich note/autosave/labels→trash→restore→permanent-delete Cancel/Confirm regression1/1 PASS. Render layout riêng với CSS thật tại320/393/1440: centerDelta0, không overlap/document overflow; đã xem ảnh320. Đây là layout snippet, không claim screenshot mobile app thật. Diff check PASS. Backend không đổi, không chạy lại .NET/fullsuite/production/thiết bị thật/owner DB/email; fixture SQLite/captured mail riêng. Scope3files NotesPage/styles/worklog; giữ .agnes/artifacts ngoài commit, push main và đối chiếu remote SHA theo quyền hiện có.
+
 ## Ẩn hàng sync bình thường và đưa thao tác vào avatar — 2026-10-24
 
 - Chủ dự án yêu cầu bỏ cả Notes synced và Sync now khỏi hàng trên notes. OfflineControls ẩn toàn bộ toolbar khi không pending/offline/warming/problem/error/busy; status synced vẫn có sr-only cho accessibility. Không hiện toolbar chỉ vì kiểm queue rỗng. ShellAccountMenu customer thêm Sync now (refresh offline session nếu cần, sync và invalidate notes), admin không có mục này. Pending/offline/error vẫn hiện trạng thái và thao tác trong flow để người dùng xử lý.

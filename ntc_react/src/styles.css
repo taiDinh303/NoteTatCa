@@ -857,6 +857,14 @@ strong {
   margin-bottom: 22px;
   gap: 10px;
 }
+.trash-toolbar .trash-retention {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.trash-toolbar .trash-retention svg { flex-shrink: 0; }
+.trash-toolbar .trash-retention span { min-width: 0; overflow-wrap: anywhere; }
+.trash-toolbar > .row-actions { flex-shrink: 0; }
 
 .view-toggle {
   display: flex;
