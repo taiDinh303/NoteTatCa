@@ -1,5 +1,13 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "A little space for your notes, ideas and everyday plans.": ["Một góc nhỏ cho ghi chú, ý tưởng và kế hoạch mỗi ngày.", "为笔记、灵感和日常计划留一方空间。", "ノート、アイデア、毎日の計画のための小さな空間。"],
+  "Explore NoteTatCa": ["Khám phá NoteTatCa", "探索 NoteTatCa", "NoteTatCa を探索"],
+  "Resources": ["Thông tin", "资源", "リソース"],
+  "About NoteTatCa": ["Về NoteTatCa", "关于 NoteTatCa", "NoteTatCa について"],
+  "Help center": ["Trung tâm trợ giúp", "帮助中心", "ヘルプセンター"],
+  "Terms of use": ["Điều khoản sử dụng", "使用条款", "利用規約"],
+  "Coming soon": ["Sắp có", "即将推出", "準備中"],
+  "Less to remember. More room to think.": ["Bớt phải nhớ. Thêm chỗ cho suy nghĩ.", "少一份记挂，多一份思考空间。", "覚えることを減らして、考える余裕を。"],
   "Guest notes and labels stay on this browser without an account. Anyone using this browser profile can access them. Sign in and choose Copy to my account to store a copy online.": ["Ghi chú và nhãn khách lưu trên trình duyệt này, không cần tài khoản. Người dùng chung hồ sơ trình duyệt có thể xem chúng. Đăng nhập và chọn Chép vào tài khoản để lưu bản sao online.","访客笔记和标签无需账户，仅保存在此浏览器。使用同一浏览器配置文件的人可以访问。登录并选择复制到我的账户可在线保存副本。","ゲストのノートとラベルはアカウントなしでブラウザーに保存され、同じブラウザープロファイルの利用者がアクセスできます。ログインしてアカウントにコピーするとオンラインに保存できます。"],
   "Account notes and labels are cached on this browser for offline use. Signing out protects pending changes before clearing the account cache. Guest data is separate and stays until you reset the demo, copy it successfully, or clear browser data.": ["Ghi chú và nhãn tài khoản được lưu trên trình duyệt để dùng offline. Đăng xuất bảo vệ thay đổi chờ trước khi xóa cache tài khoản. Dữ liệu khách tách riêng và được giữ đến khi đặt lại demo, chép thành công hoặc xóa dữ liệu trình duyệt.","账户笔记和标签缓存于此浏览器以供离线使用。退出前会保护待同步更改，再清除账户缓存。访客数据独立保存，直到重置演示、成功复制或清除浏览器数据。","アカウントのノートとラベルはオフライン用に保存されます。ログアウト時は未同期の変更を保護してからキャッシュを削除します。ゲストデータは別に保持され、デモのリセット、コピー成功、ブラウザーデータの削除で消去されます。"],
   "A copied note changed in your account. Guest data was kept.": ["Một ghi chú đã chép đã thay đổi trong tài khoản. Dữ liệu khách vẫn được giữ lại.", "已复制的笔记在账户中发生了更改。访客数据已保留。", "コピー済みのノートがアカウントで変更されています。ゲストデータは保持されています。"],

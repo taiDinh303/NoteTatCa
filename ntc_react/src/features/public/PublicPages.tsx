@@ -222,6 +222,30 @@ export function Landing({
           </Link>
         </section>
       </main>
+      <footer className="landing-footer">
+        <div className="landing-footer-top">
+          <div className="landing-footer-intro">
+            <Link to="/Home"><Logo /></Link>
+            <p>{tr("A little space for your notes, ideas and everyday plans.")}</p>
+            <span className="landing-footer-note"><LockKeyhole size={13} />{tr("Your notes are private. Always yours.")}</span>
+          </div>
+          <nav aria-label={tr("Explore NoteTatCa")}>
+            <h2>{tr("Explore NoteTatCa")}</h2>
+            <Link to={signedIn ? destination : "/guest"}>{signedIn ? tr("Open workspace") : tr("Try guest mode")}</Link>
+            <Link to={signedIn ? destination : "/login"}>{signedIn ? tr("Your account") : tr("Sign in")}</Link>
+            {!signedIn ? <Link to="/register">{tr("Create an account")}</Link> : null}
+          </nav>
+          <div className="landing-footer-resources">
+            <h2>{tr("Resources")}</h2>
+            {["About NoteTatCa", "Help center", "Terms of use"].map((label) => <span className="landing-footer-pending" key={label}>{tr(label)}<small>{tr("Coming soon")}</small></span>)}
+          </div>
+        </div>
+        <div className="landing-footer-bottom">
+          <span>© {new Date().getFullYear()} NoteTatCa.</span>
+          <Link to="/privacy">{tr("Privacy & data")}</Link>
+          <span className="landing-footer-signoff"><Leaf size={13} />{tr("Less to remember. More room to think.")}</span>
+        </div>
+      </footer>
     </div>
   );
 }

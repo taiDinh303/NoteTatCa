@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Footer landing — 2026-10-25
+
+- Theo yêu cầu làm footer, chưa làm trang con: thêm brand/mô tả, Explore với guest/login/register hoặc workspace khi đã login, Resources có About/Help/Terms dạng text Coming soon không giả link. Privacy dùng route có sẵn; dòng copyright theo năm và signoff. Bốn ngôn ngữ, grid desktop và hai cột mobile.
+- Validation: TypeScript/Vite build, ESLint, diff check PASS. Chromium320/393/1440 footer không overflow, đúng5links có route thật và3mục pending; đã xem screenshot320. Không page mới/backend/API/config/fullsuite/.NET/manual deploy. Scope PublicPages/styles/messages/worklog; push main và đối chiếu remote SHA theo quyền hiện có.
+
 ## Căn giữa logo header Home — 2026-10-25
 
 - Link bọc brand dùng flex/align-items center để bỏ khoảng baseline của inline brand gây logo cao hơn nhóm nút. Scope CSS landing header, không chỉnh shared logo hoặc auth/workspace.
