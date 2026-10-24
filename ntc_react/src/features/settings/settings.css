@@ -242,3 +242,6 @@
 .settings-account .connected-provider-label {
   font: inherit;
 }
+
+.avatar-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.avatar-actions .field-hint { flex-basis: 100%; }

@@ -101,6 +101,28 @@ public sealed class ServiceControllerTests
     }
 
     [Fact]
+    public async Task Avatar_is_persisted_in_profile_and_new_login_and_invalid_media_or_zone_is_rejected()
+    {
+        using var f = new ApiFactory(); await f.InitializeAsync();
+        var (a, _) = await f.LoginAsync(); using var ca = a;
+        const string png = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jL1sAAAAASUVORK5CYII=";
+        var profile = await ApiFactory.Data(await a.GetAsync("/api/v1/me/profile"));
+        var saved = await ApiFactory.Data(await a.PatchAsJsonAsync("/api/v1/me", new { version = Version(profile), picture = png }));
+        Assert.Equal(png, saved.GetProperty("picture").GetString());
+        foreach (var invalid in new[] { "data:image/svg+xml;base64,PHN2Zz4=", "data:image/png;base64,invalid", "http://example.test/avatar.png", new string('x', 100001) })
+            Assert.Equal(HttpStatusCode.BadRequest, (await a.PatchAsJsonAsync("/api/v1/me", new { version = Version(saved), picture = invalid })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await a.PatchAsJsonAsync("/api/v1/me", new { version = Version(saved), timeZoneId = "nonsense-zone" })).StatusCode);
+        var (again, session) = await f.LoginAsync(); using var cb = again;
+        Assert.Equal(png, session.GetProperty("picture").GetString());
+        var persisted = await ApiFactory.Data(await again.GetAsync("/api/v1/me/profile"));
+        Assert.Equal(png, persisted.GetProperty("picture").GetString());
+        var (other, _) = await f.LoginAsync("b@example.test"); using var cc = other;
+        var own = await ApiFactory.Data(await other.GetAsync("/api/v1/me/profile"));
+        Assert.NotEqual(png, own.GetProperty("picture").GetString());
+        var removed = await ApiFactory.Data(await again.PatchAsJsonAsync("/api/v1/me", new { version = Version(persisted), picture = (string?)null }));
+        Assert.Equal(JsonValueKind.Null, removed.GetProperty("picture").ValueKind);
+    }
+    [Fact]
     public async Task Missing_legacy_profile_can_be_created_for_self_and_account_patch_cannot_overpost_security_fields()
     {
         using var f = new ApiFactory(); await f.InitializeAsync(); var (a, _) = await f.LoginAsync(); using var ca = a;

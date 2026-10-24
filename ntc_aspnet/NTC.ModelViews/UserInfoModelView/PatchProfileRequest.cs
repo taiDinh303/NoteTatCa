@@ -13,7 +13,7 @@ public sealed class PatchProfileRequest : VersionedPatchRequest
     [MaxLength(25)]
     public string? FamilyName { get => _familyName; set => Set(ref _familyName, value); }
     private string? _picture;
-    [MaxLength(2048)]
+    [MaxLength(100000)]
     public string? Picture { get => _picture; set => Set(ref _picture, value); }
     private string? _locale;
     [MaxLength(10)]

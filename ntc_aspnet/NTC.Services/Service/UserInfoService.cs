@@ -48,8 +48,7 @@ public sealed class UserInfoService(IUnitOfWork work, ICurrentUser actor, TimePr
             || model.Address?.Length > 500 || model.Locale?.Length > 10 || model.BirthDate > UtcNow.UtcDateTime || model.Gender.HasValue && !Enum.IsDefined(model.Gender.Value))
             throw DomainErrors.Invalid("Invalid profile fields.");
         if (model.Email != null && !string.Equals(model.Email, profile.User?.Email, StringComparison.OrdinalIgnoreCase)) throw DomainErrors.Invalid("Use the verified change-email flow.");
-        if (model.Picture != null && (model.Picture.Length > 2048 || !Uri.TryCreate(model.Picture, UriKind.Absolute, out var picture) || picture.Scheme != "https"))
-            throw DomainErrors.Invalid("Profile picture must be an HTTPS URL.");
+        ProfilePicture.Validate(model.Picture);
         if (model.GivenName != null) profile.GivenName = model.GivenName.Trim();
         if (model.FamilyName != null) profile.FamilyName = model.FamilyName.Trim();
         if (model.Picture != null) profile.Picture = model.Picture;
@@ -73,8 +72,7 @@ public sealed class UserInfoService(IUnitOfWork work, ICurrentUser actor, TimePr
                 throw DomainErrors.Invalid("Invalid profile fields.");
             if (request.GivenName?.Length > 25 || request.FamilyName?.Length > 25 || request.Address?.Length > 500 || request.Locale?.Length > 10)
                 throw DomainErrors.Invalid("Invalid profile field length.");
-            if (!string.IsNullOrEmpty(request.Picture) && (request.Picture.Length > 2048 || !Uri.TryCreate(request.Picture, UriKind.Absolute, out var picture) || picture.Scheme != "https"))
-                throw DomainErrors.Invalid("Profile picture must be an HTTPS URL.");
+            ProfilePicture.Validate(request.Picture);
             if (request.Includes(nameof(request.GivenName))) profile.GivenName = request.GivenName!.Trim();
             if (request.Includes(nameof(request.FamilyName))) profile.FamilyName = request.FamilyName?.Trim();
             if (request.Includes(nameof(request.Picture))) profile.Picture = string.IsNullOrEmpty(request.Picture) ? null : request.Picture;

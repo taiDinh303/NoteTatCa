@@ -1,3 +1,4 @@
+import { AvatarPicker, TimezoneField } from "./ProfileMedia";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./settings.css";
 import { useState } from "react";
@@ -74,13 +75,15 @@ function ProfileForm({ me }: { me: Me }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const p = me.profile;
-  const picture = p?.picture ?? "";
+  const [picture, setPicture] = useState(p?.picture ?? "");
+  const [avatarBusy, setAvatarBusy] = useState(false);
   return (
     <div className="settings-profile">
       <form
         className="settings-card profile-card"
         onSubmit={(e) => {
           e.preventDefault();
+          if (busy || avatarBusy) return;
           const data = new FormData(e.currentTarget);
           setBusy(true);
           setError(undefined);
@@ -133,6 +136,15 @@ function ProfileForm({ me }: { me: Me }) {
           </div>
         </div>
         <ErrorBanner error={error} />
+        {editing && p ? (
+          <AvatarPicker
+            picture={picture}
+            onChange={setPicture}
+            onError={setError}
+            onBusy={setAvatarBusy}
+            disabled={busy}
+          />
+        ) : null}
         {editing ? (
           <>
             <div className="form-grid">
@@ -186,21 +198,9 @@ function ProfileForm({ me }: { me: Me }) {
                   />
                 </Field>
                 <div className="form-grid">
-                  <Field label={tr("Timezone")}>
-                    <input
-                      name="timeZoneId"
-                      defaultValue={p.timeZoneId || "Asia/Ho_Chi_Minh"}
-                      required
-                      maxLength={100}
-                      list="profile-zones"
-                    />
-                    <datalist id="profile-zones">
-                      <option>Asia/Ho_Chi_Minh</option>
-                      <option>UTC</option>
-                      <option>Europe/London</option>
-                      <option>America/New_York</option>
-                    </datalist>
-                  </Field>
+                  <TimezoneField
+                    initial={p.timeZoneId || me.account.timeZoneId}
+                  />
                   <Field label={tr("Locale")}>
                     <input
                       name="locale"
@@ -219,15 +219,16 @@ function ProfileForm({ me }: { me: Me }) {
               <div className="settings-edit-actions">
                 <Button
                   variant="secondary"
-                  disabled={busy}
+                  disabled={busy || avatarBusy}
                   onClick={() => {
                     setEditing(false);
+                    setPicture(p?.picture ?? "");
                     setError(undefined);
                   }}
                 >
                   {tr("Cancel")}
                 </Button>
-                <Button busy={busy} type="submit">
+                <Button busy={busy || avatarBusy} type="submit">
                   {tr("Save profile")}
                 </Button>
               </div>

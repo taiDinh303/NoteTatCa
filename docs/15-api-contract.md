@@ -92,6 +92,8 @@ GET me vẫn có data.account/data.profile; profile.email lấy ApplicationUser.
 
 PATCH `/api/v1/tags/{id}`, `/api/v1/reminders/{id}` và `/api/v1/me` yêu cầu `version` nonempty từ GET gần nhất; thiếu/empty400, cũ409. Trường chưa gửi giữ nguyên. Tag color/icon null để clear, name không null/rỗng. Profile familyName,picture,locale,address,birthDate null để clear; required givenName/timeZoneId/gender null400. Timezone edit thay cả profile version. Reminder optional repeatDays/count/until null để clear nếu cấu hình hợp lệ; required scalar null400. Toggle sendEmail không reset cursor/anchor; false hủy pending email, inbox giữ nguyên.
 
+Avatar bổ sung2026-10-24: PATCH me.picture giữ HTTPS URL tối đa2048ký tự; chấp nhận thêm data:image/png;base64 với tổng tối đa100000ký tự, PNG signature/IHDR/IEND và kích thước1–128px mỗi chiều. Frontend chuyển ảnh PNG/JPG/WebP≤5MiB thành PNG vuông128px trước khi gửi, không gửi file gốc/metadata; null xóa avatar. Ảnh lưu trong UserInfo.Picture hiện có (SQL nvarchar(max)/PostgreSQL text), không migration/bucket/public upload mới; GET me/profile và auth session đọc ảnh đã lưu. Server không fetch URL hoặc giải nén ảnh. TimeZoneId vẫn được kiểm tra bởi ReminderSchedule.Zone; không chấp nhận chuỗi không xác định.
+
 ```json
 {"version":"11111111-1111-4111-8111-111111111111","color":null}
 ```

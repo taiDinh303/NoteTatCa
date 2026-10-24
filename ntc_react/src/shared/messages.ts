@@ -2436,4 +2436,33 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "无法在此浏览器中保存颜色。",
     "このブラウザーに色を保存できませんでした。",
   ],
+  "Choose avatar": ["Chọn ảnh đại diện", "选择头像", "アバターを選択"],
+  "Change avatar": ["Đổi ảnh đại diện", "更换头像", "アバターを変更"],
+  "Remove avatar": ["Xóa ảnh đại diện", "移除头像", "アバターを削除"],
+  "PNG, JPG or WebP, up to 5 MB. Saved with your profile.": [
+    "PNG, JPG hoặc WebP, tối đa 5 MB. Lưu cùng hồ sơ của bạn.",
+    "PNG、JPG 或 WebP，最大 5 MB。随个人资料保存。",
+    "PNG、JPG、WebP、最大5 MB。プロフィールに保存します。",
+  ],
+  "Choose a PNG, JPG or WebP image up to 5 MB.": [
+    "Chọn ảnh PNG, JPG hoặc WebP không quá 5 MB.",
+    "请选择不超过 5 MB 的 PNG、JPG 或 WebP 图片。",
+    "5 MB以下のPNG、JPG、WebP画像を選択してください。",
+  ],
+  "This image could not be opened. Choose another image.": [
+    "Không mở được ảnh này. Vui lòng chọn ảnh khác.",
+    "无法打开此图片。请选择其他图片。",
+    "この画像を開けません。別の画像を選択してください。",
+  ],
+  "Use device timezone": [
+    "Dùng múi giờ thiết bị",
+    "使用设备时区",
+    "端末のタイムゾーンを使用",
+  ],
+  "Used for reminder times and dates. Choose where you live, or use your device timezone.":
+    [
+      "Dùng cho giờ nhắc việc và ngày tháng. Chọn nơi bạn sống hoặc dùng múi giờ thiết bị.",
+      "用于提醒时间和日期。选择居住地或使用设备时区。",
+      "リマインダーの時刻と日付に使用します。お住まいの地域または端末のタイムゾーンを選択してください。",
+    ],
 };

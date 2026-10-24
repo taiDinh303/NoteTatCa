@@ -39,7 +39,9 @@ export function Avatar({
   const [failed, setFailed] = useState<string>();
   return (
     <span className={large ? "large-avatar" : "avatar"}>
-      {picture?.startsWith("https://") && picture !== failed ? (
+      {(picture?.startsWith("https://") ||
+        picture?.startsWith("data:image/png;base64,")) &&
+      picture !== failed ? (
         <img
           src={picture}
           alt=""
