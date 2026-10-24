@@ -740,21 +740,6 @@ strong {
 .topbar-actions > .icon-button {
   color: #939ba5;
 }
-.notification-button {
-  position: relative;
-}
-.notification-button > span {
-  position: absolute;
-  right: 0;
-  top: 0;
-  padding: 2px 3px;
-  border-radius: 10px;
-  background: var(--accent);
-  color: white;
-  font-size: 8px;
-  min-width: 13px;
-  text-align: center;
-}
 .topbar-divider {
   width: 1px;
   height: 23px;

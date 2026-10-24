@@ -292,16 +292,6 @@ export default function AppShell() {
             }
             onClick={toggleTheme}
           />
-          <div className="notification-button">
-            <IconButton
-              icon={Bell}
-              label={tr("Open inbox")}
-              onClick={() => navigate("/notifications")}
-            />
-            {(unread.data ?? 0) > 0 ? (
-              <span>{unread.data! > 9 ? "9+" : unread.data}</span>
-            ) : null}
-          </div>
           <div className="topbar-divider" />
           <div className="header-account-menu">
             <ShellAccountMenu />

@@ -36,7 +36,6 @@ for (const width of [1440, 1024, 393, 320]) {
       expect(Math.abs(searchBox.y + searchBox.height / 2 - box.height / 2)).toBeLessThan(2);
       await expect(header.getByRole('button', { name: 'Account menu' })).toBeVisible();
       await expect(header.getByRole('button', { name: 'Use dark theme' })).toBeHidden();
-      await expect(header.getByRole('button', { name: 'Open inbox' })).toBeHidden();
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       const drawer = page.getByRole('dialog', { name: 'NoteTatCa.' });
       await expect(drawer).toBeVisible();
