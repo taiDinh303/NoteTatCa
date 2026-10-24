@@ -2789,6 +2789,10 @@ td {
   align-items: center;
   justify-content: space-between;
 }
+.landing > header > a {
+  display: flex;
+  align-items: center;
+}
 .landing-language {
   flex: 0 0 40px;
   width: 40px;

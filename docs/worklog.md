@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Căn giữa logo header Home — 2026-10-25
+
+- Link bọc brand dùng flex/align-items center để bỏ khoảng baseline của inline brand gây logo cao hơn nhóm nút. Scope CSS landing header, không chỉnh shared logo hoặc auth/workspace.
+- Validation: TypeScript/Vite production build và diff check PASS; Chromium sau fonts.ready tại320/393/1440 đo tâm brand/flag/Sign in trùng nhau (44/44/44px mobile,53/53/53px desktop). Không runtime TS/API/backend, không fullsuite/.NET/manual deploy. Push main theo quyền hiện có và đối chiếu SHA remote.
+
 ## Logo auth về Home — 2026-10-25
 
 - Đổi shared auth-brand từ / sang /Home cho login/register và auth pages chung. Root / có redirect workspace khi đang guest nên logo trước đây có thể đi /notes; /Home giữ landing chủ động. Không đổi redirect sau đăng nhập thành công.
