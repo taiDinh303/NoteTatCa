@@ -2779,14 +2779,16 @@ td {
 }
 .landing {
   background: var(--surface);
-  overflow: hidden;
+  overflow: clip;
 }
 .landing > header {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 30;
   isolation: isolate;
   max-width: 1200px;
   margin: auto;
-  padding: 32px 25px;
+  padding: 16px 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3564,7 +3566,7 @@ td {
     padding: 30px 30px;
   }
   .landing > header {
-    padding: 25px 16px;
+    padding: 12px 16px;
     gap: 12px;
   }
   .landing > header nav {
@@ -3975,7 +3977,7 @@ td {
     height: 44px;
   }
   .landing > header {
-    padding: 24px 21px;
+    padding: 12px 21px;
   }
   .landing > header nav {
     gap: 13px;

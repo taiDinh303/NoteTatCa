@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Header Home gọn và sticky — 2026-10-25
+
+- Giảm padding dọc header còn16px desktop/12px mobile, tổng76px/68px; giữ hit area44px. Sticky top0/z30, landing overflow clip thay hidden để không tạo scroll container cản sticky; nền sage giữ toàn chiều ngang.
+- Validation: TypeScript/Vite build/diff check PASS; Chromium320/393/1440 cuộn700px header y0, cao68/68/76px, menu ngôn ngữ mở và Escape đóng được. CSS-only, không fullsuite/.NET/API/manual deploy. Push main theo quyền hiện có, kiểm remote SHA.
+
 ## Nền header Home — 2026-10-25
 
 - Thêm nền sage nhạt pha surface và border đáy cho header landing; pseudo background trải hết chiều ngang, nội dung vẫn max1200px. Không đổi chiều cao/logo/nút, dùng surface để phù hợp theme.
