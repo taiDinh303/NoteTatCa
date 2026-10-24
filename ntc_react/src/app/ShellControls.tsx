@@ -1,9 +1,11 @@
 import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Settings, ZoomIn } from "lucide-react";
-import { auth } from "./runtime";
-import { settingsPath } from "../application/access";
+import { ChevronDown, LogOut, Settings, ZoomIn, RefreshCw } from "lucide-react";
+import { auth, offline, cache, workspace, onlineWorkspace } from "./runtime";
+import { settingsPath, isAdministrator } from "../application/access";
+import { toast } from "sonner";
+import { errorMessage } from "../shared/utils";
 import { useAuth, useMe } from "../shared/hooks";
 import { ActionMenu, Avatar, Modal } from "../shared/ui";
 import { LoginForm } from "../features/auth/AuthPage";
@@ -36,6 +38,25 @@ export function ShellAccountMenu({
       <ActionMenu
         label={tr("Account menu")}
         items={[
+          ...(!isAdministrator(state.session)
+            ? [
+                {
+                  label: tr("Sync now"),
+                  icon: RefreshCw,
+                  action: () => {
+                    void (async () => {
+                      if (!navigator.onLine)
+                        throw new Error(tr("Working offline"));
+                      if (!onlineWorkspace()) await auth.refresh();
+                      await offline.sync();
+                      await cache.invalidateQueries({
+                        queryKey: workspace.key("notes"),
+                      });
+                    })().catch((error) => toast.error(errorMessage(error)));
+                  },
+                },
+              ]
+            : []),
           {
             label: tr("Account settings"),
             icon: Settings,

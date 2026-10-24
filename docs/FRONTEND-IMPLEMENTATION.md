@@ -6,6 +6,8 @@
 
 ### Notes ưu tiên và offline — 2026-10-24
 
+Bổ sung UI cùng ngày: khi sync bình thường, ẩn toàn bộ toolbar để không chiếm một hàng trên notes; “Notes synced” chỉ giữ ở status cho screen reader. Sync now chuyển thêm vào menu avatar customer, không thêm vào admin. Toolbar chỉ hiện khi pending/offline/kết nối có vấn đề/lỗi hoặc thao tác cần chú ý; pending Sync now/Review sync giữ luồng hiện có. Kiểm tra queue rỗng không làm toolbar chớp lên.
+
 CURRENT source theo yêu cầu mới DEC-025/026: customer chỉ chờ active notes/labels và module AppShell/NotesPage để mở workspace. Trash/reminders/inbox/unread/me và module phụ tiếp tục tải nền; lỗi nguồn phụ không đẩy notes về màn lỗi khởi động. Admin giữ luồng cũ và chưa làm vòng đời xóa account. Các mô tả DEC-019 tải7nguồn trước khi mở ở phía dưới là lịch sử.
 
 - IndexedDB `ntc.offline.v1` lưu snapshot active notes/labels, metadata nhận diện customer và outbox riêng theo userId. Không persist toàn bộ TanStack Query, hồ sơ bảo mật/admin hoặc response auth. Static shell/chunks/fonts được precache bởi worker do Vite build tạo; chỉ GET same-origin thuộc asset manifest và navigation shell, không cache API. Cài worker sau critical-ready lúc browser idle; update chờ tab cũ đóng, không ép reload draft.

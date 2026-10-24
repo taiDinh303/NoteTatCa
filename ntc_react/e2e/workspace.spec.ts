@@ -2100,7 +2100,7 @@ test("keeps a durable draft after a network failure and syncs without duplicates
   await expect(page.getByRole("dialog", { name: "Keep your changes?", exact: true })).toHaveCount(0);
   await page.unroute("**/api/v1/notes");
   await page.getByRole("button", { name: "Sync now", exact: true }).click();
-  await expect(page.getByText("Notes synced", { exact: true })).toBeVisible();
+  await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   await expect(
     page.getByRole("button", {
       name: "Open Kept after a network error",

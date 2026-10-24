@@ -237,7 +237,7 @@ test("external edits create a reviewable conflict and an offline copy never over
     .getByRole("button", { name: "Save as a new copy", exact: true })
     .click();
   await review.getByRole("button", { name: "Close", exact: true }).click();
-  await expect(page.getByText("Notes synced", { exact: true })).toBeVisible();
+  await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   await page.reload();
   await expect(
     page.getByRole("button", { name: "Open External change", exact: true }),
@@ -264,9 +264,11 @@ test("notes open before a blocked secondary profile request", async ({
     });
   });
   await login(page);
-  await expect(
-    page.getByRole("region", { name: "Note synchronization" }),
-  ).toBeVisible();
+  await expect(page.locator(".offline-toolbar")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Sync now", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+  await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   release();
   await expect(
     page.getByRole("button", { name: "Take a note", exact: true }),
@@ -354,7 +356,7 @@ test("offline creation, reload, editing, reconnect, logout protection and accoun
     window.dispatchEvent(new Event("online"));
   });
   await page.getByRole("button", { name: "Sync now", exact: true }).click();
-  await expect(page.getByText("Notes synced", { exact: true })).toBeVisible({
+  await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({
     timeout: 30_000,
   });
   await page.reload();

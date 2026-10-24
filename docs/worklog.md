@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Ẩn hàng sync bình thường và đưa thao tác vào avatar — 2026-10-24
+
+- Chủ dự án yêu cầu bỏ cả Notes synced và Sync now khỏi hàng trên notes. OfflineControls ẩn toàn bộ toolbar khi không pending/offline/warming/problem/error/busy; status synced vẫn có sr-only cho accessibility. Không hiện toolbar chỉ vì kiểm queue rỗng. ShellAccountMenu customer thêm Sync now (refresh offline session nếu cần, sync và invalidate notes), admin không có mục này. Pending/offline/error vẫn hiện trạng thái và thao tác trong flow để người dùng xử lý.
+- Cập nhật4E2E files kiểm synced bằng attached status thay visible text; flow profile phụ bị gate thêm kiểm không toolbar/nút Sync now ngoài trang và chạy Sync now từ menu avatar. Không đổi engine sync/API/storage/queue/schema/config hoặc dữ liệu thật.
+- Validation: TypeScript/Production build và ESLint PASS; Chromium offline/connection10/10 PASS trong1.4phút, gồm avatar sync action và toolbar không chiếm hàng khi bình thường. Backend không đổi, dùng Release strict PASS của lượt trước, không chạy lại .NET/fullsuite/production/thiết bị thật. Diff check PASS; .agnes/ giữ ngoài scope. Scope8files:2runtime components,4E2E và FRONTEND-IMPLEMENTATION/worklog; push main theo quyền hiện có và kiểm remote SHA sau push.
+
 ## Notes/labels trước, offline customer và bảo vệ logout — 2026-10-24
 
 - Theo lệnh triển khai tiếp của chủ dự án: làm customer notes/offline trước; admin/account deletion để sau. Preparation chỉ gate active notes/labels;4stream trash/reminders/inbox→unread/me chạy nền, lỗi phụ không chặn workspace. Giữ phân trang đầy đủ/cache lọc và derived unread list. Module notes/shell critical; settings/reminders/inbox/editor warm nền. Cached customer snapshot mở ngay sau khi đọc credential còn hợp lệ, xác minh phiên server chạy nền; server từ chối phiên thì đóng local access, không đẩy queue sang account khác.

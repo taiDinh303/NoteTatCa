@@ -64,7 +64,7 @@ test("production shell opens with no network and preserves offline notes through
   ).toBeVisible();
   await edit.getByRole("button", { name: "Close", exact: true }).click();
   await context.setOffline(false);
-  await expect(page.getByText("Notes synced", { exact: true })).toBeVisible({
+  await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({
     timeout: 30_000,
   });
   await page.reload();

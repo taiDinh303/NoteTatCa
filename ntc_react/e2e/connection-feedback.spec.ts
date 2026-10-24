@@ -60,7 +60,7 @@ for (const width of [393, 1440]) {
       page.getByRole("button", { name: "Take a note", exact: true }),
     ).toBeVisible();
     await page.unroute("**/health/live");
-    await expect(page.getByRole("region", { name: "Note synchronization" }).getByText("Notes synced", { exact: true })).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({ timeout: 30_000 });
     await page.evaluate(() => {
       Object.defineProperty(navigator, "onLine", {
         configurable: true,
@@ -84,8 +84,8 @@ for (const width of [393, 1440]) {
     });
     await notice.getByRole("button", { name: "Sync now", exact: true }).click();
     await expect(
-      notice.getByText("Notes synced", { exact: true }),
-    ).toBeVisible();
+      page.getByText("Notes synced", { exact: true }),
+    ).toBeAttached();
     await expect(
       page.getByRole("button", { name: "Take a note", exact: true }),
     ).toBeVisible();

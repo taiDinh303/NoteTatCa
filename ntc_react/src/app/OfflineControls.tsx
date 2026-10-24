@@ -156,41 +156,55 @@ export function OfflineControls() {
       setBusy(false);
     }
   }
+  const quiet =
+    !busy &&
+    !state.pending &&
+    session.status !== "offline" &&
+    !network.warming &&
+    !network.problem &&
+    !state.error &&
+    !error;
   return (
     <>
-      <div
-        className="offline-toolbar"
-        role="region"
-        aria-label={tr("Note synchronization")}
-      >
-        <span role="status">
-          {state.syncing
-            ? tr("Syncing notes…")
-            : state.pending
-              ? tr("{0} pending changes", state.pending)
-              : session.status === "offline"
-                ? tr("Offline notes on this device")
-                : network.warming
-                  ? tr("Connecting to NoteTatCa…")
-                  : network.problem === "offline"
-                    ? tr("Working offline")
-                    : network.problem
-                      ? tr("Connection interrupted")
-                      : tr("Notes synced")}
+      {quiet ? (
+        <span className="sr-only" role="status">
+          {tr("Notes synced")}
         </span>
-        <Button
-          variant="ghost"
-          busy={state.syncing || busy}
-          onClick={() => void sync()}
+      ) : (
+        <div
+          className="offline-toolbar"
+          role="region"
+          aria-label={tr("Note synchronization")}
         >
-          {tr("Sync now")}
-        </Button>
-        {state.conflicts.length || state.error || error ? (
-          <Button variant="ghost" onClick={() => setDetails(true)}>
-            {tr("Review sync")}
+          <span role="status">
+            {state.syncing
+              ? tr("Syncing notes…")
+              : state.pending
+                ? tr("{0} pending changes", state.pending)
+                : session.status === "offline"
+                  ? tr("Offline notes on this device")
+                  : network.warming
+                    ? tr("Connecting to NoteTatCa…")
+                    : network.problem === "offline"
+                      ? tr("Working offline")
+                      : network.problem
+                        ? tr("Connection interrupted")
+                        : tr("Notes synced")}
+          </span>
+          <Button
+            variant="ghost"
+            busy={state.syncing || busy}
+            onClick={() => void sync()}
+          >
+            {tr("Sync now")}
           </Button>
-        ) : null}
-      </div>
+          {state.conflicts.length || state.error || error ? (
+            <Button variant="ghost" onClick={() => setDetails(true)}>
+              {tr("Review sync")}
+            </Button>
+          ) : null}
+        </div>
+      )}
       {details ? (
         <Modal
           open
