@@ -20,24 +20,36 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../shared/hooks";
 import { homePath } from "../../application/access";
-import { Logo, Select, Spinner } from "../../shared/ui";
+import { Logo, Spinner } from "../../shared/ui";
+import * as Dropdown from "@radix-ui/react-dropdown-menu";
+
+function LanguageFlag({ code }: { code: Language }) {
+  return (
+    <svg viewBox="0 0 30 20" aria-hidden="true" className="language-flag">
+      <rect width="30" height="20" fill={code === "en" ? "#18346a" : code === "ja" ? "#fff" : "#da251d"} />
+      {code === "ja" ? <circle cx="15" cy="10" r="6" fill="#bc002d" /> : null}
+      {code === "vi" || code === "zh" ? <path d="m0-7 1.6 4.8h5L2.6.8l1.6 4.8L0 2.6l-4.2 3L-2.6.8l-4-3h5Z" fill="#ffdf00" transform={code === "vi" ? "translate(15 10)" : "translate(6 6) scale(.55)"} /> : null}
+      {code === "zh" ? [0, 1, 2, 3].map((i) => <path key={i} d="m0-2 .5 1.4H2L.8.3l.4 1.4L0 .8l-1.2.9.4-1.4L-2-.6h1.5Z" fill="#ffdf00" transform={`translate(${[11,13,13,11][i]} ${[3,6,9,12][i]})`} />) : null}
+      {code === "en" ? <><path d="M0 0 30 20M30 0 0 20" stroke="#fff" strokeWidth="4" /><path d="M0 0 30 20M30 0 0 20" stroke="#c8102e" strokeWidth="1.5" /><path d="M15 0v20M0 10h30" stroke="#fff" strokeWidth="7" /><path d="M15 0v20M0 10h30" stroke="#c8102e" strokeWidth="4" /></> : null}
+    </svg>
+  );
+}
 
 function LandingLanguageSelect() {
   const language = useLanguage();
   return (
-    <Select
-      label={tr("App language")}
-      value={language}
-      onChange={(code) => {
-        setLanguage(code as Language);
-      }}
-    >
-      {languages.map(({ code, name }) => (
-        <option key={code} value={code} lang={code}>
-          {name}
-        </option>
-      ))}
-    </Select>
+    <Dropdown.Root>
+      <Dropdown.Trigger className="landing-language" aria-label={`${tr("App language")}: ${languages.find((item) => item.code === language)?.name}`} title={tr("App language")}>
+        <LanguageFlag code={language} />
+      </Dropdown.Trigger>
+      <Dropdown.Portal>
+        <Dropdown.Content className="landing-language-menu" align="end" sideOffset={8} collisionPadding={12}>
+          <Dropdown.RadioGroup value={language} onValueChange={(code) => setLanguage(code as Language)} aria-label={tr("App language")}>
+            {languages.map(({ code, name }) => <Dropdown.RadioItem key={code} value={code} className="landing-language-option" lang={code}><LanguageFlag code={code} /><span>{name}</span><Dropdown.ItemIndicator><Check size={16} /></Dropdown.ItemIndicator></Dropdown.RadioItem>)}
+          </Dropdown.RadioGroup>
+        </Dropdown.Content>
+      </Dropdown.Portal>
+    </Dropdown.Root>
   );
 }
 export function Landing({
@@ -59,10 +71,8 @@ export function Landing({
         <Link to="/Home">
           <Logo />
         </Link>
-        <div className="landing-language">
-          <LandingLanguageSelect />
-        </div>
         <nav>
+          <LandingLanguageSelect />
           {!signedIn && <Link to="/login">{tr("Sign in")}</Link>}
           <Link
             className="button primary"

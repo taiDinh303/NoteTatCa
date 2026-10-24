@@ -2790,9 +2790,26 @@ td {
   justify-content: space-between;
 }
 .landing-language {
-  flex-shrink: 0;
-  width: 118px;
-  margin: 0 10px;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.language-flag { width: 26px; height: 18px; border-radius: 3px; box-shadow: 0 0 0 1px #00000012; }
+.landing-language:hover, .landing-language[data-state="open"] { background: var(--hover); }
+.landing-language:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.landing-language-menu { z-index: 100; min-width: 180px; max-width: calc(100vw - 24px); padding: 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); box-shadow: 0 8px 28px #00000018; }
+.landing-language-option { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 8px 10px; border-radius: 7px; font-size: 13px; cursor: pointer; outline: none; }
+.landing-language-option > span:nth-child(2) { flex: 1; }
+.landing-language-option[data-highlighted], .landing-language-option[data-state="checked"] { background: var(--hover); }
+.landing-language-option[data-state="checked"] { font-weight: 600; }
+.landing-language-option svg { flex-shrink: 0;
 }
 .landing > header nav {
   display: flex;
@@ -3508,16 +3525,13 @@ td {
     padding: 30px 30px;
   }
   .landing > header {
-    padding: 25px 25px;
-  }
-  .landing-language {
-    width: 94px;
-    margin: 0 4px;
+    padding: 25px 16px;
+    gap: 12px;
   }
   .landing > header nav {
-    gap: 18px;
+    gap: 10px;
   }
-  .landing > header nav > a:first-child {
+  .landing > header nav > a[href="/login"] {
     display: none;
   }
   .landing-bottom {

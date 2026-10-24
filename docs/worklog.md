@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Home: nút ngôn ngữ lá cờ — 2026-10-24
+
+- Chuyển selector từ giữa header vào nav bên phải, trước Sign in/Get started. Trigger vuông 40×40, SVG cờ Anh/Việt/Trung/Nhật không phụ thuộc emoji hệ điều hành; menu có tên bản ngữ, radio selected/check, bàn phím/focus và collision padding. Dùng i18n store hiện hành, nhớ lựa chọn sau reload. Mobile ẩn Sign in bằng href thay selector first-child để không lệch khi thêm nút; giảm gap/padding cho 320px.
+- Validation: TypeScript/Vite build và ESLint PASS. Chromium kiểm 320/393/1440: chọn Việt/Anh, reload giữ ngôn ngữ, nút40×40, không document overflow; đã xem screenshot320 và sửa header chật. Không backend/config/schema/API, không chạy fullsuite/.NET hoặc deploy thủ công. Scope PublicPages/styles/worklog; push main và kiểm remote SHA theo quyền hiện có.
+
 ## Chế độ khách dùng thử từ CV — 2026-10-24
 
 - Chủ dự án duyệt triển khai: nút Try guest mode trên landing, có mẫu và tự chọn cách chuyển dữ liệu. Thêm /guest với 3 notes/3 labels, tạo/sửa/search/pin/reorder/labels/trash 30 ngày, reset có xác nhận, đổi ngôn ngữ, rời guest vẫn giữ dữ liệu. IndexedDB guest tách account; không tạo tài khoản demo chung, không token hoặc API/health request trong workspace guest. Chặn settings/reminders/inbox/admin cho guest.
