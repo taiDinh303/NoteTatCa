@@ -46,14 +46,29 @@ Mỗi giai đoạn có thể phát hành riêng. Ưu tiên hoàn thiện khả n
 - Hạn chế tải offline note được chia sẻ trong bản đầu. Thu hồi quyền chỉ chặn truy cập tiếp theo, không thể thu lại ảnh chụp/bản đã xuất/tải trước đó. Nếu cho cache offline phải chốt chính sách và giải thích giới hạn này rõ ràng.
 - Cần test không truy cập chéo bằng ID note/comment/attachment/preview/search/export, không lộ dữ liệu qua thông báo, không cấp quyền bằng email chưa xác minh. Mọi lời mời/email chỉ gửi khi người dùng chủ động yêu cầu; tests dùng fixture, không email thật.
 
-## Đề xuất bổ sung, chưa chốt triển khai
+## Bổ sung đã duyệt vào kế hoạch — 2026-10-25
+
+Chủ dự án đã hiểu và duyệt bốn mục dưới đây sau khi giải thích. Trạng thái là PLANNED, chưa triển khai; thứ tự chi tiết vẫn là đề xuất, không cam kết lịch phát hành.
+
+| Task | Phạm vi và ví dụ | Acceptance / phụ thuộc |
+| --- | --- | --- |
+| TASK-031 — Mẫu ghi chú | Chọn mẫu học tập, nhật ký, kế hoạch hoặc biên bản họp để tạo note có sẵn cấu trúc, tiêu đề phần và checklist | Mỗi lần dùng tạo note độc lập, không sửa mẫu gốc hoặc note đã tạo khác; có preview/hủy; tương thích autosave/offline/guest/i18n. Không dịch nội dung user khi đổi ngôn ngữ. Mẫu do user tự thiết kế/chia sẻ là phần mở rộng chưa chốt |
+| TASK-032 — Lọc và tìm theo loại tệp | Lọc note có ảnh, video, audio, PDF hoặc tệp khác; kết hợp từ khóa và label, ví dụ Học tập + có PDF + tiếng Anh | Phụ thuộc TASK-023/025; phân loại bằng metadata type đã xác minh, không chỉ đuôi tên. Bản đầu mỗi lần chọn một loại, một note có nhiều tệp vẫn chỉ xuất hiện một lần; tìm theo tên tệp/caption được hỗ trợ và nội dung text hiện có. Không OCR/đọc nội dung PDF/nghe audio; không hiện file/note ngoài quyền truy cập. Offline chỉ tìm metadata đã tải và báo phạm vi local |
+| TASK-033 — Liên kết giữa các note | Trong note Kế hoạch học đặt liên kết mở note Từ vựng; chọn note thay vì phải nhớ ID hoặc URL | Lưu note ID ổn định, đổi tên note đích không làm mất link; guest/offline copy sang account phải remap ID cho các note được copy. Note bị xóa/mất quyền/chưa tải offline có trạng thái phù hợp, không lộ title/snippet ngoài quyền. Không tự cấp quyền note đích. Backlinks/đồ thị liên kết là mở rộng chưa chốt |
+| TASK-034 — Mục lục trong một note | Tự sinh từ Heading 1/2/3; bấm Ngữ pháp cuộn tới phần Ngữ pháp trong note Học tiếng Anh | Có bật/tắt, phân cấp đúng, heading trùng tên vẫn có anchor riêng; cập nhật khi thêm/đổi/xóa heading, hoạt động ở View/Edit/mobile/keyboard, không đổi note version chỉ vì đọc mục lục. Hỗ trợ offline; phụ thuộc thiết kế heading/anchor của rich document |
+
+**Phân biệt:** label phân nhóm nhiều note (Học tập/Công việc); mục lục điều hướng các phần bên trong một note (Từ vựng/Ngữ pháp/Luyện nghe); liên kết note đi từ note này sang note khác; bộ lọc loại tệp tìm note có chứa loại đính kèm cần tìm. Bốn chức năng bổ sung nhau, không thay label hiện có.
+
+**Ưu tiên đề xuất:** mẫu note và mục lục sau nền tảng bảo toàn dữ liệu TASK-022, có thể làm trước media; liên kết note tiếp theo sau khi chốt ID/remap/offline; lọc loại tệp làm cùng đợt attachment, mở rộng audio/video khi các loại đó được hỗ trợ. Chưa cần chờ chia sẻ/realtime để triển khai bốn mục này, nhưng mọi đường truy cập phải sẵn sàng kiểm quyền.
+
+## Đề xuất bổ sung còn cần duyệt chi tiết
 
 1. **Lịch sử phiên bản và khôi phục**: ưu tiên trước chia sẻ để sửa nhầm không mất dữ liệu; cần giới hạn retention/dung lượng riêng, không dùng trash thay history.
-2. **Mẫu note**: học tập, nhật ký, kế hoạch, họp; dùng lại editor hiện có, giá trị sớm và ít phụ thuộc hơn video/cộng tác.
-3. **Tìm kiếm theo loại nội dung và file**: tên tệp/caption trước; OCR ảnh và chuyển audio thành chữ để sau vì cần chốt xử lý riêng tư, nhà cung cấp và chi phí. Không mặc định gửi nội dung cho AI.
+2. Mẫu note đã được duyệt tại TASK-031; chức năng tự thiết kế/chia sẻ mẫu chưa chốt.
+3. Lọc theo loại tệp đã được duyệt tại TASK-032; OCR ảnh, đọc nội dung tài liệu và chuyển audio thành chữ chưa chốt vì cần xác định xử lý riêng tư, nhà cung cấp và chi phí. Không mặc định gửi nội dung cho AI.
 4. **Export/import trọn bộ**: JSON + media manifest/archive; Markdown cho phần tương thích, thông báo nội dung không thể chuyển đổi. Kiểm import lỗi, archive quá lớn và phục hồi tham chiếu.
 5. **Thông báo cộng tác có kiểm soát**: lời mời/comment/mention và tùy chọn tắt email; gom thông báo tránh spam, không đưa nguyên nội dung riêng tư vào email mặc định.
-6. **Liên kết giữa các note và mục lục**: hữu ích khi note dài; liên kết không cấp thêm quyền truy cập note đích.
+6. Liên kết note và mục lục đã được duyệt tại TASK-033/034; backlinks/đồ thị chưa chốt. Liên kết không cấp thêm quyền truy cập note đích.
 
 ## Các lựa chọn để phỏng vấn trước từng giai đoạn
 

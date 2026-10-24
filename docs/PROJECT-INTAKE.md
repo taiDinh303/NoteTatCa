@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-25 bổ sung DEC-029: sau giải thích, chủ dự án duyệt thêm vào docs bốn hạng mục mẫu ghi chú, tìm/lọc theo loại tệp, liên kết note và mục lục (TASK-031–034). Mục lục dùng heading bên trong note, label nhóm nhiều note; lọc file theo loại/metadata, chưa OCR hoặc nghe audio. Chỉ lập kế hoạch, chưa triển khai runtime.
+
 2026-10-25/DEC-029: chủ dự án yêu cầu lập kế hoạch dài hạn cho ảnh/video/audio/bảng/vẽ bút, comment và mời người xem note như chia sẻ bảng tính. Chưa yêu cầu code các tính năng này. Xem [roadmap nội dung và cộng tác](ROADMAP-CONTENT-COLLABORATION.md); permission model, quota/storage và thứ tự phát hành chi tiết là đề xuất cần duyệt khi bắt đầu từng giai đoạn. Note private mặc định và admin không đọc nội dung được giữ.
 
 2026-10-24/DEC-028: chủ dự án duyệt và giao thực hiện guest mode cho người xem CV: landing có nút Thử ngay/chế độ khách, vài note/label mẫu, dữ liệu lưu riêng trên trình duyệt. Đã đồng ý phương án đề xuất copy guest notes/labels vào tài khoản sau login với lựa chọn để sau và bảo toàn bản local khi lỗi. Guest không có tài khoản/credentials/server ownership, không cấp quyền API notes anonymous; reminders/email/security/admin cần tài khoản. Không hỏi lại ba quyết định này.

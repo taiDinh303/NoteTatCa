@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Duyệt mẫu note, lọc tệp, liên kết và mục lục — 2026-10-25
+
+- Sau giải thích và xác nhận chủ dự án, cập nhật roadmap/intake/plan: TASK-031–034 chuyển từ đề xuất sang PLANNED được duyệt, chưa code. Có phạm vi, ví dụ, acceptance, phụ thuộc và ưu tiên đề xuất.
+- Phân biệt label nhóm nhiều note, mục lục từ heading trong một note, link mở note khác, lọc tệp tìm note có loại attachment. Ghi rõ OCR/đọc PDF/audio transcript, chia sẻ mẫu, backlinks/graph chưa được duyệt. Bao gồm guest copy remap, offline metadata, quyền note đích và heading anchor.
+- Validation docs-only: diff check PASS, IDs031–034 không có định nghĩa task trước đó; link roadmap tồn tại. Không build/test vì không sửa runtime; không migration/manual deploy. Scope4root docs; push main theo quyền hiện có, đối chiếu remote SHA.
+
 ## Kế hoạch dài hạn nội dung và cộng tác — 2026-10-25
 
 - Theo yêu cầu lập kế hoạch, chưa code: thêm ROADMAP-CONTENT-COLLABORATION.md, DEC-029 và intake link; TASK-022–030 có thứ tự, acceptance và các câu hỏi cần chốt theo từng đợt. Định hướng gồm ảnh/video/audio/bảng/vẽ bút/comment/mời xem note; realtime Editor/public link/OCR/AI là đề xuất chưa duyệt.

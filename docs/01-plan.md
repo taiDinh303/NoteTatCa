@@ -4,6 +4,8 @@
 
 ## Quyết định hiện hành
 
+Bổ sung DEC-029 (chủ dự án2026-10-25): đã duyệt đưa mẫu ghi chú, lọc/tìm theo loại tệp, liên kết giữa note và mục lục trong note vào kế hoạch. TASK-031–034 tại [roadmap](ROADMAP-CONTENT-COLLABORATION.md) có ví dụ, acceptance và phụ thuộc. PLANNED, chưa code; lọc loại tệp không bao gồm OCR/đọc PDF/chuyển giọng nói; mục lục không thay label. Các chức năng mở rộng khác vẫn chưa được duyệt.
+
 DEC-029 (định hướng chủ dự án2026-10-25): tương lai hỗ trợ ảnh/video/audio, bảng, vẽ bằng bút, bình luận và mời người xem note như chia sẻ bảng tính. Đây là kế hoạch chưa triển khai, không mở quyền API hiện tại. Note mặc định riêng tư và admin không đọc nội dung; chia sẻ là grant rõ ràng của owner. Roadmap TASK-022–030, acceptance, phụ thuộc và các đề xuất cần duyệt tại [ROADMAP-CONTENT-COLLABORATION](ROADMAP-CONTENT-COLLABORATION.md). Editor realtime/link public/OCR/AI chưa được chốt. Yêu cầu tương lai này mở rộng giới hạn không-sharing của bản đầu, không thay runtime/policies trước khi có thiết kế và tests.
 
 DEC-028 (chủ dự án2026-10-24): thêm nút Try guest mode trên landing và route `/guest` cho người xem CV thử không tài khoản. Guest có notes/labels mẫu, editor/CRUD/search/pin/reorder/trash30ngày và local persistence/offline, không server credentials hoặc quyền API anonymous mới. Khi đăng nhập customer, hỏi copy vào account; có thể để sau, bản gốc chỉ clear sau thành công. Chi tiết hiện hành và evidence tại FRONTEND-IMPLEMENTATION/worklog. TASK-021: guest local + copy an toàn, triển khai lượt này; không mở public sharing/cộng tác hoặc tài khoản demo dùng chung.
