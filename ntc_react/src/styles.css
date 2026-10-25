@@ -3583,6 +3583,9 @@ td {
   .editor-toolbar {
     padding: 8px 18px;
   }
+  .editor-toolbar > * {
+    flex-shrink: 0;
+  }
   .editor-title-wrap {
     padding: 23px 24px 16px;
   }
@@ -3797,7 +3800,7 @@ td {
   }
   .editor-tools {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
   .editor-tools .toolbar-divider {
     display: none;
@@ -4529,10 +4532,10 @@ td {
     grid-template-columns: minmax(0, 1fr);
   }
   .editor-toolbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   .editor-tools {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
   }
   .color-swatches {

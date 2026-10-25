@@ -1,6 +1,12 @@
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+## Thanh công cụ mobile một hàng, nhóm thao tác căn trái — 2026-10-25
+
+- Theo ảnh/yêu cầu chủ dự án: thanh định dạng mobile không xuống hàng, giữ overflow-x auto để vuốt ngang; các phần tử không co nhỏ trong container≤800px. Nhóm màu nền/label/reminder/options ở≤480px chuyển từ space-between sang flex-start, giữ gap8px và một hàng để bổ sung công cụ sau.
+- Validation thực tế: Chromium guest note giả tại320/393/430/768/1280px: tâm các nút định dạng cùng hàng; mobile scrollWidth605px, cuộn ngang bằng wheel đến nhóm cuối thành công, highlight/text color popup hoạt động; màu nền popup và labels mở được. Bốn nút footer mobile bắt đầu x12/49/86/123px. Đã xem screenshot393px. TypeScript/Vite Production build, ESLint, .NET solution Release strict (0warnings/0errors) và git diff --check PASS.
+- CSS-only2files: styles.css và worklog; không sửa API/autosave/dữ liệu. Không fullsuite/account HTTP/thiết bị vật lý/production/DB/email thật/manual deploy/migrate. Giữ `.agnes/` ngoài commit. Push main theo quyền hiện có và kiểm SHA remote sau push; hosting rollout chưa xác minh.
+
 ## Zoom popup gọn — 2026-10-25
 
 - Theo yêu cầu/chủ dự án: Zoom popup (mở từ avatar menu) bỏ title, label, dòng hint, ký hiệu %; giữ −, input, +, Close (nút X ở góc), Reset và Done (thay thành Close). Bước ± vẫn 5%.
