@@ -6,6 +6,8 @@
 
 ### Zoom riêng nội dung note — 2026-10-25
 
+Tinh chỉnh cùng ngày: input zoom rộng28px, số căn giữa, nút−rộng24px để sát input hơn. View mở controls sang trái, giữ vị trí kính lúp/Edit/Close ở phải; Edit vẫn mở sang phải và đẩy các công cụ sau.
+
 View có kính lúp cùng hàng cạnh Edit/Close; bấm mở/đóng cụm −/input phần trăm/+/Reset ngay tại chỗ. PC có nút bàn tay mặc định tắt, bật mới giữ chuột trái kéo nội dung hai trục; khi tắt vẫn chọn/copy chữ. Kéo dùng pointer capture nên thả chuột ngoài vùng đọc vẫn kết thúc, không chặn link/checkbox. Touch vẫn cuộn/pinch như trước. Mobile footer giữ một hàng; timestamp co lại/ellipsis khi thiếu chỗ và vẫn mở được thông tin ngày đầy đủ, nhóm thao tác cuộn ngang nếu quá chật. View có nút Enter/Exit full screen ở góc trên phải PC kể cả note không title/icon; mobile vẫn toàn màn hình và ẩn nút này như Edit.
 
 Edit có icon kính lúp ở đầu thanh định dạng; PC/mobile đều bấm để mở/đóng −/input/+/Reset100% ngay cùng hàng và đẩy các công cụ phía sau qua phải. Thanh định dạng tiếp tục cuộn ngang, không có popup nổi ngoài note hoặc thanh zoom dưới nội dung. Controls trong toolbar cao29px như nút định dạng để mở/đóng không làm tăng chiều cao. Enter hoặc rời input áp dụng giá trị, Escape hủy phần nhập chưa áp dụng. `ContentZoomOutlet` cung cấp chỗ hiển thị inline ở toolbar/footer qua portal nội bộ; context giữ ref phần trăm và target ổn định, mở/đóng chỉ đổi hiển thị, không khởi tạo lại viewport/gesture.

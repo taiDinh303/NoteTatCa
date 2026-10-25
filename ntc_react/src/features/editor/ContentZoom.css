@@ -49,6 +49,9 @@
   height: 30px;
   padding: 4px;
 }
+.content-zoom-controls > .icon-button:first-of-type {
+  width: 24px;
+}
 .content-zoom-value {
   display: flex;
   align-items: center;
@@ -57,7 +60,7 @@
   font-variant-numeric: tabular-nums;
 }
 .content-zoom-controls .content-zoom-value input[type="number"] {
-  width: 36px;
+  width: 28px;
   min-width: 0;
   height: 30px;
   padding: 0 2px;
@@ -66,7 +69,7 @@
   background: transparent;
   box-shadow: none;
   color: inherit;
-  text-align: right;
+  text-align: center;
   font: inherit;
   appearance: textfield;
 }
@@ -108,6 +111,9 @@
   align-items: center;
   flex-shrink: 0;
   gap: 2px;
+}
+.note-view-actions .content-zoom-inline {
+  flex-direction: row-reverse;
 }
 .editor-toolbar .content-zoom-controls .icon-button,
 .editor-toolbar .content-zoom-controls input[type="number"] {

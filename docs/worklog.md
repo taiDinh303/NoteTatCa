@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Input zoom gọn, View mở controls sang trái — 2026-10-25
+
+- Theo ảnh/yêu cầu chủ dự án và bổ sung trong lúc làm: input zoom36→28px, text-align center; nút−28→24px giúp sát input. View đảo hướng riêng inline wrapper để controls mở sang trái, giữ kính lúp/Edit/Close ở phía phải; Edit giữ mở sang phải. CSS-only, không đổi gesture/range/save/data hoặc bố cục phần nội dung.
+- Actual validation: Chromium content zoom5/5PASS tại320/393/1280px và PC hand/fullscreen; thêm đo layout guest393/1280: kính lúp/Edit có x trước/sau mở đúng bằng nhau, input nằm trái kính lúp, width28px/textAlign center. Đã xem screenshot control mobile/desktop. TypeScript/Vite Production build2188modules và .NET solution Release strict0warnings/0errorsPASS; diff checkPASS. Không thêm test mirror cho CSS nhỏ; không fullsuite/unit/HTTP/thiết bị thật/production/owner DB/email/manual deploy/migrate.
+- Scope3files: ContentZoom.css, FRONTEND-IMPLEMENTATION và worklog. Giữ deletion ZoomDialog.tsx có sẵn/`.agnes/` ngoài commit. Push main theo quyền hiện có và kiểm remote SHA sau push; hosting rollout chưa xác minh.
+
 ## Kính lúp mở inline ở View/Edit, bàn tay mặc định tắt, View full screen — 2026-10-25
 
 - Theo2ảnh/yêu cầu chủ dự án: bỏ popup zoom nổi ngoài note. Cả View/Edit có kính lúp toggle inline−/input/+/Reset; Edit đẩy các công cụ sau qua phải trong toolbar một hàng cuộn ngang. View giữ kính lúp/bàn tay/controls cạnh Edit/Close; nhóm thao tác có cuộn ngang nếu màn quá chật, không tràn khỏi note. Controls target giữ mounted, đóng/mở chỉ đổi hiển thị, không reset mức zoom/gesture. Reset nay có ở cả View/Edit.
