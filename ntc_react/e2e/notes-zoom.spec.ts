@@ -27,6 +27,17 @@ for (const width of [393, 1920]) {
     await expect
       .poll(async () => (await dimensions()).outer)
       .toBeLessThanOrEqual(1);
+    expect(
+      (await list.boundingBox())!.x + (await list.boundingBox())!.width,
+    ).toBeCloseTo(width, 0);
+    expect(
+      await list.evaluate((el) => {
+        const canvas = el
+          .querySelector(".notes-zoom-layer")!
+          .getBoundingClientRect();
+        return el.getBoundingClientRect().right - canvas.right;
+      }),
+    ).toBeGreaterThan(15);
     expect((await dimensions()).inner).toBeGreaterThan(100);
     const box = (await list.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -72,6 +83,12 @@ for (const width of [393, 1920]) {
     await page.screenshot({
       path: `test-results/notes-single-scroll-${width}.png`,
     });
+    const resizedWidth = width === 1920 ? 760 : 430;
+    await page.setViewportSize({ width: resizedWidth, height: 760 });
+    await expect
+      .poll(() => list.evaluate((el) => el.getBoundingClientRect().right))
+      .toBe(resizedWidth);
+    expect((await dimensions()).outer).toBeLessThanOrEqual(1);
   });
 }
 
@@ -298,7 +315,8 @@ for (const width of [393, 1920]) {
               (node) => node.getBoundingClientRect().width,
             ),
             gridWidth: grid.width,
-            available: el.clientWidth,
+            available:
+              el.clientWidth - parseFloat(getComputedStyle(el).paddingRight),
           };
         });
         expect(layout.overflow).toBeLessThanOrEqual(1);

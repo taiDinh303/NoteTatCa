@@ -1,3 +1,7 @@
+/* Notes scroll internally, so the root must not reserve a second gutter. */
+html:has([data-notes-zoom]) {
+  scrollbar-gutter: auto;
+}
 .customer-shell:has([data-notes-zoom]) {
   height: 100dvh;
   min-height: 0;
@@ -25,7 +29,9 @@
   min-height: 0;
 }
 .notes-zoom-viewport {
-  width: 100%;
+  width: calc(100% + var(--notes-edge-inset, 0px));
+  margin-right: calc(-1 * var(--notes-edge-inset, 0px));
+  padding-right: var(--notes-edge-inset, 0px);
   min-width: 0;
   overflow-x: hidden;
   overflow-y: auto;

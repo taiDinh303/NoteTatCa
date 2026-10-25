@@ -112,7 +112,11 @@ export function NotesZoomViewport({
       if (settled) fit(initialized);
     }
     function measure() {
-      const available = view.clientWidth;
+      // Extend only the scrollport to the window edge. Keep the card canvas
+      // inside the main column's existing responsive right inset.
+      const inset = getComputedStyle(view.parentElement!).paddingRight;
+      view.style.setProperty("--notes-edge-inset", inset);
+      const available = view.clientWidth - parseFloat(inset);
       if (available !== availableWidth) {
         availableWidth = available;
         fit();

@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thanh cuộn note sát mép phải cửa sổ — 2026-10-26
+
+- Theo ảnh/yêu cầu chủ dự án: đưa scrollbar của danh sách ra mép phải màn hình, vẫn giữ khoảng cách giữa note và scrollbar và chỉ một vùng cuộn. NotesZoomViewport mở rộng width/margin qua đệm phải của main, padding phải tương ứng giữ canvas trong đệm cũ. Measure đọc paddingRight thực tế theo responsive rồi trừ inset khỏi clientWidth khi fit/grid; ResizeObserver theo resize/đổi sidebar như trước, không tính khoảng đệm cạnh scrollbar thành vùng card.
+- Test mép phải ban đầu phát hiện vẫn hụt10px trên cả393/1920 do html scrollbar-gutter:stable giữ chỗ cho root không còn cuộn. Chuyển gutter root thành auto chỉ khi có data-notes-zoom; trang khác giữ stable. Không che scrollbar, không body overflow lock, không đổi dữ liệu/note order/zoom/content schema/API.
+- Actual Chromium final11/11PASS suite content/list zoom: viewport.right đúng393/1920, khoảng canvas→mép>15px, chỉ list cuộn/document không dư, cuộn đến note cuối/pagination layout probe giữ. Resize393→430 và1920→760 vẫn sát phải và không overflow dọc ngoài. Grid/List50/100/150% vừa vùng canvas sau trừ inset; cột3932/1/1 và19209/4/3,0network/smooth gesture/chrome bounds, View/Edit/hand/fullscreen giữ. Đã xem screenshot desktop. Một lượt chạy chồng hai config cùng output folder làm mất trace khi close case1920; chạy lại nguyên suite tuần tự sau sửa root gutter, final11/11PASS, không nới assertion mép phải hoặc nới timeout.
+- Account fixture SQLite/captured mail riêng5199:drag5/5PASS desktop1440 tại75/100/125%, mobile393mouse/touch, root không overflow/shape/reorder HTTP/reload/menu/View giữ. Tổng16browser casesPASS. TypeScript/Vite Production build2192modules/ESLint/.NET solution Release strict0warnings/0errorsPASS; docs verifier49Markdown/198local links/0errors/diff checkPASS. Không chạy lại Vitest/full backend/full E2E khác/thiết bị vật lý/iOS/production; không owner DB/email/migrate/manual deploy. Hosting rollout chưa xác minh.
+- Scope5files: NotesZoomViewport.tsx/CSS, notes-zoom.spec.ts và2root docs. Giữ.agnes ngoài Git; push main theo quyền hiện có, đối chiếu SHA remote sau push.
+
 ## Chỉ một vùng cuộn dọc cho danh sách note — 2026-10-25
 
 - Theo3ảnh/yêu cầu chủ dự án: tìm và bỏ phần dư khiến có scrollbar của page lẫn scrollbar danh sách. Tái hiện trước sửa bằng2browser tests tại393/1920,700px cao/List150%: document dư20px mobile và50px desktop. Nguyên nhân viewport JS lấy innerHeight-top-20 nhưng main vẫn có padding đáy40/70px, làm tổng vượt màn hình; min-height160px cũng không trừ banner/toolbar/footer.
