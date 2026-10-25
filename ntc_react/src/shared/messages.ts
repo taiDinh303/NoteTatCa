@@ -2541,4 +2541,8 @@ export const messages: Record<string, readonly [string, string, string]> = {
       "用于提醒时间和日期。选择居住地或使用设备时区。",
       "リマインダーの時刻と日付に使用します。お住まいの地域または端末のタイムゾーンを選択してください。",
     ],
+  "Content zoom": ["Thu phóng nội dung", "内容缩放", "本文のズーム"],
+  "Zoom out content": ["Thu nhỏ nội dung", "缩小内容", "本文を縮小"],
+  "Zoom in content": ["Phóng to nội dung", "放大内容", "本文を拡大"],
+  "Reset content zoom": ["Đặt lại nội dung về 100%", "重置内容为100%", "本文を100%に戻す"],
 };

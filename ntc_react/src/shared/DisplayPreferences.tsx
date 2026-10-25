@@ -27,6 +27,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     }
   });
   const target = useRef(percent);
+  const indicator = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const manualChange = useRef<(value: number) => void>(() => {});
   const changePercent = useCallback(
@@ -51,27 +52,41 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
   useEffect(() => {
     let frame = 0;
     let hideTimer = 0;
+    let commitTimer = 0;
     let pinch: { ids: number[]; distance: number; percent: number } | undefined;
     let safariBase: number | undefined;
+    const isContent = (event: Event) =>
+      event.target instanceof Element &&
+      !!event.target.closest("[data-content-zoom]");
+    function paint() {
+      frame = 0;
+      document.documentElement.style.setProperty(
+        "--interface-scale",
+        String(target.current / 100),
+      );
+      if (indicator.current)
+        indicator.current.textContent = `${Math.round(target.current)}%`;
+      setVisible(true);
+    }
     function change(value: number, immediate = false) {
       if (!Number.isFinite(value)) return;
       target.current = clamp(value);
       if (immediate) {
         cancelAnimationFrame(frame);
-        frame = 0;
+        paint();
         setPercent(Math.round(target.current));
-        setVisible(true);
-      } else if (!frame)
-        frame = requestAnimationFrame(() => {
-          frame = 0;
-          setPercent(Math.round(target.current));
-          setVisible(true);
-        });
+      } else if (!frame) frame = requestAnimationFrame(paint);
+      window.clearTimeout(commitTimer);
+      commitTimer = window.setTimeout(
+        () => setPercent(Math.round(target.current)),
+        160,
+      );
       window.clearTimeout(hideTimer);
       hideTimer = window.setTimeout(() => setVisible(false), 1200);
     }
     manualChange.current = (value) => change(Math.round(value), true);
     function wheel(event: WheelEvent) {
+      if (isContent(event)) return;
       if (
         !(event.ctrlKey || event.metaKey) ||
         !event.deltaY ||
@@ -90,6 +105,10 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     const distance = (a: Touch, b: Touch) =>
       Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
     function touchStart(event: TouchEvent) {
+      if (isContent(event)) {
+        pinch = undefined;
+        return;
+      }
       if (event.touches.length !== 2) {
         pinch = undefined;
         return;
@@ -122,11 +141,16 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       if (pinch && event.pointerType === "touch") event.stopPropagation();
     }
     function gestureStart(event: Event) {
+      if (isContent(event)) {
+        safariBase = undefined;
+        return;
+      }
       if (!event.cancelable) return;
       event.preventDefault();
       safariBase = target.current;
     }
     function gestureChange(event: Event) {
+      if (isContent(event)) return;
       if (!event.cancelable) return;
       event.preventDefault();
       const scale = (event as Event & { scale?: number }).scale;
@@ -150,6 +174,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       manualChange.current = () => {};
       cancelAnimationFrame(frame);
       window.clearTimeout(hideTimer);
+      window.clearTimeout(commitTimer);
       window.removeEventListener("wheel", wheel, true);
       window.removeEventListener("touchstart", touchStart, true);
       window.removeEventListener("touchmove", touchMove, true);
@@ -167,6 +192,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       {visible
         ? createPortal(
             <div
+              ref={indicator}
               className="zoom-indicator"
               role="status"
               aria-label={tr("Interface zoom")}

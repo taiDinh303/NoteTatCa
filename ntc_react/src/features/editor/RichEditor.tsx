@@ -54,6 +54,7 @@ import {
   clampFontSize,
 } from "../../domain/formatting";
 import { download } from "../../shared/utils";
+import ContentZoom from "./ContentZoom";
 const alignmentOptions = [
   { value: "left", label: "Align left", icon: AlignLeft },
   { value: "center", label: "Align center", icon: AlignCenter },
@@ -112,7 +113,11 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
       },
     });
   }, [editor, language]);
-  return <EditorContent editor={editor} />;
+  return (
+    <ContentZoom>
+      <EditorContent editor={editor} />
+    </ContentZoom>
+  );
 }
 export default function RichEditor({
   initial,
@@ -455,7 +460,9 @@ export default function RichEditor({
         />
       </div>
       <ErrorBanner error={error} />
-      <EditorContent className="editor-content" editor={editor} />
+      <ContentZoom>
+        <EditorContent className="editor-content" editor={editor} />
+      </ContentZoom>
       {link ? (
         <Modal open onClose={() => setLink(false)} title={tr("Add a link")}>
           <form

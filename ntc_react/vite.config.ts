@@ -67,7 +67,7 @@ self.addEventListener("fetch", event => {
     },
     test: {
       environment: "node",
-      include: ["src/**/*.test.ts"],
+      include: ["src/**/*.test.{ts,tsx}"],
       restoreMocks: true,
     },
     build: { chunkSizeWarningLimit: 700 },

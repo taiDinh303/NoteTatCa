@@ -4,6 +4,14 @@
 
 ## Phạm vi và kiến trúc
 
+### Zoom riêng nội dung note — 2026-10-25
+
+View và Edit có cụm −/phần trăm/+ bên dưới vùng nội dung; bấm phần trăm về100%. Phạm vi50–300%, bước nút10%; pinch hai ngón hoặc Ctrl/Meta+wheel trong nội dung zoom quanh điểm chạm, vuốt một ngón/cuộn bình thường để đọc và kéo ngang khi phóng lớn. Tiêu đề/icon, toolbar định dạng, labels và footer không thuộc lớp được scale. Zoom là trạng thái hiển thị, không đổi font size/document JSON/version hay tự tạo autosave. Giữ mức khi chuyển View↔Edit cùng phiên note; đóng/mở hoặc đổi note reset100%, không persist mức content zoom.
+
+`ContentZoom` giữ chiều rộng tài liệu gốc và scale bằng transform, tính kích thước vùng cuộn riêng bằng ResizeObserver; gesture gom qua requestAnimationFrame, React chỉ cập nhật phần trăm sau khi dừng hoặc bấm nút. Cleanup observer/listener/frame/timer đầy đủ. Chọn transform để tránh reflow đoạn văn khi zoom theo [hướng dẫn hiệu năng trình duyệt](https://web.dev/articles/animations-and-performance). Zoom toàn giao diện50–150% và preference trình duyệt vẫn giữ; gesture trong nội dung không đi vào global handler. Global gesture cập nhật CSS/HUD theo frame, context/localStorage chỉ commit sau160ms không có sự kiện mới; thay đổi bằng menu/settings vẫn áp dụng và lưu ngay.
+
+Giới hạn: global CSS zoom vẫn cần layout toàn trang; tối ưu này giảm render/storage lặp, không cam kết FPS hay mượt như PDF native trên mọi thiết bị. Chưa đo điện thoại vật lý/iOS Safari, bàn phím ảo hoặc tài liệu100k ký tự. Nội dung phóng lớn giữ dòng gốc và có thể cần kéo ngang. Evidence và hồi quy tại worklog; không thay API/DB/ownership.
+
 ### Sửa cache phân trang khi preload nền — 2026-10-25
 
 WorkspacePreparation dùng fetchInfiniteQuery với queryFn trả từng Page, sau đó InfiniteQueryObserver.fetchNextPage tải các trang còn lại; không dùng fetchQuery trả sẵn InfiniteData trên key mà useInfiniteQuery cũng quan sát. Cách cũ có thể lồng pages trong pages khi background gặp query đã bị invalidated/đang có infinite observer: flatMap(page.items) sinh undefined, NotesPage lỗi isPinned và workspace.commit sau Save labels lỗi id dù server đã lưu. Root errorElement hiển thị NotFound nên trông như mất route Trash; route vẫn tồn tại. Regression giữ cả Trash rỗng/có note, invalidate/refetch và commit sau preload; phiên/account guard, cancellation và critical/background được giữ. Sau rollout cần tải lại app để thay bundle/cache memory cũ, không yêu cầu xóa local drafts/IndexedDB.

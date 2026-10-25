@@ -49,6 +49,7 @@ import NoteColorPicker from "./NoteColorPicker";
 import "./NoteLabelsDialog.css";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
+import { ContentZoomSession } from "./contentZoomSession";
 const RichEditor = lazy(() => import("./RichEditor"));
 const ReadOnlyContent = lazy(() =>
   import("./RichEditor").then((module) => ({
@@ -56,15 +57,31 @@ const ReadOnlyContent = lazy(() =>
   })),
 );
 export type NoteOpenAction = "labels" | "reminder";
-export default function NoteEditor({
-  noteId,
-  onClose,
-  initialAction,
-}: {
+type NoteEditorProps = {
   noteId?: string;
   onClose: () => void;
   initialAction?: NoteOpenAction;
-}) {
+};
+export default function NoteEditor(props: NoteEditorProps) {
+  return (
+    <ZoomSession key={props.noteId ?? "new"}>
+      <NoteEditorSession {...props} />
+    </ZoomSession>
+  );
+}
+function ZoomSession({ children }: { children: React.ReactNode }) {
+  const percent = useRef(100);
+  return (
+    <ContentZoomSession.Provider value={percent}>
+      {children}
+    </ContentZoomSession.Provider>
+  );
+}
+function NoteEditorSession({
+  noteId,
+  onClose,
+  initialAction,
+}: NoteEditorProps) {
   useLanguage();
   const [editing, setEditing] = useState(!noteId);
   const [createdId, setCreatedId] = useState<string>();
