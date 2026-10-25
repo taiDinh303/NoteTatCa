@@ -1432,7 +1432,7 @@ strong {
   border: 0;
   border-radius: 7px;
   padding: 4px 7px;
-  font-size: 22px;
+  font-size: 20px;
 }
 .emoji-trigger.empty {
   display: inline-flex;
@@ -4387,6 +4387,7 @@ td {
   overflow-wrap: anywhere;
 }
 .note-view-heading h2 { margin: 0; font-size: 20px; }
+.note-view-identity > span { font-size: 20px; flex-shrink: 0; }
 .note-view-footer { justify-content: space-between; border-top: 0; flex-wrap: nowrap; gap: 8px; }
 .note-view-actions { display: flex; align-items: center; flex-shrink: 0; gap: 4px; }
 .note-view-timestamp { background: none; border: 0; padding: 6px 0; text-align: left; color: var(--subtle); font-size: 12px; cursor: pointer; min-width: 0; }
