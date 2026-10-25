@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Xác nhận xóa nhãn ngay trong dòng — 2026-10-25
+
+- Theo đề xuất chủ dự án duyệt và câu chữ đã chọn: bỏ ConfirmDialog chồng lên Your labels. Bấm trash thay icon sửa/xóa của đúng dòng bằng tên/câu hỏi, Hủy/Xóa và hint nhỏ; bản Việt giữ nguyên “Gỡ khỏi các ghi chú; Yours note vẫn được giữ.”, có4ngôn ngữ theo language hiện hành. Desktop cùng hàng, mobile actions xuống hàng ngay trong row; mỗi lúc chỉ một row xác nhận, chọn dòng khác chuyển selection.
+- Hủy/Escape không gửi DELETE; mặc định focus Hủy. Modal thêm optional native onEscapeKeyDown để inline Escape preventDefault trước Radix dismiss, giữ manager mở; Close/X vẫn đóng manager như cũ. Chỉ bấm Xóa mới gọi LabelMutations, row biến mất ngay, background delete/error rollback giữ nguyên. Không đổi API/data/ownership hoặc xóa nội dung note.
+- Actual validation: Chromium account synthetic2/2PASS tại320/1280: đúng hint, một dialog duy nhất, row không overflow, Cancel autofocus/no request, chuyển row, Escape chỉ hủy confirmation, xác nhận mới gửi DELETE; giữ test gated create/delete trước ACK, đóng/mở pending,503rollback+toast/reload và note count không đổi. Đã xem screenshot English320/1280 và guest Vietnamese320 xác nhận đúng câu chủ dự án. Lượt đầu test Escape phát hiện Radix đóng manager trước row bubble handler; chuyển sang native Modal hook, giữ assertion, final2/2PASS. Preview ban đầu import i18n khác instance HMR không đổi UI; đặt preference và reload theo luồng thật, bản ViệtPASS.
+- Config4/4 +Vitest116/116, TypeScript/Vite Production build2190modules/ESLint và .NET Release strict0warnings/0errors/diff checkPASS. Không chạy lại backend HTTP/fullsuite/thiết bị vật lý/production/owner DB/email/manual deploy/migrate; account browser dùng SQLite/captured mail riêng. Hosting rollout chưa xác minh.
+- Scope7files: LabelsManager.tsx/CSS, shared ui/messages, labels-optimistic.spec.ts và2root docs; giữ entry worklog label-chip có sẵn, deletion ZoomDialog.tsx và .agnes ngoài scope. Push main theo quyền hiện có và kiểm remote SHA sau push.
+
 ## Nhãn hiện/ẩn ngay, tạo và xóa trong nền — 2026-10-25
 
 - Theo2ảnh và yêu cầu bổ sung chủ dự án: Add hiện nhãn mới ngay ở đầu manager, reset form/scroll về đầu, không khóa Add chờ HTTP/refetch; dòng tạm aria-busy và khóa edit/delete tới ACK để không gửi ID tạm gán note. Delete sau xác nhận đóng dialog và ẩn nhãn ngay, request chạy nền. Overlay ngoài modal nên đóng/mở manager vẫn giữ trạng thái chờ; useLabels ẩn nhãn đang xóa ở sidebar/chooser. Cached list không bị thay bằng loading/error panel khi background refetch lỗi.

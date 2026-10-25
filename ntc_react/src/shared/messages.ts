@@ -1217,6 +1217,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "通知をさらに読み込む",
   ],
   "Your labels": ["Nhãn của bạn", "你的标签", "ラベル"],
+  "Remove from notes; Yours note will be kept.": ["Gỡ khỏi các ghi chú; Yours note vẫn được giữ.", "从笔记中移除；Yours note 会保留。", "ノートから外します。Yours note は保持されます。"],
   "Could not create label {0}.": ["Không thể tạo nhãn {0}.", "无法创建标签{0}。", "ラベル{0}を作成できませんでした。"],
   "Could not delete label {0}.": ["Không thể xóa nhãn {0}.", "无法删除标签{0}。", "ラベル{0}を削除できませんでした。"],
   "A little order for your ideas. Names can repeat; each label stays separate.":

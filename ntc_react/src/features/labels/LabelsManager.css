@@ -1,0 +1,44 @@
+.labels-manager .label-row-confirming {
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  padding-block: 12px;
+}
+.label-delete-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.label-delete-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  font-size: 11px;
+}
+.label-delete-copy small {
+  display: block;
+  margin-top: 4px;
+  color: var(--subtle);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.label-delete-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.label-delete-actions .button {
+  min-height: 32px;
+  padding: 6px 9px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+@container viewport (max-width: 480px) {
+  .labels-manager .label-row-confirming {
+    grid-template-columns: 17px minmax(0, 1fr);
+  }
+  .label-delete-actions {
+    grid-column: 2;
+    justify-self: end;
+  }
+}

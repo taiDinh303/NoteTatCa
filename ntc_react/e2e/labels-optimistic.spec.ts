@@ -121,11 +121,53 @@ for (const width of [320, 1280])
       await row(name)
         .getByRole("button", { name: `Delete label ${name}`, exact: true })
         .click();
-      await page
-        .getByRole("dialog", { name: "Delete this label?", exact: true })
+      await row(name)
         .getByRole("button", { name: "Delete label", exact: true })
         .click();
     }
+    await row("Instant A")
+      .getByRole("button", { name: "Delete label Instant A", exact: true })
+      .click();
+    await expect(manager.locator(".label-row-confirming")).toHaveCount(1);
+    await expect(
+      row("Instant A").getByText(
+        "Remove from notes; Yours note will be kept.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await expect(
+      row("Instant A").getByRole("button", { name: "Cancel", exact: true }),
+    ).toBeFocused();
+    await expect(page.getByRole("dialog")).toHaveCount(1);
+    expect(
+      await row("Instant A").evaluate((el) => el.scrollWidth <= el.clientWidth),
+    ).toBe(true);
+    await manager.screenshot({
+      path: `test-results/labels-inline-confirm-${width}.png`,
+    });
+    await row("Instant A")
+      .getByRole("button", { name: "Cancel", exact: true })
+      .click();
+    expect(deleteSeen).toBe(false);
+    await row("Instant A")
+      .getByRole("button", { name: "Delete label Instant A", exact: true })
+      .click();
+    await row("Instant B")
+      .getByRole("button", { name: "Delete label Instant B", exact: true })
+      .click();
+    await expect(manager.locator(".label-row-confirming")).toHaveCount(1);
+    await expect(
+      row("Instant A").getByRole("button", {
+        name: "Delete label Instant A",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await row("Instant B")
+      .getByRole("button", { name: "Cancel", exact: true })
+      .press("Escape");
+    await expect(manager.locator(".label-row-confirming")).toHaveCount(0);
+    await expect(manager).toBeVisible();
+    expect(deleteSeen).toBe(false);
     await remove("Instant A");
     await expect.poll(() => deleteSeen).toBe(true);
     await expect(

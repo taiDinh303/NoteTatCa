@@ -286,6 +286,7 @@ export function Modal({
   hideTitle = false,
   hideCloseButton = false,
   dismissOnOutside = false,
+  onEscapeKeyDown,
   style,
 }: {
   open: boolean;
@@ -298,6 +299,7 @@ export function Modal({
   hideTitle?: boolean;
   hideCloseButton?: boolean;
   dismissOnOutside?: boolean;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
   style?: CSSProperties;
 }) {
   useLanguage();
@@ -313,6 +315,7 @@ export function Modal({
         <Dialog.Content
           className={`modal ${wide ? "wide" : ""} ${className}`}
           style={style}
+          onEscapeKeyDown={onEscapeKeyDown}
           onPointerDownOutside={(e) => {
             if (!dismissOnOutside) e.preventDefault();
           }}

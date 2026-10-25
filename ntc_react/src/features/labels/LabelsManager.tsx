@@ -6,7 +6,6 @@ import { useLabels } from "../../shared/hooks";
 import type { Label } from "../../domain/models";
 import {
   Button,
-  ConfirmDialog,
   EmptyState,
   ErrorBanner,
   ErrorPanel,
@@ -15,6 +14,7 @@ import {
   Modal,
   Spinner,
 } from "../../shared/ui";
+import "./LabelsManager.css";
 export default function LabelsManager({ onClose }: { onClose: () => void }) {
   useLanguage();
   const query = useLabels();
@@ -41,6 +41,12 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
       open
       className="labels-manager"
       onClose={onClose}
+      onEscapeKeyDown={(event) => {
+        if (deleting) {
+          event.preventDefault();
+          setDeleting(undefined);
+        }
+      }}
       title={tr("Your labels")}
     >
       <div className="modal-body">
@@ -133,27 +139,73 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
             <div className="label-list">
               {items.map((label) => (
                 <div
-                  className="label-row"
+                  className={`label-row ${deleting?.id === label.id ? "label-row-confirming" : ""}`}
                   key={label.id}
                   aria-busy={label.id.startsWith("pending:")}
+                  role={deleting?.id === label.id ? "group" : undefined}
+                  aria-label={
+                    deleting?.id === label.id
+                      ? tr("Delete label {0}", label.name)
+                      : undefined
+                  }
                 >
                   <Tag size={17} style={{ color: label.color ?? undefined }} />
-                  <span>{label.name}</span>
-                  <IconButton
-                    icon={Pencil}
-                    disabled={label.id.startsWith("pending:")}
-                    label={tr("Edit label {0}", label.name)}
-                    onClick={() => {
-                      setEditing(label);
-                      setFormKey((k) => k + 1);
-                    }}
-                  />
-                  <IconButton
-                    icon={Trash2}
-                    disabled={label.id.startsWith("pending:")}
-                    label={tr("Delete label {0}", label.name)}
-                    onClick={() => setDeleting(label)}
-                  />
+                  {deleting?.id === label.id ? (
+                    <>
+                      <div className="label-delete-copy">
+                        <div className="label-delete-title">
+                          <strong>{label.name}</strong>
+                          <span>{tr("Delete this label?")}</span>
+                        </div>
+                        <small id={`label-delete-hint-${label.id}`}>
+                          {tr("Remove from notes; Yours note will be kept.")}
+                        </small>
+                      </div>
+                      <div className="label-delete-actions">
+                        <Button
+                          variant="ghost"
+                          autoFocus
+                          onClick={() => setDeleting(undefined)}
+                        >
+                          {tr("Cancel")}
+                        </Button>
+                        <Button
+                          variant="danger"
+                          aria-describedby={`label-delete-hint-${label.id}`}
+                          onClick={() => {
+                            setDeleting(undefined);
+                            if (editing?.id === label.id) {
+                              setEditing(null);
+                              setFormKey((k) => k + 1);
+                            }
+                            void labelMutations.delete(label).catch(() => {});
+                          }}
+                        >
+                          {tr("Delete label")}
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span>{label.name}</span>
+                      <IconButton
+                        icon={Pencil}
+                        disabled={label.id.startsWith("pending:")}
+                        label={tr("Edit label {0}", label.name)}
+                        onClick={() => {
+                          setDeleting(undefined);
+                          setEditing(label);
+                          setFormKey((k) => k + 1);
+                        }}
+                      />
+                      <IconButton
+                        icon={Trash2}
+                        disabled={label.id.startsWith("pending:")}
+                        label={tr("Delete label {0}", label.name)}
+                        onClick={() => setDeleting(label)}
+                      />
+                    </>
+                  )}
                 </div>
               ))}
             </div>
@@ -174,27 +226,6 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           {tr("Close")}
         </Button>
       </div>
-      {deleting ? (
-        <ConfirmDialog
-          title={tr("Delete this label?")}
-          description={tr(
-            "“{0}” will be removed from all notes. Your notes will be kept.",
-            deleting.name,
-          )}
-          confirmLabel={tr("Delete label")}
-          danger
-          onClose={() => setDeleting(undefined)}
-          onConfirm={() => {
-            const label = deleting;
-            setDeleting(undefined);
-            if (editing?.id === label.id) {
-              setEditing(null);
-              setFormKey((k) => k + 1);
-            }
-            void labelMutations.delete(label).catch(() => {});
-          }}
-        />
-      ) : null}
     </Modal>
   );
 }
