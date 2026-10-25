@@ -1,12 +1,5 @@
 import { t as tr, useLanguage } from "./i18n";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { DisplayZoomContext } from "./displayZoom";
@@ -27,6 +20,15 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     }
   });
   const target = useRef(percent);
+  const current = useRef(percent);
+  const listeners = useRef(new Set<(scale: number) => void>());
+  const subscribe = useCallback((paint: (scale: number) => void) => {
+    listeners.current.add(paint);
+    paint(current.current / 100);
+    return () => {
+      listeners.current.delete(paint);
+    };
+  }, []);
   const indicator = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const manualChange = useRef<(value: number) => void>(() => {});
@@ -35,55 +37,69 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     [],
   );
   const zoomContext = useMemo(
-    () => ({ percent, change: changePercent }),
-    [percent, changePercent],
+    () => ({ percent, change: changePercent, subscribe }),
+    [percent, changePercent, subscribe],
   );
-  useLayoutEffect(() => {
-    document.documentElement.style.setProperty(
-      "--interface-scale",
-      String(percent / 100),
-    );
-    try {
-      localStorage.setItem(storageKey, String(percent));
-    } catch {
-      /* Display preferences are optional when browser storage is blocked. */
-    }
-  }, [percent]);
   useEffect(() => {
     let frame = 0;
     let hideTimer = 0;
-    let commitTimer = 0;
+    let lastTime = 0;
+    let lastInput = 0;
     let pinch: { ids: number[]; distance: number; percent: number } | undefined;
     let safariBase: number | undefined;
     const isContent = (event: Event) =>
       event.target instanceof Element &&
       !!event.target.closest("[data-content-zoom]");
-    function paint() {
-      frame = 0;
-      document.documentElement.style.setProperty(
-        "--interface-scale",
-        String(target.current / 100),
-      );
+    const hasList = () => !!document.querySelector("[data-notes-zoom]");
+    const isList = (event: Event) =>
+      event.target instanceof Element &&
+      !!event.target.closest("[data-notes-zoom]");
+    function persist() {
+      const value = Math.round(current.current);
+      setPercent(value);
+      try {
+        localStorage.setItem(storageKey, String(value));
+      } catch {
+        /* Optional preference. */
+      }
+    }
+    function paint(time: number) {
+      const elapsed = lastTime ? Math.min(32, time - lastTime) : 16;
+      lastTime = time;
+      const difference = target.current - current.current;
+      current.current += difference * (1 - Math.exp(-elapsed / 55));
+      if (Math.abs(difference) < 0.015) current.current = target.current;
+      listeners.current.forEach((listener) => listener(current.current / 100));
       if (indicator.current)
-        indicator.current.textContent = `${Math.round(target.current)}%`;
-      setVisible(true);
+        indicator.current.textContent = `${Math.round(current.current)}%`;
+      if (current.current !== target.current || time - lastInput < 160) {
+        frame = requestAnimationFrame(paint);
+      } else {
+        frame = 0;
+        lastTime = 0;
+        persist();
+      }
     }
     function change(value: number, immediate = false) {
       if (!Number.isFinite(value)) return;
       target.current = clamp(value);
+      lastInput = performance.now();
       if (immediate) {
         cancelAnimationFrame(frame);
-        paint();
-        setPercent(Math.round(target.current));
+        frame = 0;
+        lastTime = 0;
+        current.current = target.current;
+        listeners.current.forEach((listener) =>
+          listener(current.current / 100),
+        );
+        persist();
       } else if (!frame) frame = requestAnimationFrame(paint);
-      window.clearTimeout(commitTimer);
-      commitTimer = window.setTimeout(
-        () => setPercent(Math.round(target.current)),
-        160,
-      );
+      setVisible(true);
       window.clearTimeout(hideTimer);
       hideTimer = window.setTimeout(() => setVisible(false), 1200);
     }
+    // Retain the saved preference; its scope is now the notes list only.
+    persist();
     manualChange.current = (value) => change(Math.round(value), true);
     function wheel(event: WheelEvent) {
       if (isContent(event)) return;
@@ -93,19 +109,24 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
         !event.cancelable
       )
         return;
+      if (!hasList()) return;
       event.preventDefault();
+      if (!isList(event)) return;
       const unit =
         event.deltaMode === 1
           ? 16
           : event.deltaMode === 2
             ? window.innerHeight
             : 1;
-      change(target.current * Math.exp(-event.deltaY * unit * 0.001));
+      change(
+        target.current *
+          Math.exp(-Math.max(-80, Math.min(80, event.deltaY * unit)) * 0.0012),
+      );
     }
     const distance = (a: Touch, b: Touch) =>
       Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
     function touchStart(event: TouchEvent) {
-      if (isContent(event)) {
+      if (isContent(event) || !isList(event)) {
         pinch = undefined;
         return;
       }
@@ -141,7 +162,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       if (pinch && event.pointerType === "touch") event.stopPropagation();
     }
     function gestureStart(event: Event) {
-      if (isContent(event)) {
+      if (isContent(event) || !isList(event)) {
         safariBase = undefined;
         return;
       }
@@ -174,7 +195,6 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       manualChange.current = () => {};
       cancelAnimationFrame(frame);
       window.clearTimeout(hideTimer);
-      window.clearTimeout(commitTimer);
       window.removeEventListener("wheel", wheel, true);
       window.removeEventListener("touchstart", touchStart, true);
       window.removeEventListener("touchmove", touchMove, true);
@@ -195,7 +215,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
               ref={indicator}
               className="zoom-indicator"
               role="status"
-              aria-label={tr("Interface zoom")}
+              aria-label={tr("Notes zoom")}
               aria-atomic="true"
             >
               {percent}%

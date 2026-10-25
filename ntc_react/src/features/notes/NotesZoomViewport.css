@@ -1,0 +1,18 @@
+.notes-zoom-viewport {
+  width: 100%;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  overflow-anchor: none;
+}
+.notes-zoom-stage {
+  position: relative;
+}
+.notes-zoom-layer {
+  display: flow-root;
+  position: absolute;
+  inset: 0 auto auto 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}

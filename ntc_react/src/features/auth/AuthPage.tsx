@@ -7,9 +7,8 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-  Leaf,
+  Hash,
   LockKeyhole,
-  Sparkles,
 } from "lucide-react";
 import { api, auth } from "../../app/runtime";
 import { homePath } from "../../application/access";
@@ -437,37 +436,84 @@ export default function AuthPage({ mode }: { mode: Mode }) {
         </div>
       </section>
       <aside className="auth-art">
-        <div className="art-spark">
-          <Sparkles size={26} />
-        </div>
-        <div className="paper-card art-note-one">
-          <span>💡</span>
-          <h2>
-            {tr("Good ideas")}
-            <br />
-            {tr("deserve a home.")}
-          </h2>
-          <p>
-            {tr("A thought, a plan, a tiny reminder.")}
-            <br />
-            {tr("Keep the things that matter.")}
-          </p>
-          <span className="mini-label">{tr("a little inspiration")}</span>
-        </div>
-        <div className="paper-card art-note-two">
-          <Leaf size={25} />
-          <h3>{tr("A little more clarity.")}</h3>
-          <div className="art-check">
-            <span>✓</span>
-            {tr("Capture the thought")}
+        <div className="product-preview">
+          <div className="preview-sidebar">
+            <div className="preview-sidebar-section">
+              <div className="preview-sidebar-item active">
+                <span className="preview-icon-dot" />
+                <span>All notes</span>
+                <span className="preview-count">3</span>
+              </div>
+              <div className="preview-sidebar-item">
+                <span className="preview-icon-dot" />
+                <span>Trash</span>
+                <span className="preview-count">0</span>
+              </div>
+            </div>
+            <div className="preview-sidebar-heading">
+              YOUR LABELS
+            </div>
+            <div className="preview-sidebar-section">
+              <div className="preview-sidebar-item">
+                <Hash size={13} />
+                <span>Ideas</span>
+              </div>
+              <div className="preview-sidebar-item">
+                <Hash size={13} />
+                <span>Personal</span>
+              </div>
+              <div className="preview-sidebar-item">
+                <Hash size={13} />
+                <span>Work</span>
+              </div>
+            </div>
           </div>
-          <div className="art-check">
-            <span>✓</span>
-            {tr("Make a little space")}
-          </div>
-          <div className="art-check">
-            <span />
-            {tr("Let ideas grow")}
+          <div className="preview-main">
+            <div className="preview-section">
+              <div className="preview-section-label">
+                Pinned <span className="preview-section-count">1</span>
+              </div>
+              <div className="preview-note-card" style={{ backgroundColor: "#fce4e5", color: "#30373d" }}>
+                <div className="preview-note-title">
+                  <span>💡</span> Welcome to your guest space
+                </div>
+                <div className="preview-note-text">
+                  Try writing a note, choosing a color, or adding a label.
+                </div>
+                <span className="preview-label-chip" style={{ background: "#fce4e5" }}>
+                  <Hash size={10} /> Ideas
+                </span>
+              </div>
+            </div>
+            <div className="preview-section">
+              <div className="preview-section-label">
+                Everything else <span className="preview-section-count">2</span>
+              </div>
+              <div className="preview-note-grid">
+                <div className="preview-note-card" style={{ backgroundColor: "#edf5ef", color: "#30373d" }}>
+                  <div className="preview-note-title">
+                    <span>🌿</span> A few things to try
+                  </div>
+                  <div className="preview-note-text">
+                    Create your own note
+                  </div>
+                  <span className="preview-label-chip" style={{ background: "#edf5ef" }}>
+                    <Hash size={10} /> Personal
+                  </span>
+                </div>
+                <div className="preview-note-card" style={{ backgroundColor: "#faf3e0", color: "#30373d" }}>
+                  <div className="preview-note-title">
+                    <span>💡</span> A little room for ideas
+                  </div>
+                  <div className="preview-note-text">
+                    A project idea, a book to read, a place to visit.
+                  </div>
+                  <span className="preview-label-chip" style={{ background: "#faf3e0" }}>
+                    <Hash size={10} /> Work
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="art-caption">
@@ -475,7 +521,6 @@ export default function AuthPage({ mode }: { mode: Mode }) {
           <br />
           <strong>{tr("More room to think.")}</strong>
         </div>
-        <div className="art-orbit" />
       </aside>
     </div>
   );
