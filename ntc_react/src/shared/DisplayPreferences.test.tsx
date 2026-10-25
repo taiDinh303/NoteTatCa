@@ -111,9 +111,17 @@ it("cancels pending gesture work when unmounted and still persists explicit chan
 it("eases coarse wheel deltas over multiple frames, caps each impulse, and ignores chrome", () => {
   vi.useFakeTimers();
   const frames: number[] = [];
+  const settlements: number[] = [];
   function Consumer() {
     const { subscribe } = useDisplayZoom();
-    useEffect(() => subscribe((value) => frames.push(value)), [subscribe]);
+    useEffect(
+      () =>
+        subscribe((value, settled) => {
+          frames.push(value);
+          if (settled) settlements.push(value);
+        }),
+      [subscribe],
+    );
     return (
       <>
         <div data-notes-zoom data-testid="list" />
@@ -142,8 +150,11 @@ it("eases coarse wheel deltas over multiple frames, caps each impulse, and ignor
   act(() => vi.advanceTimersByTime(17));
   expect(frames.at(-1)).toBeGreaterThan(1);
   expect(frames.at(-1)).toBeLessThan(1.04);
+  expect(settlements).toEqual([1]);
   act(() => vi.advanceTimersByTime(1000));
   expect(frames.length).toBeGreaterThan(15);
   expect(frames.at(-1)).toBeCloseTo(Math.exp(80 * 0.0012), 5);
+  expect(settlements).toHaveLength(2);
+  expect(settlements.at(-1)).toBe(frames.at(-1));
   expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("110");
 });

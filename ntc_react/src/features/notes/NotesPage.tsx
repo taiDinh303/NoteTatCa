@@ -551,7 +551,7 @@ export default function NotesPage({
           }
         />
       ) : (
-        <NotesZoomViewport>
+        <NotesZoomViewport mode={view}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

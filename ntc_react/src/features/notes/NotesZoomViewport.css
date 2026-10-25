@@ -1,7 +1,8 @@
 .notes-zoom-viewport {
   width: 100%;
   min-width: 0;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   overflow-anchor: none;
@@ -14,4 +15,11 @@
   position: absolute;
   inset: 0 auto auto 0;
   transform-origin: 0 0;
+}
+.notes-zoom-layer .note-grid {
+  grid-template-columns: repeat(var(--notes-columns, 1), minmax(0, 1fr));
+  gap: 20px;
+}
+.notes-zoom-layer .note-grid.list-view {
+  grid-template-columns: minmax(0, 1fr);
 }

@@ -21,14 +21,19 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
   });
   const target = useRef(percent);
   const current = useRef(percent);
-  const listeners = useRef(new Set<(scale: number) => void>());
-  const subscribe = useCallback((paint: (scale: number) => void) => {
-    listeners.current.add(paint);
-    paint(current.current / 100);
-    return () => {
-      listeners.current.delete(paint);
-    };
-  }, []);
+  const listeners = useRef(
+    new Set<(scale: number, settled: boolean) => void>(),
+  );
+  const subscribe = useCallback(
+    (paint: (scale: number, settled: boolean) => void) => {
+      listeners.current.add(paint);
+      paint(current.current / 100, true);
+      return () => {
+        listeners.current.delete(paint);
+      };
+    },
+    [],
+  );
   const indicator = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const manualChange = useRef<(value: number) => void>(() => {});
@@ -69,7 +74,9 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       const difference = target.current - current.current;
       current.current += difference * (1 - Math.exp(-elapsed / 55));
       if (Math.abs(difference) < 0.015) current.current = target.current;
-      listeners.current.forEach((listener) => listener(current.current / 100));
+      listeners.current.forEach((listener) =>
+        listener(current.current / 100, false),
+      );
       if (indicator.current)
         indicator.current.textContent = `${Math.round(current.current)}%`;
       if (current.current !== target.current || time - lastInput < 160) {
@@ -77,6 +84,9 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       } else {
         frame = 0;
         lastTime = 0;
+        listeners.current.forEach((listener) =>
+          listener(current.current / 100, true),
+        );
         persist();
       }
     }
@@ -90,7 +100,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
         lastTime = 0;
         current.current = target.current;
         listeners.current.forEach((listener) =>
-          listener(current.current / 100),
+          listener(current.current / 100, true),
         );
         persist();
       } else if (!frame) frame = requestAnimationFrame(paint);
