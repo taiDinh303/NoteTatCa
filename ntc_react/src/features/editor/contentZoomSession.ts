@@ -5,4 +5,6 @@ export const ContentZoomSession = createContext<{
   percent: RefObject<number>;
   target: HTMLDivElement | null;
   setTarget: (target: HTMLDivElement | null) => void;
+  handTarget: HTMLDivElement | null;
+  setHandTarget: (target: HTMLDivElement | null) => void;
 } | null>(null);

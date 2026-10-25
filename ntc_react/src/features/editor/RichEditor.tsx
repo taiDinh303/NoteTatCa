@@ -115,7 +115,7 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
     });
   }, [editor, language]);
   return (
-    <ContentZoom readOnly>
+    <ContentZoom>
       <EditorContent editor={editor} />
     </ContentZoom>
   );

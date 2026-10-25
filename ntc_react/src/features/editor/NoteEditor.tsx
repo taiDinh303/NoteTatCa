@@ -74,7 +74,8 @@ export default function NoteEditor(props: NoteEditorProps) {
 function ZoomSession({ children }: { children: React.ReactNode }) {
   const percent = useRef(100);
   const [target, setTarget] = useState<HTMLDivElement | null>(null);
-  const zoom = useMemo(() => ({ percent, target, setTarget }), [target]);
+  const [handTarget, setHandTarget] = useState<HTMLDivElement | null>(null);
+  const zoom = useMemo(() => ({ percent, target, setTarget, handTarget, setHandTarget }), [target, handTarget]);
   return (
     <ContentZoomSession.Provider value={zoom}>
       {children}
@@ -374,7 +375,7 @@ function NoteViewer({
           </Popover.Portal>
         </Popover.Root>
         <div className="note-view-actions">
-          <ContentZoomOutlet />
+          <ContentZoomOutlet popup color={note.backgroundColor ?? undefined} />
           <Button variant="ghost" onClick={onEdit}>
             <Pencil size={15} />
             {tr("Edit")}

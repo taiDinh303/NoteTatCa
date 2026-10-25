@@ -44,6 +44,15 @@ for (const width of [320, 393, 1280]) {
       (_, i) => `Line ${i + 1}: Keep the original font size and content.`,
     ).join("\n");
     await content.fill(text);
+    await dialog
+      .getByRole("button", { name: "Note background color", exact: true })
+      .click();
+    await page
+      .getByRole("textbox", { name: "Hex color", exact: true })
+      .fill(width === 393 ? "#202824" : "#ffdab5");
+    await page
+      .getByRole("button", { name: "Apply color", exact: true })
+      .click();
     await expect(
       dialog.getByText("Saved on this device", { exact: true }),
     ).toBeVisible();
@@ -111,18 +120,39 @@ for (const width of [320, 393, 1280]) {
     await dialog.getByRole("button", { name: "View", exact: true }).click();
     dialog = page.getByRole("dialog", { name: "View note", exact: true });
     const footer = dialog.locator(".note-view-footer");
-    const zoomBounds = (await (await zoomInput(page)).boundingBox())!;
-    const editBounds = (await dialog
-      .getByRole("button", { name: "Edit", exact: true })
-      .boundingBox())!;
-    expect(
-      Math.abs(
-        zoomBounds.y +
-          zoomBounds.height / 2 -
-          editBounds.y -
-          editBounds.height / 2,
-      ),
-    ).toBeLessThan(3);
+    const stampBefore = await dialog
+      .locator(".note-view-timestamp")
+      .boundingBox();
+    await zoomInput(page);
+    const menu = page.locator(".content-zoom-menu");
+    await expect(menu).toHaveAttribute("data-side", "top");
+    const popup = (await menu.boundingBox())!,
+      note = (await dialog.boundingBox())!,
+      trigger = (await dialog
+        .getByRole("button", { name: "Content zoom", exact: true })
+        .boundingBox())!;
+    expect(popup.x).toBeGreaterThanOrEqual(note.x);
+    expect(popup.x + popup.width).toBeLessThanOrEqual(note.x + note.width);
+    expect(popup.y).toBeGreaterThanOrEqual(note.y);
+    expect(popup.y + popup.height).toBeLessThan(trigger.y);
+    expect(await dialog.locator(".note-view-timestamp").boundingBox()).toEqual(
+      stampBefore,
+    );
+    const noteColor = await dialog.evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+    await expect(menu).toHaveCSS("background-color", noteColor);
+    const reset = await menu
+      .getByRole("button", { name: "Reset content zoom", exact: true })
+      .locator("svg")
+      .boundingBox();
+    const plus = await menu
+      .getByRole("button", { name: "Zoom in content", exact: true })
+      .locator("svg")
+      .boundingBox();
+    expect(reset!.width).toBe(14);
+    expect(reset!.height).toBe(14);
+    expect(plus!.width).toBe(reset!.width);
     expect(
       await footer.evaluate((el) => el.scrollWidth <= el.clientWidth),
     ).toBe(true);
@@ -296,15 +326,9 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
   await dialog.getByRole("button", { name: "View", exact: true }).click();
   dialog = page.getByRole("dialog", { name: "View note", exact: true });
   const input = await zoomInput(page);
-  const inputBox = (await input.boundingBox())!,
-    editBox = (await dialog
-      .getByRole("button", { name: "Edit", exact: true })
-      .boundingBox())!;
-  expect(
-    Math.abs(inputBox.y + inputBox.height / 2 - editBox.y - editBox.height / 2),
-  ).toBeLessThan(3);
+  await expect(input).toBeVisible();
   await setZoom(page, 200);
-  const hand = dialog.getByRole("button", { name: "Pan content", exact: true });
+  const hand = page.getByRole("button", { name: "Pan content", exact: true });
   await expect(hand).toHaveAttribute("aria-pressed", "false");
   await dialog
     .getByRole("button", { name: "Enter full screen", exact: true })
@@ -317,6 +341,7 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
     .getByRole("button", { name: "Exit full screen", exact: true })
     .click();
   expect((await dialog.boundingBox())!.width).toBeLessThan(1280);
+  await zoomInput(page);
   await hand.click();
   const view = dialog.locator(".content-zoom-viewport");
   await view.evaluate((el) => {
@@ -335,9 +360,8 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
   expect(await view.evaluate((el) => el.scrollTop)).toBeGreaterThan(120);
   await page.mouse.up();
   await expect(view).toHaveCSS("cursor", "grab");
-  await dialog
-    .getByRole("button", { name: "Pan content", exact: true })
-    .click();
+  await zoomInput(page);
+  await hand.click();
   const before = await view.evaluate((el) => ({
     x: el.scrollLeft,
     y: el.scrollTop,
@@ -355,5 +379,40 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
   await dialog.screenshot({
     path: "test-results/content-zoom-hand-desktop.png",
   });
+  await dialog.getByRole("button", { name: "Edit", exact: true }).click();
+  dialog = page.getByRole("dialog", { name: "Edit note", exact: true });
+  await expect(
+    page.getByRole("button", { name: "Pan content", exact: true }),
+  ).toBeVisible();
+  await expect(
+    dialog.getByRole("button", { name: "Content zoom", exact: true }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await setZoom(page, 200);
+  const editHand = page.getByRole("button", {
+    name: "Pan content",
+    exact: true,
+  });
+  await expect(editHand).toHaveAttribute("aria-pressed", "false");
+  await editHand.click();
+  const editView = dialog.locator(".content-zoom-viewport");
+  const original = await dialog
+    .getByRole("textbox", { name: "Note content" })
+    .innerHTML();
+  await editView.evaluate((el) => {
+    el.scrollLeft = 0;
+    el.scrollTop = 0;
+  });
+  const editArea = (await editView.boundingBox())!;
+  await page.mouse.move(editArea.x + 400, editArea.y + 250);
+  await page.mouse.down();
+  await page.mouse.move(editArea.x + 280, editArea.y + 120, { steps: 8 });
+  await page.mouse.up();
+  expect(await editView.evaluate((el) => el.scrollLeft)).toBeGreaterThan(100);
+  expect(await editView.evaluate((el) => el.scrollTop)).toBeGreaterThan(110);
+  await expect(
+    dialog.getByRole("textbox", { name: "Note content" }),
+  ).toHaveJSProperty("innerHTML", original);
+  await editHand.click();
+  await expect(editHand).toHaveAttribute("aria-pressed", "false");
   await context.close();
 });

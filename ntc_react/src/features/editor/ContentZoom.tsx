@@ -10,13 +10,7 @@ import { ContentZoomSession } from "./contentZoomSession";
 const clamp = (value: number) => Math.min(300, Math.max(50, value));
 
 // Scale a fixed-width document, so gestures never reflow paragraphs or edit marks.
-export default function ContentZoom({
-  children,
-  readOnly = false,
-}: {
-  children: ReactNode;
-  readOnly?: boolean;
-}) {
+export default function ContentZoom({ children }: { children: ReactNode }) {
   useLanguage();
   const viewport = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -184,12 +178,7 @@ export default function ContentZoom({
     let dragged = false;
     function pointerDown(event: PointerEvent) {
       dragged = false;
-      if (
-        !readOnly ||
-        !hand.current ||
-        event.pointerType !== "mouse" ||
-        event.button !== 0
-      )
+      if (!hand.current || event.pointerType !== "mouse" || event.button !== 0)
         return;
       if (
         event.target instanceof Element &&
@@ -270,7 +259,7 @@ export default function ContentZoom({
       view.removeEventListener("lostpointercapture", pointerEnd);
       view.removeEventListener("click", click, true);
     };
-  }, [savedPercent, readOnly]);
+  }, [savedPercent]);
   function commit(input: HTMLInputElement) {
     const value = input.value.trim() ? Number(input.value) : NaN;
     if (Number.isFinite(value)) change.current(value);
@@ -284,20 +273,6 @@ export default function ContentZoom({
       role="group"
       aria-label={tr("Content zoom")}
     >
-      {readOnly ? (
-        <span className="content-pan-toggle">
-          <IconButton
-            icon={Hand}
-            label={tr("Pan content")}
-            aria-pressed={handEnabled}
-            active={handEnabled}
-            onClick={() => {
-              hand.current = !hand.current;
-              setHandEnabled(hand.current);
-            }}
-          />
-        </span>
-      ) : null}
       <IconButton
         icon={Minus}
         label={tr("Zoom out content")}
@@ -328,12 +303,14 @@ export default function ContentZoom({
       </label>
       <IconButton
         icon={Plus}
+        className="content-zoom-increase"
         label={tr("Zoom in content")}
         disabled={percent >= 300}
         onClick={() => change.current(percent + 10)}
       />
       <IconButton
         icon={RotateCcw}
+        className="content-zoom-reset"
         label={tr("Reset content zoom")}
         onClick={() => change.current(100)}
       />
@@ -344,7 +321,7 @@ export default function ContentZoom({
       <div
         className="content-zoom-viewport"
         data-content-zoom
-        data-hand={readOnly && handEnabled}
+        data-hand={handEnabled}
         ref={viewport}
       >
         <div className="content-zoom-stage" ref={stage}>
@@ -354,6 +331,21 @@ export default function ContentZoom({
         </div>
       </div>
       {session?.target ? createPortal(controls, session.target) : null}
+      {session?.handTarget
+        ? createPortal(
+            <IconButton
+              icon={Hand}
+              label={tr("Pan content")}
+              aria-pressed={handEnabled}
+              active={handEnabled}
+              onClick={() => {
+                hand.current = !hand.current;
+                setHandEnabled(hand.current);
+              }}
+            />,
+            session.handTarget,
+          )
+        : null}
     </div>
   );
 }

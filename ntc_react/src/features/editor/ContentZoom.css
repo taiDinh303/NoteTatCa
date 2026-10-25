@@ -112,6 +112,25 @@
   flex-shrink: 0;
   gap: 2px;
 }
+.content-zoom-menu {
+  z-index: 180;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 28px #0002;
+}
+.content-zoom-controls .content-zoom-reset svg,
+.content-zoom-controls .content-zoom-increase svg {
+  width: 14px;
+  height: 14px;
+}
+.editor-toolbar
+  .content-zoom-outlet[data-expanded="false"]
+  .content-zoom-controls {
+  display: none;
+}
 .note-view-actions .content-zoom-inline {
   flex-direction: row-reverse;
 }

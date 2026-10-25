@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## View popup phía trên cùng màu note, bàn tay luôn cạnh kính lúp PC — 2026-10-25
+
+- Theo ảnh/yêu cầu chủ dự án và các bổ sung cùng lượt: View chuyển controls zoom khỏi footer thành popup phía trên kính lúp, giới hạn collision theo modal, backgroundColor/notePalette đúng note, không chiếm chỗ ngày Edited. Edit giữ controls inline. Reset và dấu+ SVG14px ở cả View/Edit, giữ hit area nút. Không thay range50–300%, gesture, full screen hoặc reopen100%.
+- Theo yêu cầu cuối: bàn tay hiện trực tiếp cạnh kính lúp trên thanh công cụ PC ở cả View/Edit, không phải mở kính lúp; mặc định tắt. Tách handTarget/zoom target và portal riêng; trạng thái hand/zoom không reset khi đóng popup. Mouse pan dùng chung viewport trong Edit, chặn mouse text-selection lúc kéo nhưng không đổi JSON/autosave. Touch/coarse pointer không hiện hand như trước.
+- Actual validation: Chromium5/5PASS tại320/393/1280px +PC: popup data-side=top, toàn bộ bounds nằm trong note và trên trigger; ngày Edited có bounding box trước/sau mở giống nhau; màu popup khớp note peach#ffdab5 và dark#202824; Reset/+SVG cùng14px. Hồi quy zoom/pinch/cuộn/gõ thật/save/reopen/global zoom/fullscreen giữ. PC hand hiện ở Edit trước khi mở zoom, aria-expanded kính lúp=false; mặc định hand=false, bật kéo Edit tăng scrollLeft/Top mà innerHTML không đổi, tắt lại được; View pan/selection vẫnPASS. Đã xem screenshot mobile View popup peach và desktop Edit có hand cạnh kính lúp.
+- TypeScript/Vite Production build2188modules, ESLint, config4/4 +Vitest107/107 và .NET solution Release strict0warnings/0errorsPASS; git diff --checkPASS. Sửa type null backgroundColor thànhundefined tại prop popup, final buildPASS. Không full backend suite/full E2E/thiết bị vật lý/iOS/bàn phím ảo/production/owner DB/email thật/manual deploy/migrate; hosting rollout chưa xác minh.
+- Account synthetic regression: mobile393PASS; desktop1280lượt chung timeout label Work sau503/retry như các đợt trước, rerun riêngPASS. Không sửa/nới label assertion hoặc kết luận race đã được sửa. Fetch trước publication divergence0/0. Publication scope10files:6editor source/CSS/context files,2E2E và2root docs. Giữ deletion ZoomDialog.tsx có sẵn và `.agnes/` ngoài commit. Push main theo quyền hiện có và kiểm SHA remote sau push.
+
 ## Input zoom gọn, View mở controls sang trái — 2026-10-25
 
 - Theo ảnh/yêu cầu chủ dự án và bổ sung trong lúc làm: input zoom36→28px, text-align center; nút−28→24px giúp sát input. View đảo hướng riêng inline wrapper để controls mở sang trái, giữ kính lúp/Edit/Close ở phía phải; Edit giữ mở sang phải. CSS-only, không đổi gesture/range/save/data hoặc bố cục phần nội dung.
