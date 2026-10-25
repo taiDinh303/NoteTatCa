@@ -1,6 +1,7 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Minus, Plus } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Hand, Minus, Plus, RotateCcw } from "lucide-react";
 import { IconButton } from "../../shared/ui";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./ContentZoom.css";
@@ -9,21 +10,30 @@ import { ContentZoomSession } from "./contentZoomSession";
 const clamp = (value: number) => Math.min(300, Math.max(50, value));
 
 // Scale a fixed-width document, so gestures never reflow paragraphs or edit marks.
-export default function ContentZoom({ children }: { children: ReactNode }) {
+export default function ContentZoom({
+  children,
+  readOnly = false,
+}: {
+  children: ReactNode;
+  readOnly?: boolean;
+}) {
   useLanguage();
   const viewport = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const change = useRef<(value: number) => void>(() => {});
   const session = useContext(ContentZoomSession);
+  const savedPercent = session?.percent;
+  const hand = useRef(true);
+  const [handEnabled, setHandEnabled] = useState(true);
   const [percent, setPercent] = useState(() =>
-    Math.round(session?.current ?? 100),
+    Math.round(savedPercent?.current ?? 100),
   );
   useLayoutEffect(() => {
     const view = viewport.current!;
     const space = stage.current!;
     const document = layer.current!;
-    let current = session?.current ?? 100;
+    let current = savedPercent?.current ?? 100;
     let target = current;
     let frame = 0;
     let timer = 0;
@@ -68,7 +78,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     function update(value: number) {
       if (!Number.isFinite(value)) return;
       target = clamp(value);
-      if (session) session.current = target;
+      if (savedPercent) savedPercent.current = target;
       document.style.willChange = "transform";
       schedule();
       window.clearTimeout(timer);
@@ -161,6 +171,70 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     function gestureEnd() {
       safariBase = undefined;
     }
+    let drag:
+      | {
+          id: number;
+          x: number;
+          y: number;
+          left: number;
+          top: number;
+          scale: number;
+        }
+      | undefined;
+    let dragged = false;
+    function pointerDown(event: PointerEvent) {
+      dragged = false;
+      if (
+        !readOnly ||
+        !hand.current ||
+        event.pointerType !== "mouse" ||
+        event.button !== 0
+      )
+        return;
+      if (
+        event.target instanceof Element &&
+        event.target.closest("a,button,input,textarea,select")
+      )
+        return;
+      if (
+        view.scrollWidth <= view.clientWidth &&
+        view.scrollHeight <= view.clientHeight
+      )
+        return;
+      event.preventDefault();
+      dragged = false;
+      drag = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        left: view.scrollLeft,
+        top: view.scrollTop,
+        scale: view.getBoundingClientRect().width / view.clientWidth || 1,
+      };
+      view.setPointerCapture(event.pointerId);
+      view.dataset.dragging = "true";
+    }
+    function pointerMove(event: PointerEvent) {
+      if (!drag || event.pointerId !== drag.id) return;
+      const dx = (event.clientX - drag.x) / drag.scale;
+      const dy = (event.clientY - drag.y) / drag.scale;
+      if (Math.hypot(dx, dy) > 3) dragged = true;
+      view.scrollLeft = drag.left - dx;
+      view.scrollTop = drag.top - dy;
+    }
+    function pointerEnd(event: PointerEvent) {
+      if (!drag || event.pointerId !== drag.id) return;
+      drag = undefined;
+      delete view.dataset.dragging;
+      if (view.hasPointerCapture(event.pointerId))
+        view.releasePointerCapture(event.pointerId);
+    }
+    function click(event: MouseEvent) {
+      if (!dragged) return;
+      dragged = false;
+      event.preventDefault();
+      event.stopPropagation();
+    }
     const options = { passive: false };
     view.addEventListener("wheel", wheel, options);
     view.addEventListener("touchstart", start, options);
@@ -170,6 +244,12 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     view.addEventListener("gesturestart", gestureStart, options);
     view.addEventListener("gesturechange", gestureChange, options);
     view.addEventListener("gestureend", gestureEnd);
+    view.addEventListener("pointerdown", pointerDown);
+    view.addEventListener("pointermove", pointerMove);
+    view.addEventListener("pointerup", pointerEnd);
+    view.addEventListener("pointercancel", pointerEnd);
+    view.addEventListener("lostpointercapture", pointerEnd);
+    view.addEventListener("click", click, true);
     return () => {
       change.current = () => {};
       observer.disconnect();
@@ -183,44 +263,99 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       view.removeEventListener("gesturestart", gestureStart);
       view.removeEventListener("gesturechange", gestureChange);
       view.removeEventListener("gestureend", gestureEnd);
+      view.removeEventListener("pointerdown", pointerDown);
+      view.removeEventListener("pointermove", pointerMove);
+      view.removeEventListener("pointerup", pointerEnd);
+      view.removeEventListener("pointercancel", pointerEnd);
+      view.removeEventListener("lostpointercapture", pointerEnd);
+      view.removeEventListener("click", click, true);
     };
-  }, [session]);
+  }, [savedPercent, readOnly]);
+  function commit(input: HTMLInputElement) {
+    const value = input.value.trim() ? Number(input.value) : NaN;
+    if (Number.isFinite(value)) change.current(value);
+    input.value = String(
+      Number.isFinite(value) ? Math.round(clamp(value)) : percent,
+    );
+  }
+  const controls = (
+    <div
+      className="content-zoom-controls"
+      role="group"
+      aria-label={tr("Content zoom")}
+    >
+      {readOnly ? (
+        <span className="content-pan-toggle">
+          <IconButton
+            icon={Hand}
+            label={tr("Pan content")}
+            aria-pressed={handEnabled}
+            active={handEnabled}
+            onClick={() => {
+              hand.current = !hand.current;
+              setHandEnabled(hand.current);
+            }}
+          />
+        </span>
+      ) : null}
+      <IconButton
+        icon={Minus}
+        label={tr("Zoom out content")}
+        disabled={percent <= 50}
+        onClick={() => change.current(percent - 10)}
+      />
+      <label className="content-zoom-value">
+        <input
+          key={percent}
+          type="number"
+          inputMode="numeric"
+          min={50}
+          max={300}
+          step={10}
+          defaultValue={percent}
+          aria-label={tr("Content zoom percentage")}
+          onBlur={(event) => commit(event.currentTarget)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              event.currentTarget.blur();
+            }
+            if (event.key === "Escape")
+              event.currentTarget.value = String(percent);
+          }}
+        />
+        <span aria-hidden="true">%</span>
+      </label>
+      <IconButton
+        icon={Plus}
+        label={tr("Zoom in content")}
+        disabled={percent >= 300}
+        onClick={() => change.current(percent + 10)}
+      />
+      {!readOnly ? (
+        <IconButton
+          icon={RotateCcw}
+          label={tr("Reset content zoom")}
+          onClick={() => change.current(100)}
+        />
+      ) : null}
+    </div>
+  );
   return (
     <div className="content-zoom">
-      <div className="content-zoom-viewport" data-content-zoom ref={viewport}>
+      <div
+        className="content-zoom-viewport"
+        data-content-zoom
+        data-hand={readOnly && handEnabled}
+        ref={viewport}
+      >
         <div className="content-zoom-stage" ref={stage}>
           <div className="content-zoom-layer" ref={layer}>
             {children}
           </div>
         </div>
       </div>
-      <div
-        className="content-zoom-controls"
-        role="group"
-        aria-label={tr("Content zoom")}
-      >
-        <IconButton
-          icon={Minus}
-          label={tr("Zoom out content")}
-          disabled={percent <= 50}
-          onClick={() => change.current(percent - 10)}
-        />
-        <button
-          type="button"
-          className="content-zoom-reset"
-          aria-label={tr("Reset content zoom")}
-          title={tr("Reset content zoom")}
-          onClick={() => change.current(100)}
-        >
-          {percent}%
-        </button>
-        <IconButton
-          icon={Plus}
-          label={tr("Zoom in content")}
-          disabled={percent >= 300}
-          onClick={() => change.current(percent + 10)}
-        />
-      </div>
+      {session?.target ? createPortal(controls, session.target) : null}
     </div>
   );
 }

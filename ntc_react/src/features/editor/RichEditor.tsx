@@ -55,6 +55,7 @@ import {
 } from "../../domain/formatting";
 import { download } from "../../shared/utils";
 import ContentZoom from "./ContentZoom";
+import ContentZoomOutlet from "./ContentZoomOutlet";
 const alignmentOptions = [
   { value: "left", label: "Align left", icon: AlignLeft },
   { value: "center", label: "Align center", icon: AlignCenter },
@@ -114,7 +115,7 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
     });
   }, [editor, language]);
   return (
-    <ContentZoom>
+    <ContentZoom readOnly>
       <EditorContent editor={editor} />
     </ContentZoom>
   );
@@ -241,6 +242,8 @@ export default function RichEditor({
   return (
     <>
       <div className="editor-toolbar" aria-label={tr("Text formatting")}>
+        <ContentZoomOutlet popup />
+        <span className="toolbar-divider" />
         <IconButton
           icon={Bold}
           label={tr("Bold")}

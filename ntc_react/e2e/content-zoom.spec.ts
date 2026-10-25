@@ -1,7 +1,27 @@
 import { test, expect } from "@playwright/test";
 
 test.use({ hasTouch: true });
-for (const width of [393, 1280]) {
+async function zoomInput(page: import("@playwright/test").Page) {
+  const trigger = page.getByRole("button", {
+    name: "Content zoom",
+    exact: true,
+  });
+  if (
+    (await trigger.isVisible()) &&
+    !(await page.locator(".content-zoom-menu").isVisible())
+  )
+    await trigger.click();
+  return page.getByRole("spinbutton", {
+    name: "Content zoom percentage",
+    exact: true,
+  });
+}
+async function setZoom(page: import("@playwright/test").Page, percent: number) {
+  const input = await zoomInput(page);
+  await input.fill(String(percent));
+  await input.press("Enter");
+}
+for (const width of [320, 393, 1280]) {
   test(`content zoom keeps note chrome and saved text unchanged ${width}`, async ({
     page,
   }) => {
@@ -37,13 +57,12 @@ for (const width of [393, 1280]) {
           y: el.getBoundingClientRect().y,
         })),
       );
+    await zoomInput(page);
     for (let i = 0; i < 10; i++)
-      await dialog
+      await page
         .getByRole("button", { name: "Zoom in content", exact: true })
         .click();
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("200%");
+    await expect(await zoomInput(page)).toHaveValue("200");
     await expect(content).toHaveJSProperty("innerHTML", markup);
     const after = await dialog
       .locator(".editor-heading, .editor-toolbar, .editor-footer")
@@ -62,12 +81,8 @@ for (const width of [393, 1280]) {
     });
     expect(await viewport.evaluate((el) => el.scrollTop)).toBeGreaterThan(400);
     expect(await viewport.evaluate((el) => el.scrollLeft)).toBeGreaterThan(100);
-    await dialog
-      .getByRole("button", { name: "Reset content zoom", exact: true })
-      .click();
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("100%");
+    await setZoom(page, 100);
+    await expect(await zoomInput(page)).toHaveValue("100");
     await viewport.evaluate((el) =>
       el.dispatchEvent(
         new WheelEvent("wheel", {
@@ -80,23 +95,33 @@ for (const width of [393, 1280]) {
         }),
       ),
     );
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).not.toHaveText("100%");
+    await expect(await zoomInput(page)).not.toHaveValue("100");
     expect(
       await page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
     ).toBe("100");
     await dialog.getByRole("button", { name: "View", exact: true }).click();
     dialog = page.getByRole("dialog", { name: "View note", exact: true });
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).not.toHaveText("100%");
+    const footer = dialog.locator(".note-view-footer");
+    const zoomBounds = (await (await zoomInput(page)).boundingBox())!;
+    const editBounds = (await dialog
+      .getByRole("button", { name: "Edit", exact: true })
+      .boundingBox())!;
+    expect(
+      Math.abs(
+        zoomBounds.y +
+          zoomBounds.height / 2 -
+          editBounds.y -
+          editBounds.height / 2,
+      ),
+    ).toBeLessThan(3);
+    expect(
+      await footer.evaluate((el) => el.scrollWidth <= el.clientWidth),
+    ).toBe(true);
+    await expect(await zoomInput(page)).not.toHaveValue("100");
     const read = dialog.getByRole("region", { name: "Note content" });
     await expect(read).toHaveJSProperty("innerHTML", markup);
     await expect(read).toHaveAttribute("contenteditable", "false");
-    await dialog
-      .getByRole("button", { name: "Reset content zoom", exact: true })
-      .click();
+    await setZoom(page, 100);
     await dialog.locator(".content-zoom-viewport").evaluate((el) => {
       el.scrollTop = 0;
       el.scrollLeft = 0;
@@ -123,9 +148,7 @@ for (const width of [393, 1280]) {
       type: "touchEnd",
       touchPoints: [],
     });
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("175%");
+    await expect(await zoomInput(page)).toHaveValue("175");
     expect(
       await page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
     ).toBe("100");
@@ -171,14 +194,10 @@ for (const width of [393, 1280]) {
         page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
       )
       .toBe("111");
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("175%");
+    await expect(await zoomInput(page)).toHaveValue("175");
     await dialog.getByRole("button", { name: "Edit", exact: true }).click();
     dialog = page.getByRole("dialog", { name: "Edit note", exact: true });
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("175%");
+    await expect(await zoomInput(page)).toHaveValue("175");
     await dialog.getByRole("textbox", { name: "Note content" }).click();
     await page.keyboard.press("ControlOrMeta+A");
     await page.keyboard.type("Edited while content is zoomed");
@@ -190,9 +209,7 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Open Zoom regression", exact: true })
       .click();
     dialog = page.getByRole("dialog", { name: "View note", exact: true });
-    await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText("100%");
+    await expect(await zoomInput(page)).toHaveValue("100");
     await expect(
       dialog.getByRole("region", { name: "Note content" }),
     ).toHaveText("Edited while content is zoomed");
@@ -216,8 +233,8 @@ test("large gestures clamp content zoom and Reset restores the document", async 
   await content.fill("Keep this text unchanged");
   const viewport = dialog.locator(".content-zoom-viewport");
   for (const [delta, expected, button] of [
-    [-3000, "300%", "Zoom in content"],
-    [3000, "50%", "Zoom out content"],
+    [-3000, "300", "Zoom in content"],
+    [3000, "50", "Zoom out content"],
   ] as const) {
     await viewport.evaluate(
       (el, deltaY) =>
@@ -231,18 +248,89 @@ test("large gestures clamp content zoom and Reset restores the document", async 
         ),
       delta,
     );
+    await expect(await zoomInput(page)).toHaveValue(expected);
     await expect(
-      dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-    ).toHaveText(expected);
-    await expect(
-      dialog.getByRole("button", { name: button, exact: true }),
+      page.getByRole("button", { name: button, exact: true }),
     ).toBeDisabled();
   }
-  await dialog
-    .getByRole("button", { name: "Reset content zoom", exact: true })
-    .click();
-  await expect(
-    dialog.getByRole("button", { name: "Reset content zoom", exact: true }),
-  ).toHaveText("100%");
+  await setZoom(page, 100);
+  await expect(await zoomInput(page)).toHaveValue("100");
   await expect(content).toHaveText("Keep this text unchanged");
+});
+
+test("desktop hand pans both axes and can be turned off for text selection", async ({
+  browser,
+  baseURL,
+}) => {
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    hasTouch: false,
+  });
+  const page = await context.newPage();
+  await page.goto(`${baseURL}/Home`);
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
+  let dialog = page.getByRole("dialog", { name: "New note", exact: true });
+  await dialog.getByLabel("Note title").fill("Hand pan regression");
+  await dialog
+    .getByRole("textbox", { name: "Note content" })
+    .fill(
+      Array.from(
+        { length: 60 },
+        (_, i) =>
+          `Long paragraph ${i + 1} for horizontal and vertical dragging.`,
+      ).join("\n"),
+    );
+  await dialog.getByRole("button", { name: "View", exact: true }).click();
+  dialog = page.getByRole("dialog", { name: "View note", exact: true });
+  const input = await zoomInput(page);
+  const inputBox = (await input.boundingBox())!,
+    editBox = (await dialog
+      .getByRole("button", { name: "Edit", exact: true })
+      .boundingBox())!;
+  expect(
+    Math.abs(inputBox.y + inputBox.height / 2 - editBox.y - editBox.height / 2),
+  ).toBeLessThan(3);
+  await setZoom(page, 200);
+  const view = dialog.locator(".content-zoom-viewport");
+  await view.evaluate((el) => {
+    el.scrollLeft = 0;
+    el.scrollTop = 0;
+  });
+  await expect(view).toHaveCSS("cursor", "grab");
+  const bounds = (await view.boundingBox())!;
+  const x = bounds.x + 400,
+    y = bounds.y + 300;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x - 120, y - 140, { steps: 8 });
+  await expect(view).toHaveCSS("cursor", "grabbing");
+  expect(await view.evaluate((el) => el.scrollLeft)).toBeGreaterThan(100);
+  expect(await view.evaluate((el) => el.scrollTop)).toBeGreaterThan(120);
+  await page.mouse.up();
+  await expect(view).toHaveCSS("cursor", "grab");
+  await dialog
+    .getByRole("button", { name: "Pan content", exact: true })
+    .click();
+  const before = await view.evaluate((el) => ({
+    x: el.scrollLeft,
+    y: el.scrollTop,
+  }));
+  await page.mouse.move(x - 180, y - 180);
+  await page.mouse.down();
+  await page.mouse.move(x - 250, y - 200, { steps: 5 });
+  await page.mouse.up();
+  expect(
+    await view.evaluate((el) => ({ x: el.scrollLeft, y: el.scrollTop })),
+  ).toEqual(before);
+  expect(
+    await page.evaluate(() => window.getSelection()?.toString().length),
+  ).toBeGreaterThan(0);
+  await dialog.screenshot({
+    path: "test-results/content-zoom-hand-desktop.png",
+  });
+  await context.close();
 });

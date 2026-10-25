@@ -72,9 +72,15 @@ for (const width of [393, 1280]) {
     await expect(readContent).toHaveAttribute("contenteditable", "false");
     await expect(
       viewer.locator(
-        "[contenteditable=true], input:not([type=checkbox]), .editor-toolbar, .editor-tools, .editor-labels",
+        '[contenteditable=true], input:not([type=checkbox]):not([aria-label="Content zoom percentage"]), .editor-toolbar, .editor-tools, .editor-labels',
       ),
     ).toHaveCount(0);
+    await expect(
+      viewer.getByRole("spinbutton", {
+        name: "Content zoom percentage",
+        exact: true,
+      }),
+    ).toHaveCount(1);
     await expect(viewer.getByLabel("Character count")).toHaveCount(0);
     if (width <= 800) {
       const bounds = (await viewer.boundingBox())!;

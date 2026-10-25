@@ -3,6 +3,7 @@ import {
   lazy,
   Suspense,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -50,6 +51,7 @@ import "./NoteLabelsDialog.css";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 import { ContentZoomSession } from "./contentZoomSession";
+import ContentZoomOutlet from "./ContentZoomOutlet";
 const RichEditor = lazy(() => import("./RichEditor"));
 const ReadOnlyContent = lazy(() =>
   import("./RichEditor").then((module) => ({
@@ -71,8 +73,10 @@ export default function NoteEditor(props: NoteEditorProps) {
 }
 function ZoomSession({ children }: { children: React.ReactNode }) {
   const percent = useRef(100);
+  const [target, setTarget] = useState<HTMLDivElement | null>(null);
+  const zoom = useMemo(() => ({ percent, target, setTarget }), [target]);
   return (
-    <ContentZoomSession.Provider value={percent}>
+    <ContentZoomSession.Provider value={zoom}>
       {children}
     </ContentZoomSession.Provider>
   );
@@ -362,6 +366,7 @@ function NoteViewer({
           </Popover.Portal>
         </Popover.Root>
         <div className="note-view-actions">
+          <ContentZoomOutlet />
           <Button variant="ghost" onClick={onEdit}>
             <Pencil size={15} />
             {tr("Edit")}
