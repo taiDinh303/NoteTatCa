@@ -120,11 +120,6 @@ export function NotesZoomViewport({
       height = content.offsetHeight;
       paint(scale);
     }
-    function resize() {
-      const top = view.getBoundingClientRect().top;
-      view.style.height = `${Math.max(160, window.innerHeight - top - 20)}px`;
-      measure();
-    }
     function point(event: MouseEvent) {
       const rect = view.getBoundingClientRect();
       anchor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -141,7 +136,7 @@ export function NotesZoomViewport({
         y: (a.clientY + b.clientY) / 2 - rect.top,
       };
     }
-    resize();
+    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(view);
     observer.observe(content);
@@ -152,7 +147,6 @@ export function NotesZoomViewport({
     view.addEventListener("mouseleave", leave);
     view.addEventListener("touchstart", touch, { passive: true });
     view.addEventListener("touchmove", touch, { passive: true });
-    window.addEventListener("resize", resize);
     return () => {
       observer.disconnect();
       window.clearTimeout(rasterTimer);
@@ -164,7 +158,6 @@ export function NotesZoomViewport({
       view.removeEventListener("mouseleave", leave);
       view.removeEventListener("touchstart", touch);
       view.removeEventListener("touchmove", touch);
-      window.removeEventListener("resize", resize);
     };
   }, [subscribe, mode]);
   return (

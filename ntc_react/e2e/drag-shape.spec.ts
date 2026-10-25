@@ -86,6 +86,13 @@ for (const [width, zoom, touch] of [
       has: page.getByRole("heading", { name: "Tall card", exact: true }),
     });
     await expect(tall).toBeVisible();
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight,
+      ),
+    ).toBeLessThanOrEqual(1);
     const before = [(await short.boundingBox())!, (await tall.boundingBox())!];
     expect(before[1].height - before[0].height).toBeGreaterThan(20);
     const source = (await tall

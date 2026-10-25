@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Chỉ một vùng cuộn dọc cho danh sách note — 2026-10-25
+
+- Theo3ảnh/yêu cầu chủ dự án: tìm và bỏ phần dư khiến có scrollbar của page lẫn scrollbar danh sách. Tái hiện trước sửa bằng2browser tests tại393/1920,700px cao/List150%: document dư20px mobile và50px desktop. Nguyên nhân viewport JS lấy innerHeight-top-20 nhưng main vẫn có padding đáy40/70px, làm tổng vượt màn hình; min-height160px cũng không trừ banner/toolbar/footer.
+- Bỏ height inline/window resize listener của NotesZoomViewport. CSS scoped khi customer-shell chứa data-notes-zoom: shell flex column100dvh, header không co, main-column/workspace-main min-height0, viewport flex nhận phần còn lại; đệm đáy main20px. Banner/notice/toolbar/Load more không co và tự chiếm chỗ trong flex, ResizeObserver hiện có theo kích thước mới. Không body overflow:hidden để giấu lỗi, không khóa trang khác, không đổi zoom/grid/Dnd/data/API.
+- Actual Chromium sau sửa:11/11PASS zoom/content/layout/single-scroll.2case mới kiểm document không dư quá1px, list thực sự overflow/cuộn được bằng wheel, window.scrollY=0, cuộn đến card cuối không có đuôi trống lớn; chèn/bỏ một hàng cùng DOM class/load-more để kiểm chiều cao được nhường/thu hồi và nút nằm trong viewport (đây là layout probe, không khẳng định đã test API phân trang). Giữ9case cũ: zoom mượt/chrome cố định/0network, Grid393cột2/1/1 và1920cột9/4/3 tại50/100/150%, List vừa, content View/Edit/hand/fullscreen. Đã xem screenshot desktop sau sửa.
+- Account fixture SQLite/captured mail riêng5199:5/5PASS drag desktop1440 tại75/100/125%, mobile393mouse/touch; bổ sung kiểm document không overflow ngoài. HTTP reorder/reload/menu/View/shape giữ. Tổng16browser casesPASS. TypeScript/Vite Production build2192modules/ESLint và .NET solution Release strict0warnings/0errorsPASS; docs verifier49Markdown/198local links/0errors/diff checkPASS. Không chạy lại Vitest/backend fullsuite hoặc full E2E khác; không thiết bị vật lý/iOS/production/owner DB/email/migrate/manual deploy. Hosting rollout chưa xác minh.
+- Scope6files: NotesZoomViewport.tsx/CSS,2E2E và2root docs. Giữ styles.css đang được sửa đồng thời và.agnes ngoài commit; base main có publication4d3f819 của công việc khác, không rewrite lịch sử. Push main theo quyền hiện có, kiểm SHA remote sau push.
+
 ## Grid tự đổi cột sau zoom, List luôn vừa chiều ngang — bổ sung DEC-031, 2026-10-25
 
 - Chủ dự án dừng yêu cầu thêm bàn tay để xem phương án bố trí, sau đó duyệt thực hiện đề xuất: Grid thu nhỏ hiện thêm cột, phóng lớn giảm cột; List một note/hàng vừa chiều ngang; ít note không tự kéo giãn lấp cả nhóm. Giữ thứ tự đã lưu và toàn bộ chrome/content zoom độc lập. Không thêm bàn tay vì bố trí mới vừa khung sau khi dừng zoom.

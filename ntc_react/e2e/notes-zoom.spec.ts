@@ -1,5 +1,80 @@
 import { test, expect } from "@playwright/test";
 
+for (const width of [393, 1920]) {
+  test(`notes have a single vertical scroll area ${width}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 700 });
+    await page.addInitScript(() => {
+      localStorage.setItem("ntc.interface.zoom.v1", "150");
+      localStorage.setItem("ntc.view.v1", "list");
+    });
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    const list = page.locator("[data-notes-zoom]");
+    await expect(list).toBeVisible();
+    const dimensions = () =>
+      list.evaluate((el) => ({
+        outer:
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight,
+        inner: el.scrollHeight - el.clientHeight,
+        height: el.clientHeight,
+      }));
+    await expect
+      .poll(async () => (await dimensions()).outer)
+      .toBeLessThanOrEqual(1);
+    expect((await dimensions()).inner).toBeGreaterThan(100);
+    const box = (await list.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.wheel(0, 400);
+    await expect
+      .poll(() => list.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(0);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    await list.evaluate((el) => {
+      el.scrollTop = el.scrollHeight;
+    });
+    const bottom = await list.evaluate((el) => {
+      const cards = el.querySelectorAll(".note-card");
+      return (
+        el.getBoundingClientRect().bottom -
+        cards[cards.length - 1].getBoundingClientRect().bottom
+      );
+    });
+    expect(bottom).toBeGreaterThanOrEqual(-1);
+    expect(bottom).toBeLessThan(80);
+    // Pagination controls are a sibling of the viewport in the real page.
+    // Adding/removing that row must reduce/reclaim list height without page overflow.
+    const before = (await dimensions()).height;
+    await page.locator(".workspace-main").evaluate((el) => {
+      const footer = document.createElement("div");
+      footer.className = "load-more";
+      footer.id = "pagination-layout-probe";
+      footer.innerHTML =
+        '<button type="button">Pagination layout probe</button>';
+      el.append(footer);
+    });
+    await expect
+      .poll(async () => (await dimensions()).height)
+      .toBeLessThan(before);
+    expect((await dimensions()).outer).toBeLessThanOrEqual(1);
+    await expect(
+      page.getByRole("button", { name: "Pagination layout probe" }),
+    ).toBeInViewport();
+    await page
+      .locator("#pagination-layout-probe")
+      .evaluate((el) => el.remove());
+    await expect.poll(async () => (await dimensions()).height).toBe(before);
+    await page.screenshot({
+      path: `test-results/notes-single-scroll-${width}.png`,
+    });
+  });
+}
+
 for (const width of [393, 1440]) {
   test(`list zoom is continuous and leaves chrome fixed ${width}`, async ({
     page,

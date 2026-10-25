@@ -1,3 +1,29 @@
+.customer-shell:has([data-notes-zoom]) {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.customer-shell:has([data-notes-zoom]) > .topbar {
+  flex-shrink: 0;
+}
+.customer-shell:has([data-notes-zoom]) > .main-column {
+  flex: 1;
+  min-height: 0;
+}
+.customer-shell:has([data-notes-zoom]) .workspace-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding-bottom: 20px;
+}
+.customer-shell:has([data-notes-zoom]) .workspace-main > * {
+  flex-shrink: 0;
+}
+.customer-shell .workspace-main > .notes-zoom-viewport {
+  flex: 1 1 0;
+  min-height: 0;
+}
 .notes-zoom-viewport {
   width: 100%;
   min-width: 0;
