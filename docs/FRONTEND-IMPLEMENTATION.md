@@ -4,6 +4,14 @@
 
 ## Phạm vi và kiến trúc
 
+### Tạo/xóa nhãn phản hồi ngay — 2026-10-25
+
+Your labels hiện nhãn mới ngay khi Add, xóa trắng form và đưa danh sách về đầu; nút Add không chờ request hoặc tải lại workspace. Nhãn tạm chỉ có trong manager, aria-busy và khóa sửa/xóa tới khi nhận ID/version thật, không gửi ID tạm qua API gán nhãn. Sidebar/chooser nhận nhãn đã được server xác nhận. Xác nhận Delete đóng ngay, overlay ẩn nhãn trong mọi useLabels; request xóa chạy nền. Hoạt động đang chờ tồn tại ngoài modal nên đóng/mở manager không làm nhãn tạm biến mất hoặc nhãn đang xóa xuất hiện lại.
+
+`LabelMutations` giữ từng thao tác riêng: lỗi tạo bỏ đúng dòng tạm, lỗi xóa bỏ overlay để phục hồi nhãn; không restore snapshot toàn danh sách làm mất thao tác thành công khác. Lỗi có toast4ngôn ngữ kể cả manager đã đóng. Cache đầy đủ cập nhật trực tiếp bằng phản hồi create/delete, không refetch labels toàn bộ mỗi lần; cache thiếu/chưa tải hết trang và lỗi kết quả chưa chắc chắn được reconcile ở nền. Xóa thành công invalidate notes để đồng bộ tag/version. Cached list vẫn hiện khi background refetch lỗi. Hộp Edit label hiện hữu giữ save/version behavior.
+
+Mọi cache key được chụp theo account, auth identity thay đổi reset overlay/generation; trước gửi và sau ACK kiểm lại identity để không gửi thao tác đã chờ sang account mới hoặc ghi kết quả cũ vào account mới. Giữ guest repository, API ownership/backend/migrations. Đây là phản hồi lạc quan khi trang còn mở, không thêm hàng đợi ghi bền/offline hoặc tự replay tạo nhãn sau khi đóng tab. Không báo đã lưu trước ACK và không cho thao tác với ID tạm. Evidence9unit mới và2browser account tại worklog.
+
 ### Zoom riêng nội dung note — 2026-10-25
 
 Tinh chỉnh cùng ngày: input zoom rộng28px, số căn giữa, nút−rộng24px để sát input hơn. Reset và dấu+ dùng SVG14px. View mở popup phía trên kính lúp, Edit mở inline sang phải và đẩy các công cụ sau.

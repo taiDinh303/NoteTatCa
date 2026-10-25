@@ -23,6 +23,9 @@ import {
 } from "../infrastructure/repositories";
 import { AuthService, SessionVault } from "../application/auth";
 import { WorkspaceService } from "../application/workspace";
+import { LabelMutations } from "../application/labelMutations";
+import { toast } from "sonner";
+import { errorMessage } from "../shared/utils";
 import { ServerConnection, healthUrl } from "../application/connection";
 import {
   WorkspacePreparation,
@@ -246,6 +249,24 @@ export const workspace = new WorkspaceService(
   cache,
   () => auth.getSnapshot().session?.userId,
 );
+export const labelMutations = new LabelMutations(
+  labels,
+  cache,
+  resource => workspace.key(resource),
+  () => auth.identity(),
+  (action, label, error) => toast.error(
+    t(action === "create" ? "Could not create label {0}." : "Could not delete label {0}.", label.name),
+    { description: errorMessage(error) },
+  ),
+);
+let labelsIdentity = auth.identity();
+auth.subscribe(() => {
+  const next = auth.identity();
+  if (next !== labelsIdentity) {
+    labelsIdentity = next;
+    labelMutations.reset();
+  }
+});
 let orderOwner = auth.getSnapshot().session?.userId;
 auth.subscribe(() => {
   const next = auth.getSnapshot().session?.userId;

@@ -1,7 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react";
-import { labels, cache, workspace } from "../../app/runtime";
+import { labels, cache, workspace, labelMutations } from "../../app/runtime";
 import { useLabels } from "../../shared/hooks";
 import type { Label } from "../../domain/models";
 import {
@@ -18,12 +18,20 @@ import {
 export default function LabelsManager({ onClose }: { onClose: () => void }) {
   useLanguage();
   const query = useLabels();
+  const mutations = useSyncExternalStore(
+    labelMutations.subscribe,
+    labelMutations.getSnapshot,
+  );
   const [editing, setEditing] = useState<Label | null>(null);
   const [deleting, setDeleting] = useState<Label>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [formKey, setFormKey] = useState(0);
-  const items = query.data?.pages.flatMap((p) => p.items) ?? [];
+  const list = useRef<HTMLDivElement>(null);
+  const items = [
+    ...mutations.creating,
+    ...(query.data?.pages.flatMap((p) => p.items) ?? []),
+  ];
   async function refresh() {
     await cache.invalidateQueries({ queryKey: workspace.key("labels") });
     await cache.invalidateQueries({ queryKey: workspace.key("notes") });
@@ -42,14 +50,21 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           onSubmit={(e) => {
             e.preventDefault();
             const data = new FormData(e.currentTarget);
-            setBusy(true);
             setError(undefined);
             const body = {
               name: String(data.get("name")).trim(),
               color: String(data.get("color")),
               icon: null,
             };
-            void (editing ? labels.patch(editing, body) : labels.create(body))
+            if (!editing) {
+              list.current?.scrollTo({ top: 0 });
+              setFormKey((k) => k + 1);
+              void labelMutations.create(body).catch(() => {});
+              return;
+            }
+            setBusy(true);
+            void labels
+              .patch(editing, body)
               .then(async () => {
                 setEditing(null);
                 setFormKey((k) => k + 1);
@@ -100,10 +115,10 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           ) : null}
         </form>
         <ErrorBanner error={error} />
-        <div className="labels-manager-scroll">
-          {query.isPending ? (
+        <div className="labels-manager-scroll" ref={list}>
+          {query.isPending && items.length === 0 ? (
             <Spinner />
-          ) : query.isError ? (
+          ) : query.isError && items.length === 0 ? (
             <ErrorPanel
               error={query.error}
               retry={() => void query.refetch()}
@@ -117,11 +132,16 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           ) : (
             <div className="label-list">
               {items.map((label) => (
-                <div className="label-row" key={label.id}>
+                <div
+                  className="label-row"
+                  key={label.id}
+                  aria-busy={label.id.startsWith("pending:")}
+                >
                   <Tag size={17} style={{ color: label.color ?? undefined }} />
                   <span>{label.name}</span>
                   <IconButton
                     icon={Pencil}
+                    disabled={label.id.startsWith("pending:")}
                     label={tr("Edit label {0}", label.name)}
                     onClick={() => {
                       setEditing(label);
@@ -130,6 +150,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                   />
                   <IconButton
                     icon={Trash2}
+                    disabled={label.id.startsWith("pending:")}
                     label={tr("Delete label {0}", label.name)}
                     onClick={() => setDeleting(label)}
                   />
@@ -163,13 +184,14 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
           confirmLabel={tr("Delete label")}
           danger
           onClose={() => setDeleting(undefined)}
-          onConfirm={async () => {
-            await labels.delete(deleting.id);
-            await refresh();
-            if (editing?.id === deleting.id) {
+          onConfirm={() => {
+            const label = deleting;
+            setDeleting(undefined);
+            if (editing?.id === label.id) {
               setEditing(null);
               setFormKey((k) => k + 1);
             }
+            void labelMutations.delete(label).catch(() => {});
           }}
         />
       ) : null}

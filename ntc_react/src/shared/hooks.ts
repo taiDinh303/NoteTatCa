@@ -1,6 +1,14 @@
 import { useSyncExternalStore, useState, useEffect } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { auth, workspace, notes, labels, account, cache } from "../app/runtime";
+import {
+  auth,
+  workspace,
+  notes,
+  labels,
+  account,
+  cache,
+  labelMutations,
+} from "../app/runtime";
 import type { NoteFilter } from "../domain/models";
 export const useAuth = () =>
   useSyncExternalStore(auth.subscribe, auth.getSnapshot);
@@ -31,7 +39,11 @@ export function useNotes(filter: NoteFilter) {
 }
 export function useLabels() {
   const state = useAuth();
-  return useInfiniteQuery({
+  const mutations = useSyncExternalStore(
+    labelMutations.subscribe,
+    labelMutations.getSnapshot,
+  );
+  const query = useInfiniteQuery({
     networkMode: "always",
     queryKey: workspace.key("labels"),
     queryFn: ({ pageParam, signal }) => labels.list(pageParam, signal),
@@ -41,6 +53,19 @@ export function useLabels() {
     enabled: ["authenticated", "offline", "guest"].includes(state.status),
     staleTime: 120_000,
   });
+  if (!query.data || mutations.deleting.length === 0) return query;
+  return {
+    ...query,
+    data: {
+      ...query.data,
+      pages: query.data.pages.map((page) => ({
+        ...page,
+        items: page.items.filter(
+          (label) => !mutations.deleting.includes(label.id),
+        ),
+      })),
+    },
+  };
 }
 export function useMe() {
   const state = useAuth();
