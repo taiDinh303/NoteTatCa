@@ -32,6 +32,18 @@
 - Validation thực tế: Chromium guest note giả tại320/393/430/768/1280px: tâm các nút định dạng cùng hàng; mobile scrollWidth605px, cuộn ngang bằng wheel đến nhóm cuối thành công, highlight/text color popup hoạt động; màu nền popup và labels mở được. Bốn nút footer mobile bắt đầu x12/49/86/123px. Đã xem screenshot393px. TypeScript/Vite Production build, ESLint, .NET solution Release strict (0warnings/0errors) và git diff --check PASS.
 - CSS-only2files: styles.css và worklog; không sửa API/autosave/dữ liệu. Không fullsuite/account HTTP/thiết bị vật lý/production/DB/email thật/manual deploy/migrate. Giữ `.agnes/` ngoài commit. Push main theo quyền hiện có và kiểm SHA remote sau push; hosting rollout chưa xác minh.
 
+## Zoom inline trong dropdown account — 2026-10-25
+
+- Theo yêu cầu/chủ dự án: bỏ popup Zoom (ZoomDialog) và đưa các nút −/input/+ / Reset nằm thẳng trong dropdown account menu; đồng thời làm đẹp zoom row trong Appearance.
+- `ZoomMenu.tsx`: thay `ZoomDialog.tsx` (đã delete) bằng `ZoomDropdown` — render như một block "extra" trong Radix Dropdown của account menu. Auto-focus input khi mở; commit khi blur/Enter; step ± 5; Reset (RotateCcw) về 100%.
+- `ui.tsx`: thêm prop `extra?: ReactNode` vào `ActionMenu` để render content bên dưới items (zoom controls).
+- `ShellControls.tsx`: bỏ import `ZoomDialog`, `ZoomIn`, `useState`; thay bằng `ZoomDropdown` render qua `extra={<ZoomDropdown />}`; bỏ item "Zoom (100%)" khỏi items list.
+- `PreferencesPage.tsx` (Appearance zoom row): thay IconButton + text button bằng `.zoom-step` buttons + input number + `.zoom-reset`; dùng chung CSS với zoom dropdown.
+- `styles.css`: thêm styles `.zoom-dropdown-controls`, `.zoom-step`, `.zoom-dropdown-number`, `.zoom-reset`; bỏ `.zoom-dropdown-trigger`, `.zoom-dropdown`, `.zoom-panel`, `.zoom-adjustments` (không còn dùng).
+- Validation: typecheck/lint/build PASS. Chưa E2E; không deploy/migrate.
+- Scope: `ntc_react/src/shared/ZoomMenu.tsx`, `ntc_react/src/shared/ui.tsx`, `ntc_react/src/app/ShellControls.tsx`, `ntc_react/src/features/settings/PreferencesPage.tsx`, `ntc_react/src/styles.css`, `docs/worklog.md`; xóa `ZoomDialog.tsx`.
+
+
 ## Zoom popup gọn — 2026-10-25
 
 - Theo yêu cầu/chủ dự án: Zoom popup (mở từ avatar menu) bỏ title, label, dòng hint, ký hiệu %; giữ −, input, +, Close (nút X ở góc), Reset và Done (thay thành Close). Bước ± vẫn 5%.

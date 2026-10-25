@@ -7,9 +7,8 @@ import {
   t as tr,
 } from "../../shared/i18n";
 import PrivacySettings from "./PrivacySettings";
-import { IconButton } from "../../shared/ui";
 import { useDisplayZoom } from "../../shared/displayZoom";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, RotateCcw } from "lucide-react";
 import "./preferences.css";
 
 export default function PreferencesPage({
@@ -78,32 +77,50 @@ function AppearanceZoomRow() {
     <div className="preferences-row appearance-zoom-row">
       <span>{tr("Interface zoom")}</span>
       <div
-        className="appearance-zoom-controls"
+        className="appearance-zoom-controls zoom-dropdown-controls"
         role="group"
         aria-label={tr("Interface zoom")}
       >
-        <IconButton
-          icon={Minus}
-          label={tr("Zoom out")}
-          disabled={percent <= 50}
-          onClick={() => change(percent - 5)}
-        />
-        <span className="appearance-zoom-percentage">
-          {tr("Zoom ({0}%)", percent)}
-        </span>
-        <IconButton
-          icon={Plus}
-          label={tr("Zoom in")}
-          disabled={percent >= 150}
-          onClick={() => change(percent + 5)}
-        />
         <button
           type="button"
-          className="text-button appearance-zoom-reset"
-          disabled={percent === 100}
+          className="zoom-step"
+          aria-label={tr("Zoom out")}
+          disabled={percent <= 50}
+          onClick={() => change(Math.max(50, percent - 5))}
+        >
+          <Minus size={15} />
+        </button>
+        <div className="zoom-dropdown-number">
+          <input
+            type="number"
+            min={50}
+            max={150}
+            step={5}
+            inputMode="numeric"
+            value={percent}
+            aria-label={tr("Zoom percentage")}
+            onChange={(event) => {
+              const raw = Number(event.target.value);
+              if (Number.isFinite(raw)) change(Math.min(150, Math.max(50, Math.round(raw))));
+            }}
+          />
+        </div>
+        <button
+          type="button"
+          className="zoom-step"
+          aria-label={tr("Zoom in")}
+          disabled={percent >= 150}
+          onClick={() => change(Math.min(150, percent + 5))}
+        >
+          <Plus size={15} />
+        </button>
+        <button
+          type="button"
+          className="zoom-reset"
+          aria-label={tr("Reset")}
           onClick={() => change(100)}
         >
-          {tr("Reset to 100%")}
+          <RotateCcw size={15} />
         </button>
       </div>
     </div>

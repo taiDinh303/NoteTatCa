@@ -748,6 +748,11 @@ strong {
   background: var(--border);
   margin: 0 4px;
 }
+.avatar-menu-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 .avatar-menu {
   background: none;
   border: 0;
@@ -4581,6 +4586,86 @@ td {
   line-height: 1.6;
   text-align: center;
 }
+.zoom-dropdown-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+}
+.zoom-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--hover);
+  color: var(--subtle);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.zoom-step:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.zoom-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.zoom-dropdown-number {
+  display: flex;
+  align-items: center;
+  width: 64px;
+}
+.zoom-dropdown-number input {
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  text-align: center;
+  padding: 0 !important;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.zoom-dropdown-number input::-webkit-inner-spin-button,
+.zoom-dropdown-number input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+.zoom-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.zoom-reset:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.zoom-reset:focus-visible,
+.zoom-step:focus-visible,
+.zoom-dropdown-number input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .editor-heading .editor-heading-action {
   background: transparent;
   color: inherit;

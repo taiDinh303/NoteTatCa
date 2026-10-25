@@ -406,10 +406,12 @@ export function ActionMenu({
   items,
   label = tr("More actions"),
   children,
+  extra,
 }: {
   items: MenuAction[];
   label?: string;
   children?: ReactNode;
+  extra?: ReactNode;
 }) {
   useLanguage();
   return (
@@ -440,6 +442,7 @@ export function ActionMenu({
               </Dropdown.Item>
             </span>
           ))}
+          {extra}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>

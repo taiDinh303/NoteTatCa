@@ -1,11 +1,10 @@
 import { t as tr, useLanguage } from "../shared/i18n";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   LogOut,
   Settings,
-  ZoomIn,
   RefreshCw,
   LogIn,
   Copy,
@@ -24,8 +23,7 @@ import { errorMessage } from "../shared/utils";
 import { useAuth, useMe } from "../shared/hooks";
 import { ActionMenu, Avatar, Modal } from "../shared/ui";
 import { LoginForm } from "../features/auth/AuthPage";
-import { useDisplayZoom } from "../shared/displayZoom";
-import { ZoomDialog } from "../shared/ZoomDialog";
+import { ZoomDropdown } from "../shared/ZoomMenu";
 
 export function ShellAccountMenu({
   onNavigate,
@@ -41,8 +39,6 @@ export function ShellAccountMenu({
     void navigate(path);
     onNavigate?.();
   }
-  const [zoomOpen, setZoomOpen] = useState(false);
-  const zoom = useDisplayZoom();
   const trigger = useRef<HTMLButtonElement>(null);
   const name =
     me.data?.profile?.fullName ||
@@ -51,97 +47,83 @@ export function ShellAccountMenu({
     state.session?.userName ||
     tr("Your account");
   return (
-    <>
-      <ActionMenu
-        label={tr("Account menu")}
-        items={[
-          ...(guestMode
-            ? [
-                {
-                  label: tr("Sign in"),
-                  icon: LogIn,
-                  action: () => {
-                    guest.requestImport();
-                    navigateTo("/login");
-                  },
+    <ActionMenu
+      label={tr("Account menu")}
+      extra={<ZoomDropdown />}
+      items={[
+        ...(guestMode
+          ? [
+              {
+                label: tr("Sign in"),
+                icon: LogIn,
+                action: () => {
+                  guest.requestImport();
+                  navigateTo("/login");
                 },
-              ]
-            : []),
-          ...(!guestMode && !isAdministrator(state.session)
-            ? [
-                {
-                  label: tr("Sync now"),
-                  icon: RefreshCw,
-                  action: () => {
-                    void (async () => {
-                      if (!navigator.onLine)
-                        throw new Error(tr("Working offline"));
-                      if (!onlineWorkspace()) await auth.refresh();
-                      await offline.sync();
-                      await cache.invalidateQueries({
-                        queryKey: workspace.key("notes"),
-                      });
-                    })().catch((error) => toast.error(errorMessage(error)));
-                  },
+              },
+            ]
+          : []),
+        ...(!guestMode && !isAdministrator(state.session)
+          ? [
+              {
+                label: tr("Sync now"),
+                icon: RefreshCw,
+                action: () => {
+                  void (async () => {
+                    if (!navigator.onLine)
+                      throw new Error(tr("Working offline"));
+                    if (!onlineWorkspace()) await auth.refresh();
+                    await offline.sync();
+                    await cache.invalidateQueries({
+                      queryKey: workspace.key("notes"),
+                    });
+                  })().catch((error) => toast.error(errorMessage(error)));
                 },
-              ]
-            : []),
-          ...(!guestMode && !isAdministrator(state.session) && guestData.exists
-            ? [
-                {
-                  label: tr("Copy guest notes"),
-                  icon: Copy,
-                  action: () => guest.requestImport(),
-                },
-              ]
-            : []),
-          ...(!guestMode
-            ? [
-                {
-                  label: tr("Account settings"),
-                  icon: Settings,
-                  action: () => navigateTo(base + "/profile"),
-                },
-              ]
-            : []),
-          {
-            label: tr("Zoom ({0}%)", zoom.percent),
-            icon: ZoomIn,
-            action: () => setZoomOpen(true),
-          },
-          {
-            label: tr(guestMode ? "Leave guest mode" : "Sign out"),
-            icon: LogOut,
-            separator: true,
-            action: () => navigateTo("/logout"),
-          },
-        ]}
+              },
+            ]
+          : []),
+        ...(!guestMode && !isAdministrator(state.session) && guestData.exists
+          ? [
+              {
+                label: tr("Copy guest notes"),
+                icon: Copy,
+                action: () => guest.requestImport(),
+              },
+            ]
+          : []),
+        ...(!guestMode
+          ? [
+              {
+                label: tr("Account settings"),
+                icon: Settings,
+                action: () => navigateTo(base + "/profile"),
+              },
+            ]
+          : []),
+        {
+          label: tr(guestMode ? "Leave guest mode" : "Sign out"),
+          icon: LogOut,
+          separator: true,
+          action: () => navigateTo("/logout"),
+        },
+      ]}
+    >
+      <button
+        ref={trigger}
+        type="button"
+        className="avatar-menu"
+        aria-label={tr("Account menu")}
       >
-        <button
-          ref={trigger}
-          type="button"
-          className="avatar-menu"
-          aria-label={tr("Account menu")}
-        >
-          <Avatar
-            name={name}
-            picture={
-              me.data ? me.data.profile?.picture : state.session?.picture
-            }
-          />
-          <span className="account-name">{name.split(" ")[0]}</span>
-          <ChevronDown size={12} />
-        </button>
-      </ActionMenu>
-      {zoomOpen ? (
-        <ZoomDialog
-          onClose={() => {
-            setZoomOpen(false);
-            requestAnimationFrame(() => trigger.current?.focus());
-          }}
+        <Avatar
+          name={name}
+          picture={
+            me.data ? me.data.profile?.picture : state.session?.picture
+          }
         />
-      ) : null}
-    </>
+        <span className="account-name">{name.split(" ")[0]}</span>
+        <ChevronDown size={12} />
+      </button>
+    </ActionMenu>
   );
 }
 
