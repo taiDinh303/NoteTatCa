@@ -355,6 +355,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "応答を待っています…",
   ],
   Reconnect: ["Kết nối lại", "重新连接", "再接続"],
+  "Notes zoom": ["Thu phóng danh sách ghi chú", "笔记列表缩放", "ノート一覧のズーム"],
   "Interface zoom": ["Thu phóng giao diện", "界面缩放", "画面のズーム"],
   "Loading…": ["Đang tải…", "加载中…", "読み込み中…"],
   "Close dialog": ["Đóng hộp thoại", "关闭对话框", "ダイアログを閉じる"],

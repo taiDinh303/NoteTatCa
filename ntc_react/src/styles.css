@@ -1,6 +1,5 @@
 :root {
   --interface-scale: 1;
-  zoom: var(--interface-scale);
   container: viewport / inline-size;
   --scroll-thumb: #b8bec5;
   --scroll-thumb-hover: #929ba6;

@@ -2,6 +2,9 @@
 
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES
 
+
+DEC-031 (chủ dự án2026-10-25): zoom bên ngoài chỉ phóng/thu danh sách note, header/sidebar/các controls và View/Edit giữ nguyên. Thay phạm vi zoom toàn giao diện DEC-021; giữ50–150%, preference cũ và content zoom riêng. Ctrl+wheel/pinch dùng transform với nội suy từng frame, không reflow card/grid hoặc tải lại dữ liệu khi zoom. Chi tiết triển khai và kiểm chứng tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+
 ## Quyết định hiện hành
 
 DEC-030 (chủ dự án2026-10-25): đồng ý đưa toàn bộ đề xuất mở rộng vào roadmap, gồm realtime TASK-029, TASK-035–042 và thông báo cộng tác TASK-044; bổ sung TASK-043 AI chat tạo note/nội dung theo prompt (ví dụ từ vựng tiếng Anh chủ đề family). Tất cả PLANNED, chưa code. Quyền Editor/link public, tập công thức, dữ liệu gửi/provider AI, phương án delta/pagination và chi phí/thứ tự vẫn cần chốt trước từng đợt. Delta được hiểu là đồng bộ phần thay đổi, không phải một kiểu tìm kiếm. TASK-014/015 tiếp tục phụ trách đo tải để chọn tối ưu. Chi tiết [roadmap](ROADMAP-CONTENT-COLLABORATION.md) và [AI](32-ai-features.md).

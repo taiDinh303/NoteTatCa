@@ -217,7 +217,7 @@ for (const width of [320, 393, 1280]) {
     await dialog.screenshot({
       path: `test-results/content-zoom-view-${width}.png`,
     });
-    // Global zoom still works from the title, independently of the document.
+    // Note chrome does not change list zoom.
     await dialog.locator(".note-view-heading").evaluate((el) =>
       el.dispatchEvent(
         new WheelEvent("wheel", {
@@ -232,7 +232,7 @@ for (const width of [320, 393, 1280]) {
       .poll(() =>
         page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
       )
-      .toBe("111");
+      .toBe("100");
     await expect(await zoomInput(page)).toHaveValue("175");
     await dialog.getByRole("button", { name: "Edit", exact: true }).click();
     dialog = page.getByRole("dialog", { name: "Edit note", exact: true });
@@ -254,7 +254,7 @@ for (const width of [320, 393, 1280]) {
     ).toHaveText("Edited while content is zoomed");
     expect(
       await page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
-    ).toBe("111");
+    ).toBe("100");
   });
 }
 

@@ -75,11 +75,11 @@ function AppearanceZoomRow() {
   const { percent, change } = useDisplayZoom();
   return (
     <div className="preferences-row appearance-zoom-row">
-      <span>{tr("Interface zoom")}</span>
+      <span>{tr("Notes zoom")}</span>
       <div
         className="appearance-zoom-controls zoom-dropdown-controls"
         role="group"
-        aria-label={tr("Interface zoom")}
+        aria-label={tr("Notes zoom")}
       >
         <button
           type="button"

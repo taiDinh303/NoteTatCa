@@ -2,6 +2,9 @@
 
 > Cập nhật: 2026-10-17 | DRAFT | Áp dụng: YES | Người quyết định: chủ dự án
 
+
+DEC-031 (chủ dự án2026-10-25): zoom bên ngoài chỉ phóng/thu danh sách note, header/sidebar/các controls và View/Edit giữ nguyên. Thay phạm vi zoom toàn giao diện DEC-021; giữ50–150%, preference cũ và content zoom riêng. Ctrl+wheel/pinch dùng transform với nội suy từng frame, không reflow card/grid hoặc tải lại dữ liệu khi zoom. Chi tiết triển khai và kiểm chứng tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+
 ## Đầu vào đã biết
 
 | Trường | Nội dung / nguồn |

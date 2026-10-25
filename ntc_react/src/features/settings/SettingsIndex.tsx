@@ -9,7 +9,6 @@ import {
   Monitor,
   ChevronRight,
 } from "lucide-react";
-import { useDisplayZoom } from "../../shared/displayZoom";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { settingsLinks } from "./settingsLinks";
 import "./settings.css";
@@ -34,9 +33,8 @@ export default function SettingsIndex({
 }) {
   useLanguage();
   const width = useSyncExternalStore(subscribe, () => window.innerWidth);
-  const { percent } = useDisplayZoom();
   const base = administration ? "/admin/settings" : "/settings";
-  if (width / (percent / 100) > 800)
+  if (width > 800)
     return <Navigate to={base + "/account"} replace />;
   return (
     <section className="settings-index">

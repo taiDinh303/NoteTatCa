@@ -14,5 +14,4 @@
   position: absolute;
   inset: 0 auto auto 0;
   transform-origin: 0 0;
-  will-change: transform;
 }

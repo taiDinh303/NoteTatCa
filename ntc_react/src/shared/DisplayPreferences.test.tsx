@@ -3,6 +3,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { useDisplayZoom } from "./displayZoom";
+import { useEffect } from "react";
 
 afterEach(() => {
   cleanup();
@@ -18,7 +19,7 @@ it("paints gesture frames without writing storage or rerendering zoom subscriber
   function Consumer() {
     const zoom = useDisplayZoom();
     renders++;
-    return <output>{zoom.percent}</output>;
+    return <output data-notes-zoom>{zoom.percent}</output>;
   }
   render(
     <DisplayPreferences>
@@ -28,8 +29,9 @@ it("paints gesture frames without writing storage or rerendering zoom subscriber
   const write = vi.spyOn(Storage.prototype, "setItem");
   for (let i = 0; i < 20; i++)
     act(() => {
-      window.dispatchEvent(
+      screen.getByText("100", { selector: "output" }).dispatchEvent(
         new WheelEvent("wheel", {
+          bubbles: true,
           cancelable: true,
           ctrlKey: true,
           deltaY: -5,
@@ -38,20 +40,13 @@ it("paints gesture frames without writing storage or rerendering zoom subscriber
       vi.advanceTimersByTime(17);
     });
   expect(
-    Number(
-      document.documentElement.style.getPropertyValue("--interface-scale"),
-    ),
-  ).toBeGreaterThan(1.09);
-  expect(
-    screen.getByRole("status", { name: "Interface zoom" }).textContent,
-  ).toBe("111%");
+    document.documentElement.style.getPropertyValue("--interface-scale"),
+  ).toBe("");
+  expect(screen.getByRole("status", { name: "Notes zoom" })).toBeTruthy();
   expect(write).not.toHaveBeenCalled();
   expect(renders).toBe(1);
-  act(() => vi.advanceTimersByTime(161));
-  expect(
-    screen.getByRole("status", { name: "Interface zoom" }).textContent,
-  ).toBe("111%");
-  expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("111");
+  act(() => vi.advanceTimersByTime(1000));
+  expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("113");
   expect(renders).toBe(2);
 });
 
@@ -85,7 +80,11 @@ it("cancels pending gesture work when unmounted and still persists explicit chan
   vi.useFakeTimers();
   function Consumer() {
     const zoom = useDisplayZoom();
-    return <button onClick={() => zoom.change(120)}>Change</button>;
+    return (
+      <button data-notes-zoom onClick={() => zoom.change(120)}>
+        Change
+      </button>
+    );
   }
   const view = render(
     <DisplayPreferences>
@@ -95,8 +94,9 @@ it("cancels pending gesture work when unmounted and still persists explicit chan
   act(() => screen.getByRole("button", { name: "Change" }).click());
   expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("120");
   act(() =>
-    window.dispatchEvent(
+    screen.getByRole("button", { name: "Change" }).dispatchEvent(
       new WheelEvent("wheel", {
+        bubbles: true,
         cancelable: true,
         ctrlKey: true,
         deltaY: -100,
@@ -106,4 +106,44 @@ it("cancels pending gesture work when unmounted and still persists explicit chan
   view.unmount();
   act(() => vi.advanceTimersByTime(1500));
   expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("120");
+});
+
+it("eases coarse wheel deltas over multiple frames, caps each impulse, and ignores chrome", () => {
+  vi.useFakeTimers();
+  const frames: number[] = [];
+  function Consumer() {
+    const { subscribe } = useDisplayZoom();
+    useEffect(() => subscribe((value) => frames.push(value)), [subscribe]);
+    return (
+      <>
+        <div data-notes-zoom data-testid="list" />
+        <button>Header</button>
+      </>
+    );
+  }
+  render(
+    <DisplayPreferences>
+      <Consumer />
+    </DisplayPreferences>,
+  );
+  const wheel = () =>
+    new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      deltaY: -10000,
+    });
+  act(() =>
+    screen.getByRole("button", { name: "Header" }).dispatchEvent(wheel()),
+  );
+  act(() => vi.advanceTimersByTime(1000));
+  expect(frames).toEqual([1]);
+  act(() => screen.getByTestId("list").dispatchEvent(wheel()));
+  act(() => vi.advanceTimersByTime(17));
+  expect(frames.at(-1)).toBeGreaterThan(1);
+  expect(frames.at(-1)).toBeLessThan(1.04);
+  act(() => vi.advanceTimersByTime(1000));
+  expect(frames.length).toBeGreaterThan(15);
+  expect(frames.at(-1)).toBeCloseTo(Math.exp(80 * 0.0012), 5);
+  expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("110");
 });

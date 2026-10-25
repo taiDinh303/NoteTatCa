@@ -171,7 +171,7 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       safariBase = target.current;
     }
     function gestureChange(event: Event) {
-      if (isContent(event)) return;
+      if (isContent(event) || safariBase === undefined) return;
       if (!event.cancelable) return;
       event.preventDefault();
       const scale = (event as Event & { scale?: number }).scale;

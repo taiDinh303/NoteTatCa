@@ -40,6 +40,7 @@ import { notePalette } from "../../domain/color";
 import { CardLabels } from "./CardLabels";
 import { animateNoteDrop, cancelNoteDrop } from "./noteMotion";
 import "./NoteMotion.css";
+import { NotesZoomViewport } from "./NotesZoomViewport";
 import { workspace } from "../../app/runtime";
 import { useAuth, useDebounced, useLabels, useNotes } from "../../shared/hooks";
 import {
@@ -111,9 +112,9 @@ function NoteCard({
       style={{
         ...notePalette(note.backgroundColor),
         // Dnd-kit measures screen pixels; CSS transforms use pixels before the
-        // app's CSS zoom. Translate only, so unequal cards keep their shape.
+        // notes layer's scale. Translate only, so unequal cards keep their shape.
         transform: transform
-          ? `translate3d(calc(${transform.x}px / var(--interface-scale)), calc(${transform.y}px / var(--interface-scale)), 0)`
+          ? `translate3d(calc(${transform.x}px / var(--notes-scale, 1)), calc(${transform.y}px / var(--notes-scale, 1)), 0)`
           : undefined,
         transition: transition,
         backgroundColor: note.backgroundColor || undefined,
@@ -459,9 +460,11 @@ export default function NotesPage({
         {trash ? (
           <div className="notice-strip trash-retention">
             <Trash2 size={16} />
-            <span>{tr(
-              "Deleted notes are permanently removed after the 30-day retention period.",
-            )}</span>
+            <span>
+              {tr(
+                "Deleted notes are permanently removed after the 30-day retention period.",
+              )}
+            </span>
           </div>
         ) : null}
         {!trash ? (
@@ -548,35 +551,37 @@ export default function NotesPage({
           }
         />
       ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={({ active }) => cancelNoteDrop(active.id)}
-          onDragCancel={({ active }) => animateNoteDrop(active.id)}
-          onDragEnd={dragEnd}
-        >
-          <SortableContext
-            items={all.map((n) => n.id)}
-            strategy={groupSortingStrategy}
+        <NotesZoomViewport>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={({ active }) => cancelNoteDrop(active.id)}
+            onDragCancel={({ active }) => animateNoteDrop(active.id)}
+            onDragEnd={dragEnd}
           >
-            {trash ? (
-              renderGroup(all, tr("Deleted notes"))
-            ) : (
-              <>
-                {renderGroup(
-                  all.filter((n) => n.isPinned),
-                  tr("Pinned"),
-                )}
-                {renderGroup(
-                  all.filter((n) => !n.isPinned),
-                  all.some((n) => n.isPinned)
-                    ? tr("Everything else")
-                    : tr("All notes"),
-                )}
-              </>
-            )}
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={all.map((n) => n.id)}
+              strategy={groupSortingStrategy}
+            >
+              {trash ? (
+                renderGroup(all, tr("Deleted notes"))
+              ) : (
+                <>
+                  {renderGroup(
+                    all.filter((n) => n.isPinned),
+                    tr("Pinned"),
+                  )}
+                  {renderGroup(
+                    all.filter((n) => !n.isPinned),
+                    all.some((n) => n.isPinned)
+                      ? tr("Everything else")
+                      : tr("All notes"),
+                  )}
+                </>
+              )}
+            </SortableContext>
+          </DndContext>
+        </NotesZoomViewport>
       )}
       {query.hasNextPage ? (
         <div className="load-more">

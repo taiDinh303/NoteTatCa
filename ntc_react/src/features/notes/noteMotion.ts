@@ -22,8 +22,8 @@ export function animateNoteDrop(id: string | number) {
     const to = node.getBoundingClientRect();
     const zoom =
       parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--interface-scale",
+        getComputedStyle(node).getPropertyValue(
+          "--notes-scale",
         ),
       ) || 1;
     const x = (from.x - to.x) / zoom;

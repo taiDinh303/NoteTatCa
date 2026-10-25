@@ -4,6 +4,16 @@
 
 ## Phạm vi và kiến trúc
 
+### Zoom danh sách, giữ nguyên giao diện — DEC-031, 2026-10-25
+
+Theo yêu cầu mới, thay phạm vi zoom toàn giao diện của DEC-021: chỉ scale các nhóm/danh sách/card note, kể cả list view và Trash. Header, sidebar, New/filter/view mode, Load more, menu và hộp View/Edit giữ nguyên. Settings gọi là “Notes zoom” với4ngôn ngữ. Giữ range50–150% và key `ntc.interface.zoom.v1` để không mất preference cũ; giá trị lưu cũ nay áp dụng danh sách. Mức zoom nội dung note vẫn độc lập và reset100% khi đóng/mở.
+
+`NotesZoomViewport` giữ layout gốc theo chiều rộng vùng chứa, transform một lớp danh sách và cập nhật kích thước vùng cuộn riêng. Khi zoom không sắp xếp lại cột/card, phóng lớn có thể kéo ngang; đổi kích thước cửa sổ/sidebar vẫn đo lại layout. Mở trang với mức lưu bắt đầu góc trái, không tự cuộn vào giữa. Wheel/pinch giữ điểm dưới con trỏ/giữa hai ngón trong giới hạn vùng cuộn. Cuộn thường vẫn cuộn danh sách; vùng này focus được bằng bàn phím.
+
+Ctrl/Meta+wheel trong danh sách dùng exponential target, chuẩn hóa deltaMode và giới hạn mỗi impulse80px để tránh một nấc nhảy quá xa; requestAnimationFrame tiến dần tới target với time constant55ms. Transform dùng phần lẻ liên tục, không làm tròn từng frame. Context/localStorage chỉ ghi khi đã dừng ít nhất160ms và animation hoàn tất; HUD cập nhật trực tiếp. Hint compositor được bỏ sau khi dừng để chữ vẽ lại rõ ở mức cuối. Không fetch/refetch hoặc sửa dữ liệu trong zoom. Ctrl+wheel trên chrome khi đang có danh sách không đổi zoom; không chặn content zoom riêng. Cleanup đầy đủ frame/timer/listener/observer. Dnd translations và drop FLIP chia theo scale danh sách, giữ hình dáng card.
+
+Đã kiểm Chromium local, không coi số liệu local là cam kết FPS mọi máy; chưa đo thiết bị vật lý/iOS Safari hoặc hàng nghìn card. Chưa triển khai virtualized canvas/board tự do. Evidence actual tại worklog.
+
 ### Tạo/xóa nhãn phản hồi ngay — 2026-10-25
 
 Your labels hiện nhãn mới ngay khi Add, xóa trắng form và đưa danh sách về đầu; nút Add không chờ request hoặc tải lại workspace. Nhãn tạm chỉ có trong manager, aria-busy và khóa sửa/xóa tới khi nhận ID/version thật, không gửi ID tạm qua API gán nhãn. Sidebar/chooser nhận nhãn đã được server xác nhận. Xác nhận Delete đóng ngay, overlay ẩn nhãn trong mọi useLabels; request xóa chạy nền. Hoạt động đang chờ tồn tại ngoài modal nên đóng/mở manager không làm nhãn tạm biến mất hoặc nhãn đang xóa xuất hiện lại.
@@ -26,9 +36,9 @@ Edit có icon kính lúp ở đầu thanh định dạng; PC/mobile đều bấm
 
 Phạm vi50–300%, bước nút10%; Reset100% có ở cả View/Edit. Pinch hai ngón hoặc Ctrl/Meta+wheel trong nội dung zoom quanh điểm chạm, vuốt một ngón/cuộn bình thường để đọc và kéo ngang khi phóng lớn. Tiêu đề/icon, toolbar định dạng, labels và footer không thuộc lớp được scale. Zoom là trạng thái hiển thị, không đổi font size/document JSON/version hay tự tạo autosave. Giữ mức khi chuyển View↔Edit cùng phiên note; đóng/mở hoặc đổi note reset100%, không persist mức content zoom. View chuyển full screen/khung nhỏ cũng giữ mức zoom nội dung.
 
-`ContentZoom` giữ chiều rộng tài liệu gốc và scale bằng transform, tính kích thước vùng cuộn riêng bằng ResizeObserver; gesture gom qua requestAnimationFrame, React chỉ cập nhật phần trăm sau khi dừng hoặc bấm nút. Cleanup observer/listener/frame/timer đầy đủ. Chọn transform để tránh reflow đoạn văn khi zoom theo [hướng dẫn hiệu năng trình duyệt](https://web.dev/articles/animations-and-performance). Zoom toàn giao diện50–150% và preference trình duyệt vẫn giữ; gesture trong nội dung không đi vào global handler. Global gesture cập nhật CSS/HUD theo frame, context/localStorage chỉ commit sau160ms không có sự kiện mới; thay đổi bằng menu/settings vẫn áp dụng và lưu ngay.
+`ContentZoom` giữ chiều rộng tài liệu gốc và scale bằng transform, tính kích thước vùng cuộn riêng bằng ResizeObserver; gesture gom qua requestAnimationFrame, React chỉ cập nhật phần trăm sau khi dừng hoặc bấm nút. Cleanup observer/listener/frame/timer đầy đủ. Chọn transform để tránh reflow đoạn văn khi zoom theo [hướng dẫn hiệu năng trình duyệt](https://web.dev/articles/animations-and-performance). Zoom bên ngoài hiện chỉ áp dụng danh sách note50–150% theo DEC-031 bên dưới; gesture trong nội dung không đi vào handler danh sách. Menu/settings vẫn áp dụng và lưu ngay.
 
-Giới hạn: global CSS zoom vẫn cần layout toàn trang; tối ưu này giảm render/storage lặp, không cam kết FPS hay mượt như PDF native trên mọi thiết bị. Chưa đo điện thoại vật lý/iOS Safari, bàn phím ảo hoặc tài liệu100k ký tự. Nội dung phóng lớn giữ dòng gốc và có thể cần kéo ngang. Evidence và hồi quy tại worklog; không thay API/DB/ownership.
+Giới hạn: không cam kết FPS hay mượt như PDF native trên mọi thiết bị. Chưa đo điện thoại vật lý/iOS Safari, bàn phím ảo hoặc tài liệu100k ký tự. Nội dung phóng lớn giữ dòng gốc và có thể cần kéo ngang. Evidence và hồi quy tại worklog; không thay API/DB/ownership.
 
 ### Sửa cache phân trang khi preload nền — 2026-10-25
 
