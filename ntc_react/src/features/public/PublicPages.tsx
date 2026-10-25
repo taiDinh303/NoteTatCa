@@ -242,7 +242,7 @@ export function Landing({
             className="button primary"
             to={signedIn ? destination : "/register"}
           >
-            {signedIn ? tr("Open your workspace") : tr("Create your space")}
+            {signedIn ? tr("Continue where you left off") : tr("Create your space")}
             <ArrowRight size={16} />
           </Link>
         </section>

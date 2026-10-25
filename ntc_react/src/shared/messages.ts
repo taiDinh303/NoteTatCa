@@ -12,6 +12,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
   "Account notes and labels are cached on this browser for offline use. Signing out protects pending changes before clearing the account cache. Guest data is separate and stays until you reset the demo, copy it successfully, or clear browser data.": ["Ghi chú và nhãn tài khoản được lưu trên trình duyệt để dùng offline. Đăng xuất bảo vệ thay đổi chờ trước khi xóa cache tài khoản. Dữ liệu khách tách riêng và được giữ đến khi đặt lại demo, chép thành công hoặc xóa dữ liệu trình duyệt.","账户笔记和标签缓存于此浏览器以供离线使用。退出前会保护待同步更改，再清除账户缓存。访客数据独立保存，直到重置演示、成功复制或清除浏览器数据。","アカウントのノートとラベルはオフライン用に保存されます。ログアウト時は未同期の変更を保護してからキャッシュを削除します。ゲストデータは別に保持され、デモのリセット、コピー成功、ブラウザーデータの削除で消去されます。"],
   "A copied note changed in your account. Guest data was kept.": ["Một ghi chú đã chép đã thay đổi trong tài khoản. Dữ liệu khách vẫn được giữ lại.", "已复制的笔记在账户中发生了更改。访客数据已保留。", "コピー済みのノートがアカウントで変更されています。ゲストデータは保持されています。"],
   "Try guest mode": ["Thử ngay — chế độ khách","试用访客模式","ゲストモードを試す"],
+  "Continue where you left off": ["Tiếp tục chỗ bạn để lại","从上次停下的地方继续","続きからどうぞ"],
   "Opening guest mode": ["Đang mở chế độ khách","正在打开访客模式","ゲストモードを開いています"],
   "Guest mode": ["Chế độ khách","访客模式","ゲストモード"],
   "Guest workspace": ["Không gian khách","访客空间","ゲストのワークスペース"],
