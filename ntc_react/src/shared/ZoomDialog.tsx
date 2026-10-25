@@ -19,17 +19,16 @@ export function ZoomDialog({ onClose }: { onClose: () => void }) {
       title={tr("Interface zoom")}
       className="zoom-panel"
       onClose={onClose}
+      hideTitle
+      hideCloseButton
     >
-      <div className="modal-body">
-        <label className="field-label" htmlFor={inputId}>
-          {tr("Zoom percentage")}
-        </label>
+      <div className="modal-body zoom-panel-body">
         <div className="zoom-adjustments">
           <IconButton
             icon={Minus}
             label={tr("Zoom out")}
             disabled={percent <= 50}
-            onClick={() => change(percent - 10)}
+            onClick={() => change(percent - 5)}
           />
           <div className="zoom-number-wrap">
             <input
@@ -48,25 +47,22 @@ export function ZoomDialog({ onClose }: { onClose: () => void }) {
                   commit();
                 }
               }}
+              aria-label={tr("Zoom percentage")}
             />
-            <span aria-hidden="true">%</span>
           </div>
           <IconButton
             icon={Plus}
             label={tr("Zoom in")}
             disabled={percent >= 150}
-            onClick={() => change(percent + 10)}
+            onClick={() => change(percent + 5)}
           />
         </div>
-        <p className="zoom-help">
-          {tr("50%–150% · Ctrl + mouse wheel · Pinch with two fingers")}
-        </p>
       </div>
       <div className="modal-footer">
         <Button variant="secondary" onClick={() => change(100)}>
-          {tr("Reset to 100%")}
+          {tr("Reset")}
         </Button>
-        <Button onClick={onClose}>{tr("Done")}</Button>
+        <Button onClick={onClose}>{tr("Close")}</Button>
       </div>
     </Modal>
   );

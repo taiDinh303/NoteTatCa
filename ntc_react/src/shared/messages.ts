@@ -386,7 +386,7 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "50%–150% · Ctrl + マウスホイール · 2 本指でピンチ",
   ],
   "Reset to 100%": ["Đặt lại 100%", "重置为 100%", "100% にリセット"],
-  Done: ["Xong", "完成", "完了"],
+  Reset: ["Đặt lại", "重置", "リセット"],
   "System overview": ["Tổng quan hệ thống", "系统概览", "システム概要"],
   "Roles & permissions": ["Vai trò & quyền hạn", "角色与权限", "ロールと権限"],
   "Manage accounts and access. Everyone’s note content stays private.": [

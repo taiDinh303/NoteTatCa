@@ -7,6 +7,9 @@ import {
   t as tr,
 } from "../../shared/i18n";
 import PrivacySettings from "./PrivacySettings";
+import { IconButton } from "../../shared/ui";
+import { useDisplayZoom } from "../../shared/displayZoom";
+import { Minus, Plus } from "lucide-react";
 import "./preferences.css";
 
 export default function PreferencesPage({
@@ -61,8 +64,48 @@ export default function PreferencesPage({
               <span />
             </button>
           </div>
+          <AppearanceZoomRow />
         </div>
       ) : null}
     </section>
+  );
+}
+
+function AppearanceZoomRow() {
+  useLanguage();
+  const { percent, change } = useDisplayZoom();
+  return (
+    <div className="preferences-row appearance-zoom-row">
+      <span>{tr("Interface zoom")}</span>
+      <div
+        className="appearance-zoom-controls"
+        role="group"
+        aria-label={tr("Interface zoom")}
+      >
+        <IconButton
+          icon={Minus}
+          label={tr("Zoom out")}
+          disabled={percent <= 50}
+          onClick={() => change(percent - 5)}
+        />
+        <span className="appearance-zoom-percentage">
+          {tr("Zoom ({0}%)", percent)}
+        </span>
+        <IconButton
+          icon={Plus}
+          label={tr("Zoom in")}
+          disabled={percent >= 150}
+          onClick={() => change(percent + 5)}
+        />
+        <button
+          type="button"
+          className="text-button appearance-zoom-reset"
+          disabled={percent === 100}
+          onClick={() => change(100)}
+        >
+          {tr("Reset to 100%")}
+        </button>
+      </div>
+    </div>
   );
 }

@@ -1,6 +1,29 @@
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+## Zoom popup gọn — 2026-10-25
+
+- Theo yêu cầu/chủ dự án: Zoom popup (mở từ avatar menu) bỏ title, label, dòng hint, ký hiệu %; giữ −, input, +, Close (nút X ở góc), Reset và Done (thay thành Close). Bước ± vẫn 5%.
+- `ZoomDialog.tsx`: dùng `hideTitle` + `hideCloseButton` rồi hiển thị nút Close ở footer; xóa `<label>`, dòng `.zoom-help`, ký hiệu `%`; input thêm `aria-label` thay vì `<label htmlFor>`; `Done` → `tr("Close")`, `Reset to 100%` → `tr("Reset")`.
+- `messages.ts`: thêm `Reset`, giữ `Close` đã có sẵn (dùng chung); bỏ key `Done` vì không còn dùng.
+- Validation: typecheck/lint/build PASS. Chưa E2E; không deploy/migrate.
+
+## Zoom step 5 — 2026-10-25
+
+- Theo yêu cầu/chủ dự án: nút −/+ trong Zoom dialog và Appearance zoom step đổi từ 10% sang 5%. Giữ min50/max150, number input vẫn step1, Reset100%, gesture/HUD không đổi.
+- `ZoomDialog.tsx`: `percent - 10` → `percent - 5`; `percent + 10` → `percent + 5`.
+- `PreferencesPage.tsx`: `AppearanceZoomRow` tăng/giảm theo 5. Không đổi API/backend/storage.
+- Validation: `npm run typecheck` PASS; `npm run lint -- --max-warnings 0` PASS; `npm run build` PASS 2184 modules. Chưa chạy E2E/thiết bị thật; không deploy/migrate.
+
+
+## Appearance có mục zoom — 2026-10-25
+
+- Theo yêu cầu/chủ dự án: `/settings/appearance` bổ sung mục Interface zoom cùng dòng Dark mode; gồm nút −/+, phần trăm hiện tại, Reset to 100%. Zoom dùng `DisplayZoomContext` hiện có, giới hạn 50–150%, lưu `ntc.interface.zoom.v1`, HUD gesture Ctrl+wheel/pinch không đổi. Admin preferences appearance cũng dùng cùng row.
+- `PreferencesPage.tsx`: thêm import `IconButton`, `useDisplayZoom`, `Minus`, `Plus`; render `AppearanceZoomRow` sau Dark mode. Row có group accessible, percentage dùng message `Zoom ({0}%)` hiện có, Reset disabled khi đã 100%; nút ± disable ở 50/150. Không đổi API/backend/i18n store/schema/ownership.
+- `preferences.css`: thêm `.appearance-zoom-row` wrap flex và `.appearance-zoom-controls` cùng mép phải; màn <480px control xuống dòng. Không thêm image, dependency hoặc placeholder.
+- Validation thực tế: `npm run typecheck` PASS; `npm run lint -- --max-warnings 0` PASS; `npm run build` PASS 2184 modules. Chưa chạy E2E Chromium/.NET/device thật; không deploy/migrate/DB/email thật.
+- Scope 2 source + CSS: `ntc_react/src/features/settings/PreferencesPage.tsx`, `ntc_react/src/features/settings/preferences.css`, `docs/worklog.md`.
+
 ## Căn lề trái màn hình View note — 2026-10-25
 
 - Theo ảnh/yêu cầu chủ dự án: tiêu đề không icon, nội dung và dòng Edited dùng chung lề ngang trong View note. CSS scoped `.note-viewer` dùng inset32px desktop,24px tablet,19px mobile theo lề nội dung hiện có; giữ khoảng cách icon/title khi có icon và hành vi editor.

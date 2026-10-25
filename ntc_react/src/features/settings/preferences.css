@@ -98,6 +98,34 @@ a.preferences-row:hover {
   display: grid;
   gap: 16px;
 }
+.appearance-zoom-row {
+  flex-wrap: wrap;
+}
+.appearance-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  min-width: 0;
+}
+.appearance-zoom-percentage {
+  min-width: 44px;
+  text-align: center;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+}
+.appearance-zoom-reset {
+  padding: 0 4px;
+  min-height: 32px;
+}
+@media (max-width: 480px) {
+  .appearance-zoom-controls {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 8px;
+  }
+}
 .privacy-section {
   padding: 20px;
 }
