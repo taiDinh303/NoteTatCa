@@ -80,7 +80,7 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [29-multitenancy](29-multitenancy.md) | NO | Không team/tenant; file vẫn ghi cách ly owner bắt buộc |
 | [30-user-guide](30-user-guide.md) | YES | Hướng dẫn dự thảo, cần đối chiếu React sau này |
 | [31-handover](31-handover.md) | YES | Bàn giao docs và việc tiếp theo |
-| [32-ai-features](32-ai-features.md) | NO | Chưa có yêu cầu tính năng AI |
+| [32-ai-features](32-ai-features.md) | YES | Kế hoạch AI chat tạo note/nội dung theo prompt DEC-030; chưa triển khai hoặc chọn provider |
 | [33-data-analytics](33-data-analytics.md) | YES | Thống kê admin đã chọn; không analytics nội dung/pipeline |
 | [34-risks-changes](34-risks-changes.md) | YES | Rủi ro và quản lý thay đổi |
 | [BACKEND-IMPLEMENTATION](BACKEND-IMPLEMENTATION.md) | YES | Contract trước code, quyết định và kết quả đợt backend |

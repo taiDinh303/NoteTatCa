@@ -25,3 +25,10 @@ CR-001,2026-10-16: editor đầy đủ/màu/icon, admin no-content, trash7 ngày
 Thay đổi tiếp theo ghi nguồn/ngày, REQ/RULE/ADR liên quan, ảnh hưởng schema/API/UI/security/test/chi phí. Giữ quyết định cũ đánh dấu SUPERSEDED khi thay; không tự mở sharing/archive/attachments/AI từ yêu cầu editor. Xem [hồ sơ](PROJECT-INTAKE.md), [plan](01-plan.md), [contract](BACKEND-IMPLEMENTATION.md).
 
 CR-004,2026-10-17: theo yêu cầu chủ dự án chuyển .git và repository files lên NTC, dùng một docs ở NTC/docs, giữ backend NoteTatCa. Đã cập nhật ADR/plan/intake/README/AI instructions/CI/Docker/scripts. Lịch sử/remote/working changes giữ nguyên,287 rename baseline stage; không commit/push hoặc thay dữ liệu/config thật. Bản docs dư archive vào Git backup thay vì xóa khi automatic command review chặn thao tác xóa thư mục.
+
+## CR-005 — Roadmap mở rộng và AI chat — 2026-10-25
+
+Nguồn chủ dự án/DEC-030: bổ sung các đề xuất và AI chat tạo note/nội dung, TASK-029/035–044, REQ-013/ADR-019. Chỉ docs, chưa thay schema/API/UI/runtime, provider hoặc billing. Giới hạn cũ chưa có yêu cầu AI trong32 đã được thay bằng YES cho kế hoạch, không khẳng định đã tích hợp AI.
+
+- RISK-012 — AI: gửi dữ liệu riêng ngoài ý muốn, output sai/không hợp lệ, prompt injection, chi phí và ghi đè bản mới. Cần chốt opt-in/phạm vi dữ liệu, quyền tool, quota/timeout, version/idempotency, retention/log redaction và eval trước code; không coi note/file/chat là chỉ dẫn cấp quyền.
+- RISK-013 — Mở rộng: link public/Editor/realtime có thể lộ note nếu bỏ qua quyền; công thức/OCR có bề mặt xử lý dữ liệu mới; delta phải xử lý xóa/thu hồi và phân trang phải giữ filter/order đúng. Duyệt chi tiết theo giai đoạn, có tests trước bật; không mở quyền runtime từ việc đưa vào roadmap.

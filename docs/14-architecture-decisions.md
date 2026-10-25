@@ -63,3 +63,7 @@ ACCEPTED: người dùng giao xây SPA đầy đủ từ Razor, đặt ntc_react
 ## Gỡ Razor theo DEC-020 — 2026-10-21
 
 ACCEPTED theo yêu cầu trực tiếp: chỉ duy trì frontend ntc_react, gỡ NTC.VIEW/NTC.Razor khỏi repo và solution. Các mô tả giữ Razor ở mốc lịch sử bên trên không còn là hướng dẫn hiện hành. Giữ lịch sử Git, cấu hình local trong bản khôi phục ngoài repo và API legacy tương thích; không thay Identity/ownership/database/migrations. Evidence kiểm tra xem worklog.
+
+## ADR-019 — Kế hoạch mở rộng và AI tạo ghi chú (DEC-030, 2026-10-25)
+
+ACCEPTED đưa vào kế hoạch theo yêu cầu chủ dự án: realtime, các mở rộng TASK-035–042/044 và AI chat TASK-043/REQ-013. NOT IMPLEMENTED; kiến trúc/công nghệ/provider chưa chọn. Giữ note private, Identity, kiểm quyền server, document schema/version/idempotency và bảo vệ draft. AI chỉ được cấp phạm vi cần cho lệnh được user yêu cầu, không mặc định đọc toàn workspace hoặc thao tác chia sẻ/xóa/gửi email. Luồng preview/ghi là đề xuất cần chốt trước triển khai; không suy việc duyệt roadmap thành quyền gửi dữ liệu ra ngoài hay áp dụng migration. Chi tiết [roadmap](ROADMAP-CONTENT-COLLABORATION.md) và [AI](32-ai-features.md).

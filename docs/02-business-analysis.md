@@ -23,6 +23,10 @@ Giúp nhiều user lưu/tìm/tổ chức note riêng, ghim/nhãn, khôi phục k
 | REQ-011 | Unified rich editor, P1 | DocumentJson schema 1 whitelist + plain projection; UI editor chưa làm | Plain/checklist/rich/Markdown shortcuts, màu chữ/emoji/emoji đại diện; round-trip đúng, sanitizer; conversion Markdown có cảnh báo mất format | Q-003/020/021 |
 | REQ-012 | Admin tài khoản/thống kê, P1 | Admin metadata/statistics/lock, không bypass note content | Admin khóa/quản lý user và aggregate; không title/content/preview note khác owner; khóa ngừng phiên theo policy | Q-007 |
 
+## REQ-013 — AI chat tạo note/nội dung (PLANNED, 2026-10-25)
+
+Nguồn chủ dự án/DEC-030: nhập yêu cầu như từ vựng tiếng Anh chủ đề family, AI sinh note mới hoặc nội dung cho note. CURRENT chưa triển khai AI. Acceptance đề xuất: không gửi notes ngoài phạm vi user chọn, output hợp lệ với schema/limit hiện hành, tạo không trùng khi retry, không ghi đè bản mới/draft nếu note đổi trong lúc sinh; lỗi/hủy giữ dữ liệu hiện có. Preview so với tạo thẳng, thêm/thay nội dung, provider/model/quota và retention chưa chốt (Q-031–035). TASK-043 và [32-ai-features](32-ai-features.md) giữ chi tiết, không mở thêm quyền admin hoặc quyền dữ liệu cho AI.
+
 ## Quy tắc nghiệp vụ
 
 | ID | Quy tắc hiện hành | Biên / kết quả | Nguồn |
@@ -37,7 +41,7 @@ Giúp nhiều user lưu/tìm/tổ chức note riêng, ghim/nhãn, khôi phục k
 | RULE-008 | Hard delete chỉ từ trash và phải xác nhận | Mất note, quan hệ nhãn, reminder và dữ liệu phụ theo transaction | Q-006 |
 | RULE-009 | Login và liên kết Google xác minh danh tính server | Không tin providerKey/email từ client; cùng email không tự mặc định đủ quyền link | REQ-001/009 |
 
-Các RULE đã triển khai backend và có regression tests tại file 06; UX/React evidence tách riêng tại FRONTEND-IMPLEMENTATION. Retention, email login, rich schema, version, quota100k, untitled, nhãn trùng và month-end đã chốt/triển khai (DEC-013–015). Phải giữ account/note cũ khi thêm schema hoặc chuyển PostgreSQL. Export/xóa tài khoản và offline chưa chốt.
+Các RULE đã triển khai backend và có regression tests tại file 06; UX/React evidence tách riêng tại FRONTEND-IMPLEMENTATION. Retention, email login, rich schema, version, quota100k, untitled, nhãn trùng và month-end đã chốt/triển khai (DEC-013–015). Phải giữ account/note cũ khi thêm schema hoặc chuyển PostgreSQL. Offline/export/xóa tài khoản xem cập nhật DEC-025–027 tại01-plan và evidence mới trong worklog; không dùng mô tả lịch sử này làm trạng thái triển khai hiện tại.
 
 ## Phi chức năng đề xuất
 
@@ -49,7 +53,7 @@ Các RULE đã triển khai backend và có regression tests tại file 06; UX/R
 | UX | Hoàn thành luồng bằng bàn phím; mobile không tràn ngang | File 09; runtime NOT RUN |
 | Thời gian | API ISO-8601 có offset; lưu UTC đã triển khai | Chuyển dữ liệu UTC+7 phải giữ instant, file 23 |
 
-Không có yêu cầu thanh toán, native mobile, AI hoặc analytics nội dung trong phạm vi hiện được giao.
+Không có yêu cầu thanh toán, native mobile hoặc analytics nội dung trong phạm vi hiện được giao. Từ2026-10-25/DEC-030, AI chat tạo note/nội dung đã được đưa vào kế hoạch, chưa có trong runtime; xem REQ-013 và32-ai-features.
 
 ## Rà soát và triển khai 2026-10-17
 

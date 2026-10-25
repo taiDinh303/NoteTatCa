@@ -25,6 +25,8 @@
 
 ## Phạm vi
 
+2026-10-25/DEC-030: chủ dự án yêu cầu thêm toàn bộ đề xuất vào kế hoạch và dự định liên kết AI chat để tự tạo note hoặc tạo nội dung theo lệnh, ví dụ từ vựng tiếng Anh chủ đề family. TASK-029/035–044 là PLANNED, chưa triển khai. Realtime/công thức/delta đã có ví dụ giải thích trong roadmap, chưa chốt thiết kế do user đang tìm hiểu. AI ở phạm vi lập kế hoạch YES, runtime vẫn chưa có; chưa chọn provider/model, chat nhúng trong app hay kết nối ngoài, quota/retention hay mặc định đọc note. Xem [32-ai-features](32-ai-features.md), Q-031–035.
+
 2026-10-25 bổ sung DEC-029: sau giải thích, chủ dự án duyệt thêm vào docs bốn hạng mục mẫu ghi chú, tìm/lọc theo loại tệp, liên kết note và mục lục (TASK-031–034). Mục lục dùng heading bên trong note, label nhóm nhiều note; lọc file theo loại/metadata, chưa OCR hoặc nghe audio. Chỉ lập kế hoạch, chưa triển khai runtime.
 
 2026-10-25/DEC-029: chủ dự án yêu cầu lập kế hoạch dài hạn cho ảnh/video/audio/bảng/vẽ bút, comment và mời người xem note như chia sẻ bảng tính. Chưa yêu cầu code các tính năng này. Xem [roadmap nội dung và cộng tác](ROADMAP-CONTENT-COLLABORATION.md); permission model, quota/storage và thứ tự phát hành chi tiết là đề xuất cần duyệt khi bắt đầu từng giai đoạn. Note private mặc định và admin không đọc nội dung được giữ.

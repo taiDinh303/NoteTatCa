@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bổ sung các đề xuất tương lai và AI chat tạo note — DEC-030, 2026-10-25
+
+- Theo yêu cầu chủ dự án: đưa toàn bộ đề xuất trước vào roadmap ở trạng thái PLANNED, chưa code, gồm TASK-029 realtime và TASK-035–044: link chia sẻ/quyền/thời hạn, mẫu tự tạo/chia sẻ, backlinks/đồ thị, OCR/tài liệu/transcript, bảng công thức, mở rộng offline/label order, delta sync, phân trang hiển thị, AI chat và thông báo cộng tác. History/export trọn bộ giữ TASK-022, đo tối ưu giữ TASK-014/015. Việc duyệt đưa vào kế hoạch không đồng nghĩa đã chốt quyền Editor/public, cơ chế đồng bộ, tập công thức hay provider/chi phí; không mở quyền runtime.
+- Đã thêm ví dụ giải thích: hai người cùng sửa một note có quyền Editor; bảng tự cộng100+200+50=350 và đổi200→300 thành450; delta chỉ đồng bộ2note thay đổi trong1.000note, phân trang ví dụ hiện30card mỗi lần, đo request/bytes/thời gian/bộ nhớ trước tối ưu. Sửa thuật ngữ “tìm kiếm delta” đã dùng chưa chuẩn thành “đồng bộ phần thay đổi”, không tự lập semantic search.
+- TASK-043/REQ-013: user muốn liên kết AI chat tự tạo note hoặc nội dung theo prompt, ví dụ từ vựng tiếng Anh chủ đề family. Chuyển32-ai-features từ NO sang YES cho kế hoạch, runtime vẫn chưa có AI. Ghi mục tiêu, preview/chèn/tạo thẳng là lựa chọn chưa chốt, guard owner/version/schema, tránh ghi đè draft/tạo trùng, quota/lỗi/hủy, quyền dữ liệu và Q-031–035. Không chọn nhà cung cấp/model, không thêm key/SDK/RAG hoặc gửi note ra ngoài. Đồng bộ intake/plan/README matrix/REQ/ADR-019/CR-005 để không còn coi AI là chưa có yêu cầu.
+- Validation docs-only: scripts/verify_docs.py bằng Python bundled PASS49Markdown/194local links/0errors; kiểm10task mới và5câu hỏi có đúng một định nghĩa, trạng thái AI YES/PLANNED/chưa triển khai, diff checkPASS. Không build/test runtime, migrate/deploy/cấu hình/provider/billing hoặc dữ liệu thật. Không có lịch phát hành cam kết.
+- Publication scope9root docs: roadmap,32-ai-features,00-README,01-plan,02-business-analysis,PROJECT-INTAKE,14-architecture-decisions,34-risks-changes và entry này của worklog. Giữ entry label-chip có sẵn/deletion ZoomDialog.tsx/.agnes ngoài commit; stage riêng entry. Push main theo quyền hiện có và kiểm remote SHA sau push.
+
 ## Xác nhận xóa nhãn ngay trong dòng — 2026-10-25
 
 - Theo đề xuất chủ dự án duyệt và câu chữ đã chọn: bỏ ConfirmDialog chồng lên Your labels. Bấm trash thay icon sửa/xóa của đúng dòng bằng tên/câu hỏi, Hủy/Xóa và hint nhỏ; bản Việt giữ nguyên “Gỡ khỏi các ghi chú; Yours note vẫn được giữ.”, có4ngôn ngữ theo language hiện hành. Desktop cùng hàng, mobile actions xuống hàng ngay trong row; mỗi lúc chỉ một row xác nhận, chọn dòng khác chuyển selection.
