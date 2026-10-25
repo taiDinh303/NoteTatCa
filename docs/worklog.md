@@ -1,6 +1,12 @@
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+## Căn lề trái màn hình View note — 2026-10-25
+
+- Theo ảnh/yêu cầu chủ dự án: tiêu đề không icon, nội dung và dòng Edited dùng chung lề ngang trong View note. CSS scoped `.note-viewer` dùng inset32px desktop,24px tablet,19px mobile theo lề nội dung hiện có; giữ khoảng cách icon/title khi có icon và hành vi editor.
+- Validation thực tế: Chromium guest với note giả Food/Pho/Banh mi tại320/393/768/1280px đo mép trái chữ title/content/Edited lần lượt19/19/24/248px, cả ba bằng nhau từng viewport; popover ngày tạo/sửa và nút Edit hoạt động. Đã xem screenshot393px. TypeScript/Vite Production build PASS; .NET solution Release strict PASS0warnings/0errors. Không fullsuite/account HTTP/thiết bị vật lý/production/DB/email thật/manual deploy/migrate; CSS-only, không đổi API/dữ liệu.
+- ESLint và git diff --check PASS. Publication scope2files: `ntc_react/src/styles.css`, `docs/worklog.md`; giữ `.agnes/` ngoài commit. Fetch trước publication divergence0/0. Push main theo quyền hiện có, kiểm SHA remote sau push; hosting rollout chưa xác minh.
+
 ## Landing header hiện avatar khi đã đăng nhập — 2026-10-25
 
 - Theo yêu cầu/chủ dự án: header trang Home khi đã đăng nhập hiện avatar, bỏ nút "Open workspace" trên header; chưa đăng nhập vẫn giữ nút "Sign in". Avatar liên kết tới workspace, dùng tên/hình từ `useMe` hoặc session; hero CTA "Open your workspace" giữ nguyên.

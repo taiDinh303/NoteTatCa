@@ -4438,6 +4438,21 @@ td {
   }
 }
 
+.note-viewer {
+  --note-view-inset: 32px;
+}
+.note-viewer .note-view-heading,
+.note-viewer .rich-editor,
+.note-viewer .note-view-footer {
+  padding-inline: var(--note-view-inset);
+}
+@container viewport (max-width: 800px) {
+  .note-viewer { --note-view-inset: 24px; }
+}
+@container viewport (max-width: 480px) {
+  .note-viewer { --note-view-inset: 19px; }
+}
+
 /* Shared scrollbars follow the active surface in both themes. */
 * {
   scrollbar-width: thin;
