@@ -1746,6 +1746,12 @@ strong {
 .label-chooser .check-label .color-dot {
   margin-left: 4px;
 }
+.label-chooser-options {
+  max-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
 .conflict-panel {
   padding: 15px 25px;
   background: #fff7e6;

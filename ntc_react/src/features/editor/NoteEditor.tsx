@@ -719,7 +719,6 @@ function EditorSession({
                   style={label.color ? { color: label.color } : undefined}
                 />
                 {label.name}
-                <X size={11} />
               </button>
             ) : null;
           })}
@@ -740,30 +739,37 @@ function EditorSession({
                 retry={() => void labels.refetch()}
               />
             ) : allLabels.length ? (
-              allLabels.map((label) => (
-                <label key={label.id} className="check-label">
-                  <input
-                    type="checkbox"
-                    checked={draft.tagIds.includes(label.id)}
+              <div className="note-label-options label-chooser-options">
+                {allLabels.map((label) => (
+                  <button
+                    key={label.id}
+                    type="button"
+                    className="note-label-option"
+                    aria-pressed={draft.tagIds.includes(label.id)}
                     disabled={
                       !draft.tagIds.includes(label.id) &&
                       draft.tagIds.length >= 20
                     }
-                    onChange={() =>
+                    onClick={() =>
                       update({
                         tagIds: draft.tagIds.includes(label.id)
                           ? draft.tagIds.filter((x) => x !== label.id)
                           : [...draft.tagIds, label.id],
                       })
                     }
-                  />
-                  <span
-                    className="color-dot"
-                    style={{ background: label.color ?? "#a0a8b2" }}
-                  />
-                  {label.name}
-                </label>
-              ))
+                  >
+                    <Tag
+                      size={14}
+                      aria-hidden="true"
+                      style={{ color: label.color ?? undefined }}
+                    />
+                    <span>{label.name}</span>
+                    {draft.tagIds.includes(label.id) ? (
+                      <Check size={14} aria-hidden="true" />
+                    ) : null}
+                  </button>
+                ))}
+              </div>
             ) : (
               <p className="muted">
                 {tr("Create labels from the sidebar to organize your notes.")}
