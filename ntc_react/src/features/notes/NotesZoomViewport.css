@@ -36,8 +36,27 @@ html:has([data-notes-zoom]) {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-gutter: stable;
+  scrollbar-width: none;
   overflow-anchor: none;
+}
+.notes-zoom-viewport::-webkit-scrollbar {
+  display: none;
+}
+.notes-window-scrollbar {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: 12px;
+  z-index: 30;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+  visibility: hidden;
+}
+.notes-window-scrollbar > div {
+  width: 1px;
+  pointer-events: none;
 }
 .notes-zoom-stage {
   position: relative;

@@ -13,11 +13,15 @@ export function NotesZoomViewport({
   const viewport = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
+  const scrollbar = useRef<HTMLDivElement>(null);
+  const scrollRange = useRef<HTMLDivElement>(null);
   const { subscribe } = useDisplayZoom();
   useLayoutEffect(() => {
     const view = viewport.current!,
       space = stage.current!,
-      content = layer.current!;
+      content = layer.current!,
+      rail = scrollbar.current!,
+      range = scrollRange.current!;
     let initialized = false;
     let rasterTimer = 0;
     let fitTimer = 0;
@@ -27,6 +31,20 @@ export function NotesZoomViewport({
       width = 0,
       height = 0;
     let anchor: { x: number; y: number } | undefined;
+    // A native scrollbar spans the whole window while the note viewport stays
+    // below the fixed controls. Both represent the same scroll offset/range.
+    function updateScrollbar() {
+      const overflow = Math.max(0, view.scrollHeight - view.clientHeight);
+      const height = `${rail.clientHeight + overflow}px`;
+      if (range.style.height !== height) range.style.height = height;
+      rail.style.visibility = overflow > 1 ? "visible" : "hidden";
+      if (Math.abs(rail.scrollTop - view.scrollTop) > 0.5)
+        rail.scrollTop = view.scrollTop;
+    }
+    function scrollNotes() {
+      if (Math.abs(view.scrollTop - rail.scrollTop) > 0.5)
+        view.scrollTop = rail.scrollTop;
+    }
     function cards() {
       return Array.from(content.querySelectorAll<HTMLElement>(".note-card"));
     }
@@ -65,6 +83,7 @@ export function NotesZoomViewport({
       if (initialized && marker >= 0)
         view.scrollTop +=
           nodes[marker].getBoundingClientRect().top - before[marker].top;
+      updateScrollbar();
       if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches)
         return;
       nodes.forEach((node, index) => {
@@ -110,6 +129,7 @@ export function NotesZoomViewport({
       view.scrollLeft = docX * scale - x;
       view.scrollTop = docY * scale - y;
       if (settled) fit(initialized);
+      updateScrollbar();
     }
     function measure() {
       // Extend only the scrollport to the window edge. Keep the card canvas
@@ -144,6 +164,7 @@ export function NotesZoomViewport({
     const observer = new ResizeObserver(measure);
     observer.observe(view);
     observer.observe(content);
+    observer.observe(rail);
     const unsubscribe = subscribe(paint);
     initialized = true;
     view.addEventListener("wheel", point, { passive: true });
@@ -151,6 +172,8 @@ export function NotesZoomViewport({
     view.addEventListener("mouseleave", leave);
     view.addEventListener("touchstart", touch, { passive: true });
     view.addEventListener("touchmove", touch, { passive: true });
+    view.addEventListener("scroll", updateScrollbar, { passive: true });
+    rail.addEventListener("scroll", scrollNotes, { passive: true });
     return () => {
       observer.disconnect();
       window.clearTimeout(rasterTimer);
@@ -162,22 +185,34 @@ export function NotesZoomViewport({
       view.removeEventListener("mouseleave", leave);
       view.removeEventListener("touchstart", touch);
       view.removeEventListener("touchmove", touch);
+      view.removeEventListener("scroll", updateScrollbar);
+      rail.removeEventListener("scroll", scrollNotes);
     };
   }, [subscribe, mode]);
   return (
-    <div
-      ref={viewport}
-      className="notes-zoom-viewport"
-      data-notes-zoom
-      tabIndex={0}
-      role="region"
-      aria-label={tr("All notes")}
-    >
-      <div ref={stage} className="notes-zoom-stage">
-        <div ref={layer} className="notes-zoom-layer">
-          {children}
+    <>
+      <div
+        ref={viewport}
+        className="notes-zoom-viewport"
+        data-notes-zoom
+        tabIndex={0}
+        role="region"
+        aria-label={tr("All notes")}
+      >
+        <div ref={stage} className="notes-zoom-stage">
+          <div ref={layer} className="notes-zoom-layer">
+            {children}
+          </div>
         </div>
       </div>
-    </div>
+      <div
+        ref={scrollbar}
+        className="notes-window-scrollbar"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        <div ref={scrollRange} />
+      </div>
+    </>
   );
 }

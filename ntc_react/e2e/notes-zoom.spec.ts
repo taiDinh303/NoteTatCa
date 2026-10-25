@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+// Headless Chromium otherwise hides native scrollbars, including their hit area.
+test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
+
 for (const width of [393, 1920]) {
   test(`notes have a single vertical scroll area ${width}`, async ({
     page,
@@ -16,6 +19,15 @@ for (const width of [393, 1920]) {
       .click();
     const list = page.locator("[data-notes-zoom]");
     await expect(list).toBeVisible();
+    const rail = page.locator(".notes-window-scrollbar");
+    await expect(rail).toBeVisible();
+    const railBox = (await rail.boundingBox())!;
+    expect(railBox.y).toBe(0);
+    expect(railBox.height).toBe(700);
+    expect(railBox.x + railBox.width).toBe(width);
+    expect(
+      await list.evaluate((el) => getComputedStyle(el).scrollbarWidth),
+    ).toBe("none");
     const dimensions = () =>
       list.evaluate((el) => ({
         outer:
@@ -45,6 +57,29 @@ for (const width of [393, 1920]) {
     await expect
       .poll(() => list.evaluate((el) => el.scrollTop))
       .toBeGreaterThan(0);
+    await expect
+      .poll(async () =>
+        Math.abs(
+          (await rail.evaluate((el) => el.scrollTop)) -
+            (await list.evaluate((el) => el.scrollTop)),
+        ),
+      )
+      .toBeLessThanOrEqual(1);
+    await rail.evaluate((el) => {
+      el.scrollTop = 0;
+    });
+    await expect.poll(() => list.evaluate((el) => el.scrollTop)).toBe(0);
+    // Exercise the browser's actual native thumb, not a synthetic pointer handler.
+    const thumbHeight = await rail.evaluate(
+      (el) => el.clientHeight ** 2 / el.scrollHeight,
+    );
+    await page.mouse.move(width - 3, thumbHeight / 2);
+    await page.mouse.down();
+    await page.mouse.move(width - 3, thumbHeight / 2 + 100, { steps: 8 });
+    await page.mouse.up();
+    await expect
+      .poll(() => list.evaluate((el) => el.scrollTop))
+      .toBeGreaterThan(30);
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
     await list.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
@@ -88,6 +123,10 @@ for (const width of [393, 1920]) {
     await expect
       .poll(() => list.evaluate((el) => el.getBoundingClientRect().right))
       .toBe(resizedWidth);
+    const resizedRail = (await rail.boundingBox())!;
+    expect(resizedRail.y).toBe(0);
+    expect(resizedRail.height).toBe(760);
+    expect(resizedRail.x + resizedRail.width).toBe(resizedWidth);
     expect((await dimensions()).outer).toBeLessThanOrEqual(1);
   });
 }
