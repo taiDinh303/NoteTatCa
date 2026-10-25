@@ -138,6 +138,11 @@
 .editor-toolbar .content-zoom-controls input[type="number"] {
   height: 29px;
 }
+.note-editor-modal .editor-toolbar input.font-size-input {
+  width: 30px;
+  min-width: 30px;
+  padding-inline: 2px;
+}
 .content-zoom-outlet[data-expanded="false"]
   .content-zoom-controls
   > :not(.content-pan-toggle) {

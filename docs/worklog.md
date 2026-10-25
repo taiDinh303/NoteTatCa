@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bàn tay trước kính lúp, input kích cỡ chữ gọn — 2026-10-25
+
+- Theo2ảnh/yêu cầu chủ dự án: Edit PC chuyển bàn tay ra trước kính lúp, kính lúp sát dấu− khi mở zoom. Input font size40→30px, padding ngang2px, giữ số căn giữa/step/min/max/formatting. View giữ bàn tay trái kính lúp và popup phía trên như trước. CSS scoped trong ContentZoom.css để không nhận thay đổi styles.css đang làm song song.
+- Actual validation: Chromium content zoom5/5PASS ở320/393/1280px và PC pan/fullscreen. Đo riêng PC: hand.x<zoom.x, khoảng cách kính lúp→minus2px; input font width30px và nhập/commit96 vẫn hiển thị96. Đã xem screenshot desktop có thứ tự mới và font96. TypeScript/Vite Production build2188modules, ESLint, .NET Release strict0warnings/0errors và scoped diff checkPASS. Không thêm test mirror cho sửa nhỏ; không fullsuite/unit/account HTTP/thiết bị vật lý/production/owner DB/email/manual deploy/migrate.
+- Scope4files: ContentZoomOutlet.tsx, ContentZoom.css, FRONTEND-IMPLEMENTATION và entry này của worklog. Giữ worklog entry label đang có ngoài scope, deletion ZoomDialog.tsx và .agnes. Push main theo quyền hiện có, kiểm SHA remote sau push; hosting rollout chưa xác minh.
+
 ## View popup phía trên cùng màu note, bàn tay luôn cạnh kính lúp PC — 2026-10-25
 
 - Theo ảnh/yêu cầu chủ dự án và các bổ sung cùng lượt: View chuyển controls zoom khỏi footer thành popup phía trên kính lúp, giới hạn collision theo modal, backgroundColor/notePalette đúng note, không chiếm chỗ ngày Edited. Edit giữ controls inline. Reset và dấu+ SVG14px ở cả View/Edit, giữ hit area nút. Không thay range50–300%, gesture, full screen hoặc reopen100%.

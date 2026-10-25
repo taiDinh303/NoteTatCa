@@ -74,6 +74,7 @@ export default function ContentZoomOutlet({
     );
   return (
     <div className="content-zoom-inline">
+      <div className="content-pan-toggle" ref={attachHand} />
       <IconButton
         icon={ZoomIn}
         label={tr("Content zoom")}
@@ -82,7 +83,6 @@ export default function ContentZoomOutlet({
         aria-controls={id}
         onClick={() => setExpanded((value) => !value)}
       />
-      <div className="content-pan-toggle" ref={attachHand} />
       <div
         id={id}
         className="content-zoom-outlet"
