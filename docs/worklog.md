@@ -1,6 +1,21 @@
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
+
+## English README và công bố GitHub — 2026-10-25
+
+- Chủ dự án yêu cầu chuyển README sang tiếng Anh và push. Dịch toàn bộ README gốc, bao gồm giới thiệu, chức năng hiện có/kế hoạch, chú thích ảnh, quick start và giới hạn kiểm chứng. Giữ2ảnh Guest thật và link demo đã kiểm ở lượt trước; docs chuyên sâu tiếp tục bằng tiếng Việt. Không đổi runtime hoặc nhận các thay đổi editor/content zoom đang được làm riêng vào commit này.
+- Publication scope4files: `README.md`, `docs/images/guest-desktop.png`, `docs/images/guest-mobile.png`, `docs/worklog.md` (gồm evidence của lượt README trước chưa commit). Fetch trước publication: HEAD=origin/main=`35217eb`, divergence0/0. Push nhánh main theo lệnh trực tiếp, đối chiếu HEAD với `git ls-remote origin refs/heads/main` sau push. Giữ `.agnes/` và toàn bộ React changes ngoài scope.
+- Validation dịch thuật/docs: đọc lại nội dung tiếng Anh, kiểm14relative links/images và UTF-8; `scripts/verify_docs.py` PASS49Markdown/184local links/0errors; scoped `git diff --check` PASS. Không chạy lại build/tests cho thay đổi văn bản/ảnh; evidence104Vitest+4config/24HTTP và2buildPASS tại source35217eb của lượt trước được giữ ngày/commit/giới hạn. Không manual deploy, migrate, gọi DB hoặc gửi email.
+
+## README giới thiệu sản phẩm và ảnh Guest — 2026-10-25
+
+- Theo yêu cầu bước 6 của chủ dự án: viết lại README gốc bằng tiếng Việt, ngắn hơn bản cũ; giới thiệu giá trị, demo Guest, 5 nhóm chức năng hiện có, backlog chưa triển khai, stack/ownership/autosave, quick start Guest không cần DB và link setup/test/docs. Không suy đoán team size hoặc phạm vi đóng góp cá nhân khi hồ sơ chưa xác nhận. Loại thông tin đường dẫn máy cũ và Razor còn được giữ đã lỗi thời khỏi README gốc.
+- Thêm `docs/images/guest-desktop.png` (1440x960) và `guest-mobile.png` (393x852), chụp ứng dụng local tại source HEAD `35217eb`, dữ liệu seed Guest giả. Đã xem cả hai ảnh; mobile chờ checklist render xong trước chụp. Không dùng ảnh mẫu tạo bằng AI hoặc nội dung tài khoản thật. Script chụp thử nằm trong ignored artifacts/, ngoài scope tài liệu.
+- Mở `https://note-tat-ca.vercel.app/Home` bằng Chromium context mới: HTTP200, bấm Try guest mode vào /notes, thấy đủ3notes mẫu; vì đã kiểm demo nên thêm link /guest vào README. Không đăng nhập tài khoản hoặc gửi email. Local cổng5188: Guest3notes, sửa note giả, chờ Saved on this device, đóng/reload vẫn giữ nội dung; ghi nhận0request API/health. Đây là smoke Guest, không chứng minh auth/email/reminder hoặc offline reload của production.
+- Validation thực tế từ root: `npm --prefix ntc_react test` PASS4/4config +104/104Vitest; `npm --prefix ntc_react run build` PASS TypeScript/Vite2184modules; `.NET build ntc_aspnet/NTC.sln -c Release -warnaserror -m:1` PASS0warnings/0errors, dùng SDK8.0.426 tại `C:/Users/ADMIN/.dotnet/dotnet.exe` vì dotnet không có trong PATH. Focused Release HTTP tests NoteTests/AuthorizationTests/AdministratorSeparationTests/ContractTests PASS24/24 qua `--no-build --filter`; fixtures SQLite/email giả, không owner DB/mail thật.
+- `scripts/verify_docs.py` PASS49Markdown/184local links/0errors; kiểm thêm README14local links/images và UTF-8 PASS; `git diff --check` PASS. Chưa chạy full backend suite/full E2E/thiết bị thật hoặc xác minh toàn bộ chức năng live. Phạm vi4files: README,2ảnh và worklog; giữ `.agnes/` có sẵn ngoài scope. Chưa commit/push; không thay About/Template settings, runtime, cấu hình, migration hoặc deploy. Còn lại: công bố thay đổi lên GitHub khi thực hiện publication; roadmap giữ trạng thái kế hoạch.
+
 ## Thanh công cụ mobile một hàng, nhóm thao tác căn trái — 2026-10-25
 
 - Theo ảnh/yêu cầu chủ dự án: thanh định dạng mobile không xuống hàng, giữ overflow-x auto để vuốt ngang; các phần tử không co nhỏ trong container≤800px. Nhóm màu nền/label/reminder/options ở≤480px chuyển từ space-between sang flex-start, giữ gap8px và một hàng để bổ sung công cụ sau.

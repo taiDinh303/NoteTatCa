@@ -1,115 +1,72 @@
 # NoteTatCa
 
-Cấu hình local/Production và quy ước dùng chung NTC/Marixa: [CONFIGURATION-STANDARD](docs/CONFIGURATION-STANDARD.md). Public deployment targets: [deploy/project.json](deploy/project.json).
+A personal space to capture ideas, build checklists, and organize everyday work — with rich-text editing, autosave, and offline support.
 
-Private note web app with an ASP.NET Core 8 API and .NET Identity.
-Read [project docs](docs/00-README.md) and [architecture](ARCHITECTURE.md).
+**[Try Guest Mode](https://note-tat-ca.vercel.app/guest)** · [Project Docs](docs/00-README.md) · [Roadmap](docs/ROADMAP-CONTENT-COLLABORATION.md)
 
-## Repository layout
+**In active development.** Try the app without signing up. Guest notes stay in your browser, with an option to copy them into your account after signing in. The live Guest demo was opened and checked with three sample notes on **October 25, 2026**.
 
-Repository root: `D:\My Project\NTC`. There is one Git repository and one
-maintained documentation directory. The React/TypeScript/Vite SPA lives in `ntc_react/`.
-See [frontend implementation](docs/FRONTEND-IMPLEMENTATION.md).
+## Screenshots
 
-```text
-NTC/
-  .git/
-  .github/workflows/
-  .config/dotnet-tools.json
-  docs/                    # single documentation source
-  scripts/
-  ntc_aspnet/               # .NET projects and solutions
-    NTC.sln
-    NTC.Backend.slnf
-    NTC.API/
-    NTC.Repositories/
-    NTC.Services/
-    NTC.Tests/
-    ...
-  ntc_react/               # React TypeScript SPA
-  Dockerfile
-  render.yaml
-  .env.example
-  .gitignore
-```
+Captured locally in Guest mode using sample data on October 25, 2026, at source commit `35217eb`.
 
-Do not recreate `ntc_aspnet/docs` or `ntc_aspnet/.git`. Git history and the original
-remote are retained. Backend project references and solution paths stay relative
-to `ntc_aspnet/`.
+![Guest notes workspace on desktop](docs/images/guest-desktop.png)
 
-## Build and test
+<img src="docs/images/guest-mobile.png" alt="A checklist note viewed on a mobile screen" width="320" />
 
-PowerShell from the repository root:
+## Current Features
 
-```powershell
-dotnet tool restore
-dotnet restore ntc_aspnet/NTC.Backend.slnf
-dotnet build ntc_aspnet/NTC.Backend.slnf -c Release --no-restore -warnaserror
-dotnet test ntc_aspnet/NTC.Tests/NTC.Tests.csproj -c Release --no-build
-python scripts/verify_docs.py
-```
+- **Write and organize:** rich text, checklists, Markdown shortcuts, text and background colors, and emoji; search, labels, pinning, and drag-and-drop ordering.
+- **Autosave and offline work:** IndexedDB stores data on the device. Signed-in users can view, create, and edit downloaded notes offline, sync when reconnected, and resolve version conflicts.
+- **Guest mode and recovery:** explore sample notes without an account, optionally copy Guest notes into an account, and restore trashed notes within 30 days.
+- **Accounts and privacy:** email/Google sign-in and session management. Notes are private to each user; administrators manage accounts and statistics without access to other users' note content.
+- **Everyday tools:** recurring reminders with time-zone support, in-app/email notifications for accounts, a responsive layout, light/dark themes, and English, Vietnamese, Chinese, and Japanese interfaces.
 
-Tests use synthetic SQLite and SQL Server LocalDB fixtures. Optional PostgreSQL
-tests require `NTC_TEST_POSTGRES` pointing to a loopback `postgres` administration
-database; the fixture creates and drops a unique `ntc_test_<guid>` database.
-The backend solution filter excludes retained Razor from the strict build.
+Offline access covers data already downloaded to the device. Clearing browser storage can remove unsynced changes. Guest mode excludes reminders, email, and administration. Email reminders require configured delivery services and background jobs; Guest screenshots demonstrate the notes interface only.
 
-## Database and API
+## Planned Features
 
-For local Development, set `Database:Provider` (`SqlServer` or `PostgreSQL`) and
-`ConnectionStrings:MyCnn` in `ntc_aspnet/NTC.API/appsettings.Development.json` or
-environment variables. Provider defaults to SQL Server. See [configuration](docs/17-environment-config.md).
-`.env.example` lists environment keys; ASP.NET does not automatically load .env.
+- Note templates, heading-based tables of contents, and links between notes.
+- Images and file attachments, filtering by file type, tables, audio/video, and drawing with pen or touch.
+- Invitations to view notes and leave comments, with permissions controlled by the note owner.
 
-```powershell
-# Generate scripts for review; these commands do not apply a migration.
-dotnet ef migrations script --context DatabaseContext --project ntc_aspnet/NTC.Repositories --startup-project ntc_aspnet/NTC.API --output artifacts/sqlserver-migrations.sql
-dotnet ef migrations script --context PostgreSqlDatabaseContext --project ntc_aspnet/NTC.Repositories --startup-project ntc_aspnet/NTC.API --output artifacts/postgresql-migrations.sql
-# Start only against a separately prepared database:
-dotnet run --project ntc_aspnet/NTC.API --launch-profile https
-```
+These features are **not implemented yet**, with no committed release dates. Version history and full export/import remain proposals; real-time collaborative editing requires a separate decision. See the [detailed roadmap](docs/ROADMAP-CONTENT-COLLABORATION.md).
 
-API profile: HTTPS 5033, HTTP 5032. Swagger is available in Development.
-Startup does not migrate, seed or enable maintenance automatically.
-SQL Server to PostgreSQL data transfer requires a separate preservation plan.
+## Stack and Architecture
 
-On a prepared database, explicit operator commands can bootstrap roles or grant
-Admin to a verified account; see [local setup](docs/10-setup-local.md). No default
-administrator password is created. `BackgroundJobs__Enabled=false` remains default.
-Local configurations, accounts and notes must be preserved.
+**React + TypeScript + Vite + Tiptap → ASP.NET Core 8 API + Identity → EF Core → PostgreSQL / SQL Server.** IndexedDB stores Guest data and the offline sync queue.
 
-## Deployment
+The frontend lives in `ntc_react/`, the backend in `ntc_aspnet/`, and maintained documentation in `docs/`. The API enforces resource ownership. Autosave uses versions to detect conflicts and idempotency keys to prevent duplicate creates on retry. Read the [architecture overview](ARCHITECTURE.md) and [frontend implementation notes](docs/FRONTEND-IMPLEMENTATION.md).
 
-Dockerfile, .dockerignore, render.yaml and .github/ live at the repository root;
-build Docker from here. API image builds `ntc_aspnet/NTC.API` and excludes all
-appsettings files, retained Razor, tests, frontend and local artifacts.
-Supply DB/JWT/Google/SMTP settings through the hosting secret store. Actual Docker,
-cloud deployment and external-provider verification remain separate release checks.
+## Quick Start
 
-## Run React
+Requires **Node.js 24**. Run from the repository root:
 
 ```powershell
 npm --prefix ntc_react ci
-# Start API in another terminal against a separately prepared local DB.
 npm --prefix ntc_react run dev
 ```
 
-Open http://127.0.0.1:5173; development proxy targets API HTTP5032.
-See [React setup, architecture and synthetic browser tests](ntc_react/README.md).
+Open [Guest mode locally](http://127.0.0.1:5173/guest); no API or database is required. Account features also require the **.NET 8 SDK** and a separately prepared PostgreSQL or SQL Server database:
 
-## Shared Supabase configuration commands
+```powershell
+# In a separate terminal, after configuring the database and secrets:
+dotnet run --project ntc_aspnet/NTC.API --launch-profile https
+```
 
-For the same dotnet user-secrets workflow as Marixa and future .NET projects,
-see [shared commands and concrete examples](docs/SUPABASE-DOTNET-COMMANDS.md).
-NTC.API now has its own UserSecretsId. Development secrets override local JSON;
-remove the provider/connection secret keys to return to the existing SQL Server
-configuration. Schema setup and test-account provisioning remain explicit NTC
-operator commands documented in [Supabase setup](docs/SUPABASE-SETUP.md).
+React proxies API requests to HTTP port `5032` by default. See the [local setup guide](docs/10-setup-local.md), [configuration standard](docs/CONFIGURATION-STANDARD.md), [backend environment example](.env.example), and [frontend environment example](ntc_react/.env.example). ASP.NET does not load `.env` automatically. Keep secrets outside Git; API startup does not migrate or seed the database.
 
-## Render and Vercel
+## Validation
 
-See [dashboard configuration and rollout limits](docs/RENDER-VERCEL-SETUP.md).
-Render uses the root Dockerfile/context and a public Supabase CA; Vercel uses
-ntc_react, Node24 and the production API endpoint ending in /api/v1.
-Export private values with scripts/Export-CloudEnvironment.ps1; outputs stay
-under ignored artifacts/deployment. Saving settings does not deploy new source.
+Run from the repository root:
+
+```powershell
+npm --prefix ntc_react test
+npm --prefix ntc_react run build
+dotnet build ntc_aspnet/NTC.sln -c Release -warnaserror
+dotnet test ntc_aspnet/NTC.Tests/NTC.Tests.csproj -c Release --no-build
+```
+
+Browser tests use an isolated API fixture, SQLite, and captured email. See the [frontend test runbook](ntc_react/README.md#verify-using-synthetic-data).
+
+Checked on **October 25, 2026**, at source commit `35217eb`: 104 Vitest tests, 4 configuration checks, and 24 focused HTTP regression tests passed; React production and .NET Release builds passed. Local and live Guest smoke checks passed. The full E2E and backend suites were not rerun for this documentation update. See the [worklog](docs/worklog.md) for evidence and limits; these results do not guarantee later revisions. Continue with the [documentation index](docs/00-README.md).
