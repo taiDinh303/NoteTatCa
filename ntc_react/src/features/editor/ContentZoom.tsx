@@ -24,8 +24,8 @@ export default function ContentZoom({
   const change = useRef<(value: number) => void>(() => {});
   const session = useContext(ContentZoomSession);
   const savedPercent = session?.percent;
-  const hand = useRef(true);
-  const [handEnabled, setHandEnabled] = useState(true);
+  const hand = useRef(false);
+  const [handEnabled, setHandEnabled] = useState(false);
   const [percent, setPercent] = useState(() =>
     Math.round(savedPercent?.current ?? 100),
   );
@@ -332,13 +332,11 @@ export default function ContentZoom({
         disabled={percent >= 300}
         onClick={() => change.current(percent + 10)}
       />
-      {!readOnly ? (
-        <IconButton
-          icon={RotateCcw}
-          label={tr("Reset content zoom")}
-          onClick={() => change.current(100)}
-        />
-      ) : null}
+      <IconButton
+        icon={RotateCcw}
+        label={tr("Reset content zoom")}
+        onClick={() => change.current(100)}
+      />
     </div>
   );
   return (

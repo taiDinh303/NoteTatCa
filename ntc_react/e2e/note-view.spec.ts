@@ -76,10 +76,7 @@ for (const width of [393, 1280]) {
       ),
     ).toHaveCount(0);
     await expect(
-      viewer.getByRole("spinbutton", {
-        name: "Content zoom percentage",
-        exact: true,
-      }),
+      viewer.locator('input[aria-label="Content zoom percentage"]'),
     ).toHaveCount(1);
     await expect(viewer.getByLabel("Character count")).toHaveCount(0);
     if (width <= 800) {

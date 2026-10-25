@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kính lúp mở inline ở View/Edit, bàn tay mặc định tắt, View full screen — 2026-10-25
+
+- Theo2ảnh/yêu cầu chủ dự án: bỏ popup zoom nổi ngoài note. Cả View/Edit có kính lúp toggle inline−/input/+/Reset; Edit đẩy các công cụ sau qua phải trong toolbar một hàng cuộn ngang. View giữ kính lúp/bàn tay/controls cạnh Edit/Close; nhóm thao tác có cuộn ngang nếu màn quá chật, không tràn khỏi note. Controls target giữ mounted, đóng/mở chỉ đổi hiển thị, không reset mức zoom/gesture. Reset nay có ở cả View/Edit.
+- Bàn tay View mặc định tắt, aria-pressed=false; chọn chữ bình thường, bật mới drag pan. View thêm Enter/Exit full screen góc trên phải, dùng cùng fullscreen class/ẩn nút mobile như Edit; không scale toolbar/title hoặc đổi document JSON. Mode View↔Edit, pinch/Ctrl-wheel, reopen reset100% và zoom giao diện giữ nguyên.
+- Actual validation: Chromium content zoom5/5PASS:320/393/1280px kính lúp đẩy Bold sang phải>100px, không còn popup; toolbar/header/footer bounds không đổi sau mở controls và zoom200%, footer không overflow; HTML nguyên vẹn, pinch175%/cuộn một ngón, global111% độc lập, gõ thật khi zoom/autosave/reopen, clamp/Reset. PC mặc định hand=false, fullscreen1280x900 rồi thu nhỏ vẫn zoom200%, bật hand kéo hai trục và tắt chọn chữ được. Lượt đầu phát hiện toolbar tăng1px do controls30px; sửa riêng controls toolbar29px, giữ assertion bounds tuyệt đối, final5/5PASS. Đã xem screenshot Edit393inline120% và View1280inline120% có nút fullscreen.
+- Account synthetic regression mobile393PASS; desktop1280lượt đầu timeout label Work sau503/retry như các đợt trước, không sửa label/auth hoặc nới assertion. Config4/4 + Vitest107/107PASS; TypeScript/Vite Production build2188modules/ESLint và .NET solution Release strict0warnings/0errorsPASS; git diff --checkPASS. Không fullsuite backend/full E2E/thiết bị vật lý/iOS/bàn phím ảo/owner DB/email thật/production/manual deploy/migrate; hosting rollout chưa xác minh.
+- Desktop account1280rerun riêngPASS; không kết luận race label đã được sửa. Fetch trước publication divergence0/0. Publication scope9files:5editor source/CSS files,2E2E và2root docs. Giữ deletion ZoomDialog.tsx có sẵn và `.agnes/` ngoài commit; push main theo quyền hiện có và kiểm remote SHA sau push.
+
 ## View kéo bằng bàn tay, Edit zoom qua kính lúp — 2026-10-25
 
 - Theo2ảnh/yêu cầu chủ dự án: View chuyển cụm−/input phần trăm/+ xuống cùng hàng cạnh Edit/Close; PC có nút bàn tay bật sẵn, giữ chuột trái kéo cả hai trục, pointer capture và cursor grab/grabbing; tắt để chọn/copy chữ. Bỏ qua input/link khi bắt đầu kéo; touch không bị bắt thành mouse pan. Mobile timestamp ellipsis khi thiếu chỗ, vẫn bấm xem thông tin đầy đủ; footer không thêm hàng zoom riêng.

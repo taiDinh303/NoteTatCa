@@ -242,7 +242,7 @@ export default function RichEditor({
   return (
     <>
       <div className="editor-toolbar" aria-label={tr("Text formatting")}>
-        <ContentZoomOutlet popup />
+        <ContentZoomOutlet />
         <span className="toolbar-divider" />
         <IconButton
           icon={Bold}

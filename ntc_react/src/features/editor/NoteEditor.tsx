@@ -269,6 +269,7 @@ function NoteViewer({
   useLanguage();
   const me = useMe();
   const auth = useAuth();
+  const [fullscreen, setFullscreen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(
     initialAction === "reminder",
   );
@@ -300,21 +301,28 @@ function NoteViewer({
       hideTitle
       title={tr("View note")}
       onClose={onClose}
-      className="note-editor-modal note-viewer"
+      className={`note-editor-modal note-viewer ${fullscreen ? "fullscreen" : ""}`}
       style={{
         ...notePalette(note.backgroundColor),
         backgroundColor: note.backgroundColor || undefined,
         ...(note.backgroundColor ? { "--surface": note.backgroundColor } : {}),
       }}
     >
-      {note.title || note.iconEmoji ? (
-        <div className="note-view-heading">
+      <div className="note-view-heading">
+        <div className="note-view-identity">
           {note.iconEmoji ? (
             <span aria-hidden="true">{note.iconEmoji}</span>
           ) : null}
           {note.title ? <h2>{note.title}</h2> : null}
         </div>
-      ) : null}
+        <IconButton
+          className="editor-size-toggle"
+          icon={fullscreen ? Minimize2 : Maximize2}
+          label={fullscreen ? tr("Exit full screen") : tr("Enter full screen")}
+          aria-pressed={fullscreen}
+          onClick={() => setFullscreen(value => !value)}
+        />
+      </div>
       <div className="editor-scroll">
         <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
           <ReadOnlyContent

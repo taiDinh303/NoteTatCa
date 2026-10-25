@@ -8,7 +8,7 @@ async function zoomInput(page: import("@playwright/test").Page) {
   });
   if (
     (await trigger.isVisible()) &&
-    !(await page.locator(".content-zoom-menu").isVisible())
+    (await trigger.getAttribute("aria-expanded")) !== "true"
   )
     await trigger.click();
   return page.getByRole("spinbutton", {
@@ -57,7 +57,16 @@ for (const width of [320, 393, 1280]) {
           y: el.getBoundingClientRect().y,
         })),
       );
+    const boldX = (await dialog
+      .getByRole("button", { name: "Bold", exact: true })
+      .boundingBox())!.x;
     await zoomInput(page);
+    expect(
+      (await dialog
+        .getByRole("button", { name: "Bold", exact: true })
+        .boundingBox())!.x,
+    ).toBeGreaterThan(boldX + 100);
+    await expect(page.locator(".content-zoom-menu")).toHaveCount(0);
     for (let i = 0; i < 10; i++)
       await page
         .getByRole("button", { name: "Zoom in content", exact: true })
@@ -295,6 +304,20 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
     Math.abs(inputBox.y + inputBox.height / 2 - editBox.y - editBox.height / 2),
   ).toBeLessThan(3);
   await setZoom(page, 200);
+  const hand = dialog.getByRole("button", { name: "Pan content", exact: true });
+  await expect(hand).toHaveAttribute("aria-pressed", "false");
+  await dialog
+    .getByRole("button", { name: "Enter full screen", exact: true })
+    .click();
+  await expect(dialog).toHaveClass(/fullscreen/);
+  expect((await dialog.boundingBox())!.width).toBeCloseTo(1280);
+  expect((await dialog.boundingBox())!.height).toBeCloseTo(900);
+  await expect(await zoomInput(page)).toHaveValue("200");
+  await dialog
+    .getByRole("button", { name: "Exit full screen", exact: true })
+    .click();
+  expect((await dialog.boundingBox())!.width).toBeLessThan(1280);
+  await hand.click();
   const view = dialog.locator(".content-zoom-viewport");
   await view.evaluate((el) => {
     el.scrollLeft = 0;
