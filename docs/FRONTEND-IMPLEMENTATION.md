@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Sidebar phản hồi ngay khi nhấn — 2026-10-26
+
+Nút desktop nhận primary mouse/pen pointerdown để bắt đầu mở/thu ngay khi nhấn xuống, không chờ mouseup/click. Click sau đó không toggle lần hai; bàn phím Enter/Space, activation hỗ trợ và touch giữ click semantics. Hover không tự mở/đóng; sidebar vốn có will-change:transform để chuẩn bị lớp render. Giữ animation160ms và đồng clock với main/card, không thêm delay/timer. Memo phần nội dung Sidebar và callbacks desktop ổn định để toggle AppShell không dựng lại danh sách nhãn; queries/language/theme/navigation vẫn cập nhật theo context. Mobile drawer giữ nút/cơ chế cũ.
+
 ### Zoom danh sách, giữ nguyên giao diện — DEC-031, 2026-10-25
 
 Bổ sung theo3ảnh50% ngày2026-10-26: desktop Grid tại scale50% dùng thêm tối đa10px từ đệm phải sẵn có (giữ ít nhất12px cách mép); đủ thêm1cột trước xuống hàng, không đổi width/gap gốc hoặc lề trái. Điều kiện chỉ tại min zoom50%, List/mobile và mốc khác giữ quy tắc cũ. fitWidth dùng chung cho số cột/canvas/stage để không chỉ thêm slot rồi clip card cuối.100% vẫn như trước.

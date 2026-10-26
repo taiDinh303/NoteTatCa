@@ -3,7 +3,15 @@ import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
 import "./SidebarLayout.css";
 import type { ReactNode } from "react";
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Link,
   NavLink,
@@ -37,7 +45,7 @@ import { OfflineControls } from "./OfflineControls";
 import { GuestBanner } from "./GuestControls";
 import { useTheme } from "../shared/useTheme";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
-function Sidebar({
+const Sidebar = memo(function Sidebar({
   onLabels,
   onNavigate,
   accountControls,
@@ -148,7 +156,7 @@ function Sidebar({
       </div>
     </>
   );
-}
+});
 export default function AppShell() {
   useLanguage();
   const state = useAuth();
@@ -179,6 +187,11 @@ export default function AppShell() {
     }
   });
   const [manageLabels, setManageLabels] = useState(false);
+  const openLabels = useCallback(
+    () => setManageLabels(true),
+    [setManageLabels],
+  );
+  const keepNavigation = useCallback(() => {}, []);
   const [search, setSearch] = useState(params.get("q") ?? "");
   const input = useRef<HTMLInputElement>(null);
   const { theme, toggleTheme } = useTheme();
@@ -235,7 +248,23 @@ export default function AppShell() {
             label={sidebarHidden ? tr("Show sidebar") : tr("Hide sidebar")}
             aria-controls="workspace-navigation"
             aria-expanded={!sidebarHidden}
-            onClick={() => setSidebarHidden((hidden) => !hidden)}
+            onPointerDown={(event) => {
+              if (
+                event.button === 0 &&
+                event.isPrimary &&
+                event.pointerType !== "touch"
+              )
+                setSidebarHidden((hidden) => !hidden);
+            }}
+            onClick={(event) => {
+              // Mouse/pen already responded on press. Keyboard and touch still
+              // activate on click, without toggling a second time on release.
+              if (
+                event.detail === 0 ||
+                (event.nativeEvent as PointerEvent).pointerType === "touch"
+              )
+                setSidebarHidden((hidden) => !hidden);
+            }}
           />
           <IconButton
             className="mobile-menu-button"
@@ -324,7 +353,7 @@ export default function AppShell() {
         inert={sidebarHidden}
         aria-hidden={sidebarHidden}
       >
-        <Sidebar onLabels={() => setManageLabels(true)} onNavigate={() => {}} />
+        <Sidebar onLabels={openLabels} onNavigate={keepNavigation} />
       </aside>
       <div className="main-column">
         <main className="workspace-main" id="workspace-main">

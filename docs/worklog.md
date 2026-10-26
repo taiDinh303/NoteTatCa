@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sidebar bắt đầu chuyển động ngay khi nhấn — 2026-10-26
+
+- Chủ dự án thấy độ trễ lúc nhấn mở/thu, mong nhấn phản hồi ngay hoặc chuẩn bị khi hover. CSS hiện không có delay, nhưng nút dùng click nên đợi thả chuột. Đổi desktop mouse/pen primary sang pointerdown, bỏ double-toggle khi click tiếp theo; Enter/Space/touch vẫn click. Giữ160ms/cùng clock sidebar/main/card và will-change hiện hữu, không tự mở/thu khi chỉ hover. Memo nội dung Sidebar/callbacks desktop để tránh render lại label list mỗi toggle; dữ liệu/context vẫn cập nhật. Mobile drawer không đổi.
+- Test mới giữ mouse.down rồi kiểm class/aria trước mouse.up, đảo chiều, release không toggle lần hai, Enter/Space và touch PointerEvent. Lượt đầu mock click bằng MouseEvent làm mất pointerType nên test touch thất bại; dùng PointerEvent đúng loại, focused1/1PASS.5case rapid/wrapping Grid-List75/100/125%PASS,16reads/8cards một lần và shared clock giữ. Final14unique browser casesPASS:6guest (1input/5motion),4account live frames thường/reduced-motion và4header1440/1024/393/320. Lượt chạy header riêng ban đầu fixture cũ trả Authentication required trước khi có note; reset fixture riêng5199 rồi rerun4/4PASS, không đổi runtime/auth để xử lý. React ESLint/TypeScript/Vite2192modulesPASS; .NET solution Release strict0warnings/0errorsPASS; docs49Markdown/198links/0errors/diff checkPASS. Không fullE2E/backend tests/thiết bị vật lý/DPR/iOS/1000labels hoặc đo latency hardware, không cam kết0ms/FPS mọi máy. Hosting rollout chưa xác minh. Scope4files AppShell.tsx, notes-zoom.spec.ts, frontend/worklog; giữ.agnes/local config ngoài Git; push main và kiểm remote theo quyền hiện có. Không migration/manual deploy/owner DB/email thật.
+
 ## Thêm1note mỗi hàng ở50% mà giữ width/gap — 2026-10-26
 
 - Chủ dự án gửi3ảnh1920px50%, yêu cầu thêm1note trước xuống hàng.100% cột vừa hàng nhưng ở50% thiếu nửa gap vật lý10px để đủ thêm1slot. Desktop Grid tại min zoom50% cho canvas dùng thêm min(g/2,rightInset−12) từ đệm phải sẵn có, cùng fitWidth cho columns/canvas/stage; không tăng chiều rộng scrollport, không resize card/gap hoặc di chuyển lề trái/New+. List/mobile và mức khác giữ nguyên. Khoảng cách mép phải desktop bình thường giảm50→40px, không chạm scrollbar.

@@ -3,6 +3,52 @@ import { test, expect } from "@playwright/test";
 // Headless Chromium otherwise hides native scrollbars, including their hit area.
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
 
+test("desktop sidebar responds on press and reverses without waiting for release", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/Home");
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
+  await expect(page.locator(".note-card").first()).toBeVisible();
+  const toggle = page.locator(".desktop-sidebar-toggle");
+  const shell = page.locator(".customer-shell");
+  await toggle.hover();
+  const pos = await toggle.boundingBox();
+  await page.mouse.move(pos!.x + pos!.width / 2, pos!.y + pos!.height / 2);
+  await page.mouse.down();
+  await expect(shell).toHaveClass(/sidebar-hidden/);
+  await page.mouse.up();
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await page.mouse.down();
+  await expect(shell).not.toHaveClass(/sidebar-hidden/);
+  await page.mouse.up();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await toggle.focus();
+  await page.keyboard.press("Enter");
+  await expect(shell).toHaveClass(/sidebar-hidden/);
+  await page.keyboard.press("Space");
+  await expect(shell).not.toHaveClass(/sidebar-hidden/);
+  await toggle.dispatchEvent("pointerdown", {
+    pointerType: "touch",
+    button: 0,
+    isPrimary: true,
+  });
+  await expect(shell).not.toHaveClass(/sidebar-hidden/);
+  await toggle.evaluate((el) =>
+    el.dispatchEvent(
+      new PointerEvent("click", {
+        bubbles: true,
+        pointerType: "touch",
+        detail: 1,
+      }),
+    ),
+  );
+  await expect(shell).toHaveClass(/sidebar-hidden/);
+});
+
 for (const mode of ["grid", "list"]) {
   test(`sidebar slides quickly through frames without restarting ${mode} cards`, async ({
     page,
