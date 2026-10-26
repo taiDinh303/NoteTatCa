@@ -3,7 +3,7 @@
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES
 
 
-DEC-031 cập nhật theo chủ dự án2026-10-26: zoom bên ngoài chỉ phóng/thu danh sách note50–150%; header/sidebar/controls và View/Edit giữ nguyên, content zoom riêng. Grid chọn width gốc theo chiều rộng cửa sổ tại100% với sidebar mở (mục tiêu khoảng300px), gap20px desktop/16px compact; giữ cả2khi zoom hoặc toggle sidebar. Khi thay đổi chiều rộng cửa sổ mới tính lại cỡ gốc. Canvas dùng đủ số slot theo viewport/scale, căn giữa và chia đều phần dư hai bên; nhóm ghim/thường cùng cột, hàng thiếu note điền từ trái. Đây là thay đổi quyết định cố định320px/dồn dư bên phải trước đó; không thể ép mọi mức zoom sát cả2mép mà vẫn giữ width/gap cố định. Sidebar desktop224–256px, đủ chỗ chữ một dòng. Grid motion chỉ translate, không tween width/height; zoom không tự cuộn ngang/dọc, card đầu không bị che. Chi tiết và evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+DEC-031 cập nhật theo video17-01 và chủ dự án2026-10-26: bỏ căn giữa/căn đều, danh sách giữ lề trái cố định như5f7d282; New+, heading và card đầu thẳng mép trái. Card/gap gốc chọn theo cửa sổ, giữ nguyên khi zoom hoặc toggle sidebar. Desktop tính sidebar bằng đúng1bước cột (card+gap) nên100% mở/đóng sidebar đều vừa hàng đầy, đóng thêm đúng1cột; zoom khác cho phép dư bên phải dưới1bước cột, không giãn width/gap. Gap20px desktop/16px compact, phone100% dư16px phải. Đây là cập nhật thay quyết định căn giữa trước đó. Giữ zoom danh sách50–150%, chrome/View/Edit đứng yên, content zoom riêng; Grid chỉ animate vị trí, không tween width/height hoặc tự cuộn. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
 
 ## Quyết định hiện hành
 

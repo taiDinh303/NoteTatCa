@@ -66,6 +66,7 @@ html:has([data-notes-zoom]) {
   position: absolute;
   inset: 0 auto auto 0;
   transform-origin: 0 0;
+  translate: none;
 }
 .notes-zoom-layer .note-grid {
   grid-template-columns: repeat(
@@ -80,8 +81,7 @@ html:has([data-notes-zoom]) {
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* The canvas contains all column slots, including empty slots in short groups.
-   Its independent translate centres that canvas without changing card motion. */
+/* A fixed left origin aligns group headings and cards with the New button. */
 .notes-zoom-layer .notes-section {
   width: 100%;
 }

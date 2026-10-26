@@ -22,16 +22,12 @@ export function NotesZoomViewport({
       content = layer.current!,
       rail = scrollbar.current!,
       range = scrollRange.current!;
+    content.style.removeProperty("translate");
     let initialized = false;
     let fitTimer = 0;
     let availableWidth = 0;
     let cardWidth = 320;
     let gap = 20;
-    let centerAnimation: Animation | undefined;
-    let centerFrame = 0;
-    let centerTime = 0;
-    let centerX = 0;
-    let centerTarget = 0;
     const reflowAnimations = new Set<Animation>();
     const frozenGrids = new Set<HTMLElement>();
     let scale = 1,
@@ -43,6 +39,12 @@ export function NotesZoomViewport({
       ?.classList.contains("sidebar-hidden");
     const shell = view.closest<HTMLElement>(".customer-shell");
     const main = shell?.querySelector<HTMLElement>(":scope > .main-column");
+    const previousSidebarWidth = shell?.style.getPropertyValue(
+      "--workspace-sidebar-width",
+    );
+    const previousSidebarPriority = shell?.style.getPropertyPriority(
+      "--workspace-sidebar-width",
+    );
     // A native scrollbar spans the whole window while the note viewport stays
     // below the fixed controls. Both represent the same scroll offset/range.
     function updateScrollbar() {
@@ -64,7 +66,6 @@ export function NotesZoomViewport({
     function cancelReflow() {
       reflowAnimations.forEach((animation) => animation.cancel());
       reflowAnimations.clear();
-      stopCenter();
       releaseGrids();
     }
     function releaseGrids() {
@@ -92,18 +93,6 @@ export function NotesZoomViewport({
             animation.transitionProperty === "margin-left",
         );
     }
-    function stopCenter() {
-      if (centerAnimation) {
-        centerX = parseFloat(getComputedStyle(content).translate) || 0;
-        centerAnimation.cancel();
-        centerAnimation = undefined;
-      }
-      cancelAnimationFrame(centerFrame);
-      centerFrame = 0;
-      centerTime = 0;
-      centerTarget = centerX;
-      content.style.translate = `${centerX}px 0`;
-    }
     function shareClock(animation: Animation, transition?: Animation) {
       if (!transition) return;
       if (transition.startTime != null)
@@ -116,73 +105,6 @@ export function NotesZoomViewport({
           },
           () => {},
         );
-    }
-    function stepCenter(time: number) {
-      const elapsed = centerTime ? Math.min(50, time - centerTime) : 16.67;
-      centerTime = time;
-      centerX += (centerTarget - centerX) * (1 - Math.exp(-elapsed / 55));
-      if (Math.abs(centerTarget - centerX) < 0.05) centerX = centerTarget;
-      content.style.translate = `${centerX}px 0`;
-      if (centerX !== centerTarget)
-        centerFrame = requestAnimationFrame(stepCenter);
-      else {
-        centerFrame = 0;
-        centerTime = 0;
-      }
-    }
-    function positionCenter(sidebar = false) {
-      if (content.querySelector(".dragging")) return;
-      const target =
-        mode === "list" ? 0 : Math.max(0, (availableWidth - width * scale) / 2);
-      if (
-        !initialized ||
-        matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
-        stopCenter();
-        centerX = centerTarget = target;
-        content.style.translate = `${target}px 0`;
-        return;
-      }
-      if (sidebar) {
-        stopCenter();
-        centerTarget = target;
-        const transition = sidebarClock();
-        if (!transition || Math.abs(centerX - target) < 0.01) {
-          centerX = target;
-          content.style.translate = `${target}px 0`;
-          return;
-        }
-        const duration = transition?.effect?.getTiming().duration;
-        content.style.translate = `${target}px 0`;
-        const animation = content.animate(
-          [{ translate: `${centerX}px 0` }, { translate: `${target}px 0` }],
-          {
-            duration: typeof duration === "number" ? duration : 160,
-            easing: "cubic-bezier(.2,0,0,1)",
-          },
-        );
-        shareClock(animation, transition);
-        animation.id = "notes-centering";
-        centerAnimation = animation;
-        void animation.finished.then(
-          () => {
-            if (centerAnimation !== animation) return;
-            centerAnimation = undefined;
-            centerX = target;
-            if (centerTarget !== centerX && !centerFrame)
-              centerFrame = requestAnimationFrame(stepCenter);
-          },
-          () => {},
-        );
-      } else {
-        centerTarget = target;
-        if (
-          !centerAnimation &&
-          !centerFrame &&
-          Math.abs(centerTarget - centerX) > 0.01
-        )
-          centerFrame = requestAnimationFrame(stepCenter);
-      }
     }
     function fit(animate = false, resizeOnly = false, sidebar = false) {
       window.clearTimeout(fitTimer);
@@ -208,12 +130,10 @@ export function NotesZoomViewport({
         Math.abs(nextWidth - width) < 0.01 &&
         content.style.getPropertyValue("--notes-columns") === String(columns)
       ) {
-        positionCenter(sidebar);
         return;
       }
-      // A sidebar transition resizes the canvas every frame. Fixed card/gap
-      // tracks have identical geometry until a column boundary is crossed.
-      // Avoid cancelling/restarting card motion for each margin animation tick.
+      // Fixed card/gap tracks keep their geometry until a column boundary is
+      // crossed. Do not measure or restart card motion on each resize tick.
       if (
         !tracksChanged &&
         ((mode === "list" && resizeOnly) || mode !== "list") &&
@@ -227,7 +147,6 @@ export function NotesZoomViewport({
           height = content.offsetHeight;
           space.style.height = `${height * scale}px`;
         }
-        positionCenter(sidebar);
         return;
       }
       const nodes = cards();
@@ -246,7 +165,6 @@ export function NotesZoomViewport({
       view.scrollLeft = 0;
       updateScrollbar();
       if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        positionCenter(sidebar);
         return;
       }
       // Keep destination rows stable while cards move; List can also resize.
@@ -322,7 +240,6 @@ export function NotesZoomViewport({
         );
       });
       if (!reflowAnimations.size) releaseGrids();
-      positionCenter(sidebar);
     }
     function paint(next: number, settled = false) {
       if (next !== scale) window.clearTimeout(fitTimer);
@@ -343,7 +260,6 @@ export function NotesZoomViewport({
           String(columnsFor(scale))
       )
         fit(initialized);
-      positionCenter();
       updateScrollbar();
     }
     function measure() {
@@ -351,30 +267,40 @@ export function NotesZoomViewport({
       // inside the main column's existing responsive right inset.
       const inset = getComputedStyle(view.parentElement!).paddingRight;
       view.style.setProperty("--notes-edge-inset", inset);
-      const available = view.getBoundingClientRect().width - parseFloat(inset);
-      // Size once for the window at 100% with navigation open. Zoom and sidebar
-      // toggles change columns/outer margins, never these base card/gap metrics.
-      const sidebar = shell?.querySelector<HTMLElement>(":scope > .sidebar");
+      // At 100%, closing navigation adds exactly one complete column. Card
+      // width, gap and sidebar width stay fixed during zoom and toggles.
       const desktop = window.innerWidth > 800;
-      const sidebarWidth =
-        desktop && sidebar ? parseFloat(getComputedStyle(sidebar).width) : 0;
       const mainStyle = getComputedStyle(view.parentElement!);
-      const baseline =
+      const fullWidth =
         (shell?.clientWidth ?? window.innerWidth) -
-        sidebarWidth -
         parseFloat(mainStyle.paddingLeft) -
         parseFloat(mainStyle.paddingRight);
       gap = desktop ? 20 : 16;
-      const baseColumns = Math.max(
-        1,
-        Math.round((baseline + gap) / (300 + gap)),
-      );
-      // Reserve half a gap on each side of a single phone card. Two cards then
-      // fit at 50%, rather than keeping one column because of the extra gutter.
+      const fullColumns = desktop
+        ? Math.max(3, Math.round((fullWidth + gap) / (300 + gap)))
+        : Math.max(1, Math.round((fullWidth + gap) / (300 + gap)));
       const nextCardWidth =
         window.innerWidth < 600
-          ? Math.max(1, baseline - gap)
-          : (baseline - (baseColumns - 1) * gap) / baseColumns;
+          ? Math.max(1, fullWidth - gap)
+          : (fullWidth - (fullColumns - 1) * gap) / fullColumns;
+      if (desktop && shell && main) {
+        const sidebarWidth = `${nextCardWidth + gap}px`;
+        if (
+          shell.style.getPropertyValue("--workspace-sidebar-width") !==
+          sidebarWidth
+        ) {
+          // A window resize sets the new geometry before paint. Do not run a
+          // margin transition while the sidebar's width itself changes.
+          const transition = main.style.getPropertyValue("transition");
+          const priority = main.style.getPropertyPriority("transition");
+          main.style.setProperty("transition", "none", "important");
+          shell.style.setProperty("--workspace-sidebar-width", sidebarWidth);
+          void main.offsetWidth;
+          if (transition)
+            main.style.setProperty("transition", transition, priority);
+          else main.style.removeProperty("transition");
+        }
+      }
       const tracksChanged = Math.abs(nextCardWidth - cardWidth) > 0.01;
       cardWidth = nextCardWidth;
       if (
@@ -389,6 +315,7 @@ export function NotesZoomViewport({
           )
       )
         sidebarMoving = false;
+      const available = view.getBoundingClientRect().width - parseFloat(inset);
       if (tracksChanged || (!sidebarMoving && available !== availableWidth)) {
         availableWidth = available;
         fit(initialized, true);
@@ -448,6 +375,13 @@ export function NotesZoomViewport({
       main?.removeEventListener("transitionend", sidebarFinished);
       window.clearTimeout(fitTimer);
       cancelReflow();
+      if (previousSidebarWidth)
+        shell?.style.setProperty(
+          "--workspace-sidebar-width",
+          previousSidebarWidth,
+          previousSidebarPriority,
+        );
+      else shell?.style.removeProperty("--workspace-sidebar-width");
       unsubscribe();
       view.removeEventListener("scroll", updateScrollbar);
       rail.removeEventListener("scroll", scrollNotes);
