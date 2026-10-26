@@ -427,6 +427,8 @@ for (const width of [393, 1440]) {
         card.offsetLeft,
       ];
       const samples: number[] = [];
+      const horizontalOffsets: number[] = [];
+      const leftEdges: number[] = [];
       const columns = new Set<string>();
       const start = performance.now();
       let previous = start;
@@ -435,6 +437,10 @@ for (const width of [393, 1440]) {
         longest = Math.max(longest, time - previous);
         previous = time;
         samples.push(new DOMMatrix(getComputedStyle(layer).transform).a);
+        horizontalOffsets.push(el.scrollLeft);
+        leftEdges.push(
+          card.getBoundingClientRect().left - el.getBoundingClientRect().left,
+        );
         columns.add(
           getComputedStyle(el.querySelector(".note-grid")!)
             .gridTemplateColumns.split(" ")
@@ -450,7 +456,7 @@ for (const width of [393, 1440]) {
             cancelable: true,
             ctrlKey: true,
             deltaY: -12,
-            clientX: 150,
+            clientX: el.getBoundingClientRect().left + el.clientWidth * 0.85,
             clientY: 350,
           }),
         );
@@ -465,6 +471,8 @@ for (const width of [393, 1440]) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return {
         samples,
+        horizontalOffsets,
+        leftEdges,
         longest,
         layout,
         during,
@@ -480,6 +488,8 @@ for (const width of [393, 1440]) {
       };
     });
     expect(result.scale).toBeCloseTo(Math.exp(144 * 0.0012), 3);
+    expect(result.horizontalOffsets.every((value) => value === 0)).toBe(true);
+    expect(result.leftEdges.every((value) => Math.abs(value) < 1)).toBe(true);
     expect(
       new Set(result.samples.map((n) => n.toFixed(4))).size,
     ).toBeGreaterThan(15);
@@ -523,6 +533,41 @@ for (const width of [393, 1440]) {
         page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
       )
       .toBe("108");
+    expect(await chrome()).toEqual(before);
+    const extremes = await list.evaluate(async (el) => {
+      const card = el.querySelector(".note-card")!;
+      const offsets: number[] = [];
+      const edges: number[] = [];
+      function record() {
+        offsets.push(el.scrollLeft);
+        edges.push(
+          card.getBoundingClientRect().left - el.getBoundingClientRect().left,
+        );
+      }
+      for (const deltaY of [-80, 80]) {
+        for (let i = 0; i < 18; i++) {
+          el.dispatchEvent(
+            new WheelEvent("wheel", {
+              ctrlKey: true,
+              bubbles: true,
+              cancelable: true,
+              deltaY,
+              clientX: el.getBoundingClientRect().right - 30,
+              clientY: 350,
+            }),
+          );
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          record();
+        }
+        for (let i = 0; i < 40; i++) {
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          record();
+        }
+      }
+      return { offsets, edges };
+    });
+    expect(extremes.offsets.every((value) => value === 0)).toBe(true);
+    expect(extremes.edges.every((value) => Math.abs(value) < 1)).toBe(true);
     expect(await chrome()).toEqual(before);
     await page
       .getByRole("button", { name: "Open List zoom regression", exact: true })

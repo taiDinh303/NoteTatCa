@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Giữ mép trái danh sách làm chuẩn khi zoom — 2026-10-26
+
+- Theo video bandicam2026-10-26 13-47-18-407.mp4 (10.28s), note trái bị che khi zoom rồi trả về lúc dừng. Đã xem contact sheet local; nguyên nhân paint vẫn tính scrollLeft theo vị trí con trỏ/tâm pinch trong khi fit đưa ngang về0. Bỏ anchor ngang, giữ scrollLeft0 suốt từng frame và lúc đồng bộ scrollbar; mép trái luôn làm chuẩn. Neo dọc vẫn theo vị trí đọc, content zoom View/Edit độc lập không đổi. Không thêm đo/xếp card hoặc request dữ liệu.
+- Regression393/1440px đặt con trỏ85% chiều ngang thực trong canvas (thay tọa độ cũ có thể nằm ngoài viewport PC), lấy mẫu rAF: scrollLeft luôn0, mép trái card đầu lệch<1px trong gesture/settle. Thêm zoom nhanh tới biên150%, đảo về50% với con trỏ sát phải và kiểm mọi frame; giữ kiểm scale liên tục/chrome bounds/0network/nội dung không đổi. Cả2case PASS,33mức scale trung gian; số liệu local không phải cam kết FPS mọi máy.
+- Full guest Chromium16/16PASS: content View/Edit/pinch/hand/fullscreen, live reflow normal/reduced, rapid sidebar Grid/List không đo card lặp, full-height native scrollbar kéo thật/sync/resize và fixed320/gap20 ở393/1280/1920 tại50/100/150%. Account fixture SQLite/captured mail riêng5199:drag5/5PASS desktop1440zoom75/100/125%,393mouse/touch, reorder HTTP/reload/menu/View/shape giữ. Tổng21browser casesPASS. TypeScript/Vite Production build2192modules, ESLint và .NET solution Release strict0warnings/0errorsPASS. Lần đầu gọi npx từ root tải nhầm runner khác phiên bản nên lỗi discovery; chạy lại CLI đã cài trong ntc_react, không thay dependency/lockfile.
+- Scope4files: NotesZoomViewport.tsx, notes-zoom.spec.ts, frontend/worklog; giữ.agnes ngoài Git. Không migration/manual deploy/owner DB/email thật. Không chạy lại Vitest/full backend/full E2E khác hoặc thiết bị vật lý/iOS/1000cards/production; hosting rollout chưa xác minh. Push main theo quyền hiện có, kiểm SHA remote sau push.
+
 ## Fixed width + gap, sidebar trượt nhanh và chặn đo/xếp lặp — 2026-10-26
 
 - Chủ dự án gửi video hiện trạng bandicam2026-10-26 12-59-20-855.mp4 (27.07s); đã xem contact sheets, không coi video là chuyển động mong muốn. Yêu cầu cố định width/gap, sidebar trượt nhanh/mượt hơn và cho phép tối ưu width sidebar; bổ sung trực tiếp nhấn mạnh hạn chế hoặc chặn danh sách đo/xếp nhiều lần. Grid giữ320px/gap20px logical, justify-content:start; phần dư để bên phải, cả2cùng scale uniform theo zoom. Không tự giãn gap hoặc card để lấp hàng.

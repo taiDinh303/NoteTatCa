@@ -31,10 +31,11 @@ export function NotesZoomViewport({
     let scale = 1,
       width = 0,
       height = 0;
-    let anchor: { x: number; y: number } | undefined;
+    let anchor: { y: number } | undefined;
     // A native scrollbar spans the whole window while the note viewport stays
     // below the fixed controls. Both represent the same scroll offset/range.
     function updateScrollbar() {
+      if (view.scrollLeft !== 0) view.scrollLeft = 0;
       const overflow = Math.max(0, view.scrollHeight - view.clientHeight);
       const height = `${rail.clientHeight + overflow}px`;
       if (range.style.height !== height) range.style.height = height;
@@ -183,16 +184,16 @@ export function NotesZoomViewport({
           content.style.willChange = "auto";
         }, 180);
       }
-      const x = initialized ? (anchor?.x ?? view.clientWidth / 2) : 0;
       const y = initialized ? (anchor?.y ?? view.clientHeight / 2) : 0;
-      const docX = (view.scrollLeft + x) / scale;
       const docY = (view.scrollTop + y) / scale;
       scale = next;
       content.style.transform = `scale(${scale})`;
       content.style.setProperty("--notes-scale", String(scale));
       space.style.width = `${width * scale}px`;
       space.style.height = `${height * scale}px`;
-      view.scrollLeft = docX * scale - x;
+      // The note canvas always grows from its left edge. Never pan it toward
+      // the pointer and snap it back when the responsive layout settles.
+      view.scrollLeft = 0;
       view.scrollTop = docY * scale - y;
       // Reflow as soon as a column boundary is crossed, rather than waiting
       // for the zoom gesture and easing tail to stop in two separate phases.
@@ -219,7 +220,7 @@ export function NotesZoomViewport({
     }
     function point(event: MouseEvent) {
       const rect = view.getBoundingClientRect();
-      anchor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+      anchor = { y: event.clientY - rect.top };
     }
     function leave() {
       anchor = undefined;
@@ -229,7 +230,6 @@ export function NotesZoomViewport({
       const [a, b] = Array.from(event.touches);
       const rect = view.getBoundingClientRect();
       anchor = {
-        x: (a.clientX + b.clientX) / 2 - rect.left,
         y: (a.clientY + b.clientY) / 2 - rect.top,
       };
     }
