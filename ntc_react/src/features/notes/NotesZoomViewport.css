@@ -68,11 +68,20 @@ html:has([data-notes-zoom]) {
   transform-origin: 0 0;
 }
 .notes-zoom-layer .note-grid {
-  grid-template-columns: repeat(var(--notes-columns, 1), min(320px, 100%));
-  column-gap: 20px;
-  row-gap: 20px;
+  grid-template-columns: repeat(
+    var(--notes-columns, 1),
+    min(var(--notes-card-width, 320px), 100%)
+  );
+  column-gap: var(--notes-gap, 20px);
+  row-gap: var(--notes-gap, 20px);
   justify-content: start;
 }
 .notes-zoom-layer .note-grid.list-view {
   grid-template-columns: minmax(0, 1fr);
+}
+
+/* The canvas contains all column slots, including empty slots in short groups.
+   Its independent translate centres that canvas without changing card motion. */
+.notes-zoom-layer .notes-section {
+  width: 100%;
 }

@@ -75,7 +75,7 @@
 
 @container viewport (min-width: 801px) {
   .customer-shell {
-    --workspace-sidebar-width: clamp(192px, 14vw, 242px);
+    --workspace-sidebar-width: clamp(224px, 16vw, 256px);
   }
   .customer-shell > .sidebar {
     width: var(--workspace-sidebar-width);

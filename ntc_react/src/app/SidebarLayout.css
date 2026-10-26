@@ -25,3 +25,13 @@
   margin-top: 0;
   padding-top: 12px;
 }
+
+/* Keep navigation labels readable at laptop window widths. */
+.customer-shell > .sidebar .primary-nav a,
+.customer-shell > .sidebar .settings-link {
+  white-space: nowrap;
+}
+.customer-shell > .sidebar .primary-nav svg,
+.customer-shell > .sidebar .settings-link svg {
+  flex-shrink: 0;
+}

@@ -19,6 +19,10 @@ for (const mode of ["grid", "list"]) {
       .click();
     await expect(page.locator(".note-card").first()).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    const expectedWidth = await page
+      .locator(".note-card")
+      .first()
+      .evaluate((el) => (el as HTMLElement).offsetWidth);
     const samples = page.evaluate(
       () =>
         new Promise<
@@ -54,7 +58,10 @@ for (const mode of ["grid", "list"]) {
             frames.push({
               measured,
               x: main.x,
-              offset: readBox.call(card).x - main.x,
+              offset:
+                readBox.call(card).x -
+                main.x +
+                (document.querySelector(".list-view") ? 0 : main.x / 2),
               width: card.offsetWidth,
               gap: parseFloat(
                 getComputedStyle(document.querySelector(".note-grid")!)
@@ -62,7 +69,9 @@ for (const mode of ["grid", "list"]) {
               ),
               running: card
                 .getAnimations()
-                .filter((a) => a.id === "notes-reflow").length,
+                .filter(
+                  (a) => a.id === "notes-reflow" || a.id === "notes-centering",
+                ).length,
             });
             if (performance.now() - start < 700) requestAnimationFrame(sample);
             else {
@@ -91,7 +100,7 @@ for (const mode of ["grid", "list"]) {
     expect(
       frames.every(
         (f) =>
-          (mode === "list" || f.width === 320) &&
+          (mode === "list" || f.width === expectedWidth) &&
           f.gap === 20 &&
           f.running === 0 &&
           f.measured === 0,
@@ -178,9 +187,14 @@ for (const zoom of [75, 100, 125]) {
           function sample() {
             frames.push({
               delta: read.call(sidebar).right - read.call(main).left,
-              running: cards
+              running: [
+                ...cards,
+                ...document.querySelectorAll(".notes-zoom-layer"),
+              ]
                 .flatMap((card) => card.getAnimations())
-                .filter((a) => a.id === "notes-reflow").length,
+                .filter(
+                  (a) => a.id === "notes-reflow" || a.id === "notes-centering",
+                ).length,
               mainMoving: main
                 .getAnimations()
                 .some((a) => a.playState === "running"),
@@ -237,9 +251,12 @@ for (const zoom of [75, 100, 125]) {
               "transitionProperty" in a &&
               a.transitionProperty === "margin-left",
           );
-        const reflows = cards
+        const reflows = [
+          ...cards,
+          ...document.querySelectorAll(".notes-zoom-layer"),
+        ]
           .flatMap((card) => card.getAnimations())
-          .filter((a) => a.id === "notes-reflow");
+          .filter((a) => a.id === "notes-reflow" || a.id === "notes-centering");
         if (transition && reflows.length) {
           sharedFrames++;
           for (const reflow of reflows) {
@@ -265,6 +282,10 @@ for (const zoom of [75, 100, 125]) {
       }
       requestAnimationFrame(sample);
       for (const name of [
+        "Hide sidebar",
+        "Show sidebar",
+        "Hide sidebar",
+        "Show sidebar",
         "Hide sidebar",
         "Show sidebar",
         "Hide sidebar",
@@ -336,6 +357,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             getComputedStyle(el.querySelector(".notes-zoom-layer")!).transform,
           ).a,
       );
+      const logicalWidths = cards.map(
+        (card) =>
+          card.getBoundingClientRect().width /
+          new DOMMatrix(
+            getComputedStyle(el.querySelector(".notes-zoom-layer")!).transform,
+          ).a,
+      );
       function sample(time: number) {
         if (
           cards.some((card) =>
@@ -348,23 +376,25 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           frames.push(
             cards.map((card) => {
               const rect = card.getBoundingClientRect();
-              maxLogicalWidthError = Math.max(
-                maxLogicalWidthError,
-                maxLogicalHeightError,
-                heightKeyframes,
-                Math.abs(card.offsetWidth - 320),
-              );
               const zoom = new DOMMatrix(
                 getComputedStyle(el.querySelector(".notes-zoom-layer")!)
                   .transform,
               ).a;
+              maxLogicalWidthError = Math.max(
+                maxLogicalWidthError,
+                Math.abs(
+                  rect.width / zoom - logicalWidths[cards.indexOf(card)],
+                ),
+              );
               maxLogicalHeightError = Math.max(
                 maxLogicalHeightError,
                 Math.abs(rect.height / zoom - heights[cards.indexOf(card)]),
               );
               heightKeyframes += card
                 .getAnimations()
-                .filter((a) => a.id === "notes-reflow")
+                .filter(
+                  (a) => a.id === "notes-reflow" || a.id === "notes-centering",
+                )
                 .flatMap((a) => (a.effect as KeyframeEffect).getKeyframes())
                 .filter((k) => "height" in k).length;
               const transform = new DOMMatrix(getComputedStyle(card).transform);
@@ -695,7 +725,7 @@ for (const width of [393, 1440]) {
     expect(result.scale).toBeCloseTo(Math.exp(144 * 0.0012), 3);
     expect(result.horizontalOffsets.every((value) => value === 0)).toBe(true);
     expect(result.verticalOffsets.every((value) => value === 0)).toBe(true);
-    expect(result.leftEdges.every((value) => Math.abs(value) < 1)).toBe(true);
+    expect(result.leftEdges.every((value) => value >= -1)).toBe(true);
     expect(
       new Set(result.samples.map((n) => n.toFixed(4))).size,
     ).toBeGreaterThan(15);
@@ -776,7 +806,7 @@ for (const width of [393, 1440]) {
     });
     expect(extremes.offsets.every((value) => value === 0)).toBe(true);
     expect(extremes.tops.every((value) => value === 0)).toBe(true);
-    expect(extremes.edges.every((value) => Math.abs(value) < 1)).toBe(true);
+    expect(extremes.edges.every((value) => value >= -1)).toBe(true);
     expect(await chrome()).toEqual(before);
     await page
       .getByRole("button", { name: "Open List zoom regression", exact: true })
@@ -790,11 +820,28 @@ for (const width of [393, 1440]) {
   });
 }
 
-for (const width of [393, 1280, 1920]) {
-  test(`fixed grid card widths and balanced gaps at every zoom ${width}`, async ({
+for (const { width, theme } of [
+  { width: 320, theme: "light" },
+  { width: 393, theme: "light" },
+  { width: 768, theme: "light" },
+  { width: 1024, theme: "dark" },
+  { width: 1280, theme: "light" },
+  { width: 1366, theme: "dark" },
+  { width: 1440, theme: "light" },
+  { width: 1536, theme: "dark" },
+  { width: 1920, theme: "light" },
+  { width: 1920, theme: "dark" },
+  { width: 2560, theme: "light" },
+  { width: 3440, theme: "dark" },
+]) {
+  test(`fixed grid card widths and balanced margins at every zoom ${width} ${theme}`, async ({
     page,
   }) => {
     test.setTimeout(90000);
+    await page.addInitScript(
+      (theme) => localStorage.setItem("ntc.theme.v1", theme),
+      theme,
+    );
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/Home");
     await page
@@ -826,6 +873,8 @@ for (const width of [393, 1280, 1920]) {
         nodes.map((node) => node.getAttribute("data-testid")),
       );
     const columns: number[] = [];
+    let baseWidth = 0;
+    let baseGap = 0;
     for (const mode of ["grid", "list"]) {
       for (const percent of [50, 100, 150]) {
         await page.evaluate(
@@ -870,20 +919,44 @@ for (const width of [393, 1280, 1920]) {
               (node) => node.getBoundingClientRect().width,
             ),
             gridWidth: grid.width,
+            baseWidth: parseFloat(
+              getComputedStyle(
+                el.querySelector(".notes-zoom-layer")!,
+              ).getPropertyValue("--notes-card-width"),
+            ),
+            baseGap: parseFloat(
+              getComputedStyle(el.querySelector(".note-grid")!).columnGap,
+            ),
+            leftMargin: grid.left - el.getBoundingClientRect().left,
+            rightMargin:
+              el.getBoundingClientRect().left +
+              el.clientWidth -
+              parseFloat(getComputedStyle(el).paddingRight) -
+              grid.right,
+            headerLeft: el
+              .querySelector(".section-heading")!
+              .getBoundingClientRect().left,
+            groupLeft: groups[0].getBoundingClientRect().left,
             available:
               el.clientWidth - parseFloat(getComputedStyle(el).paddingRight),
           };
         });
         expect(layout.overflow).toBeLessThanOrEqual(1);
-        expect(layout.gridWidth).toBeCloseTo(layout.available, 0);
-        if (mode === "list") expect(layout.rightGap).toBeLessThan(1);
-        else
-          expect(layout.rightGap).toBeCloseTo(
-            layout.available -
-              (layout.columns * layout.widths[0] +
-                ((layout.columns - 1) * 20 * percent) / 100),
-            0,
-          );
+        expect(layout.gridWidth).toBeLessThanOrEqual(layout.available + 1);
+        expect(Math.abs(layout.leftMargin - layout.rightMargin)).toBeLessThan(
+          1,
+        );
+        expect(Math.abs(layout.headerLeft - layout.groupLeft)).toBeLessThan(1);
+        if (!baseWidth) {
+          baseWidth = layout.baseWidth;
+          baseGap = layout.baseGap;
+        }
+        expect(layout.baseWidth).toBeCloseTo(baseWidth, 4);
+        expect(layout.baseGap).toBe(baseGap);
+        if (mode === "grid" && percent === 100) {
+          expect(layout.leftMargin).toBeLessThan(width < 600 ? 8.1 : 1);
+          expect(layout.rightMargin).toBeLessThan(width < 600 ? 8.1 : 1);
+        }
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
@@ -892,7 +965,7 @@ for (const width of [393, 1280, 1920]) {
           expect(layout.widths[0]).toBeCloseTo(layout.available, 0);
         } else {
           expect(layout.widths[0]).toBeCloseTo(
-            Math.min((320 * percent) / 100, layout.available),
+            Math.min((baseWidth * percent) / 100, layout.available),
             0,
           );
           if (layout.gaps.length) {
@@ -900,7 +973,7 @@ for (const width of [393, 1280, 1920]) {
               Math.max(...layout.gaps) - Math.min(...layout.gaps),
             ).toBeLessThan(1);
             expect(Math.min(...layout.gaps)).toBeCloseTo(
-              (20 * percent) / 100,
+              (baseGap * percent) / 100,
               0,
             );
           }
@@ -914,17 +987,109 @@ for (const width of [393, 1280, 1920]) {
             ),
         ).toEqual(order);
         await page.screenshot({
-          path: `test-results/notes-fit-${width}-${mode}-${percent}.png`,
+          path: `test-results/notes-fit-${width}-${theme}-${mode}-${percent}.png`,
         });
+        if (width > 800) {
+          await page
+            .getByRole("button", { name: "Hide sidebar", exact: true })
+            .click();
+          await expect
+            .poll(() =>
+              list.evaluate((el) => {
+                const grid = el
+                  .querySelector(".note-grid")!
+                  .getBoundingClientRect();
+                const available =
+                  el.getBoundingClientRect().width -
+                  parseFloat(getComputedStyle(el).paddingRight);
+                return Math.abs(
+                  grid.left -
+                    el.getBoundingClientRect().left -
+                    (el.getBoundingClientRect().left + available - grid.right),
+                );
+              }),
+            )
+            .toBeLessThan(1);
+          await expect
+            .poll(() =>
+              list.evaluate(
+                (el) =>
+                  el
+                    .getAnimations({ subtree: true })
+                    .filter(
+                      (a) =>
+                        a.id === "notes-reflow" || a.id === "notes-centering",
+                    ).length,
+              ),
+            )
+            .toBe(0);
+          const hidden = await list.evaluate((el) => {
+            const layer = el.querySelector(".notes-zoom-layer")!;
+            const grid = el
+              .querySelector(".note-grid")!
+              .getBoundingClientRect();
+            return {
+              baseWidth: parseFloat(
+                getComputedStyle(layer).getPropertyValue("--notes-card-width"),
+              ),
+              gap: parseFloat(
+                getComputedStyle(el.querySelector(".note-grid")!).columnGap,
+              ),
+              overflow: el.scrollWidth - el.clientWidth,
+              sectionLefts: Array.from(
+                el.querySelectorAll(".notes-section"),
+              ).map((section) => section.getBoundingClientRect().left),
+              gridWidth: grid.width,
+              available:
+                el.getBoundingClientRect().width -
+                parseFloat(getComputedStyle(el).paddingRight),
+            };
+          });
+          expect(hidden.baseWidth).toBeCloseTo(baseWidth, 4);
+          expect(hidden.gap).toBe(baseGap);
+          expect(hidden.overflow).toBeLessThanOrEqual(1);
+          expect(
+            Math.max(...hidden.sectionLefts) - Math.min(...hidden.sectionLefts),
+          ).toBeLessThan(1);
+          expect(hidden.gridWidth).toBeLessThanOrEqual(hidden.available + 1);
+          await page.screenshot({
+            path: `test-results/notes-fit-${width}-${theme}-${mode}-${percent}-hidden.png`,
+          });
+          await page
+            .getByRole("button", { name: "Show sidebar", exact: true })
+            .click();
+          await expect
+            .poll(() =>
+              page
+                .locator(".main-column")
+                .evaluate(
+                  (el) =>
+                    el.getAnimations().filter((a) => a.playState === "running")
+                      .length,
+                ),
+            )
+            .toBe(0);
+          await expect
+            .poll(() =>
+              list.evaluate(
+                (el) =>
+                  el
+                    .getAnimations({ subtree: true })
+                    .filter(
+                      (a) =>
+                        a.id === "notes-reflow" || a.id === "notes-centering",
+                    ).length,
+              ),
+            )
+            .toBe(0);
+        }
       }
     }
     console.log(`Grid ${width}, 50/100/150%: ${columns.join("/")} columns`);
-    if (width === 1920) {
-      expect(columns[0]).toBeGreaterThanOrEqual(8);
-      expect(columns[1]).toBe(4);
-      expect(columns[2]).toBe(3);
-    } else if (width === 1280) expect(columns).toEqual([5, 3, 2]);
-    else expect(columns).toEqual([2, 1, 1]);
+    expect(columns[0]).toBeGreaterThanOrEqual(columns[1]);
+    expect(columns[1]).toBeGreaterThanOrEqual(columns[2]);
+    expect(baseWidth).toBeGreaterThanOrEqual(240);
+    expect(baseWidth).toBeLessThanOrEqual(380);
     // Changing view mode at a saved 150% also fits immediately without a reload.
     await page.getByRole("button", { name: "grid view", exact: true }).click();
     await expect
