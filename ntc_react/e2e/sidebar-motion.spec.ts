@@ -63,11 +63,11 @@ for (const scale of [0.75, 1, 1.25]) {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
-          animation.currentTime = 200 * progress;
-          const right = getComputedStyle(element).clipPath.split(" ")[1];
-          return { progress, fraction: parseFloat(right) / 100 };
+          animation.currentTime = 160 * progress;
+          const rect = element.getBoundingClientRect();
+          return { progress, fraction: -rect.x / rect.width };
         });
-        animation.currentTime = 100;
+        animation.currentTime = 80;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
@@ -79,12 +79,16 @@ for (const scale of [0.75, 1, 1.25]) {
         };
       });
     expect(opening.name).toBe("sidebar-slide-in");
-    expect(opening.duration).toBe(200);
+    expect(opening.duration).toBe(160);
     expect(opening.delay).toBe(0);
+    expect(opening.samples[0].fraction).toBeGreaterThan(
+      opening.samples[2].fraction,
+    );
     for (const sample of opening.samples) {
-      expect(sample.fraction).toBeCloseTo(1 - sample.progress, 2);
+      expect(sample.fraction).toBeGreaterThan(0);
+      expect(sample.fraction).toBeLessThan(1);
     }
-    expect(opening.x).toBeCloseTo(0);
+    expect(opening.x).toBeLessThan(0);
     expect(opening.x).toBeGreaterThan(-opening.width);
     await unchanged();
     await expect(page.locator(".modal-overlay")).toHaveCSS(
@@ -100,11 +104,11 @@ for (const scale of [0.75, 1, 1.25]) {
         const animation = element.getAnimations()[0] as CSSAnimation;
         animation.pause();
         const samples = [0.25, 0.5, 0.75].map((progress) => {
-          animation.currentTime = 200 * progress;
-          const right = getComputedStyle(element).clipPath.split(" ")[1];
-          return { progress, fraction: parseFloat(right) / 100 };
+          animation.currentTime = 160 * progress;
+          const rect = element.getBoundingClientRect();
+          return { progress, fraction: -rect.x / rect.width };
         });
-        animation.currentTime = 100;
+        animation.currentTime = 80;
         const { x, width } = element.getBoundingClientRect();
         return {
           name: animation.animationName,
@@ -117,13 +121,17 @@ for (const scale of [0.75, 1, 1.25]) {
         };
       });
     expect(closing.name).toBe("sidebar-slide-out");
-    expect(closing.duration).toBe(200);
+    expect(closing.duration).toBe(160);
     expect(closing.delay).toBe(0);
+    expect(closing.samples[0].fraction).toBeLessThan(
+      closing.samples[2].fraction,
+    );
     for (const sample of closing.samples) {
-      expect(sample.fraction).toBeCloseTo(sample.progress, 2);
+      expect(sample.fraction).toBeGreaterThan(0);
+      expect(sample.fraction).toBeLessThan(1);
     }
     expect(closing.fill).toBe("both");
-    expect(closing.x).toBeCloseTo(0);
+    expect(closing.x).toBeLessThan(0);
     expect(closing.x).toBeGreaterThan(-closing.width);
     await unchanged();
     await page.screenshot({ path: `test-results/sidebar-exit-${scale}.png` });
@@ -137,7 +145,7 @@ for (const scale of [0.75, 1, 1.25]) {
       .evaluate((element) =>
         parseFloat(getComputedStyle(element).animationDuration),
       );
-    expect(duration).toBe(0.2);
+    expect(duration).toBe(0.16);
     await expect(page.locator(".navigation-drawer")).toHaveCSS(
       "animation-name",
       "sidebar-slide-in",

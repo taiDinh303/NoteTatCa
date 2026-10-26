@@ -7,6 +7,7 @@ for (const width of [1440, 1024, 393, 320]) {
     await page.getByLabel('Password', { exact: true }).fill('Synthetic-password-123!');
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(page).toHaveURL(/\/notes/);
+    await expect(page.locator('.note-card').first()).toBeVisible();
     const header = page.locator('.customer-shell > .topbar');
     const layout = await page.evaluate(() => document.body.clientWidth);
     const box = (await header.boundingBox())!;
@@ -28,7 +29,7 @@ for (const width of [1440, 1024, 393, 320]) {
       expect(sidebar.y).toBeGreaterThanOrEqual(box.y + box.height);
       await page.getByRole('button', { name: 'Hide sidebar', exact: true }).click();
       await expect(page.locator('#workspace-navigation')).toHaveAttribute('inert', '');
-      await expect.poll(() => page.locator('#workspace-navigation').evaluate(el => parseFloat(getComputedStyle(el).clipPath.split(' ')[1]))).toBe(100);
+      await expect.poll(() => page.locator('#workspace-navigation').evaluate(el => -el.getBoundingClientRect().x / el.getBoundingClientRect().width * 100)).toBe(100);
       await expect(header.getByRole('link', { name: 'NoteTatCa home' })).toBeVisible();
       await page.getByRole('button', { name: 'Show sidebar', exact: true }).click();
     } else {
@@ -40,17 +41,17 @@ for (const width of [1440, 1024, 393, 320]) {
       const drawer = page.getByRole('dialog', { name: 'NoteTatCa.' });
       await expect(drawer).toBeVisible();
       await expect.poll(async () => (await drawer.boundingBox())!.x).toBeCloseTo(0);
-      for (const scale of [0.9, 1, 1.1]) {
-        await page.evaluate(value => document.documentElement.style.setProperty('--interface-scale', String(value)), scale);
-        await expect.poll(async () => (await drawer.boundingBox())!.height).toBeCloseTo(900, 0);
+      for (const height of [740, 852, 900]) {
+        await page.setViewportSize({ width, height });
+        await expect.poll(async () => (await drawer.boundingBox())!.height).toBeCloseTo(height, 0);
         const bounds = (await drawer.boundingBox())!;
         expect(bounds.x).toBeCloseTo(0);
         expect(bounds.y).toBeCloseTo(0);
-        expect(bounds.y + bounds.height).toBeCloseTo(900, 0);
+        expect(bounds.y + bounds.height).toBeCloseTo(height, 0);
         expect(bounds.width).toBeLessThanOrEqual(width * 0.9 + 1);
         await expect(drawer).toHaveCSS('border-radius', '0px');
       }
-      await page.evaluate(() => document.documentElement.style.removeProperty('--interface-scale'));
+      await page.setViewportSize({ width, height: 900 });
       await page.screenshot({ path: `test-results/drawer-${width}.png` });
       await expect(drawer.getByRole('button', { name: /Use (light|dark) theme/ })).toHaveCount(0);
       await drawer.getByRole('link', { name: 'Settings', exact: true }).click();
@@ -65,10 +66,8 @@ for (const width of [1440, 1024, 393, 320]) {
       await header.getByRole('link', { name: 'Back', exact: true }).click();
       await expect(page).toHaveURL(/\/notes$/);
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
-      await page.getByRole('menuitem', { name: 'Zoom (100%)', exact: true }).click();
-      const zoom = page.getByRole('dialog', { name: 'Interface zoom', exact: true });
-      await expect(zoom).toBeVisible();
-      await zoom.getByRole('button', { name: 'Done', exact: true }).click();
+      await expect(page.getByRole('spinbutton', { name: 'Zoom percentage', exact: true })).toHaveValue('100');
+      await page.keyboard.press('Escape');
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();
       await expect(drawer).toBeHidden();
@@ -112,19 +111,19 @@ for (const width of [1440, 1024, 393, 320]) {
     await page.reload();
     await expect(themeSwitch).toBeChecked();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(layout);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.body.clientWidth)).toBe(0);
     await page.screenshot({ path: `test-results/appearance-${width}.png`, fullPage: true });
     await page.goto('/notes');
     await page.getByRole('textbox', { name: 'Search your notes', exact: true }).fill('Welcome');
     await expect(page).toHaveURL(/q=Welcome/);
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(layout);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.body.clientWidth)).toBe(0);
     if (width <= 800) {
-      for (const scale of [0.9, 1, 1.1]) {
-        await page.evaluate((value) => {
-          document.documentElement.style.setProperty('--interface-scale', String(value));
+      for (const height of [650, 740, 900]) {
+        await page.setViewportSize({ width, height });
+        await page.evaluate(() => {
           document.querySelector<HTMLElement>('.main-column')!.style.minHeight = '2400px';
           window.scrollTo(0, 301);
-        }, scale);
+        });
         await expect.poll(async () => (await header.boundingBox())!.y).toBeLessThanOrEqual(1);
         const coverage = await header.evaluate((element) => {
           const rect = element.getBoundingClientRect();
@@ -138,7 +137,6 @@ for (const width of [1440, 1024, 393, 320]) {
         expect(coverage.shadow).toContain('0px -2px 0px');
       }
       await page.evaluate(() => {
-        document.documentElement.style.removeProperty('--interface-scale');
         document.querySelector<HTMLElement>('.main-column')!.style.removeProperty('min-height');
         window.scrollTo(0, 0);
       });

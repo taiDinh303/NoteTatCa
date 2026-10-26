@@ -65,11 +65,11 @@ export function NotesZoomViewport({
         ? 1
         : Math.max(1, Math.floor((availableWidth / nextScale + 20) / 340));
     }
-    function fit(animate = false) {
+    function fit(animate = false, resizeOnly = false) {
       window.clearTimeout(fitTimer);
       // Do not change sortable geometry underneath a pointer/keyboard drag.
       if (content.querySelector(".dragging")) {
-        fitTimer = window.setTimeout(() => fit(animate), 100);
+        fitTimer = window.setTimeout(() => fit(animate, resizeOnly), 100);
         return;
       }
       const nextWidth = availableWidth / scale;
@@ -79,6 +79,23 @@ export function NotesZoomViewport({
         content.style.getPropertyValue("--notes-columns") === String(columns)
       )
         return;
+      // A sidebar transition resizes the canvas every frame. Fixed card/gap
+      // tracks have identical geometry until a column boundary is crossed.
+      // Avoid cancelling/restarting card motion for each margin animation tick.
+      if (
+        ((mode === "list" && resizeOnly) ||
+          (mode !== "list" && width >= 320 && nextWidth >= 320)) &&
+        content.style.getPropertyValue("--notes-columns") === String(columns)
+      ) {
+        width = nextWidth;
+        content.style.width = `${width}px`;
+        space.style.width = `${availableWidth}px`;
+        if (mode === "list") {
+          height = content.offsetHeight;
+          space.style.height = `${height * scale}px`;
+        }
+        return;
+      }
       const nodes = cards();
       // Capture the on-screen boxes before cancelling any in-flight reflow,
       // so a resize can retarget the current visual position without snapping.
@@ -195,7 +212,7 @@ export function NotesZoomViewport({
       const available = view.clientWidth - parseFloat(inset);
       if (available !== availableWidth) {
         availableWidth = available;
-        fit(initialized);
+        fit(initialized, true);
       }
       height = content.offsetHeight;
       paint(scale);

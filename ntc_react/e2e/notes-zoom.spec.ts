@@ -3,6 +3,114 @@ import { test, expect } from "@playwright/test";
 // Headless Chromium otherwise hides native scrollbars, including their hit area.
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
 
+for (const mode of ["grid", "list"]) {
+  test(`sidebar slides quickly through frames without restarting ${mode} cards`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.addInitScript(
+      (mode) => localStorage.setItem("ntc.view.v1", mode),
+      mode,
+    );
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    await expect(page.locator(".note-card").first()).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const samples = page.evaluate(
+      () =>
+        new Promise<
+          {
+            x: number;
+            offset: number;
+            width: number;
+            gap: number;
+            running: number;
+            measured: number;
+          }[]
+        >((resolve) => {
+          const frames: {
+            x: number;
+            offset: number;
+            width: number;
+            gap: number;
+            running: number;
+            measured: number;
+          }[] = [];
+          const start = performance.now();
+          const readBox = Element.prototype.getBoundingClientRect;
+          let measured = 0;
+          Element.prototype.getBoundingClientRect = function () {
+            if (this.matches(".note-card")) measured++;
+            return readBox.call(this);
+          };
+          function sample() {
+            const main = document
+              .querySelector(".main-column")!
+              .getBoundingClientRect();
+            const card = document.querySelector<HTMLElement>(".note-card")!;
+            frames.push({
+              measured,
+              x: main.x,
+              offset: readBox.call(card).x - main.x,
+              width: card.offsetWidth,
+              gap: parseFloat(
+                getComputedStyle(document.querySelector(".note-grid")!)
+                  .columnGap,
+              ),
+              running: card
+                .getAnimations()
+                .filter((a) => a.id === "notes-reflow").length,
+            });
+            if (performance.now() - start < 700) requestAnimationFrame(sample);
+            else {
+              Element.prototype.getBoundingClientRect = readBox;
+              resolve(frames);
+            }
+          }
+          requestAnimationFrame(sample);
+        }),
+    );
+    for (const name of [
+      "Hide sidebar",
+      "Show sidebar",
+      "Hide sidebar",
+      "Show sidebar",
+    ]) {
+      await page.getByRole("button", { name, exact: true }).click();
+      await page.waitForTimeout(40);
+    }
+    const frames = await samples;
+    expect(new Set(frames.map((f) => Math.round(f.x))).size).toBeGreaterThan(4);
+    expect(
+      Math.max(...frames.map((f) => f.offset)) -
+        Math.min(...frames.map((f) => f.offset)),
+    ).toBeLessThan(1);
+    expect(
+      frames.every(
+        (f) =>
+          (mode === "list" || f.width === 320) &&
+          f.gap === 20 &&
+          f.running === 0 &&
+          f.measured === 0,
+      ),
+    ).toBe(true);
+    await expect(page.locator("#workspace-navigation")).toHaveCSS(
+      "transition-duration",
+      "0.16s",
+    );
+    await expect
+      .poll(() =>
+        page
+          .locator("#workspace-navigation")
+          .evaluate((el) => el.getBoundingClientRect().x),
+      )
+      .toBe(0);
+  });
+}
+
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test(`note reflow animates geometry frame by frame ${reducedMotion}`, async ({
     page,
@@ -14,6 +122,27 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       .getByRole("main")
       .getByRole("link", { name: "Try guest mode", exact: true })
       .click();
+    // With fixed tracks, cards already occupying the first slots need not move.
+    // Add enough notes to actually wrap when the grid changes from 4 to 3 columns.
+    for (let i = 0; i < 3; i++) {
+      await page
+        .getByRole("button", { name: "Take a note", exact: true })
+        .click();
+      const dialog = page.getByRole("dialog", {
+        name: "New note",
+        exact: true,
+      });
+      await dialog
+        .getByLabel("Note title", { exact: true })
+        .fill(`Reflow slot ${i}`);
+      await dialog
+        .getByRole("textbox", { name: "Note content" })
+        .fill("Keep the fixed card and gap while wrapping.");
+      await expect(
+        dialog.getByText("Saved on this device", { exact: true }),
+      ).toBeVisible();
+      await dialog.getByRole("button", { name: "Close", exact: true }).click();
+    }
     const list = page.locator("[data-notes-zoom]");
     await expect(list).toBeVisible();
     const result = await list.evaluate(async (el) => {
@@ -407,7 +536,7 @@ for (const width of [393, 1440]) {
   });
 }
 
-for (const width of [393, 1920]) {
+for (const width of [393, 1280, 1920]) {
   test(`fixed grid card widths and balanced gaps at every zoom ${width}`, async ({
     page,
   }) => {
@@ -493,11 +622,12 @@ for (const width of [393, 1920]) {
         });
         expect(layout.overflow).toBeLessThanOrEqual(1);
         expect(layout.gridWidth).toBeCloseTo(layout.available, 0);
-        if (layout.columns > 1 || mode === "list")
-          expect(layout.rightGap).toBeLessThan(1);
+        if (mode === "list") expect(layout.rightGap).toBeLessThan(1);
         else
           expect(layout.rightGap).toBeCloseTo(
-            layout.available - layout.widths[0],
+            layout.available -
+              (layout.columns * layout.widths[0] +
+                ((layout.columns - 1) * 20 * percent) / 100),
             0,
           );
         expect(
@@ -515,8 +645,9 @@ for (const width of [393, 1920]) {
             expect(
               Math.max(...layout.gaps) - Math.min(...layout.gaps),
             ).toBeLessThan(1);
-            expect(Math.min(...layout.gaps)).toBeGreaterThanOrEqual(
-              (20 * percent) / 100 - 1,
+            expect(Math.min(...layout.gaps)).toBeCloseTo(
+              (20 * percent) / 100,
+              0,
             );
           }
           columns.push(layout.columns);
@@ -538,7 +669,8 @@ for (const width of [393, 1920]) {
       expect(columns[0]).toBeGreaterThanOrEqual(8);
       expect(columns[1]).toBe(4);
       expect(columns[2]).toBe(3);
-    } else expect(columns).toEqual([2, 1, 1]);
+    } else if (width === 1280) expect(columns).toEqual([5, 3, 2]);
+    else expect(columns).toEqual([2, 1, 1]);
     // Changing view mode at a saved 150% also fits immediately without a reload.
     await page.getByRole("button", { name: "grid view", exact: true }).click();
     await expect

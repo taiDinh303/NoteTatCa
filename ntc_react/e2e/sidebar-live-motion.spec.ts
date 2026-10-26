@@ -25,32 +25,40 @@ for (const reduced of [false, true]) {
       const capture = () =>
         page.evaluate(
           (target) =>
-            new Promise<{ right: number; x: number; opacity: number }[]>(
-              (resolve) => {
-                const frames: { right: number; x: number; opacity: number }[] =
-                  [];
-                const start = performance.now();
-                const sample = () => {
-                  const element = document.querySelector(target);
-                  if (
-                    element &&
-                    getComputedStyle(element).visibility !== "hidden"
-                  ) {
-                    const css = getComputedStyle(element);
-                    const edges = css.clipPath.slice(6, -1).split(/\s+/);
-                    frames.push({
-                      right: parseFloat(edges[1] ?? edges[0]),
-                      x: element.getBoundingClientRect().x,
-                      opacity: Number(css.opacity),
-                    });
-                  }
-                  if (performance.now() - start < 700)
-                    requestAnimationFrame(sample);
-                  else resolve(frames);
-                };
-                requestAnimationFrame(sample);
-              },
-            ),
+            new Promise<
+              { right: number; x: number; opacity: number; margin: number }[]
+            >((resolve) => {
+              const frames: {
+                right: number;
+                x: number;
+                opacity: number;
+                margin: number;
+              }[] = [];
+              const start = performance.now();
+              const sample = () => {
+                const element = document.querySelector(target);
+                if (
+                  element &&
+                  getComputedStyle(element).visibility !== "hidden"
+                ) {
+                  const css = getComputedStyle(element);
+                  const rect = element.getBoundingClientRect();
+                  frames.push({
+                    right: (Math.abs(rect.x) / rect.width) * 100,
+                    x: element.getBoundingClientRect().x,
+                    opacity: Number(css.opacity),
+                    margin: parseFloat(
+                      getComputedStyle(document.querySelector(".main-column")!)
+                        .marginLeft,
+                    ),
+                  });
+                }
+                if (performance.now() - start < 700)
+                  requestAnimationFrame(sample);
+                else resolve(frames);
+              };
+              requestAnimationFrame(sample);
+            }),
           selector,
         );
       const assertReveal = (
@@ -63,7 +71,7 @@ for (const reduced of [false, true]) {
           new Set(intermediate.map((frame) => Math.round(frame.right))).size,
         ).toBeGreaterThan(2);
         intermediate.forEach((frame) => {
-          expect(Math.abs(frame.x)).toBeLessThan(0.5);
+          expect(frame.x).toBeLessThan(-0.5);
           expect(frame.opacity).toBe(1);
         });
       };
@@ -77,6 +85,14 @@ for (const reduced of [false, true]) {
           .click(),
       ]);
       assertReveal(opening);
+      if (width > 800) {
+        const margins = opening.map((frame) => frame.margin);
+        expect(
+          new Set(margins.map((value) => Math.round(value))).size,
+        ).toBeGreaterThan(2);
+        for (let i = 1; i < margins.length; i++)
+          expect(margins[i]).toBeLessThanOrEqual(margins[i - 1] + 0.5);
+      }
       if (width < 800) {
         for (const frame of opening.slice(-5)) {
           expect(frame.right).toBe(0);
@@ -108,7 +124,7 @@ for (const reduced of [false, true]) {
       } else {
         for (const frame of opening.slice(-5)) {
           expect(frame.right).toBe(100);
-          expect(frame.x).toBe(0);
+          expect(frame.x).toBeLessThan(-190);
         }
         await expect(page.locator(selector)).toHaveAttribute("inert", "");
         await expect(page.locator(selector)).toHaveCSS(
