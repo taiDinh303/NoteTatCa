@@ -3,7 +3,7 @@
 > Cập nhật: 2026-10-17 | DRAFT | Áp dụng: YES | Người quyết định: chủ dự án
 
 
-DEC-031 cập nhật theo video17-01 và chủ dự án2026-10-26: bỏ căn giữa/căn đều, danh sách giữ lề trái cố định như5f7d282; New+, heading và card đầu thẳng mép trái. Card/gap gốc chọn theo cửa sổ, giữ nguyên khi zoom hoặc toggle sidebar. Desktop tính sidebar bằng đúng1bước cột (card+gap) nên100% mở/đóng sidebar đều vừa hàng đầy, đóng thêm đúng1cột; zoom khác cho phép dư bên phải dưới1bước cột, không giãn width/gap. Gap20px desktop/16px compact, phone100% dư16px phải. Đây là cập nhật thay quyết định căn giữa trước đó. Giữ zoom danh sách50–150%, chrome/View/Edit đứng yên, content zoom riêng; Grid chỉ animate vị trí, không tween width/height hoặc tự cuộn. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+DEC-031 cập nhật theo lựa chọn trực tiếp của chủ dự án2026-10-26: ưu tiên khít5mốc50/75/100/125/150%, cho phép width card thích ứng theo zoom và phải nội suy từng frame, không nhảy khi tính lại. Giữ lề trái/New+/heading thẳng cột, gap gốc20px desktop/16px compact và sidebar đứng yên khi zoom. Cỡ tham chiếu/sidebar chọn theo cửa sổ như trước; chọn số cột gần cỡ tham chiếu rồi tính width đích vừa hàng đầy. Đây là thay đổi đã duyệt của ràng buộc width cố định trước đó. Width thật cập nhật bằng một rAF chung, không scaleX chữ hoặc đọc bounds từng card mỗi frame; đổi cột vẫn animate vị trí. Giữ zoom danh sách50–150%, chrome/View/Edit không thuộc phạm vi zoom ngoài, content zoom riêng và không tự cuộn. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
 
 ## Đầu vào đã biết
 

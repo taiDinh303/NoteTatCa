@@ -28,8 +28,13 @@ export function NotesZoomViewport({
     let availableWidth = 0;
     let cardWidth = 320;
     let gap = 20;
+    let shownCardPixels = 320;
+    let targetCardPixels = 320;
+    let widthFrame = 0;
+    let widthTime = 0;
+    let sidebarWidthMotion:
+      { from: number; start: number; end: number } | undefined;
     const reflowAnimations = new Set<Animation>();
-    const frozenGrids = new Set<HTMLElement>();
     let scale = 1,
       width = 0,
       height = 0;
@@ -66,22 +71,13 @@ export function NotesZoomViewport({
     function cancelReflow() {
       reflowAnimations.forEach((animation) => animation.cancel());
       reflowAnimations.clear();
-      releaseGrids();
-    }
-    function releaseGrids() {
-      frozenGrids.forEach((grid) => {
-        grid.style.gridTemplateRows = "";
-      });
-      frozenGrids.clear();
     }
     function columnsFor(nextScale: number) {
       return mode === "list"
         ? 1
         : Math.max(
             1,
-            Math.floor(
-              (availableWidth / nextScale + gap + 0.01) / (cardWidth + gap),
-            ),
+            Math.round((availableWidth / nextScale + gap) / (cardWidth + gap)),
           );
     }
     function sidebarClock() {
@@ -106,161 +102,157 @@ export function NotesZoomViewport({
           () => {},
         );
     }
-    function fit(animate = false, resizeOnly = false, sidebar = false) {
-      window.clearTimeout(fitTimer);
-      // Do not change sortable geometry underneath a pointer/keyboard drag.
+    function refreshHeight() {
+      height = content.offsetHeight;
+      space.style.height = `${height * scale}px`;
+      updateScrollbar();
+    }
+    function applyWidth(refresh = true) {
+      const logical = shownCardPixels / scale;
+      content.style.setProperty("--notes-card-width", `${logical}px`);
+      content.style.width = `${mode === "list" ? logical : width}px`;
+      if (refresh) refreshHeight();
+    }
+    function stepWidth(time: number) {
       if (content.querySelector(".dragging")) {
-        fitTimer = window.setTimeout(() => fit(animate, resizeOnly), 100);
+        widthFrame = 0;
+        widthTime = 0;
+        return;
+      }
+      // Cap catch-up after a busy frame so resizing cannot jump a large step.
+      const elapsed = widthTime ? Math.min(32, time - widthTime) : 16.67;
+      widthTime = time;
+      if (sidebarWidthMotion && sidebarMoving && main) {
+        const { from, start, end } = sidebarWidthMotion;
+        const margin = parseFloat(getComputedStyle(main).marginLeft);
+        const progress = Math.max(
+          0,
+          Math.min(1, (margin - start) / (end - start)),
+        );
+        shownCardPixels = from + (targetCardPixels - from) * progress;
+        if (progress >= 0.9999 || !sidebarClock()) {
+          shownCardPixels = targetCardPixels;
+          sidebarWidthMotion = undefined;
+        }
+      } else {
+        sidebarWidthMotion = undefined;
+        shownCardPixels +=
+          (targetCardPixels - shownCardPixels) * (1 - Math.exp(-elapsed / 55));
+      }
+      if (Math.abs(targetCardPixels - shownCardPixels) < 0.01)
+        shownCardPixels = targetCardPixels;
+      applyWidth();
+      if (shownCardPixels !== targetCardPixels)
+        widthFrame = requestAnimationFrame(stepWidth);
+      else {
+        widthFrame = 0;
+        widthTime = 0;
+        delete content.dataset.widthAnimating;
+      }
+    }
+    function setWidthTarget(value: number) {
+      targetCardPixels = value;
+      if (
+        !initialized ||
+        matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        cancelAnimationFrame(widthFrame);
+        widthFrame = 0;
+        widthTime = 0;
+        sidebarWidthMotion = undefined;
+        shownCardPixels = targetCardPixels;
+        delete content.dataset.widthAnimating;
+        applyWidth();
+      } else if (
+        Math.abs(targetCardPixels - shownCardPixels) > 0.01 &&
+        !widthFrame
+      ) {
+        content.dataset.widthAnimating = "true";
+        widthFrame = requestAnimationFrame(stepWidth);
+      }
+    }
+    function fit(animate = false, sidebar = false) {
+      window.clearTimeout(fitTimer);
+      if (content.querySelector(".dragging")) {
+        fitTimer = window.setTimeout(() => fit(animate), 100);
         return;
       }
       const columns = columnsFor(scale);
-      const nextWidth =
-        mode === "list"
-          ? availableWidth / scale
-          : Math.min(
-              availableWidth / scale,
-              columns * cardWidth + (columns - 1) * gap,
-            );
-      const tracksChanged =
-        content.style.getPropertyValue("--notes-card-width") !==
-          `${cardWidth}px` ||
-        content.style.getPropertyValue("--notes-gap") !== `${gap}px`;
-      if (
-        !tracksChanged &&
-        Math.abs(nextWidth - width) < 0.01 &&
-        content.style.getPropertyValue("--notes-columns") === String(columns)
-      ) {
-        return;
-      }
-      // Fixed card/gap tracks keep their geometry until a column boundary is
-      // crossed. Do not measure or restart card motion on each resize tick.
-      if (
-        !tracksChanged &&
-        ((mode === "list" && resizeOnly) || mode !== "list") &&
-        content.style.getPropertyValue("--notes-columns") === String(columns)
-      ) {
-        const clamped = width < cardWidth || nextWidth < cardWidth;
-        width = nextWidth;
-        content.style.width = `${width}px`;
-        space.style.width = `${availableWidth}px`;
-        if (mode === "list" || clamped) {
-          height = content.offsetHeight;
-          space.style.height = `${height * scale}px`;
-        }
+      width = availableWidth / scale;
+      const nextCardWidth = Math.max(
+        1,
+        (width - (columns - 1) * gap) / columns,
+      );
+      const changedColumns =
+        content.style.getPropertyValue("--notes-columns") !== String(columns);
+      content.style.setProperty("--notes-gap", `${gap}px`);
+      space.style.width = `${availableWidth}px`;
+      if (!changedColumns) {
+        content.style.width = `${mode === "list" ? shownCardPixels / scale : width}px`;
+        setWidthTarget(nextCardWidth * scale);
+        refreshHeight();
         return;
       }
       const nodes = cards();
-      // Capture the on-screen boxes before cancelling any in-flight reflow,
-      // so a resize can retarget the current visual position without snapping.
       const before = nodes.map((node) => node.getBoundingClientRect());
       cancelReflow();
-      width = nextWidth;
-      content.style.width = `${width}px`;
       content.style.setProperty("--notes-columns", String(columns));
-      content.style.setProperty("--notes-card-width", `${cardWidth}px`);
-      content.style.setProperty("--notes-gap", `${gap}px`);
-      height = content.offsetHeight;
-      space.style.width = `${availableWidth}px`;
-      space.style.height = `${height * scale}px`;
-      view.scrollLeft = 0;
-      updateScrollbar();
-      if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        return;
+      // Re-wrap at the current animated width, then grow/shrink the shared
+      // track. FLIP accounts for the new slots without a width jump or scaleX.
+      content.style.width = `${mode === "list" ? shownCardPixels / scale : width}px`;
+      if (!initialized) shownCardPixels = nextCardWidth * scale;
+      applyWidth();
+      const after = nodes.map((node) => node.getBoundingClientRect());
+      if (animate && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const transition = sidebar ? sidebarClock() : undefined;
+        const duration = transition?.effect?.getTiming().duration;
+        nodes.forEach((node, index) => {
+          const x = (before[index].left - after[index].left) / scale;
+          const y = (before[index].top - after[index].top) / scale;
+          if (Math.hypot(x, y) < 1) return;
+          const animation = node.animate(
+            [
+              { transform: `translate3d(${x}px, ${y}px, 0)` },
+              { transform: "translate3d(0, 0, 0)" },
+            ],
+            {
+              duration: sidebar
+                ? typeof duration === "number"
+                  ? duration
+                  : 160
+                : 240,
+              easing: sidebar
+                ? "cubic-bezier(.2,0,0,1)"
+                : "cubic-bezier(.4,0,.2,1)",
+            },
+          );
+          shareClock(animation, transition);
+          animation.id = "notes-reflow";
+          reflowAnimations.add(animation);
+          void animation.finished.then(
+            () => {
+              reflowAnimations.delete(animation);
+              if (!reflowAnimations.size && view.isConnected) refreshHeight();
+            },
+            () => {
+              reflowAnimations.delete(animation);
+            },
+          );
+        });
       }
-      // Keep destination rows stable while cards move; List can also resize.
-      // Avoid scaling text or moving subsequent rows twice.
-      const afterBoxes = nodes.map((node) => node.getBoundingClientRect());
-      content.querySelectorAll<HTMLElement>(".note-grid").forEach((grid) => {
-        grid.style.gridTemplateRows = getComputedStyle(grid).gridTemplateRows;
-        frozenGrids.add(grid);
-      });
-      const sidebarTransition = sidebar ? sidebarClock() : undefined;
-      const sidebarDuration = sidebarTransition?.effect?.getTiming().duration;
-      nodes.forEach((node, index) => {
-        const after = afterBoxes[index];
-        if (!after.width || !after.height) return;
-        const x = (before[index].left - after.left) / scale;
-        const y = (before[index].top - after.top) / scale;
-        if (
-          Math.hypot(x, y) < 1 &&
-          (mode !== "list" ||
-            (Math.abs(before[index].width - after.width) < 1 &&
-              Math.abs(before[index].height - after.height) < 1))
-        )
-          return;
-        const animation = node.animate(
-          [
-            {
-              transform: `translate3d(${x}px, ${y}px, 0)`,
-              ...(mode === "list"
-                ? { width: `${before[index].width / scale}px` }
-                : {}),
-              ...(mode === "list"
-                ? { height: `${before[index].height / scale}px` }
-                : {}),
-            },
-            {
-              transform: "translate3d(0, 0, 0)",
-              ...(mode === "list" ? { width: `${after.width / scale}px` } : {}),
-              ...(mode === "list"
-                ? { height: `${after.height / scale}px` }
-                : {}),
-            },
-          ],
-          {
-            duration: sidebar
-              ? typeof sidebarDuration === "number"
-                ? sidebarDuration
-                : 160
-              : 240,
-            easing: sidebar
-              ? "cubic-bezier(.2,0,0,1)"
-              : "cubic-bezier(.4,0,.2,1)",
-          },
-        );
-        // CSS shortens a reversed transition. Share its actual clock as well
-        // as its curve so a rapid reversal cannot leave a second animation tail.
-        shareClock(animation, sidebarTransition);
-        animation.id = "notes-reflow";
-        reflowAnimations.add(animation);
-        void animation.finished.then(
-          () => {
-            reflowAnimations.delete(animation);
-            // Transformed boxes can temporarily extend the scrollable overflow.
-            if (!reflowAnimations.size && view.isConnected) {
-              releaseGrids();
-              height = content.offsetHeight;
-              space.style.height = `${height * scale}px`;
-              updateScrollbar();
-            }
-          },
-          () => {
-            reflowAnimations.delete(animation);
-          },
-        );
-      });
-      if (!reflowAnimations.size) releaseGrids();
+      setWidthTarget(nextCardWidth * scale);
+      refreshHeight();
     }
-    function paint(next: number, settled = false) {
-      if (next !== scale) window.clearTimeout(fitTimer);
+    function paint(next: number) {
       scale = next;
       content.style.transform = `scale(${scale})`;
       content.style.setProperty("--notes-scale", String(scale));
-      space.style.width = `${availableWidth}px`;
-      space.style.height = `${height * scale}px`;
-      // Zoom grows from the top-left. Keep the scroll offset instead of
-      // moving toward the pointer and hiding the start of the notes.
+      // Interpolate screen-pixel width separately from text zoom. Compensating
+      // the parent's scale avoids growing then shrinking a card in one slot.
+      applyWidth(false);
       view.scrollLeft = 0;
-      // Reflow as soon as a column boundary is crossed, rather than waiting
-      // for the zoom gesture and easing tail to stop in two separate phases.
-      if (
-        mode !== "list" ||
-        settled ||
-        content.style.getPropertyValue("--notes-columns") !==
-          String(columnsFor(scale))
-      )
-        fit(initialized);
-      updateScrollbar();
+      fit(initialized);
+      refreshHeight();
     }
     function measure() {
       // Extend only the scrollport to the window edge. Keep the card canvas
@@ -268,7 +260,7 @@ export function NotesZoomViewport({
       const inset = getComputedStyle(view.parentElement!).paddingRight;
       view.style.setProperty("--notes-edge-inset", inset);
       // At 100%, closing navigation adds exactly one complete column. Card
-      // width, gap and sidebar width stay fixed during zoom and toggles.
+      // Reference width, gap and sidebar stay fixed; rendered width adapts.
       const desktop = window.innerWidth > 800;
       const mainStyle = getComputedStyle(view.parentElement!);
       const fullWidth =
@@ -303,6 +295,7 @@ export function NotesZoomViewport({
       }
       const tracksChanged = Math.abs(nextCardWidth - cardWidth) > 0.01;
       cardWidth = nextCardWidth;
+      content.style.setProperty("--notes-base-card-width", `${cardWidth}px`);
       if (
         sidebarMoving &&
         !main
@@ -318,7 +311,7 @@ export function NotesZoomViewport({
       const available = view.getBoundingClientRect().width - parseFloat(inset);
       if (tracksChanged || (!sidebarMoving && available !== availableWidth)) {
         availableWidth = available;
-        fit(initialized, true);
+        fit(initialized);
       }
       height = content.offsetHeight;
       paint(scale);
@@ -336,6 +329,9 @@ export function NotesZoomViewport({
         hidden || !sidebar ? 0 : parseFloat(getComputedStyle(sidebar).width);
       const mainStyle = getComputedStyle(view.parentElement!);
       sidebarMoving = Math.abs(currentMargin - target) > 0.1;
+      sidebarWidthMotion = sidebarMoving
+        ? { from: shownCardPixels, start: currentMargin, end: target }
+        : undefined;
       // clientWidth rounds each intermediate transition width. Derive the exact
       // destination from the shell instead, so a subpixel cannot drop a column.
       availableWidth =
@@ -343,7 +339,7 @@ export function NotesZoomViewport({
         target -
         parseFloat(mainStyle.paddingLeft) -
         parseFloat(mainStyle.paddingRight);
-      fit(initialized, true, true);
+      fit(initialized, true);
     }
     function sidebarFinished(event: TransitionEvent) {
       if (event.target !== main || event.propertyName !== "margin-left") return;
@@ -366,15 +362,27 @@ export function NotesZoomViewport({
     initialized = true;
     view.addEventListener("scroll", updateScrollbar, { passive: true });
     rail.addEventListener("scroll", scrollNotes, { passive: true });
-    // Release presentation transforms before sortable's interaction sensors run.
-    view.addEventListener("pointerdown", cancelReflow, true);
-    view.addEventListener("keydown", cancelReflow, true);
+    // Finish presentation geometry before sortable's interaction sensors run.
+    function finishMotion() {
+      cancelReflow();
+      cancelAnimationFrame(widthFrame);
+      widthFrame = 0;
+      widthTime = 0;
+      sidebarWidthMotion = undefined;
+      shownCardPixels = targetCardPixels;
+      delete content.dataset.widthAnimating;
+      applyWidth();
+    }
+    view.addEventListener("pointerdown", finishMotion, true);
+    view.addEventListener("keydown", finishMotion, true);
     return () => {
       observer.disconnect();
       sidebarObserver.disconnect();
       main?.removeEventListener("transitionend", sidebarFinished);
       window.clearTimeout(fitTimer);
       cancelReflow();
+      cancelAnimationFrame(widthFrame);
+      delete content.dataset.widthAnimating;
       if (previousSidebarWidth)
         shell?.style.setProperty(
           "--workspace-sidebar-width",
@@ -385,8 +393,8 @@ export function NotesZoomViewport({
       unsubscribe();
       view.removeEventListener("scroll", updateScrollbar);
       rail.removeEventListener("scroll", scrollNotes);
-      view.removeEventListener("pointerdown", cancelReflow, true);
-      view.removeEventListener("keydown", cancelReflow, true);
+      view.removeEventListener("pointerdown", finishMotion, true);
+      view.removeEventListener("keydown", finishMotion, true);
     };
   }, [subscribe, mode]);
   return (
