@@ -3,7 +3,7 @@
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES
 
 
-DEC-031 (chủ dự án2026-10-25): zoom bên ngoài chỉ phóng/thu danh sách note, header/sidebar/các controls và View/Edit giữ nguyên. Thay phạm vi zoom toàn giao diện DEC-021; giữ50–150%, preference cũ và content zoom riêng. Ctrl+wheel/pinch dùng transform với nội suy từng frame; theo bổ sung đã duyệt, khi zoom dừng Grid tự tính lại số cột/card chuẩn320px để lấp chiều ngang, List luôn một hàng vừa khung. Nhóm ghim/thường cùng chiều rộng card, không đổi thứ tự đã lưu, không reflow từng frame hoặc tải lại dữ liệu khi zoom. Chi tiết triển khai và kiểm chứng tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+DEC-031 (chủ dự án2026-10-25): zoom bên ngoài chỉ phóng/thu danh sách note, header/sidebar/các controls và View/Edit giữ nguyên. Thay phạm vi zoom toàn giao diện DEC-021; giữ50–150%, preference cũ và content zoom riêng. Ctrl+wheel/pinch dùng transform với nội suy từng frame; theo bổ sung đã duyệt, theo video so sánh Keep ngày2026-10-26, Grid đổi cột ngay khi vượt ngưỡng trong lúc zoom rồi căn chiều ngang cuối khi dừng, card chuẩn320px; List luôn một hàng vừa khung. Motion dùng khung width/height thật + translate, giữ chữ đúng tỉ lệ. Nhóm ghim/thường cùng chiều rộng card, không đổi thứ tự đã lưu, không reflow từng frame hoặc tải lại dữ liệu khi zoom. Chi tiết triển khai và kiểm chứng tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
 
 ## Quyết định hiện hành
 

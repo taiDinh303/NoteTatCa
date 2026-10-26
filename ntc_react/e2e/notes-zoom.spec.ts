@@ -20,6 +20,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       const cards = Array.from(el.querySelectorAll<HTMLElement>(".note-card"));
       const frames: { x: number; y: number; width: number }[][] = [];
       const start = performance.now();
+      let firstMotion = -1;
+      let lastInput = 0;
+      let maxTextScaleError = 0;
       function sample(time: number) {
         if (
           cards.some((card) =>
@@ -28,9 +31,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               .some((animation) => animation.id === "notes-reflow"),
           )
         ) {
+          if (firstMotion < 0) firstMotion = time - start;
           frames.push(
             cards.map((card) => {
               const rect = card.getBoundingClientRect();
+              const transform = new DOMMatrix(getComputedStyle(card).transform);
+              maxTextScaleError = Math.max(
+                maxTextScaleError,
+                Math.abs(transform.a - 1),
+                Math.abs(transform.d - 1),
+              );
               return { x: rect.x, y: rect.y, width: rect.width };
             }),
           );
@@ -39,6 +49,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       }
       requestAnimationFrame(sample);
       for (let i = 0; i < 8; i++) {
+        lastInput = performance.now() - start;
         el.dispatchEvent(
           new WheelEvent("wheel", {
             ctrlKey: true,
@@ -55,6 +66,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       )!;
       return {
         frames,
+        firstMotion,
+        lastInput,
+        maxTextScaleError,
         columns: getComputedStyle(
           el.querySelector(".note-grid")!,
         ).gridTemplateColumns.split(" ").length,
@@ -76,6 +90,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(result.frames).toHaveLength(0);
     } else {
       expect(result.frames.length).toBeGreaterThan(5);
+      expect(result.firstMotion).toBeLessThan(result.lastInput);
+      expect(result.maxTextScaleError).toBeLessThan(0.001);
       const widths = result.frames.map((frame) => frame[0].width);
       expect(
         new Set(widths.map((value) => value.toFixed(1))).size,
@@ -275,6 +291,7 @@ for (const width of [393, 1440]) {
         card.offsetLeft,
       ];
       const samples: number[] = [];
+      const columns = new Set<string>();
       const start = performance.now();
       let previous = start;
       let longest = 0;
@@ -282,6 +299,11 @@ for (const width of [393, 1440]) {
         longest = Math.max(longest, time - previous);
         previous = time;
         samples.push(new DOMMatrix(getComputedStyle(layer).transform).a);
+        columns.add(
+          getComputedStyle(el.querySelector(".note-grid")!)
+            .gridTemplateColumns.split(" ")
+            .length.toString(),
+        );
         if (time - start < 900) requestAnimationFrame(sample);
       }
       requestAnimationFrame(sample);
@@ -310,6 +332,7 @@ for (const width of [393, 1440]) {
         longest,
         layout,
         during,
+        columnCounts: [...columns],
         after: [
           card.offsetWidth,
           card.offsetHeight,
@@ -330,7 +353,9 @@ for (const width of [393, 1440]) {
       );
       expect(result.samples[i] - result.samples[i - 1]).toBeLessThan(0.04);
     }
-    expect(result.during).toEqual(result.layout);
+    // A column boundary may reflow while zoom is still in progress; it must
+    // not oscillate layouts on every frame or wait for the gesture to stop.
+    expect(result.columnCounts.length).toBeLessThanOrEqual(2);
     expect(
       Math.abs(result.width - result.after[0] * result.scale),
     ).toBeLessThan(result.scale);

@@ -27,6 +27,7 @@ export function NotesZoomViewport({
     let fitTimer = 0;
     let availableWidth = 0;
     const reflowAnimations = new Set<Animation>();
+    const frozenGrids = new Set<HTMLElement>();
     let scale = 1,
       width = 0,
       height = 0;
@@ -51,6 +52,18 @@ export function NotesZoomViewport({
     function cancelReflow() {
       reflowAnimations.forEach((animation) => animation.cancel());
       reflowAnimations.clear();
+      releaseGrids();
+    }
+    function releaseGrids() {
+      frozenGrids.forEach((grid) => {
+        grid.style.gridTemplateRows = "";
+      });
+      frozenGrids.clear();
+    }
+    function columnsFor(nextScale: number) {
+      return mode === "list"
+        ? 1
+        : Math.max(1, Math.floor((availableWidth / nextScale + 20) / 340));
     }
     function fit(animate = false) {
       window.clearTimeout(fitTimer);
@@ -60,8 +73,7 @@ export function NotesZoomViewport({
         return;
       }
       const nextWidth = availableWidth / scale;
-      const columns =
-        mode === "list" ? 1 : Math.max(1, Math.floor((nextWidth + 20) / 340));
+      const columns = columnsFor(scale);
       if (
         Math.abs(nextWidth - width) < 0.01 &&
         content.style.getPropertyValue("--notes-columns") === String(columns)
@@ -88,13 +100,18 @@ export function NotesZoomViewport({
       updateScrollbar();
       if (!animate || matchMedia("(prefers-reduced-motion: reduce)").matches)
         return;
+      // Lock the destination rows while each card's own box interpolates.
+      // This avoids scaling/distorting its text or moving subsequent rows twice.
+      const afterBoxes = nodes.map((node) => node.getBoundingClientRect());
+      content.querySelectorAll<HTMLElement>(".note-grid").forEach((grid) => {
+        grid.style.gridTemplateRows = getComputedStyle(grid).gridTemplateRows;
+        frozenGrids.add(grid);
+      });
       nodes.forEach((node, index) => {
-        const after = node.getBoundingClientRect();
+        const after = afterBoxes[index];
         if (!after.width || !after.height) return;
         const x = (before[index].left - after.left) / scale;
         const y = (before[index].top - after.top) / scale;
-        const sx = before[index].width / after.width;
-        const sy = before[index].height / after.height;
         if (
           Math.hypot(x, y) < 1 &&
           Math.abs(before[index].width - after.width) < 1 &&
@@ -104,15 +121,17 @@ export function NotesZoomViewport({
         const animation = node.animate(
           [
             {
-              transformOrigin: "0 0",
-              transform: `translate3d(${x}px, ${y}px, 0) scale(${sx}, ${sy})`,
+              transform: `translate3d(${x}px, ${y}px, 0)`,
+              width: `${before[index].width / scale}px`,
+              height: `${before[index].height / scale}px`,
             },
             {
-              transformOrigin: "0 0",
-              transform: "translate3d(0, 0, 0) scale(1, 1)",
+              transform: "translate3d(0, 0, 0)",
+              width: `${after.width / scale}px`,
+              height: `${after.height / scale}px`,
             },
           ],
-          { duration: 280, easing: "cubic-bezier(.22,1,.36,1)" },
+          { duration: 240, easing: "cubic-bezier(.4,0,.2,1)" },
         );
         animation.id = "notes-reflow";
         reflowAnimations.add(animation);
@@ -120,13 +139,19 @@ export function NotesZoomViewport({
           () => {
             reflowAnimations.delete(animation);
             // Transformed boxes can temporarily extend the scrollable overflow.
-            if (!reflowAnimations.size && view.isConnected) updateScrollbar();
+            if (!reflowAnimations.size && view.isConnected) {
+              releaseGrids();
+              height = content.offsetHeight;
+              space.style.height = `${height * scale}px`;
+              updateScrollbar();
+            }
           },
           () => {
             reflowAnimations.delete(animation);
           },
         );
       });
+      if (!reflowAnimations.size) releaseGrids();
     }
     function paint(next: number, settled = false) {
       if (next !== scale) {
@@ -150,7 +175,14 @@ export function NotesZoomViewport({
       space.style.height = `${height * scale}px`;
       view.scrollLeft = docX * scale - x;
       view.scrollTop = docY * scale - y;
-      if (settled) fit(initialized);
+      // Reflow as soon as a column boundary is crossed, rather than waiting
+      // for the zoom gesture and easing tail to stop in two separate phases.
+      if (
+        settled ||
+        content.style.getPropertyValue("--notes-columns") !==
+          String(columnsFor(scale))
+      )
+        fit(initialized);
       updateScrollbar();
     }
     function measure() {
