@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Giữ hình học View ↔ Edit — 2026-10-26
+
+Header của hai chế độ dùng cùng chiều cao, lề ngang, cỡ chữ20px và ô icon28×36px. Khi note không có icon, nút thêm icon ở Edit nằm sau vùng tiêu đề để tiêu đề vẫn thẳng lề nội dung như View. Ô tiêu đề View một dòng với dấu ba chấm nếu quá dài, tương ứng input một dòng ở Edit. View giữ một chỗ trống không tương tác bằng đúng chiều cao toolbar định dạng; khi vào Edit, toolbar xuất hiện tại đó và dòng đầu nội dung không dịch chuyển. Footer hai chế độ có cùng lề/chiều cao, kể cả hàng nút dưới ở mobile; đường kẻ dùng viền trong suốt ở View để không làm đổi kích thước. Nút toàn màn hình, Close và icon/tiêu đề giữ tọa độ khi đổi chế độ. Thanh công cụ và các nút riêng của Edit vẫn chỉ xuất hiện ở Edit.
+
 ### View ↔ Edit không phát lại fade — 2026-10-26
 
 Theo video bandicam20-40-52 (~16.68s), mỗi mode dùng nhánh modal riêng, khiến fade-in120ms của note và fade-in150ms của backdrop phát lại mỗi lần chuyển. Bỏ animation cho .modal.note-editor-modal (cả fullscreen) và overlay là sibling có note modal; opacity/màu nền giữ nguyên từ frame đầu, không fade cả workspace khi đổi mode. Áp dụng cả lần mở note; modal/drawer khác giữ animation riêng. Không đổi luồng flush autosave trước View, cache document, content zoom/session, focus trap hay quản lý dialog. Lượt kiểm frame phát hiện thêm nội dung trống ngắn do2lazy wrappers riêng cho RichEditor/ReadOnlyContent; chuyển sang static dependency chung bên trong module NoteEditor vẫn được lazy-load ở NotesPage. Module/readonly đã sẵn sàng trước khi mode render, không spinner xen giữa khi chuyển. Không giữ editor chạy ẩn hoặc thay autosave; không hứa loại bỏ mọi chi phí khởi tạo Tiptap.

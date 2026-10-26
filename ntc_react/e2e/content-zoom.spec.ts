@@ -530,3 +530,105 @@ for (const [width, theme] of [
     ).toHaveText("Keep this content visible while switching modes.");
   });
 }
+
+for (const [width, theme] of [
+  [393, "light"],
+  [1440, "light"],
+  [1440, "dark"],
+] as const) {
+  test(`View Edit keeps shared note geometry ${width} ${theme}`, async ({ page }) => {
+    await page.addInitScript(
+      (value) => localStorage.setItem("ntc.theme.v1", value),
+      theme,
+    );
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Take a note", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Note title", { exact: true }).fill("Still title");
+    await dialog
+      .getByRole("textbox", { name: "Note content" })
+      .fill("The first content line stays still.");
+    await expect(dialog.getByText("Saved on this device", { exact: true })).toBeVisible();
+
+    const measure = () =>
+      dialog.evaluate((root) => {
+        const origin = root.getBoundingClientRect();
+        const box = (selector: string) => {
+          const node = root.querySelector<HTMLElement>(selector);
+          if (!node) return null;
+          const rect = node.getBoundingClientRect();
+          return {
+            x: rect.x - origin.x,
+            y: rect.y - origin.y,
+            width: rect.width,
+            height: rect.height,
+          };
+        };
+        const title = root.querySelector<HTMLElement>(
+          ".note-heading-title, .editor-title",
+        )!;
+        const close = [...root.querySelectorAll<HTMLButtonElement>("button")]
+          .find((button) => button.textContent?.trim() === "Close")!;
+        const closeRect = close.getBoundingClientRect();
+        return {
+          heading: box(".editor-heading"),
+          title: box(".note-heading-title, .editor-title"),
+          icon: box(".note-heading-icon, .emoji-trigger:not(.empty)"),
+          fullscreen: box(".editor-size-toggle"),
+          content: box(".rich-editor p"),
+          toolbar: box(".editor-toolbar"),
+          close: {
+            x: closeRect.x - origin.x,
+            y: closeRect.y - origin.y,
+            width: closeRect.width,
+            height: closeRect.height,
+          },
+          fontSize: getComputedStyle(title).fontSize,
+          fontWeight: getComputedStyle(title).fontWeight,
+        };
+      });
+    const compare = async (hasIcon: boolean) => {
+      await dialog.getByRole("button", { name: "View", exact: true }).click();
+      await expect(dialog.getByRole("button", { name: "Edit", exact: true })).toBeVisible();
+      const view = await measure();
+      await dialog.getByRole("button", { name: "Edit", exact: true }).click();
+      await expect(dialog.getByLabel("Note title", { exact: true })).toBeVisible();
+      const edit = await measure();
+      const near = (a: number, b: number) => expect(Math.abs(a - b)).toBeLessThan(1);
+      for (const key of ["title", "content", "close", "fullscreen"] as const) {
+        if (!view[key] || !edit[key]) continue;
+        near(view[key].x, edit[key].x);
+        near(view[key].y, edit[key].y);
+        near(view[key].height, edit[key].height);
+      }
+      near(view.heading!.height, edit.heading!.height);
+      near(view.toolbar!.height, edit.toolbar!.height);
+      expect(view.fontSize).toBe(edit.fontSize);
+      expect(view.fontWeight).toBe(edit.fontWeight);
+      if (hasIcon) {
+        expect(view.icon).not.toBeNull();
+        expect(edit.icon).not.toBeNull();
+        near(view.icon!.x, edit.icon!.x);
+        near(view.icon!.y, edit.icon!.y);
+        near(view.icon!.width, edit.icon!.width);
+        near(view.icon!.height, edit.icon!.height);
+      } else {
+        expect(view.icon).toBeNull();
+      }
+    };
+
+    await compare(false);
+    await dialog.getByRole("button", { name: "Choose note icon" }).click();
+    await page
+      .getByRole("dialog", { name: "Note icons", exact: true })
+      .getByRole("button", { name: "💡", exact: true })
+      .click();
+    await expect(dialog.getByText("Saved on this device", { exact: true })).toBeVisible();
+    await compare(true);
+  });
+}

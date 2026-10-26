@@ -4504,19 +4504,13 @@ td {
   }
 }
 
-.note-viewer {
-  --note-view-inset: 32px;
-}
-.note-viewer .note-view-heading,
-.note-viewer .rich-editor,
-.note-viewer .note-view-footer {
-  padding-inline: var(--note-view-inset);
-}
+.note-editor-modal { --note-chrome-inset: 32px; }
+.note-editor-modal .rich-editor { padding-inline: var(--note-chrome-inset); }
 @container viewport (max-width: 800px) {
-  .note-viewer { --note-view-inset: 24px; }
+  .note-editor-modal { --note-chrome-inset: 24px; }
 }
 @container viewport (max-width: 480px) {
-  .note-viewer { --note-view-inset: 19px; }
+  .note-editor-modal { --note-chrome-inset: 19px; }
 }
 
 /* Shared scrollbars follow the active surface in both themes. */
@@ -4890,12 +4884,63 @@ td {
 .saved-colors-empty, .saved-colors-hint { margin: 8px 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
 .text-custom-color { display: flex; gap: 10px; align-items: center; font-size: 12px; margin-top: 12px; cursor: pointer; }
 
-.note-editor-modal .editor-heading { gap: 12px; flex-wrap: nowrap; }
+.note-editor-modal .editor-heading {
+  gap: 12px;
+  flex-wrap: nowrap;
+  min-height: 67px;
+  padding: 15px var(--note-chrome-inset);
+}
+.note-editor-modal .note-view-heading {
+  border-bottom-color: transparent;
+}
 .note-editor-modal .editor-heading .editor-title-wrap { padding: 0; flex: 1; min-width: 0; }
-.note-editor-modal .editor-heading .editor-title { font-size: clamp(16px, 2.4vw, 24px) !important; letter-spacing: -0.3px; color: inherit; min-width: 0; }
+.note-editor-modal .editor-heading .editor-title,
+.note-editor-modal .note-view-heading .note-heading-title {
+  font-family: "Manrope Variable", sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.3px;
+  color: inherit;
+  min-width: 0;
+}
+.note-editor-modal .editor-heading .editor-title { height: 26px; }
+.note-editor-modal .note-view-heading .note-heading-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.note-editor-modal .editor-heading .emoji-trigger:not(.empty),
+.note-editor-modal .note-view-heading .note-heading-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 36px;
+  padding: 0;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.note-editor-modal .editor-heading-no-icon .editor-title-wrap { order: 1; }
+.note-editor-modal .editor-heading-no-icon .editor-identity { order: 2; }
+.note-editor-modal .editor-heading-no-icon .row-actions { order: 3; }
+.note-editor-modal .note-view-toolbar-space { visibility: hidden; }
+.note-editor-modal .note-view-toolbar-size { width: 1px; height: 29px; flex: 0 0 1px; }
+.note-editor-modal .editor-footer { padding-inline: var(--note-chrome-inset); }
+.note-editor-modal .note-view-footer { border-top: 1px solid transparent; }
 .note-editor-modal .editor-heading .editor-identity,
 .note-editor-modal .editor-heading .row-actions { flex-shrink: 0; }
 .note-editor-modal .editor-heading .row-actions { margin-left: auto; flex-wrap: nowrap; }
+@container viewport (max-width: 480px) {
+  .note-editor-modal .note-view-footer { flex-wrap: wrap; }
+  .note-editor-modal .note-view-footer .note-view-timestamp { flex: 0 0 100%; }
+  .note-editor-modal .note-view-footer .note-view-actions {
+    width: 100%;
+    justify-content: flex-end;
+    padding-top: 9px;
+    border-top: 1px solid transparent;
+  }
+}
 .note-icon-menu { z-index: 160; width: min(300px, calc(100vw / var(--interface-scale) - 24px)); padding: 12px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 30px #0003; }
 .note-icon-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); justify-items: center; gap: 6px; margin-bottom: 10px; }
 .note-icon-grid button { width: 44px; height: 44px; background: transparent; border: 1px solid transparent; border-radius: 8px; font-size: 22px; color: inherit; }

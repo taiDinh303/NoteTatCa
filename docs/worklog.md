@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Giữ vị trí và kích cỡ chữ/nút khi đổi View ↔ Edit — 2026-10-26
+
+- Chủ dự án gửi2ảnh cùng video22-04-10, bổ sung rõ icon gần tiêu đề cũng phải đứng yên. Đường dẫn video `D:/Things/band/bandicam 2026-10-26 22-04-10-975.mp4` không hiện diện trong workspace ở lượt này; dùng2ảnh kèm, source và browser local để xác định. View/Edit trước đó có padding/height/cỡ chữ/slot icon khác nhau, View thiếu hàng toolbar nên nội dung nhảy xuống khi Edit hiện; footer có lề và wrap khác nhau. Dùng chung kích thước header/title/icon/footer; nút thêm icon của note chưa có icon chuyển ra sau title trong Edit để không thụt title. View giữ chỗ toolbar vô hình, không tương tác, đúng chiều cao toolbar Edit; viền header/footer trong suốt ở View. Không đổi document, autosave, nội dung zoom hoặc vị trí riêng đã chọn của hand/zoom giữa View và Edit.
+- Browser geometry mới3case393light/1440light/1440dark với cả note có/không có icon: so tọa độ và kích thước title, icon, dòng đầu nội dung, fullscreen, Close, chiều cao header/toolbar, font size/weight giữa2mode; sai khác dưới1px,3/3PASS. Xem screenshot synthetic1440light View/Edit: tiêu đề/icon, dòng nội dung đầu, fullscreen, Close đứng yên; toolbar/pin/tools chỉ hiện ở Edit. Focused full content11/11PASS gồm3case mới,3case chống chớp và5case zoom/pinch/hand; account editor-header fixture SQLite/captured mail riêng5/5PASS tại320/393/430/768/1280. React ESLint, TypeScript/Vite production2192modules và .NET Release strict0warnings/0errorsPASS. Chưa kiểm video người dùng do file không sẵn, thiết bị vật lý/DPR/iOS và toàn E2E/backend suite; không cam kết mượt trên mọi phần cứng. Scope React NoteEditor.tsx/styles.css/E2E và2root docs; giữ `.agnes` ngoài Git. Không migration/manual deploy/owner DB/email thật.
+
 ## Bỏ chớp nền khi đổi View ↔ Edit — 2026-10-26
 
 - Đã xem contact sheet video bandicam2026-10-26 20-40-52-542.mp4 (~16.68s,1920×1080) do chủ dự án gửi. Source xác nhận nhánh NoteViewer/EditorSession remount Modal khi đổi mode, phát lại fade-in note120ms và overlay150ms làm khung/nền từ opacity0 lên1 mỗi lần. Bỏ animation note-editor-modal/cảfullscreen và overlay sibling của note; không đổi animation các modal/drawer khác. Không thay luồng autosave/flush/View, document/version, content zoom hay focus trap.

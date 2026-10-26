@@ -303,12 +303,12 @@ function NoteViewer({
         ...(note.backgroundColor ? { "--surface": note.backgroundColor } : {}),
       }}
     >
-      <div className="note-view-heading">
-        <div className="note-view-identity">
+      <div className="editor-heading note-view-heading">
+        <div className="editor-identity note-view-identity">
           {note.iconEmoji ? (
-            <span aria-hidden="true">{note.iconEmoji}</span>
+            <span className="note-heading-icon" aria-hidden="true">{note.iconEmoji}</span>
           ) : null}
-          {note.title ? <h2>{note.title}</h2> : null}
+          {note.title ? <h2 className="note-heading-title">{note.title}</h2> : null}
         </div>
         <IconButton
           className="editor-size-toggle"
@@ -319,6 +319,9 @@ function NoteViewer({
         />
       </div>
       <div className="editor-scroll">
+        <div className="editor-toolbar note-view-toolbar-space" aria-hidden="true">
+          <span className="note-view-toolbar-size" />
+        </div>
         <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
           <ReadOnlyContent
             key={note.version}
@@ -513,7 +516,7 @@ function EditorSession({
         }}
       >
         <div
-          className="editor-heading"
+          className={`editor-heading ${draft.iconEmoji ? "" : "editor-heading-no-icon"}`}
           style={{
             ...notePalette(draft.backgroundColor),
             backgroundColor: draft.backgroundColor || undefined,
