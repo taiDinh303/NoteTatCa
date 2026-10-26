@@ -162,7 +162,9 @@
 .note-view-footer .note-view-actions {
   min-width: 0;
   flex-shrink: 1;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  overflow: visible;
 }
 .note-view-actions > .button {
   flex-shrink: 0;

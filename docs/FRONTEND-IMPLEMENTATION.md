@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Nút View/Edit/Close không tạo thanh cuộn phụ — 2026-10-27
+
+Cụm nút footer của View không còn là vùng cuộn ngang `overflow-x:auto`. Nút giữ nguyên thứ tự và vị trí khi đủ chỗ; trên chiều rộng hẹp hoặc chuỗi dịch dài, chúng tự xuống hàng, không tạo thanh cuộn nhỏ cạnh View/Edit/Close. Chỉ vùng nội dung note tiếp tục cuộn theo nội dung của nó; không thay zoom, autosave hoặc hành vi các nút.
+
 ### Giữ hình học View ↔ Edit — 2026-10-26
 
 Header của hai chế độ dùng cùng chiều cao, lề ngang, cỡ chữ20px và ô icon28×36px. Khi note không có icon, nút thêm icon ở Edit nằm sau vùng tiêu đề để tiêu đề vẫn thẳng lề nội dung như View. Ô tiêu đề View một dòng với dấu ba chấm nếu quá dài, tương ứng input một dòng ở Edit. View giữ một chỗ trống không tương tác bằng đúng chiều cao toolbar định dạng; khi vào Edit, toolbar xuất hiện tại đó và dòng đầu nội dung không dịch chuyển. Footer hai chế độ có cùng lề/chiều cao, kể cả hàng nút dưới ở mobile; đường kẻ dùng viền trong suốt ở View để không làm đổi kích thước. Nút toàn màn hình, Close và icon/tiêu đề giữ tọa độ khi đổi chế độ. Thanh công cụ và các nút riêng của Edit vẫn chỉ xuất hiện ở Edit.

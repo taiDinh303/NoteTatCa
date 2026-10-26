@@ -532,7 +532,9 @@ for (const [width, theme] of [
 }
 
 for (const [width, theme] of [
+  [320, "light"],
   [393, "light"],
+  [904, "light"],
   [1440, "light"],
   [1440, "dark"],
 ] as const) {
@@ -575,6 +577,7 @@ for (const [width, theme] of [
         const close = [...root.querySelectorAll<HTMLButtonElement>("button")]
           .find((button) => button.textContent?.trim() === "Close")!;
         const closeRect = close.getBoundingClientRect();
+        const actions = root.querySelector<HTMLElement>(".note-view-actions");
         return {
           heading: box(".editor-heading"),
           title: box(".note-heading-title, .editor-title"),
@@ -590,12 +593,16 @@ for (const [width, theme] of [
           },
           fontSize: getComputedStyle(title).fontSize,
           fontWeight: getComputedStyle(title).fontWeight,
+          actionOverflow: actions ? getComputedStyle(actions).overflowX : null,
+          actionScrollRange: actions ? actions.scrollWidth - actions.clientWidth : null,
         };
       });
     const compare = async (hasIcon: boolean) => {
       await dialog.getByRole("button", { name: "View", exact: true }).click();
       await expect(dialog.getByRole("button", { name: "Edit", exact: true })).toBeVisible();
       const view = await measure();
+      expect(view.actionOverflow).toBe("visible");
+      expect(view.actionScrollRange).toBeLessThanOrEqual(1);
       await dialog.getByRole("button", { name: "Edit", exact: true }).click();
       await expect(dialog.getByLabel("Note title", { exact: true })).toBeVisible();
       const edit = await measure();
