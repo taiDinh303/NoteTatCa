@@ -122,12 +122,14 @@ export function NotesZoomViewport({
           [
             {
               transform: `translate3d(${x}px, ${y}px, 0)`,
-              width: `${before[index].width / scale}px`,
+              ...(mode === "list"
+                ? { width: `${before[index].width / scale}px` }
+                : {}),
               height: `${before[index].height / scale}px`,
             },
             {
               transform: "translate3d(0, 0, 0)",
-              width: `${after.width / scale}px`,
+              ...(mode === "list" ? { width: `${after.width / scale}px` } : {}),
               height: `${after.height / scale}px`,
             },
           ],

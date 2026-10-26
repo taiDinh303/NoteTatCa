@@ -2,6 +2,14 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Card Grid width gốc cố định, chia phần dư vào gap — 2026-10-26
+
+- Theo yêu cầu chủ dự án: card có width cố định, không tự đổi width để lấp hàng khi zoom; tính gap cho vừa danh sách. Áp dụng Grid width gốc320px, chỉ phóng/thu uniform theo scale (desktop50/100/150% =160/320/480px vật lý), không giãn track1fr và không WAAPI width trên Grid. List giữ một hàng vừa viewport theo quyết định trước; màn hình hẹp hơn320px logical giới hạn Grid card vừa khung để giữ không tràn ngang.
+- CSS repeat số cột hiện có với min(320px,100%), justify-content:space-between, column/row gap tối thiểu20px logical. Khi n>1, phần dư ngang chia đều cho n−1khoảng; khi n=1 căn trái, không kéo rộng card. Mọi nhóm dùng cùng số slot/cột nên ghim/regular và hàng cuối thiếu card vẫn thẳng cột, không căn theo số note thực có trong nhóm. Giữ live column reflow/translate-height240ms, reduced motion, root không overflow và scrollbar full-height.
+- Actual Chromium full13/13PASS content/list suite. Motion thêm guard logical offsetWidth=320 trong toàn bộ frame chuyển động, vẫn bắt đầu trước wheel cuối và không scale méo chữ;30frame ở lượt focused/28frame ở full, physicalwidth392.8→480 do parent zoom. Layout393/1920/11guest notes kiểm Grid width=min(320*scale,available), các gap trong một hàng bằng nhau(<1px lệch), gap≥20*scale, nhiều cột chạm phải, một cột căn trái, group widths đồng nhất/sort IDs giữ. List luôn full-width, desktop50/100/150%9/4/3cột/mobile2/1/1. Đã xem screenshot desktop100% với fixed card và gap chia đều; scoped4cases trước full cũng PASS.
+- Account fixture SQLite/captured mail riêng5199:drag5/5PASS desktop1440 zoom75/100/125%,393mouse/touch, shape/HTTP reorder/reload/menu/View giữ. Tổng18browser casesPASS; native scrollbar drag/sync/resize,0network/chrome bounds/content View/Edit/pinch/hand/fullscreen vẫn PASS. TypeScript/Vite Production build2192modules/ESLint/.NET solution Release strict0warnings/0errorsPASS; docs verifier49Markdown/198local links/0errors/diff checkPASS. Không chạy lại Vitest/full backend/full E2E khác/thiết bị vật lý/iOS/1000cards/production; không owner DB/email/migration/manual deploy, hosting rollout chưa xác minh.
+- Scope7files: NotesZoomViewport.tsx/CSS, notes-zoom.spec.ts và4root docs (frontend/plan/intake/worklog), giữ.agnes ngoài Git. Push main theo quyền hiện có và kiểm SHA remote sau push.
+
 ## Chuyển động card theo video so sánh Keep — 2026-10-26
 
 - Chủ dự án gửi bandicam2026-10-26 12-07-25-223.mp4 và yêu cầu card di chuyển gần cách Google Keep hơn. Đã đọc video local18.87s, trích contact sheets toàn clip và các khung0.25s (Keep2–5s, NoteTatCa9–13s); bản app còn hai nhịp scale rồi reflow và co kéo chữ/card. Đây là đối chiếu hành vi trong video, không khẳng định biết mã nội bộ Keep; header/sidebar cố định theo các yêu cầu trước vẫn giữ.

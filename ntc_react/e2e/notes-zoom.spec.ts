@@ -23,6 +23,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       let firstMotion = -1;
       let lastInput = 0;
       let maxTextScaleError = 0;
+      let maxLogicalWidthError = 0;
       function sample(time: number) {
         if (
           cards.some((card) =>
@@ -35,6 +36,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           frames.push(
             cards.map((card) => {
               const rect = card.getBoundingClientRect();
+              maxLogicalWidthError = Math.max(
+                maxLogicalWidthError,
+                Math.abs(card.offsetWidth - 320),
+              );
               const transform = new DOMMatrix(getComputedStyle(card).transform);
               maxTextScaleError = Math.max(
                 maxTextScaleError,
@@ -69,6 +74,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         firstMotion,
         lastInput,
         maxTextScaleError,
+        maxLogicalWidthError,
         columns: getComputedStyle(
           el.querySelector(".note-grid")!,
         ).gridTemplateColumns.split(" ").length,
@@ -92,6 +98,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(result.frames.length).toBeGreaterThan(5);
       expect(result.firstMotion).toBeLessThan(result.lastInput);
       expect(result.maxTextScaleError).toBeLessThan(0.001);
+      expect(result.maxLogicalWidthError).toBeLessThan(1);
       const widths = result.frames.map((frame) => frame[0].width);
       expect(
         new Set(widths.map((value) => value.toFixed(1))).size,
@@ -401,7 +408,7 @@ for (const width of [393, 1440]) {
 }
 
 for (const width of [393, 1920]) {
-  test(`grid fills the available width and List stays fitted at every zoom ${width}`, async ({
+  test(`fixed grid card widths and balanced gaps at every zoom ${width}`, async ({
     page,
   }) => {
     test.setTimeout(90000);
@@ -473,6 +480,9 @@ for (const width of [393, 1920]) {
             overflow: el.scrollWidth - el.clientWidth,
             columns: firstRow.length,
             rightGap: grid.right - firstRow.at(-1)!.right,
+            gaps: firstRow
+              .slice(1)
+              .map((rect, i) => rect.left - firstRow[i].right),
             widths: Array.from(el.querySelectorAll(".note-card")).map(
               (node) => node.getBoundingClientRect().width,
             ),
@@ -483,14 +493,34 @@ for (const width of [393, 1920]) {
         });
         expect(layout.overflow).toBeLessThanOrEqual(1);
         expect(layout.gridWidth).toBeCloseTo(layout.available, 0);
-        expect(layout.rightGap).toBeLessThan(1);
+        if (layout.columns > 1 || mode === "list")
+          expect(layout.rightGap).toBeLessThan(1);
+        else
+          expect(layout.rightGap).toBeCloseTo(
+            layout.available - layout.widths[0],
+            0,
+          );
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
         if (mode === "list") {
           expect(layout.columns).toBe(1);
           expect(layout.widths[0]).toBeCloseTo(layout.available, 0);
-        } else columns.push(layout.columns);
+        } else {
+          expect(layout.widths[0]).toBeCloseTo(
+            Math.min((320 * percent) / 100, layout.available),
+            0,
+          );
+          if (layout.gaps.length) {
+            expect(
+              Math.max(...layout.gaps) - Math.min(...layout.gaps),
+            ).toBeLessThan(1);
+            expect(Math.min(...layout.gaps)).toBeGreaterThanOrEqual(
+              (20 * percent) / 100 - 1,
+            );
+          }
+          columns.push(layout.columns);
+        }
         expect(
           await page
             .locator(".note-card")

@@ -68,8 +68,10 @@ html:has([data-notes-zoom]) {
   transform-origin: 0 0;
 }
 .notes-zoom-layer .note-grid {
-  grid-template-columns: repeat(var(--notes-columns, 1), minmax(0, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(var(--notes-columns, 1), min(320px, 100%));
+  column-gap: 20px;
+  row-gap: 20px;
+  justify-content: space-between;
 }
 .notes-zoom-layer .note-grid.list-view {
   grid-template-columns: minmax(0, 1fr);
