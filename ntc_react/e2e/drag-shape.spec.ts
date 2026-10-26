@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import type { Note } from "../src/domain/models";
 for (const [width, zoom, touch] of [
   [1440, 1, false],
+  [1440, 0.5, false],
   [1440, 0.75, false],
   [1440, 1.25, false],
   [393, 1, false],

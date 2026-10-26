@@ -26,6 +26,7 @@ export function NotesZoomViewport({
     let initialized = false;
     let fitTimer = 0;
     let availableWidth = 0;
+    let rightInset = 0;
     let cardWidth = 320;
     let gap = 20;
     const reflowAnimations = new Set<Animation>();
@@ -74,13 +75,23 @@ export function NotesZoomViewport({
       });
       frozenGrids.clear();
     }
+    function fitWidth(nextScale: number) {
+      // At half scale the next complete column needs half a gap more room.
+      // Borrow that from the existing right inset, keeping card/gap unchanged.
+      const allowance =
+        mode !== "list" && window.innerWidth > 800 && nextScale <= 0.50001
+          ? Math.min(gap / 2, Math.max(0, rightInset - 12))
+          : 0;
+      return availableWidth + allowance;
+    }
     function columnsFor(nextScale: number) {
       return mode === "list"
         ? 1
         : Math.max(
             1,
             Math.floor(
-              (availableWidth / nextScale + gap + 0.01) / (cardWidth + gap),
+              (fitWidth(nextScale) / nextScale + gap + 0.01) /
+                (cardWidth + gap),
             ),
           );
     }
@@ -114,11 +125,13 @@ export function NotesZoomViewport({
         return;
       }
       const columns = columnsFor(scale);
+      const fittedWidth = fitWidth(scale);
+      view.style.paddingRight = `${rightInset - (fittedWidth - availableWidth)}px`;
       const nextWidth =
         mode === "list"
-          ? availableWidth / scale
+          ? fittedWidth / scale
           : Math.min(
-              availableWidth / scale,
+              fittedWidth / scale,
               columns * cardWidth + (columns - 1) * gap,
             );
       const tracksChanged =
@@ -142,7 +155,7 @@ export function NotesZoomViewport({
         const clamped = width < cardWidth || nextWidth < cardWidth;
         width = nextWidth;
         content.style.width = `${width}px`;
-        space.style.width = `${availableWidth}px`;
+        space.style.width = `${fitWidth(scale)}px`;
         if (mode === "list" || clamped) {
           height = content.offsetHeight;
           space.style.height = `${height * scale}px`;
@@ -160,7 +173,7 @@ export function NotesZoomViewport({
       content.style.setProperty("--notes-card-width", `${cardWidth}px`);
       content.style.setProperty("--notes-gap", `${gap}px`);
       height = content.offsetHeight;
-      space.style.width = `${availableWidth}px`;
+      space.style.width = `${fitWidth(scale)}px`;
       space.style.height = `${height * scale}px`;
       view.scrollLeft = 0;
       updateScrollbar();
@@ -246,7 +259,7 @@ export function NotesZoomViewport({
       scale = next;
       content.style.transform = `scale(${scale})`;
       content.style.setProperty("--notes-scale", String(scale));
-      space.style.width = `${availableWidth}px`;
+      space.style.width = `${fitWidth(scale)}px`;
       space.style.height = `${height * scale}px`;
       // Zoom grows from the top-left. Keep the scroll offset instead of
       // moving toward the pointer and hiding the start of the notes.
@@ -266,6 +279,7 @@ export function NotesZoomViewport({
       // Extend only the scrollport to the window edge. Keep the card canvas
       // inside the main column's existing responsive right inset.
       const inset = getComputedStyle(view.parentElement!).paddingRight;
+      rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
       // At 100%, closing navigation adds exactly one complete column. Card
       // width, gap and sidebar width stay fixed during zoom and toggles.

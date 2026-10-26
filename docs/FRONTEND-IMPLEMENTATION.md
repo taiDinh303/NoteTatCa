@@ -6,6 +6,8 @@
 
 ### Zoom danh sách, giữ nguyên giao diện — DEC-031, 2026-10-25
 
+Bổ sung theo3ảnh50% ngày2026-10-26: desktop Grid tại scale50% dùng thêm tối đa10px từ đệm phải sẵn có (giữ ít nhất12px cách mép); đủ thêm1cột trước xuống hàng, không đổi width/gap gốc hoặc lề trái. Điều kiện chỉ tại min zoom50%, List/mobile và mốc khác giữ quy tắc cũ. fitWidth dùng chung cho số cột/canvas/stage để không chỉ thêm slot rồi clip card cuối.100% vẫn như trước.
+
 Yêu cầu mới nhất2026-10-26: chủ dự án thấy width thích ứng giật khi dùng thực tế nên hủy thử nghiệm d333dde, trở lại width/gap Grid gốc cố định như c4f6cb5. Bỏ toàn bộ width target/interpolation rAF theo zoom; chỉ scale uniform và animate vị trí khi đổi cột. Không còn yêu cầu khít cả5mốc; ưu tiên100% và chấp nhận phần dư phải tại mức khác. List giữ bề ngang hàng theo viewport như trước.
 
 Theo yêu cầu mới, thay phạm vi zoom toàn giao diện của DEC-021: chỉ scale các nhóm/danh sách/card note, kể cả list view và Trash. Header, sidebar, New/filter/view mode, Load more, menu và hộp View/Edit giữ nguyên. Settings gọi là “Notes zoom” với4ngôn ngữ. Giữ range50–150% và key `ntc.interface.zoom.v1` để không mất preference cũ; giá trị lưu cũ nay áp dụng danh sách. Mức zoom nội dung note vẫn độc lập và reset100% khi đóng/mở.

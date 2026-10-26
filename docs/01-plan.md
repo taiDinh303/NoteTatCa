@@ -3,7 +3,7 @@
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES
 
 
-DEC-031 cập nhật theo yêu cầu mới nhất của chủ dự án2026-10-26: hủy width thích ứng vì chuyển động resize gây giật khi sử dụng thực tế; trở lại width card Grid và gap gốc cố định trong suốt zoom/toggle sidebar. Chỉ đổi số cột và animate vị trí card. Cỡ gốc/sidebar có thể chọn theo cửa sổ,100% khít cả2trạng thái sidebar; các mốc khác chấp nhận dư phải dưới1bước cột, không ép khít5mốc. Giữ lề trái/New+/heading, góc trên trái, zoom danh sách50–150%, chrome đứng yên và content zoom độc lập. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+DEC-031 cập nhật theo yêu cầu mới nhất của chủ dự án2026-10-26: hủy width thích ứng vì chuyển động resize gây giật khi sử dụng thực tế; trở lại width card Grid và gap gốc cố định trong suốt zoom/toggle sidebar. Chỉ đổi số cột và animate vị trí card. Cỡ gốc/sidebar có thể chọn theo cửa sổ,100% khít cả2trạng thái sidebar; các mốc khác chấp nhận dư phải dưới1bước cột, không ép khít5mốc. Bổ sung mới: riêng desktop Grid50% dùng thêm tối đa10px đệm phải để thêm1cột, vẫn giữ nguyên width/gap. Giữ lề trái/New+/heading, góc trên trái, zoom danh sách50–150%, chrome đứng yên và content zoom độc lập. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
 
 ## Quyết định hiện hành
 

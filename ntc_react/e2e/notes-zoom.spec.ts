@@ -957,6 +957,20 @@ for (const { width, theme } of [
         }
         expect(layout.baseWidth).toBeCloseTo(baseWidth, 4);
         expect(layout.baseGap).toBe(baseGap);
+        if (mode === "grid" && percent === 50 && width > 800) {
+          const slots = await list
+            .locator(".notes-zoom-layer")
+            .evaluate((el) =>
+              Number(
+                (el as HTMLElement).style.getPropertyValue("--notes-columns"),
+              ),
+            );
+          const oldSlots = Math.floor(
+            ((layout.available - 10) / 0.5 + baseGap + 0.01) /
+              (baseWidth + baseGap),
+          );
+          expect(slots).toBe(oldSlots + 1);
+        }
         if (percent === 100) expect(layout.rightGap).toBeLessThan(1);
         if (mode === "grid" && percent === 100) {
           expect(layout.leftMargin).toBeLessThan(width < 600 ? 16.1 : 1);
@@ -1114,7 +1128,9 @@ for (const { width, theme } of [
         }
       }
     }
-    console.log(`Grid ${width}, 50/75/100/125/150%: ${columns.join("/")} columns`);
+    console.log(
+      `Grid ${width}, 50/75/100/125/150%: ${columns.join("/")} columns`,
+    );
     for (let i = 1; i < columns.length; i++)
       expect(columns[i - 1]).toBeGreaterThanOrEqual(columns[i]);
     expect(baseWidth).toBeGreaterThanOrEqual(240);
