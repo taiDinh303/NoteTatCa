@@ -111,6 +111,180 @@ for (const mode of ["grid", "list"]) {
   });
 }
 
+for (const zoom of [75, 100, 125]) {
+  test(`sidebar and wrapping cards share one motion at zoom ${zoom}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.addInitScript(
+      (zoom) => localStorage.setItem("ntc.interface.zoom.v1", String(zoom)),
+      zoom,
+    );
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    for (let i = 0; i < 3; i++) {
+      await page
+        .getByRole("button", { name: "Take a note", exact: true })
+        .click();
+      const dialog = page.getByRole("dialog", {
+        name: "New note",
+        exact: true,
+      });
+      await dialog
+        .getByLabel("Note title", { exact: true })
+        .fill(`Sidebar slot ${i}`);
+      await dialog
+        .getByRole("textbox", { name: "Note content" })
+        .fill("Stable bottom edge during shared sidebar motion.");
+      await expect(
+        dialog.getByText("Saved on this device", { exact: true }),
+      ).toBeVisible();
+      await dialog.getByRole("button", { name: "Close", exact: true }).click();
+    }
+    await page.evaluate(() => document.fonts.ready);
+    for (const name of ["Hide sidebar", "Show sidebar"]) {
+      const result = await page.evaluate(async (name) => {
+        const main = document.querySelector<HTMLElement>(".main-column")!;
+        const sidebar = document.querySelector<HTMLElement>(
+          "#workspace-navigation",
+        )!;
+        const cards = Array.from(
+          document.querySelectorAll<HTMLElement>(".note-card"),
+        );
+        const heights = cards.map(
+          (card) => card.getBoundingClientRect().height,
+        );
+        const start = performance.now();
+        const frames: {
+          delta: number;
+          running: number;
+          mainMoving: boolean;
+          heightError: number;
+          time: number;
+        }[] = [];
+        let measured = 0;
+        const read = Element.prototype.getBoundingClientRect;
+        Element.prototype.getBoundingClientRect = function () {
+          if (this.matches(".note-card")) measured++;
+          return read.call(this);
+        };
+        (
+          document.querySelector(`[aria-label="${name}"]`) as HTMLElement
+        ).click();
+        await new Promise<void>((resolve) => {
+          function sample() {
+            frames.push({
+              delta: read.call(sidebar).right - read.call(main).left,
+              running: cards
+                .flatMap((card) => card.getAnimations())
+                .filter((a) => a.id === "notes-reflow").length,
+              mainMoving: main
+                .getAnimations()
+                .some((a) => a.playState === "running"),
+              heightError: Math.max(
+                ...cards.map((card, i) =>
+                  Math.abs(read.call(card).height - heights[i]),
+                ),
+              ),
+              time: performance.now() - start,
+            });
+            if (performance.now() - start < 500) requestAnimationFrame(sample);
+            else resolve();
+          }
+          requestAnimationFrame(sample);
+        });
+        Element.prototype.getBoundingClientRect = read;
+        return { frames, measured, count: cards.length };
+      }, name);
+      expect(
+        Math.max(...result.frames.map((f) => Math.abs(f.delta))),
+      ).toBeLessThan(1);
+      expect(Math.max(...result.frames.map((f) => f.heightError))).toBeLessThan(
+        0.1,
+      );
+      expect(result.frames.some((f) => f.mainMoving && f.running > 0)).toBe(
+        true,
+      );
+      expect(
+        result.frames
+          .filter((f) => !f.mainMoving && f.time > 185)
+          .every((f) => f.running === 0),
+      ).toBe(true);
+      // One before/after measurement per card, rather than per transition tick.
+      expect(result.measured).toBeLessThanOrEqual(result.count * 2);
+      console.log(
+        `Sidebar ${zoom}% ${name}: ${result.measured} card reads, ${result.frames.filter((f) => f.mainMoving && f.running).length} shared frames`,
+      );
+    }
+    const reversal = await page.evaluate(async () => {
+      const main = document.querySelector<HTMLElement>(".main-column")!;
+      const cards = Array.from(
+        document.querySelectorAll<HTMLElement>(".note-card"),
+      );
+      const start = performance.now();
+      let detachedFrames = 0;
+      let maxClockError = 0;
+      let maxDurationError = 0;
+      let sharedFrames = 0;
+      function sample() {
+        const transition = main
+          .getAnimations()
+          .find(
+            (a) =>
+              "transitionProperty" in a &&
+              a.transitionProperty === "margin-left",
+          );
+        const reflows = cards
+          .flatMap((card) => card.getAnimations())
+          .filter((a) => a.id === "notes-reflow");
+        if (transition && reflows.length) {
+          sharedFrames++;
+          for (const reflow of reflows) {
+            if (
+              typeof reflow.startTime === "number" &&
+              typeof transition.startTime === "number"
+            )
+              maxClockError = Math.max(
+                maxClockError,
+                Math.abs(reflow.startTime - transition.startTime),
+              );
+            maxDurationError = Math.max(
+              maxDurationError,
+              Math.abs(
+                Number(reflow.effect!.getTiming().duration) -
+                  Number(transition.effect!.getTiming().duration),
+              ),
+            );
+          }
+        }
+        if (!transition && reflows.length) detachedFrames++;
+        if (performance.now() - start < 900) requestAnimationFrame(sample);
+      }
+      requestAnimationFrame(sample);
+      for (const name of [
+        "Hide sidebar",
+        "Show sidebar",
+        "Hide sidebar",
+        "Show sidebar",
+      ]) {
+        (
+          document.querySelector(`[aria-label="${name}"]`) as HTMLElement
+        ).click();
+        await new Promise((resolve) => setTimeout(resolve, 40));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 950));
+      return { sharedFrames, detachedFrames, maxClockError, maxDurationError };
+    });
+    expect(reversal.sharedFrames).toBeGreaterThan(3);
+    expect(reversal.detachedFrames).toBeLessThanOrEqual(1);
+    expect(reversal.maxClockError).toBeLessThan(1);
+    expect(reversal.maxDurationError).toBeLessThan(1);
+  });
+}
+
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test(`note reflow animates geometry frame by frame ${reducedMotion}`, async ({
     page,
@@ -153,6 +327,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       let lastInput = 0;
       let maxTextScaleError = 0;
       let maxLogicalWidthError = 0;
+      let maxLogicalHeightError = 0;
+      let heightKeyframes = 0;
+      const heights = cards.map(
+        (card) =>
+          card.getBoundingClientRect().height /
+          new DOMMatrix(
+            getComputedStyle(el.querySelector(".notes-zoom-layer")!).transform,
+          ).a,
+      );
       function sample(time: number) {
         if (
           cards.some((card) =>
@@ -167,8 +350,23 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               const rect = card.getBoundingClientRect();
               maxLogicalWidthError = Math.max(
                 maxLogicalWidthError,
+                maxLogicalHeightError,
+                heightKeyframes,
                 Math.abs(card.offsetWidth - 320),
               );
+              const zoom = new DOMMatrix(
+                getComputedStyle(el.querySelector(".notes-zoom-layer")!)
+                  .transform,
+              ).a;
+              maxLogicalHeightError = Math.max(
+                maxLogicalHeightError,
+                Math.abs(rect.height / zoom - heights[cards.indexOf(card)]),
+              );
+              heightKeyframes += card
+                .getAnimations()
+                .filter((a) => a.id === "notes-reflow")
+                .flatMap((a) => (a.effect as KeyframeEffect).getKeyframes())
+                .filter((k) => "height" in k).length;
               const transform = new DOMMatrix(getComputedStyle(card).transform);
               maxTextScaleError = Math.max(
                 maxTextScaleError,
@@ -204,6 +402,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         lastInput,
         maxTextScaleError,
         maxLogicalWidthError,
+        maxLogicalHeightError,
+        heightKeyframes,
         columns: getComputedStyle(
           el.querySelector(".note-grid")!,
         ).gridTemplateColumns.split(" ").length,
@@ -228,6 +428,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(result.firstMotion).toBeLessThan(result.lastInput);
       expect(result.maxTextScaleError).toBeLessThan(0.001);
       expect(result.maxLogicalWidthError).toBeLessThan(1);
+      expect(result.maxLogicalHeightError).toBeLessThan(0.1);
+      expect(result.heightKeyframes).toBe(0);
       const widths = result.frames.map((frame) => frame[0].width);
       expect(
         new Set(widths.map((value) => value.toFixed(1))).size,
@@ -428,6 +630,7 @@ for (const width of [393, 1440]) {
       ];
       const samples: number[] = [];
       const horizontalOffsets: number[] = [];
+      const verticalOffsets: number[] = [];
       const leftEdges: number[] = [];
       const columns = new Set<string>();
       const start = performance.now();
@@ -438,6 +641,7 @@ for (const width of [393, 1440]) {
         previous = time;
         samples.push(new DOMMatrix(getComputedStyle(layer).transform).a);
         horizontalOffsets.push(el.scrollLeft);
+        verticalOffsets.push(el.scrollTop);
         leftEdges.push(
           card.getBoundingClientRect().left - el.getBoundingClientRect().left,
         );
@@ -472,6 +676,7 @@ for (const width of [393, 1440]) {
       return {
         samples,
         horizontalOffsets,
+        verticalOffsets,
         leftEdges,
         longest,
         layout,
@@ -489,6 +694,7 @@ for (const width of [393, 1440]) {
     });
     expect(result.scale).toBeCloseTo(Math.exp(144 * 0.0012), 3);
     expect(result.horizontalOffsets.every((value) => value === 0)).toBe(true);
+    expect(result.verticalOffsets.every((value) => value === 0)).toBe(true);
     expect(result.leftEdges.every((value) => Math.abs(value) < 1)).toBe(true);
     expect(
       new Set(result.samples.map((n) => n.toFixed(4))).size,
@@ -537,9 +743,11 @@ for (const width of [393, 1440]) {
     const extremes = await list.evaluate(async (el) => {
       const card = el.querySelector(".note-card")!;
       const offsets: number[] = [];
+      const tops: number[] = [];
       const edges: number[] = [];
       function record() {
         offsets.push(el.scrollLeft);
+        tops.push(el.scrollTop);
         edges.push(
           card.getBoundingClientRect().left - el.getBoundingClientRect().left,
         );
@@ -564,9 +772,10 @@ for (const width of [393, 1440]) {
           record();
         }
       }
-      return { offsets, edges };
+      return { offsets, tops, edges };
     });
     expect(extremes.offsets.every((value) => value === 0)).toBe(true);
+    expect(extremes.tops.every((value) => value === 0)).toBe(true);
     expect(extremes.edges.every((value) => Math.abs(value) < 1)).toBe(true);
     expect(await chrome()).toEqual(before);
     await page
