@@ -416,3 +416,117 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
   await expect(editHand).toHaveAttribute("aria-pressed", "false");
   await context.close();
 });
+
+for (const [width, theme] of [
+  [393, "light"],
+  [1440, "light"],
+  [1440, "dark"],
+] as const) {
+  test(`View Edit switching keeps note and backdrop opaque ${width} ${theme}`, async ({
+    page,
+  }) => {
+    await page.addInitScript(
+      (theme) => localStorage.setItem("ntc.theme.v1", theme),
+      theme,
+    );
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "Take a note", exact: true })
+      .click();
+    const dialog = page.getByRole("dialog");
+    await dialog
+      .getByLabel("Note title", { exact: true })
+      .fill("Stable mode switch");
+    await dialog
+      .getByRole("textbox", { name: "Note content" })
+      .fill("Keep this content visible while switching modes.");
+    await dialog
+      .getByRole("button", { name: "Note background color", exact: true })
+      .click();
+    await page
+      .getByRole("textbox", { name: "Hex color", exact: true })
+      .fill("#ffdab5");
+    await page
+      .getByRole("button", { name: "Apply color", exact: true })
+      .click();
+    await expect(
+      dialog.getByText("Saved on this device", { exact: true }),
+    ).toBeVisible();
+    const samples = page.evaluate(
+      () =>
+        new Promise<{
+          missing: number;
+          blank: number;
+          opacity: number[];
+          colors: string[];
+          animations: string[];
+          widths: number[];
+        }>((resolve) => {
+          const result = {
+            missing: 0,
+            blank: 0,
+            opacity: [] as number[],
+            colors: [] as string[],
+            animations: [] as string[],
+            widths: [] as number[],
+          };
+          const start = performance.now();
+          const sample = () => {
+            const note = document.querySelector(".note-editor-modal");
+            const overlay = document.querySelector(".modal-overlay");
+            if (!note || !overlay) result.missing++;
+            else {
+              const css = getComputedStyle(note),
+                backdrop = getComputedStyle(overlay);
+              result.opacity.push(
+                Number(css.opacity),
+                Number(backdrop.opacity),
+              );
+              result.colors.push(css.backgroundColor);
+              result.animations.push(css.animationName, backdrop.animationName);
+              result.widths.push(note.getBoundingClientRect().width);
+              if (
+                !note
+                  .querySelector(".rich-editor")
+                  ?.textContent?.includes("Keep this content visible")
+              )
+                result.blank++;
+            }
+            if (performance.now() - start < 2200) requestAnimationFrame(sample);
+            else resolve(result);
+          };
+          requestAnimationFrame(sample);
+        }),
+    );
+    for (let i = 0; i < 6; i++) {
+      await dialog.getByRole("button", { name: "View", exact: true }).click();
+      await expect(
+        page.getByRole("dialog", { name: "View note", exact: true }),
+      ).toBeVisible();
+      await page.evaluate(() => new Promise(requestAnimationFrame));
+      await dialog.getByRole("button", { name: "Edit", exact: true }).click();
+      await expect(
+        page.getByRole("dialog", { name: "Edit note", exact: true }),
+      ).toBeVisible();
+      await page.evaluate(() => new Promise(requestAnimationFrame));
+    }
+    const frames = await samples;
+    expect(frames.opacity.length).toBeGreaterThan(20);
+    expect(frames.missing).toBe(0);
+    expect(frames.blank).toBe(0);
+    expect(Math.min(...frames.opacity)).toBe(1);
+    expect(new Set(frames.colors)).toEqual(new Set(["rgb(255, 218, 181)"]));
+    expect(new Set(frames.animations)).toEqual(new Set(["none"]));
+    expect(
+      Math.max(...frames.widths) - Math.min(...frames.widths),
+    ).toBeLessThan(1);
+    await expect(
+      dialog.getByRole("textbox", { name: "Note content" }),
+    ).toHaveText("Keep this content visible while switching modes.");
+  });
+}

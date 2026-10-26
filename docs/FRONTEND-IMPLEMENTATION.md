@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### View ↔ Edit không phát lại fade — 2026-10-26
+
+Theo video bandicam20-40-52 (~16.68s), mỗi mode dùng nhánh modal riêng, khiến fade-in120ms của note và fade-in150ms của backdrop phát lại mỗi lần chuyển. Bỏ animation cho .modal.note-editor-modal (cả fullscreen) và overlay là sibling có note modal; opacity/màu nền giữ nguyên từ frame đầu, không fade cả workspace khi đổi mode. Áp dụng cả lần mở note; modal/drawer khác giữ animation riêng. Không đổi luồng flush autosave trước View, cache document, content zoom/session, focus trap hay quản lý dialog. Lượt kiểm frame phát hiện thêm nội dung trống ngắn do2lazy wrappers riêng cho RichEditor/ReadOnlyContent; chuyển sang static dependency chung bên trong module NoteEditor vẫn được lazy-load ở NotesPage. Module/readonly đã sẵn sàng trước khi mode render, không spinner xen giữa khi chuyển. Không giữ editor chạy ẩn hoặc thay autosave; không hứa loại bỏ mọi chi phí khởi tạo Tiptap.
+
 ### Sidebar phản hồi ngay khi nhấn — 2026-10-26
 
 Nút desktop nhận primary mouse/pen pointerdown để bắt đầu mở/thu ngay khi nhấn xuống, không chờ mouseup/click. Click sau đó không toggle lần hai; bàn phím Enter/Space, activation hỗ trợ và touch giữ click semantics. Hover không tự mở/đóng; sidebar vốn có will-change:transform để chuẩn bị lớp render. Giữ animation160ms và đồng clock với main/card, không thêm delay/timer. Memo phần nội dung Sidebar và callbacks desktop ổn định để toggle AppShell không dựng lại danh sách nhãn; queries/language/theme/navigation vẫn cập nhật theo context. Mobile drawer giữ nút/cơ chế cũ.

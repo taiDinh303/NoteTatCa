@@ -1,6 +1,5 @@
 import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import {
-  lazy,
   Suspense,
   useEffect,
   useMemo,
@@ -52,12 +51,7 @@ import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 import { ContentZoomSession } from "./contentZoomSession";
 import ContentZoomOutlet from "./ContentZoomOutlet";
-const RichEditor = lazy(() => import("./RichEditor"));
-const ReadOnlyContent = lazy(() =>
-  import("./RichEditor").then((module) => ({
-    default: module.ReadOnlyContent,
-  })),
-);
+import RichEditor, { ReadOnlyContent } from "./RichEditor";
 export type NoteOpenAction = "labels" | "reminder";
 type NoteEditorProps = {
   noteId?: string;

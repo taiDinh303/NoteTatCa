@@ -4405,14 +4405,19 @@ td {
   outline: 2px solid var(--text);
   outline-offset: -3px;
 }
+/* View/Edit replace their content within the same note session. Replaying a
+   fade on each mode switch flashes both the note and the whole workspace. */
+.modal-overlay:has(~ .note-editor-modal) {
+  animation: none;
+}
 .modal.note-editor-modal {
   height: calc(90dvh / var(--interface-scale));
-  animation: fade-in 0.12s ease-out;
+  animation: none;
 }
 .modal.note-editor-modal.fullscreen {
   inset: 0;
   transform: none;
-  animation: fade-in 0.12s ease-out;
+  animation: none;
   width: calc(100vw / var(--interface-scale));
   height: calc(100dvh / var(--interface-scale));
   max-width: none;
