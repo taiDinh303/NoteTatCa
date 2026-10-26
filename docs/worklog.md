@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Xác minh lưu offline khi chuyển View/Edit — 2026-10-27
+
+- Theo yêu cầu ưu tiên số1, chạy lại `note-view-toggle` cũ:2/2FAIL vì test giả PATCH503 rồi chờ Edit báo lỗi, trong khi runtime ghi draft vào IndexedDB và mở View theo chính sách offline-first. Đọc `AutosaveCoordinator`, `OfflineNotesRepository`, `OfflineNotes` và viewer: View chờ flush; chỉ trả note sau ACK server hoặc local write; local write lỗi giữ Edit/draft/error. Không phát hiện lỗi runtime cần sửa trong phạm vi này.
+- Viết lại5browser cases trên fixture SQLite/captured mail riêng: mobile393/desktop1280 PATCH503→View local→Edit báo pending→reload vẫn còn→Sync now→reload còn dữ liệu; PATCH bị giữ thì View bận/Close disabled tới ACK; cả PATCH và IndexedDB lỗi thì Edit giữ draft; note mới qua View/Edit giữ tiêu đề và nội dung. Slot toolbar View `aria-hidden` được kiểm theo UI hiện hành. Offline suite kiểm thêm hai tab conflict, quota failure, logout protection, reconnect, cô lập tài khoản. Lượt kết hợp đầu12/13PASS, ca cuối timeout khi bấm Sync now đúng lúc auto-sync đã bắt đầu khiến nút disabled/rời DOM; đổi ca đó chờ `Notes synced` sau online event theo hành vi tự đồng bộ. Final kết hợp13/13PASS.
+- Frontend config4/4 và Vitest117/117PASS; ESLint `--max-warnings 0` PASS; TypeScript/Vite production2192modules PASS. .NET solution Release qua `C:\Users\ADMIN\.dotnet\dotnet.exe` PASS0warnings/0errors. Docs verifier49Markdown/198local links/0errors PASS. Giới hạn: chưa chạy full browser suite hoặc backend test suite, thiết bị vật lý, production hay owner's DB; không migration/email/deploy thủ công. Scope2E2E specs, FRONTEND-IMPLEMENTATION và worklog; `.agnes/` giữ ngoài Git.
+
 ## Bỏ thanh cuộn thoáng qua cạnh View/Edit/Close — 2026-10-27
 
 - Đã xem video local `bandicam 2026-10-27 00-23-19-149.mp4` (9.87s,904×880) chuyển Edit↔View nhiều lần. CSS xác nhận `.note-view-footer .note-view-actions` dùng `overflow-x:auto`, tạo một scroll container riêng ngay tại cụm nút và có thể hiện scrollbar ngang ngắn trong lúc layout đổi. Bỏ overflow auto, cho cụm nút wrap khi thật sự thiếu ngang; giữ đủ nút truy cập được thay vì cắt nội dung. Scroll của content note và toolbar Edit không đổi.

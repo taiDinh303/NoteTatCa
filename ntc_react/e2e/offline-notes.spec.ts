@@ -355,7 +355,8 @@ test("offline creation, reload, editing, reconnect, logout protection and accoun
     });
     window.dispatchEvent(new Event("online"));
   });
-  await page.getByRole("button", { name: "Sync now", exact: true }).click();
+  // Reconnection starts sync automatically; the manual button can be disabled
+  // or disappear while that flight completes.
   await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({
     timeout: 30_000,
   });

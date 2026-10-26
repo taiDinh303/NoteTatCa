@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Hợp đồng lưu khi chuyển View ↔ Edit — 2026-10-27
+
+Nút View chờ `AutosaveCoordinator.flush()` hoàn tất; một phản hồi PATCH 503 có thể chuyển sang View nếu bản nháp đã được ghi thành công vào kho offline theo tài khoản. Khi mở lại Edit, trạng thái báo “Saved on this device; waiting to sync”; reload vẫn đọc bản local và khi có mạng, đồng bộ dùng version để tránh ghi đè thay đổi ngoài. Nếu cả server lẫn kho trên thiết bị không lưu được, giữ Edit, nội dung nháp và trạng thái lỗi. Trong lúc flush đang chờ, View bận và Close bị khóa. View giữ chỗ toolbar `aria-hidden` để ổn định hình học; toolbar định dạng thật chỉ tương tác ở Edit. Browser regression dùng fixture riêng kiểm các nhánh trên, tạo note mới, xung đột hai tab, reconnect và cô lập tài khoản; kết quả/giới hạn tại worklog.
+
 ### Nút View/Edit/Close không tạo thanh cuộn phụ — 2026-10-27
 
 Cụm nút footer của View không còn là vùng cuộn ngang `overflow-x:auto`. Nút giữ nguyên thứ tự và vị trí khi đủ chỗ; trên chiều rộng hẹp hoặc chuỗi dịch dài, chúng tự xuống hàng, không tạo thanh cuộn nhỏ cạnh View/Edit/Close. Chỉ vùng nội dung note tiếp tục cuộn theo nội dung của nó; không thay zoom, autosave hoặc hành vi các nút.
