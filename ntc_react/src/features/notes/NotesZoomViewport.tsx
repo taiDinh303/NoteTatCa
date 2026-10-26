@@ -67,9 +67,11 @@ export function NotesZoomViewport({
         content.style.getPropertyValue("--notes-columns") === String(columns)
       )
         return;
-      cancelReflow();
       const nodes = cards();
+      // Capture the on-screen boxes before cancelling any in-flight reflow,
+      // so a resize can retarget the current visual position without snapping.
       const before = nodes.map((node) => node.getBoundingClientRect());
+      cancelReflow();
       const top = view.getBoundingClientRect().top;
       const marker = before.findIndex((rect) => rect.bottom > top);
       width = nextWidth;
@@ -88,27 +90,47 @@ export function NotesZoomViewport({
         return;
       nodes.forEach((node, index) => {
         const after = node.getBoundingClientRect();
+        if (!after.width || !after.height) return;
         const x = (before[index].left - after.left) / scale;
         const y = (before[index].top - after.top) / scale;
-        if (Math.hypot(x, y) < 1) return;
+        const sx = before[index].width / after.width;
+        const sy = before[index].height / after.height;
+        if (
+          Math.hypot(x, y) < 1 &&
+          Math.abs(before[index].width - after.width) < 1 &&
+          Math.abs(before[index].height - after.height) < 1
+        )
+          return;
         const animation = node.animate(
           [
-            { transform: `translate(${x}px, ${y}px)` },
-            { transform: "translate(0, 0)" },
+            {
+              transformOrigin: "0 0",
+              transform: `translate3d(${x}px, ${y}px, 0) scale(${sx}, ${sy})`,
+            },
+            {
+              transformOrigin: "0 0",
+              transform: "translate3d(0, 0, 0) scale(1, 1)",
+            },
           ],
-          { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)" },
+          { duration: 280, easing: "cubic-bezier(.22,1,.36,1)" },
         );
         animation.id = "notes-reflow";
         reflowAnimations.add(animation);
-        void animation.finished
-          .catch(() => {})
-          .finally(() => reflowAnimations.delete(animation));
+        void animation.finished.then(
+          () => {
+            reflowAnimations.delete(animation);
+            // Transformed boxes can temporarily extend the scrollable overflow.
+            if (!reflowAnimations.size && view.isConnected) updateScrollbar();
+          },
+          () => {
+            reflowAnimations.delete(animation);
+          },
+        );
       });
     }
     function paint(next: number, settled = false) {
       if (next !== scale) {
         window.clearTimeout(fitTimer);
-        cancelReflow();
         content.style.willChange = "transform";
         window.clearTimeout(rasterTimer);
         // Release the temporary compositor hint so settled text can rasterize
@@ -139,7 +161,7 @@ export function NotesZoomViewport({
       const available = view.clientWidth - parseFloat(inset);
       if (available !== availableWidth) {
         availableWidth = available;
-        fit();
+        fit(initialized);
       }
       height = content.offsetHeight;
       paint(scale);
@@ -174,6 +196,9 @@ export function NotesZoomViewport({
     view.addEventListener("touchmove", touch, { passive: true });
     view.addEventListener("scroll", updateScrollbar, { passive: true });
     rail.addEventListener("scroll", scrollNotes, { passive: true });
+    // Release presentation transforms before sortable's interaction sensors run.
+    view.addEventListener("pointerdown", cancelReflow, true);
+    view.addEventListener("keydown", cancelReflow, true);
     return () => {
       observer.disconnect();
       window.clearTimeout(rasterTimer);
@@ -187,6 +212,8 @@ export function NotesZoomViewport({
       view.removeEventListener("touchmove", touch);
       view.removeEventListener("scroll", updateScrollbar);
       rail.removeEventListener("scroll", scrollNotes);
+      view.removeEventListener("pointerdown", cancelReflow, true);
+      view.removeEventListener("keydown", cancelReflow, true);
     };
   }, [subscribe, mode]);
   return (

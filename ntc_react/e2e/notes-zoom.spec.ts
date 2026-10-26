@@ -3,6 +3,104 @@ import { test, expect } from "@playwright/test";
 // Headless Chromium otherwise hides native scrollbars, including their hit area.
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
 
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  test(`note reflow animates geometry frame by frame ${reducedMotion}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1000 });
+    await page.emulateMedia({ reducedMotion });
+    await page.goto("/Home");
+    await page
+      .getByRole("main")
+      .getByRole("link", { name: "Try guest mode", exact: true })
+      .click();
+    const list = page.locator("[data-notes-zoom]");
+    await expect(list).toBeVisible();
+    const result = await list.evaluate(async (el) => {
+      const cards = Array.from(el.querySelectorAll<HTMLElement>(".note-card"));
+      const frames: { x: number; y: number; width: number }[][] = [];
+      const start = performance.now();
+      function sample(time: number) {
+        if (
+          cards.some((card) =>
+            card
+              .getAnimations()
+              .some((animation) => animation.id === "notes-reflow"),
+          )
+        ) {
+          frames.push(
+            cards.map((card) => {
+              const rect = card.getBoundingClientRect();
+              return { x: rect.x, y: rect.y, width: rect.width };
+            }),
+          );
+        }
+        if (time - start < 1800) requestAnimationFrame(sample);
+      }
+      requestAnimationFrame(sample);
+      for (let i = 0; i < 8; i++) {
+        el.dispatchEvent(
+          new WheelEvent("wheel", {
+            ctrlKey: true,
+            cancelable: true,
+            bubbles: true,
+            deltaY: -80,
+          }),
+        );
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1900));
+      const rail = document.querySelector<HTMLElement>(
+        ".notes-window-scrollbar",
+      )!;
+      return {
+        frames,
+        columns: getComputedStyle(
+          el.querySelector(".note-grid")!,
+        ).gridTemplateColumns.split(" ").length,
+        running: cards
+          .flatMap((card) => card.getAnimations())
+          .filter((animation) => animation.id === "notes-reflow").length,
+        scrollOverflow: el.scrollWidth - el.clientWidth,
+        railRange: rail.scrollHeight - rail.clientHeight,
+        noteRange: el.scrollHeight - el.clientHeight,
+      };
+    });
+    expect(result.columns).toBe(3);
+    expect(result.running).toBe(0);
+    expect(result.scrollOverflow).toBeLessThanOrEqual(1);
+    expect(Math.abs(result.railRange - result.noteRange)).toBeLessThanOrEqual(
+      1,
+    );
+    if (reducedMotion === "reduce") {
+      expect(result.frames).toHaveLength(0);
+    } else {
+      expect(result.frames.length).toBeGreaterThan(5);
+      const widths = result.frames.map((frame) => frame[0].width);
+      expect(
+        new Set(widths.map((value) => value.toFixed(1))).size,
+      ).toBeGreaterThan(5);
+      expect(Math.max(...widths) - Math.min(...widths)).toBeGreaterThan(20);
+      expect(
+        result.frames.some(
+          (frame, index) =>
+            index > 0 &&
+            frame.some(
+              (rect, i) =>
+                Math.hypot(
+                  rect.x - result.frames[0][i].x,
+                  rect.y - result.frames[0][i].y,
+                ) > 10,
+            ),
+        ),
+      ).toBe(true);
+      console.log(
+        `Reflow: ${result.frames.length} frames; width ${widths[0].toFixed(1)}→${widths.at(-1)!.toFixed(1)}px`,
+      );
+    }
+  });
+}
+
 for (const width of [393, 1920]) {
   test(`notes have a single vertical scroll area ${width}`, async ({
     page,
