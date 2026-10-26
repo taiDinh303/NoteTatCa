@@ -1,209 +1,7 @@
-import { test, expect, type Page } from "@playwright/test";
-import type { GuestData } from "../src/infrastructure/guestStore";
-
-// Isolated guest fixture: layout coverage needs a full row even at 50% ultrawide.
-// Editing/autosave and authenticated persistence stay covered by other UI tests.
-async function seedLayoutNotes(page: Page) {
-  await expect(page.locator(".note-card").first()).toBeVisible();
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve, reject) => {
-        const request = indexedDB.open("ntc.guest.v1", 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => {
-          const db = request.result;
-          const transaction = db.transaction("workspace", "readwrite");
-          const store = transaction.objectStore("workspace");
-          const read = store.get("guest");
-          read.onsuccess = () => {
-            const data = read.result as GuestData;
-            const template = data.notes.find((note) => !note.isPinned)!;
-            for (let i = 0; i < 28; i++) {
-              const text =
-                "A synthetic layout note with enough words to exercise natural text wrapping while its card changes width.";
-              data.notes.push({
-                ...structuredClone(template),
-                id: `layout-fixture-${i}`,
-                title: `Layout example ${i}`,
-                content: text,
-                documentJson: JSON.stringify({
-                  type: "doc",
-                  content: [
-                    { type: "paragraph", content: [{ type: "text", text }] },
-                  ],
-                }),
-                isPinned: false,
-                pinnedAt: null,
-                sortOrder: i + 10,
-                tags: [],
-                reminders: [],
-                backgroundColor: null,
-              });
-            }
-            data.revision++;
-            store.put(data, "guest");
-          };
-          transaction.oncomplete = () => {
-            db.close();
-            resolve();
-          };
-          transaction.onerror = transaction.onabort = () => {
-            db.close();
-            reject(transaction.error);
-          };
-        };
-      }),
-  );
-  await page.reload();
-  await expect(page.locator(".note-card")).toHaveCount(31);
-}
+import { test, expect } from "@playwright/test";
 
 // Headless Chromium otherwise hides native scrollbars, including their hit area.
 test.use({ launchOptions: { ignoreDefaultArgs: ["--hide-scrollbars"] } });
-
-for (const width of [1366, 1920]) {
-  test(`adaptive width animates through all five zoom stops ${width}`, async ({
-    page,
-  }) => {
-    test.setTimeout(90000);
-    await page.setViewportSize({ width, height: 1000 });
-    await page.goto("/Home");
-    await page
-      .getByRole("main")
-      .getByRole("link", { name: "Try guest mode", exact: true })
-      .click();
-    await seedLayoutNotes(page);
-    await page.evaluate(() => document.fonts.ready);
-    const list = page.locator("[data-notes-zoom]");
-    const order = await page
-      .locator(".note-card")
-      .evaluateAll((nodes) =>
-        nodes.map((node) => node.getAttribute("data-testid")),
-      );
-    let requests = 0;
-    page.on("request", (request) => {
-      if (request.url().includes("/api/")) requests++;
-    });
-    for (const hidden of [false, true]) {
-      if (hidden) {
-        await page
-          .getByRole("button", { name: "Hide sidebar", exact: true })
-          .click();
-        await expect
-          .poll(() =>
-            list.evaluate(
-              (el) =>
-                el
-                  .getAnimations({ subtree: true })
-                  .filter((a) => a.id === "notes-reflow").length,
-            ),
-          )
-          .toBe(0);
-        await expect(list.locator(".notes-zoom-layer")).not.toHaveAttribute(
-          "data-width-animating",
-          "true",
-        );
-      }
-      for (const target of [50, 75, 100, 125, 150]) {
-        const result = await list.evaluate(async (el, target) => {
-          const layer = el.querySelector<HTMLElement>(".notes-zoom-layer")!;
-          const card = el.querySelector<HTMLElement>(".note-card")!;
-          const samples: { width: number; left: number; columns: number }[] =
-            [];
-          const start = performance.now();
-          let current =
-            new DOMMatrix(getComputedStyle(layer).transform).a * 100;
-          function sample() {
-            const rect = card.getBoundingClientRect();
-            samples.push({
-              width: rect.width,
-              left: rect.left - el.getBoundingClientRect().left,
-              columns: getComputedStyle(
-                el.querySelector(".note-grid")!,
-              ).gridTemplateColumns.split(" ").length,
-            });
-            if (performance.now() - start < 1100) requestAnimationFrame(sample);
-          }
-          requestAnimationFrame(sample);
-          while (Math.abs(target - current) > 0.000001) {
-            const delta = Math.max(
-              -80,
-              Math.min(80, -Math.log(target / current) / 0.0012),
-            );
-            el.dispatchEvent(
-              new WheelEvent("wheel", {
-                ctrlKey: true,
-                cancelable: true,
-                bubbles: true,
-                deltaY: delta,
-                clientX: el.getBoundingClientRect().right - 30,
-                clientY: 350,
-              }),
-            );
-            current *= Math.exp(-delta * 0.0012);
-          }
-          await new Promise((resolve) => setTimeout(resolve, 1150));
-          const group = Array.from(el.querySelectorAll(".note-grid")).at(-1)!;
-          const boxes = Array.from(group.querySelectorAll(".note-card")).map(
-            (node) => node.getBoundingClientRect(),
-          );
-          const row = boxes.filter(
-            (box) => Math.abs(box.top - boxes[0].top) < 1,
-          );
-          return {
-            samples,
-            animating: layer.dataset.widthAnimating,
-            scale: new DOMMatrix(getComputedStyle(layer).transform).a,
-            right:
-              el.getBoundingClientRect().right -
-              parseFloat(getComputedStyle(el).paddingRight) -
-              row.at(-1)!.right,
-            overflow: el.scrollWidth - el.clientWidth,
-          };
-        }, target);
-        expect(result.scale).toBeCloseTo(target / 100, 4);
-        expect(result.animating).toBeUndefined();
-        expect(Math.abs(result.right)).toBeLessThan(1);
-        expect(result.overflow).toBeLessThanOrEqual(1);
-        expect(
-          result.samples.every((sample) => Math.abs(sample.left) < 1),
-        ).toBe(true);
-        const values = result.samples.map((sample) => sample.width);
-        const range = Math.max(...values) - Math.min(...values);
-        const steps = values
-          .slice(1)
-          .map((value, index) => value - values[index]);
-        expect(
-          new Set(values.map((value) => value.toFixed(2))).size,
-        ).toBeGreaterThan(5);
-        expect(Math.max(...steps.map(Math.abs))).toBeLessThan(
-          Math.max(2, range * 0.6),
-        );
-        if (
-          new Set(result.samples.map((sample) => sample.columns)).size === 1
-        ) {
-          const direction = values.at(-1)! - values[0];
-          expect(
-            steps.every((step) =>
-              direction >= 0 ? step >= -0.15 : step <= 0.15,
-            ),
-          ).toBe(true);
-        }
-        console.log(
-          `Width ${width}/${hidden ? "closed" : "open"}/${target}%: ${new Set(values.map((value) => value.toFixed(1))).size} sizes; remainder ${result.right.toFixed(2)}px`,
-        );
-      }
-    }
-    expect(requests).toBe(0);
-    expect(
-      await page
-        .locator(".note-card")
-        .evaluateAll((nodes) =>
-          nodes.map((node) => node.getAttribute("data-testid")),
-        ),
-    ).toEqual(order);
-  });
-}
 
 for (const mode of ["grid", "list"]) {
   test(`sidebar slides quickly through frames without restarting ${mode} cards`, async ({
@@ -212,7 +10,7 @@ for (const mode of ["grid", "list"]) {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.addInitScript((mode) => {
       localStorage.setItem("ntc.view.v1", mode);
-      localStorage.setItem("ntc.interface.zoom.v1", "120");
+      localStorage.setItem("ntc.interface.zoom.v1", "150");
     }, mode);
     await page.goto("/Home");
     await page
@@ -221,6 +19,10 @@ for (const mode of ["grid", "list"]) {
       .click();
     await expect(page.locator(".note-card").first()).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    const expectedWidth = await page
+      .locator(".note-card")
+      .first()
+      .evaluate((el) => (el as HTMLElement).offsetWidth);
     const samples = page.evaluate(
       () =>
         new Promise<
@@ -293,9 +95,14 @@ for (const mode of ["grid", "list"]) {
         Math.min(...frames.map((f) => f.offset)),
     ).toBeLessThan(1);
     expect(
-      frames.every((f) => f.gap === 20 && f.running === 0 && f.measured === 0),
+      frames.every(
+        (f) =>
+          (mode === "list" || f.width === expectedWidth) &&
+          f.gap === 20 &&
+          f.running === 0 &&
+          f.measured === 0,
+      ),
     ).toBe(true);
-    expect(new Set(frames.map((f) => f.width)).size).toBeGreaterThan(4);
     await expect(page.locator("#workspace-navigation")).toHaveCSS(
       "transition-duration",
       "0.16s",
@@ -547,7 +354,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             getComputedStyle(el.querySelector(".notes-zoom-layer")!).transform,
           ).a,
       );
-      const widthSamples: number[] = [];
       const logicalWidths = cards.map(
         (card) =>
           card.getBoundingClientRect().width /
@@ -556,10 +362,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           ).a,
       );
       function sample(time: number) {
-        const zoom = new DOMMatrix(
-          getComputedStyle(el.querySelector(".notes-zoom-layer")!).transform,
-        ).a;
-        widthSamples.push(cards[0].getBoundingClientRect().width / zoom);
         if (
           cards.some((card) =>
             card
@@ -628,7 +430,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         maxTextScaleError,
         maxLogicalWidthError,
         maxLogicalHeightError,
-        widthSamples,
         heightKeyframes,
         columns: getComputedStyle(
           el.querySelector(".note-grid")!,
@@ -653,18 +454,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(result.frames.length).toBeGreaterThan(5);
       expect(result.firstMotion).toBeLessThan(result.lastInput);
       expect(result.maxTextScaleError).toBeLessThan(0.001);
-      expect(result.maxLogicalWidthError).toBeGreaterThan(1);
-      const logicalRange =
-        Math.max(...result.widthSamples) - Math.min(...result.widthSamples);
-      const maxStep = Math.max(
-        ...result.widthSamples
-          .slice(1)
-          .map((value, i) => Math.abs(value - result.widthSamples[i])),
-      );
-      expect(
-        new Set(result.widthSamples.map((value) => value.toFixed(1))).size,
-      ).toBeGreaterThan(8);
-      expect(maxStep).toBeLessThan(Math.max(5, logicalRange * 0.6));
+      expect(result.maxLogicalWidthError).toBeLessThan(1);
+      expect(result.maxLogicalHeightError).toBeLessThan(0.1);
       expect(result.heightKeyframes).toBe(0);
       const widths = result.frames.map((frame) => frame[0].width);
       expect(
@@ -1054,7 +845,25 @@ for (const { width, theme } of [
       .getByRole("main")
       .getByRole("link", { name: "Try guest mode", exact: true })
       .click();
-    await seedLayoutNotes(page);
+    for (let i = 0; i < (width >= 2560 ? 12 : 8); i++) {
+      await page
+        .getByRole("button", { name: "Take a note", exact: true })
+        .click();
+      const editor = page.getByRole("dialog", {
+        name: "New note",
+        exact: true,
+      });
+      await editor
+        .getByLabel("Note title", { exact: true })
+        .fill(`Fit example ${i}`);
+      await editor
+        .getByRole("textbox", { name: "Note content" })
+        .fill("A short synthetic note to check the layout.");
+      await expect(
+        editor.getByText("Saved on this device", { exact: true }),
+      ).toBeVisible();
+      await editor.getByRole("button", { name: "Close", exact: true }).click();
+    }
     const order = await page
       .locator(".note-card")
       .evaluateAll((nodes) =>
@@ -1086,10 +895,6 @@ for (const { width, theme } of [
             ),
           )
           .toBe(percent / 100);
-        await expect(list.locator(".notes-zoom-layer")).not.toHaveAttribute(
-          "data-width-animating",
-          "true",
-        );
         const layout = await list.evaluate((el) => {
           const groups = Array.from(el.querySelectorAll(".note-grid"));
           const cards = groups.at(-1)!.querySelectorAll(".note-card");
@@ -1103,9 +908,6 @@ for (const { width, theme } of [
           return {
             overflow: el.scrollWidth - el.clientWidth,
             columns: firstRow.length,
-            slots: getComputedStyle(groups.at(-1)!).gridTemplateColumns.split(
-              " ",
-            ).length,
             rightGap: grid.right - firstRow.at(-1)!.right,
             gaps: firstRow
               .slice(1)
@@ -1117,7 +919,7 @@ for (const { width, theme } of [
             baseWidth: parseFloat(
               getComputedStyle(
                 el.querySelector(".notes-zoom-layer")!,
-              ).getPropertyValue("--notes-base-card-width"),
+              ).getPropertyValue("--notes-card-width"),
             ),
             baseGap: parseFloat(
               getComputedStyle(el.querySelector(".note-grid")!).columnGap,
@@ -1155,8 +957,11 @@ for (const { width, theme } of [
         }
         expect(layout.baseWidth).toBeCloseTo(baseWidth, 4);
         expect(layout.baseGap).toBe(baseGap);
-        expect(layout.rightGap).toBeLessThan(1);
-        expect(Math.abs(layout.rightMargin)).toBeLessThan(1);
+        if (percent === 100) expect(layout.rightGap).toBeLessThan(1);
+        if (mode === "grid" && percent === 100) {
+          expect(layout.leftMargin).toBeLessThan(width < 600 ? 16.1 : 1);
+          expect(layout.rightMargin).toBeLessThan(width < 600 ? 16.1 : 1);
+        }
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
@@ -1165,9 +970,7 @@ for (const { width, theme } of [
           expect(layout.widths[0]).toBeCloseTo(layout.available, 0);
         } else {
           expect(layout.widths[0]).toBeCloseTo(
-            (layout.available -
-              ((layout.slots - 1) * baseGap * percent) / 100) /
-              layout.slots,
+            Math.min((baseWidth * percent) / 100, layout.available),
             0,
           );
           if (layout.gaps.length) {
@@ -1219,10 +1022,6 @@ for (const { width, theme } of [
               ),
             )
             .toBe(0);
-          await expect(list.locator(".notes-zoom-layer")).not.toHaveAttribute(
-            "data-width-animating",
-            "true",
-          );
           const hidden = await list.evaluate((el) => {
             const layer = el.querySelector(".notes-zoom-layer")!;
             const grid = el
@@ -1230,9 +1029,7 @@ for (const { width, theme } of [
               .getBoundingClientRect();
             return {
               baseWidth: parseFloat(
-                getComputedStyle(layer).getPropertyValue(
-                  "--notes-base-card-width",
-                ),
+                getComputedStyle(layer).getPropertyValue("--notes-card-width"),
               ),
               gap: parseFloat(
                 getComputedStyle(el.querySelector(".note-grid")!).columnGap,
@@ -1280,8 +1077,10 @@ for (const { width, theme } of [
           expect(hidden.remaining).toBeLessThan(
             ((baseWidth + baseGap) * percent) / 100 + 1,
           );
-          expect(Math.abs(hidden.remaining)).toBeLessThan(1);
-          expect(hidden.actualRightGap).toBeLessThan(1);
+          if (percent === 100) {
+            expect(hidden.remaining).toBeLessThan(1);
+            expect(hidden.actualRightGap).toBeLessThan(1);
+          }
           await page.screenshot({
             path: `test-results/notes-fit-${width}-${theme}-${mode}-${percent}-hidden.png`,
           });
@@ -1315,10 +1114,7 @@ for (const { width, theme } of [
         }
       }
     }
-    console.log(
-      `Grid ${width}, 50/75/100/125/150%: ${columns.join("/")} columns`,
-    );
-    expect(columns[0]).toBeGreaterThanOrEqual(columns[1]);
+    console.log(`Grid ${width}, 50/75/100/125/150%: ${columns.join("/")} columns`);
     for (let i = 1; i < columns.length; i++)
       expect(columns[i - 1]).toBeGreaterThanOrEqual(columns[i]);
     expect(baseWidth).toBeGreaterThanOrEqual(240);

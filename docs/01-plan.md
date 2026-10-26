@@ -3,7 +3,7 @@
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES
 
 
-DEC-031 cập nhật theo lựa chọn trực tiếp của chủ dự án2026-10-26: ưu tiên khít5mốc50/75/100/125/150%, cho phép width card thích ứng theo zoom và phải nội suy từng frame, không nhảy khi tính lại. Giữ lề trái/New+/heading thẳng cột, gap gốc20px desktop/16px compact và sidebar đứng yên khi zoom. Cỡ tham chiếu/sidebar chọn theo cửa sổ như trước; chọn số cột gần cỡ tham chiếu rồi tính width đích vừa hàng đầy. Đây là thay đổi đã duyệt của ràng buộc width cố định trước đó. Width thật cập nhật bằng một rAF chung, không scaleX chữ hoặc đọc bounds từng card mỗi frame; đổi cột vẫn animate vị trí. Giữ zoom danh sách50–150%, chrome/View/Edit không thuộc phạm vi zoom ngoài, content zoom riêng và không tự cuộn. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+DEC-031 cập nhật theo yêu cầu mới nhất của chủ dự án2026-10-26: hủy width thích ứng vì chuyển động resize gây giật khi sử dụng thực tế; trở lại width card Grid và gap gốc cố định trong suốt zoom/toggle sidebar. Chỉ đổi số cột và animate vị trí card. Cỡ gốc/sidebar có thể chọn theo cửa sổ,100% khít cả2trạng thái sidebar; các mốc khác chấp nhận dư phải dưới1bước cột, không ép khít5mốc. Giữ lề trái/New+/heading, góc trên trái, zoom danh sách50–150%, chrome đứng yên và content zoom độc lập. Chi tiết/evidence tại [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
 
 ## Quyết định hiện hành
 

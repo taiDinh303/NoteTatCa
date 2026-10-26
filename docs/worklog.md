@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Hủy width thích ứng, trở lại card cố định — 2026-10-26
+
+- Chủ dự án phản hồi d333dde resize width vẫn rất giật trong sử dụng thực tế và yêu cầu bỏ. Khôi phục NotesZoomViewport về c4f6cb5: cỡ gốc Grid chỉ phụ thuộc cửa sổ, không tính lại width để lấp hàng khi zoom/toggle sidebar; giữ gap gốc, chỉ scale uniform và animate translate vị trí khi đổi số cột. Bỏ width target/pump/physical compensation và cột round của thử nghiệm. Giữ lề trái thẳng New+, origin góc trên trái, sidebar đồng clock và full-height scrollbar. List giữ hàng full-width như trước.
+- Hủy yêu cầu khít cả5mốc;100% desktop vẫn vừa cả2sidebar nhờ cỡ gốc/sidebar theo1bước cột, mốc khác chấp nhận dư phải dưới1slot. Test hồi quy trở lại assertion width/height Grid/gap cố định; matrix mở rộng từ3thành5mốc50/75/100/125/150%, không giữ assertion width thích ứng hoặc animation resize đã hủy. Không thay dữ liệu/zoom nội dung/chrome/API.
+- Build React ESLint/TypeScript/Vite2192modulesPASS; .NET solution Release strict0warnings/0errorsPASS; docs verifier49Markdown/198local links/0errors và diff checkPASS. Account16/16PASS trên fixture SQLite/captured mail riêng5199; không owner data. Final guest28/28PASS + account16/16PASS =44unique browser cases. Matrix12case/11width320–3440/sáng-tối/Grid-List/5mốc và2sidebar kiểm width/gap gốc cố định,100% vừa ngang desktop, dư phải dưới1slot ở mốc khác, lề New/heading/card<1px, không đổi ID/order hoặc horizontal overflow. Live wheel393/1440 có33frame trung gian, sampled interval lớn nhất16.8ms local; reflow13frame, Grid logical shape giữ, reduced motion và sidebar clock/fast path0reads giữPASS. Đã xem screenshot1024dark100%. Không cam kết FPS/mượt trên mọi phần cứng; chưa thử thiết bị vật lý/DPR/iOS/1000cards/production; hosting rollout chưa xác minh. Scope6files: NotesZoomViewport.tsx, notes-zoom.spec.ts và4root docs; giữ.agnes/local config ngoài Git. Push main theo quyền hiện có, kiểm remote SHA; không manual deploy/migration/owner DB/email thật.
+
 ## Width thích ứng khít5mốc và nội suy từng khung hình — 2026-10-26
 
 - Chủ dự án chọn trực tiếp ưu tiên khít50/75/100/125/150%, cho phép width card thay đổi có kiểm soát; bổ sung width phải lớn/nhỏ dần từng khung hình. Quyết định mới thay ràng buộc width cố định cũ. Giữ canvas góc trên trái, New+/heading/card cùng lề, gap logical20px desktop/16px compact; sidebar/chrome đứng yên khi zoom, hàng thiếu note vẫn để slot trống.
