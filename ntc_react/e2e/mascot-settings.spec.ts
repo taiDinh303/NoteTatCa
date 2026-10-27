@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("appearance changes, hides and remembers a mascot, including a custom image", async ({
+test("appearance remembers presets and provides no second custom-upload slot", async ({
   page,
 }) => {
   await page.goto("/login");
@@ -37,21 +37,22 @@ test("appearance changes, hides and remembers a mascot, including a custom image
   await expect(
     page.getByRole("radio", { name: "Fox", exact: true }),
   ).toBeChecked();
-  await page
-    .locator('input[type="file"]')
-    .setInputFiles("public/mascots/bunny-directions.webp");
-  await expect(page.getByRole("radio", { name: "Your image" })).toBeChecked();
-  await page.goto("/notes");
-  await expect(page.getByRole("img", { name: "Custom mascot" })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole("img", { name: "Custom mascot" })).toBeVisible();
-  await page.goto("/settings/appearance");
-  await page.getByRole("button", { name: "Remove image", exact: true }).click();
-  await expect(page.getByRole("radio", { name: "Bunny", exact: true })).toBeChecked();
-  await expect(page.getByRole("radio", { name: "Your image" })).toHaveCount(0);
-  await page.screenshot({ path: "test-results/mascot-appearance-desktop.png", fullPage: true });
+  await expect(page.getByLabel("Upload image", { exact: true })).toHaveCount(0);
+  await page.screenshot({
+    path: "test-results/mascot-appearance-desktop.png",
+    fullPage: true,
+  });
   await page.setViewportSize({ width: 393, height: 852 });
-  await expect(page.getByRole("radio", { name: "Bunny", exact: true })).toBeChecked();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
-  await page.screenshot({ path: "test-results/mascot-appearance-mobile.png", fullPage: true });
+  await expect(
+    page.getByRole("radio", { name: "Fox", exact: true }),
+  ).toBeChecked();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBeTruthy();
+  await page.screenshot({
+    path: "test-results/mascot-appearance-mobile.png",
+    fullPage: true,
+  });
 });

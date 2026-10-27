@@ -2,6 +2,8 @@ import { MascotPage } from "./MascotPage";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./MascotPage.css";
 import { useMascotPreference } from "./mascotPreference";
+import { useAccountMascot } from "./generatedMascot";
+import { useAuth } from "../../shared/hooks";
 
 /*
  * NoteMascot — the bunny that sits on top of a note card.
@@ -16,6 +18,13 @@ import { useMascotPreference } from "./mascotPreference";
 export function NoteMascot({ size = 88 }: { size?: number }) {
   useLanguage();
   const { enabled, character, customImage } = useMascotPreference();
+  const actor = useAuth();
+  const { images: generated } = useAccountMascot(
+    actor.status === "guest" ? undefined : actor.session?.userId,
+    enabled && character === "generated",
+  );
+  const preset =
+    character === "custom" || character === "generated" ? "bunny" : character;
   if (!enabled) return null;
   return (
     <div className="note-mascot note-mascot-corner" data-mascot-anchor="corner">
@@ -30,8 +39,16 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
       ) : (
         <MascotPage
           key={character}
-          directions={`/mascots/${character === "custom" ? "bunny" : character}-directions.webp`}
-          reactions={`/mascots/${character === "custom" ? "bunny" : character}-reactions.webp`}
+          directions={
+            character === "generated" && generated
+              ? generated.directions
+              : `/mascots/${preset}-directions.webp`
+          }
+          reactions={
+            character === "generated" && generated
+              ? generated.reactions
+              : `/mascots/${preset}-reactions.webp`
+          }
           size={size}
           label={tr("mascot")}
           className="note-mascot-sprite"

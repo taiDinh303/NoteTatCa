@@ -13,6 +13,12 @@ public static class StartupConfiguration
         if (environment.IsEnvironment("Testing")) return;
         var errors = new List<string>();
         var production = environment.IsProduction();
+        if (ReadFlag(config, "MascotAi:Enabled", errors))
+        {
+            if (string.IsNullOrWhiteSpace(config["MascotAi:OpenAiApiKey"])) errors.Add("MASCOTAI__OPENAIAPIKEY is required when mascot AI is enabled.");
+            if (config["MascotAi:Model"] is { } model && !new[] { "gpt-image-2.5-flare", "gpt-image-2.5-sunburst", "gpt-image-1.5" }.Contains(model))
+                errors.Add("MASCOTAI__MODEL must support transparent image generation and editing.");
+        }
         var emailProvider = config["Email:Provider"] ?? "Smtp";
         if (!new[] { "Smtp", "Brevo" }.Contains(emailProvider, StringComparer.OrdinalIgnoreCase))
             errors.Add("EMAIL__PROVIDER must be Smtp or Brevo.");

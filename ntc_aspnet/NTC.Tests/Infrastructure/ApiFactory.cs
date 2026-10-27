@@ -54,6 +54,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     public TestClock Clock { get; } = new();
     public TestEmailSender Email { get; } = new();
     public int AuthLimit { get; set; } = 1000;
+    public Action<IServiceCollection>? ConfigureExtra { get; set; }
     public Guid A { get; private set; }
     public Guid B { get; private set; }
     public Guid Admin { get; private set; }
@@ -79,6 +80,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
             services.AddDataProtection().UseEphemeralDataProtectionProvider();
             foreach (var descriptor in services.Where(x => x.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService)
                 && x.ImplementationType == typeof(NTC.API.Jobs.MaintenanceWorker)).ToArray()) services.Remove(descriptor);
+            ConfigureExtra?.Invoke(services);
         });
     }
     public async Task InitializeAsync()

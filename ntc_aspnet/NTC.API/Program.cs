@@ -14,6 +14,7 @@ NTC.API.Configuration.StartupConfiguration.Validate(builder.Configuration, build
 // Recovery links contain proof tokens; our telemetry logs only endpoint metadata.
 builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
 builder.Services.AddConfig(builder.Configuration);
+builder.Services.AddMascotAi(builder.Configuration);
 var keysDirectory = builder.Configuration["DataProtection:KeysDirectory"];
 if (!string.IsNullOrWhiteSpace(keysDirectory))
     builder.Services.AddDataProtection().SetApplicationName("NoteTatCa").PersistKeysToFileSystem(new DirectoryInfo(keysDirectory));

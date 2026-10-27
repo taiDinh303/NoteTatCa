@@ -123,6 +123,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
             e.HasIndex(x => new { x.TargetUserId, x.OccurredAt });
             e.HasIndex(x => new { x.OccurredAt, x.Id });
         });
+        NTC.Repositories.Mascots.MascotModel.ConfigureMascots(builder, Database.ProviderName!);
         builder.ConfigureEntityIntegrity(Database.ProviderName!);
         foreach (var entity in builder.Model.GetEntityTypes())
         {

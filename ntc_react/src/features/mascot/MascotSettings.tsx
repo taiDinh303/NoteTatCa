@@ -1,13 +1,12 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   mascotGroups,
-  removeCustomMascot,
-  saveCustomMascot,
   setMascotPreference,
   useMascotPreference,
 } from "./mascotPreference";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useAuth } from "../../shared/hooks";
+import { MascotAiSettings } from "./MascotAiSettings";
+import { useAccountMascot } from "./generatedMascot";
 import "./MascotSettings.css";
 
 function characterLabel(name: string) {
@@ -26,8 +25,16 @@ function characterLabel(name: string) {
 
 export function MascotSettings() {
   useLanguage();
-  const { enabled, character, customImage } = useMascotPreference();
-  const [uploading, setUploading] = useState(false);
+  const { enabled, character } = useMascotPreference();
+  const owner = useAuth().session?.userId;
+  const { images } = useAccountMascot(
+    owner,
+    enabled && character === "generated",
+  );
+  const selectedCharacter =
+    (character === "generated" && !images) || character === "custom"
+      ? "bunny"
+      : character;
   return (
     <div className="mascot-settings">
       <div className="preferences-row">
@@ -51,6 +58,7 @@ export function MascotSettings() {
       </div>
       {enabled ? (
         <div role="group" aria-label={tr("Choose a mascot")}>
+          {owner ? <MascotAiSettings key={owner} owner={owner} /> : null}
           {mascotGroups.map((group) => (
             <fieldset className="mascot-choices" key={group.label}>
               <legend>{tr(group.label)}</legend>
@@ -60,7 +68,7 @@ export function MascotSettings() {
                     type="radio"
                     name="mascot-character"
                     value={name}
-                    checked={character === name}
+                    checked={selectedCharacter === name}
                     onChange={() => setMascotPreference({ character: name })}
                   />
                   <span className="mascot-choice-image" aria-hidden>
@@ -77,72 +85,6 @@ export function MascotSettings() {
               ))}
             </fieldset>
           ))}
-          <fieldset className="mascot-custom-settings">
-            <legend>{tr("Custom mascot")}</legend>
-            <p className="field-hint">
-              {tr(
-                "Upload your own image (PNG, JPEG or WebP, up to 512 KB). Custom images stay still and are saved only on this browser.",
-              )}
-            </p>
-            {customImage ? (
-              <label className="mascot-choice mascot-custom-choice">
-                <input
-                  type="radio"
-                  name="mascot-character"
-                  checked={character === "custom"}
-                  onChange={() => setMascotPreference({ character: "custom" })}
-                />
-                <img src={customImage} alt="" width={72} height={72} />
-                <span>{tr("Your image")}</span>
-              </label>
-            ) : null}
-            {customImage ? (
-              <button
-                type="button"
-                className="button secondary"
-                onClick={() => {
-                  try {
-                    removeCustomMascot();
-                  } catch {
-                    toast.error(
-                      tr(
-                        "Could not save the image. Browser storage may be full or unavailable.",
-                      ),
-                    );
-                  }
-                }}
-              >
-                {tr("Remove image")}
-              </button>
-            ) : null}
-            <label className="mascot-upload-label">
-              {tr("Upload image")}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                disabled={uploading}
-                onChange={async (event) => {
-                  const file = event.currentTarget.files?.[0];
-                  event.currentTarget.value = "";
-                  if (!file) return;
-                  setUploading(true);
-                  try {
-                    await saveCustomMascot(file);
-                  } catch (error) {
-                    toast.error(
-                      tr(
-                        error instanceof Error
-                          ? error.message
-                          : "Could not read this image.",
-                      ),
-                    );
-                  } finally {
-                    setUploading(false);
-                  }
-                }}
-              />
-            </label>
-          </fieldset>
         </div>
       ) : null}
     </div>

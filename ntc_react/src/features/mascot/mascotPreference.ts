@@ -73,7 +73,8 @@ export const mascotGroups = [
 export const mascotCharacters = mascotGroups.flatMap((group) => [
   ...group.names,
 ]);
-export type MascotCharacter = (typeof mascotCharacters)[number] | "custom";
+export type MascotCharacter =
+  (typeof mascotCharacters)[number] | "custom" | "generated";
 const key = "ntc.mascot.v1";
 const imageKey = "ntc.mascot.image.v1";
 const eventName = "ntc:mascot-change";
@@ -88,6 +89,7 @@ function read() {
   const [enabled, character] = value.split(":");
   return (enabled === "on" || enabled === "off") &&
     (character === "custom" ||
+      character === "generated" ||
       mascotCharacters.some((name) => name === character))
     ? value
     : "on:bunny";

@@ -1,6 +1,8 @@
 # 32 — Tính năng AI
 
-> Cập nhật: 2026-10-25 | Áp dụng: YES cho KẾ HOẠCH | PLANNED, CHƯA TRIỂN KHAI | DEC-030 / REQ-013 / TASK-043.
+2026-10-27: chủ dự án giao thêm **tạo mascot động từ mô tả hoặc ảnh**, chọn OpenAI API do app trả phí và giới hạn1lượt/người/ngày. Đây là phạm vi tách khỏi AIchat tạo nội dung note bên dưới. Code queue/API/Appearance được triển khai theo [MASCOT-AI](MASCOT-AI.md); gọi thật cần backend secret, migration được review và bật flag. AIchat tạo note vẫn là kế hoạch.
+
+> Cập nhật: 2026-10-27 | AI chat tạo note: PLANNED, CHƯA TRIỂN KHAI | Mascot AI: code có sẵn, chưa kích hoạt gọi thật | DEC-030 / REQ-013 / TASK-043.
 
 ## Nguồn yêu cầu và hiện trạng
 

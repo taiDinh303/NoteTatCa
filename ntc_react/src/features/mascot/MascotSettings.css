@@ -96,3 +96,77 @@
 .mascot-upload-label input {
   max-width: 100%;
 }
+.mascot-ai-settings {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.mascot-ai-settings h2 {
+  font-size: 15px;
+  margin: 0 0 8px;
+}
+.mascot-ai-settings form {
+  max-width: 640px;
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+.mascot-ai-settings textarea {
+  resize: vertical;
+  min-height: 88px;
+}
+.mascot-ai-settings .check-label {
+  align-items: start;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.mascot-ai-settings .check-label input {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.mascot-ai-settings form > .button {
+  justify-self: start;
+}
+.mascot-ai-saved,
+.mascot-reference {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 12px 0;
+}
+.mascot-ai-saved .mascot-choice {
+  width: 110px;
+}
+.mascot-reference img {
+  object-fit: contain;
+  border-radius: 8px;
+}
+.mascot-ai-result {
+  margin-top: 16px;
+}
+.mascot-ai-preview {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 16px 0;
+}
+.mascot-ai-owned {
+  margin: 16px 0;
+}
+.mascot-owned-choice {
+  width: 128px;
+  margin-bottom: 12px;
+}
+.mascot-owned-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.mascot-delete-confirm {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.mascot-delete-confirm .button + .button {
+  margin-left: 8px;
+}

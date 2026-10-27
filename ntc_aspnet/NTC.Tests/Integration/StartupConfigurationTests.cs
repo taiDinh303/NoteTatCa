@@ -8,6 +8,17 @@ namespace NTC.Tests.Integration;
 public sealed class StartupConfigurationTests
 {
     [Fact]
+    public void Mascot_ai_is_opt_in_and_requires_a_backend_key_without_echoing_it()
+    {
+        var values = Valid(); Check(values);
+        values["MascotAi:Enabled"] = "true";
+        Assert.Contains("MASCOTAI__OPENAIAPIKEY", Assert.Throws<InvalidOperationException>(() => Check(values)).Message);
+        values["MascotAi:OpenAiApiKey"] = "synthetic-private-key"; Check(values);
+        values["MascotAi:Model"] = "unsupported";
+        var error = Assert.Throws<InvalidOperationException>(() => Check(values));
+        Assert.Contains("MASCOTAI__MODEL", error.Message); Assert.DoesNotContain("synthetic-private-key", error.Message);
+    }
+    [Fact]
     public void Brevo_requires_key_and_verified_sender_configuration_without_disclosing_secrets()
     {
         var values = Valid(); values["Email:Provider"] = "Brevo";
