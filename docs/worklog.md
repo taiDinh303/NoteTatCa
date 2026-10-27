@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa lỗi giao diện modal (revert framer-motion, giữ CSS hover/pin) — 2026-10-27
+
+- Chủ dự án báo commit `f66db24` "Add motion to note modals..." gây lỗi giao diện trên `note-tat-ca.vercel.app/Home` và yêu cầu xem guest/home trước khi push. Root cause: `motion.create(Dialog.Content)` trong `Modal` (ui.tsx) đặt `transform`/`scale` inline (framer-motion), **xung đột với `transform: translate(-50%,-50%)`** dùng để center của CSS `.modal` (Radix). Modal note (cố tình `animation:none` để không nhảy) bị lệch tâm/vỡ layout.
+- Fix: revert `Modal` về Radix `Dialog.Content` nguyên bản (bỏ hoàn toàn framer-motion khỏi Modal), giữ CSS keyframes có sẵn `modal-in`/`fade-in` (an toàn, không conflict transform). Gỡ dependency `framer-motion` khỏi `package.json` + `package-lock.json` (không còn dùng). Giữ nguyên CSS hover card lift + pin pulse (không đụng transform center).
+- Kiểm chứng: `npm run typecheck` PASS; `npm run build` PASS (541ms); `npm run test` (vitest) 15 file/119 test PASS; `git diff` package.json/lock framer-motion biến mất; không còn chỗ nào dùng framer-motion/motion.create. Dev server (5173) fetch HTTP 200. Không chạy được browser render thật local (Playwright/chromium download bị chặn; dotnet fixture thiếu) — ghi hạn chế; fix là revert về trạng thái Radix gốc đã chạy ổn định.
+- Scope commit lần này: `ntc_react/src/shared/ui.tsx`, `ntc_react/package.json`, `ntc_react/package-lock.json`, `docs/worklog.md`. Giữ nguyên `NoteEditor.tsx` (editor-pin-pulsed) và `styles.css` (hover card + pin pulse) từ commit trước — chúng không gây lỗi.
+
 ## Thêm motion cho trang note (mở/đóng modal, hover, pin) — 2026-10-27
 
 - Yêu cầu chủ dự án: trang note "có sức sống" hơn khi xem và edit. Theo tư vấn turn trước, làm 3 mục ít code/tác dụng lớn, không phá hiện trạng.
