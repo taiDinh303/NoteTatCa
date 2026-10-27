@@ -58,6 +58,17 @@
   left: -72px;
   top: -72px;
 }
+
+/* Live mascot tile: the <MascotPage> button replaces the static <img>.
+   It is sized to 72px (matching the old crop) and centered in the choice.
+   The sprite layers are painted inline by the component; this class only
+   handles layout so the radio input overlay still covers the whole tile. */
+.mascot-choice .mascot-choice-page {
+  display: block;
+  margin: 0 auto;
+  width: 72px;
+  height: 72px;
+}
 .mascot-choices legend {
   padding: 8px 0 12px;
   font-size: 13px;

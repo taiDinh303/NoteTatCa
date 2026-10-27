@@ -7,6 +7,7 @@ import {
 import { useAuth } from "../../shared/hooks";
 import { MascotAiSettings } from "./MascotAiSettings";
 import { useAccountMascot } from "./generatedMascot";
+import { MascotPage } from "./MascotPage";
 import "./MascotSettings.css";
 
 function characterLabel(name: string) {
@@ -71,15 +72,15 @@ export function MascotSettings() {
                     checked={selectedCharacter === name}
                     onChange={() => setMascotPreference({ character: name })}
                   />
-                  <span className="mascot-choice-image" aria-hidden>
-                    <img
-                      src={`/mascots/${name}-directions.webp`}
-                      alt=""
-                      loading="lazy"
-                      width={216}
-                      height={216}
-                    />
-                  </span>
+                  <MascotPage
+                    key={name}
+                    directions={`/mascots/${name}-directions.webp`}
+                    reactions={`/mascots/${name}-reactions.webp`}
+                    size={72}
+                    label={characterLabel(name)}
+                    className="mascot-choice-page"
+                    disableSquash
+                  />
                   <span>{characterLabel(name)}</span>
                 </label>
               ))}
