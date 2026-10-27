@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Footer View note xuống dòng trên mobile (Edited riêng với Edit/Close) — 2026-10-27
+
+- `@container viewport (max-width: 480px)` cho footer View trong `styles.css` đã có sẵn (flex-wrap, timestamp 100% width, actions dòng 2) nhưng không trigger trên điện thoại thật — `container-type: viewport` trên `:root` không được browser hiện hành hỗ trợ đầy đủ.
+- Đổi 1 rule `@container` (footer View mobile) sang `@media (max-width: 480px)`, hành vi không đổi. E2E `note-view.spec.ts` chạy ở 393px/1280px vẫn match.
+- Kiểm chứng: `npm run build` PASS; verify dist CSS include `@media (width<=480px){.note-editor-modal .note-view-footer{flex-wrap:wrap}...}`. Chưa chạy E2E (cần dotnet fixture + dev server, chưa có sẵn).
+
 ## Giữ full screen khi chuyển Edit ↔ View — 2026-10-27
 
 - Nguyên nhân: `NoteViewer` và `EditorSession` (trong `NoteEditor.tsx`) mỗi component giữ `fullscreen` là state nội bộ (`useState(false)`); khi `NoteEditorSession` đổi flag `editing`, component cũ unmount, component mới mount về `false` — mất full screen theo cả hai chiều.

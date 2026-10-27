@@ -4931,7 +4931,7 @@ td {
 .note-editor-modal .editor-heading .editor-identity,
 .note-editor-modal .editor-heading .row-actions { flex-shrink: 0; }
 .note-editor-modal .editor-heading .row-actions { margin-left: auto; flex-wrap: nowrap; }
-@container viewport (max-width: 480px) {
+@media (max-width: 480px) {
   .note-editor-modal .note-view-footer { flex-wrap: wrap; }
   .note-editor-modal .note-view-footer .note-view-timestamp { flex: 0 0 100%; }
   .note-editor-modal .note-view-footer .note-view-actions {
@@ -4982,3 +4982,6 @@ td {
 .offline-conflict .button { margin: 4px; }
 .offline-logout-modal .modal-footer { flex-wrap: wrap; }
 .offline-logout-modal .modal-footer .button { max-width: 100%; white-space: normal; }
+.note-history-modal .note-history-list { display: grid; gap: 12px; max-height: min(60vh, 600px); overflow-y: auto; }
+.note-history-modal .note-history-item { border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.note-history-modal .note-history-item p { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 9em; overflow: auto; }
