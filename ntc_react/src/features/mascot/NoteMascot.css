@@ -1,11 +1,6 @@
-/* NoteMascot — bunny rendered INSIDE a note card, absolutely positioned.
-   Two anchors:
-   - "center" (random position on initial load / no note opened yet):
-     the bunny sits fully above the card's top edge, centered horizontally.
-   - "corner" (last-closed note, after a 500ms hop delay): the bunny sits
-     fully above the card's top-right corner.
-   The button itself is interactive (poke = blink + squash). The sprite is
-   88px square on desktop; on mobile it scales down to 64px via a CSS
+/* NoteMascot — bunny rendered on the top-right edge of a note card.
+   The button itself is interactive (poke = expression). The sprite is
+   72px square on desktop; on mobile it scales down via a CSS
    transform so the inline `width/height` from the <MascotPage> button still
    drives the layout box while the visual size adapts.
    z-index sits above the card's own content but below modals (71).
@@ -16,30 +11,28 @@
   pointer-events: auto;
 }
 
-/* "center" anchor: bottom of the sprite sits just above the card's top
-   border, horizontally centered. The sprite is NOT clipped by the card
-   body — the card has overflow:visible so the rabbit is fully visible. */
-.note-mascot-center {
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-bottom: 4px;
+/* The paws overlap the edge slightly, without covering the title. */
+.note-mascot-corner {
+  bottom: calc(100% - 10px);
+  right: 14px;
 }
 
-/* "corner" anchor: fully above the card's top-right corner. */
-.note-mascot-corner {
-  bottom: 100%;
-  right: 6px;
-  margin-bottom: 4px;
+/* The head occupies the upper part of each atlas cell. Keep the center
+   cell's torso on its own layer so pointer movement never shifts the paws. */
+.note-mascot .mascot-fixed-body {
+  clip-path: inset(78% 0 0 0);
+}
+.note-mascot .mascot-moving-head {
+  clip-path: inset(0 0 22% 0);
 }
 
 /* On small viewports, visually scale the bunny down (keeps the hit area
-   proportional). The wrapper still uses 88px layout box, so the card's
+   proportional). The wrapper still uses its 72px layout box, so the card's
    top margin is unaffected; the sprite itself just paints smaller. */
 @container viewport (max-width: 480px) {
   .note-mascot {
     transform-origin: bottom center;
-    scale: 0.72; /* 88 * 0.72 = 63px visual */
+    scale: 0.78;
   }
   .note-mascot-corner {
     right: 2px;

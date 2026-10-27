@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thỏ mascot đậu trên note vừa mở — 2026-10-27
+
+- Bắt đầu đếm 500 ms khi mở note (kể cả mở qua liên kết `?note=`), rồi chuyển thỏ sang card đó; hủy timer khi đổi/đóng note trước hạn. Thỏ luôn ở mép trên bên phải card, kể cả vị trí ngẫu nhiên ban đầu. Chừa 36 px phía trên canvas để tai không bị vùng cuộn cắt; hai chân nhô nhẹ qua viền card.
+- Tách sprite thành thân cố định lấy từ khung giữa và lớp đầu đổi hướng/biểu cảm theo con trỏ. Tắt hiệu ứng co giãn toàn thân khi chạm đối với thỏ trên note; giữ phản ứng nét mặt. Giữ hai sprite local sẵn có từ page-mascot, không thêm dịch vụ ngoài.
+- Kiểm chứng tại `D:\My Projects\NoteTatCa`: React build và lint PASS; .NET Release build 0 warning/0 error. Playwright Chromium với fixture local ở cổng riêng: thỏ ban đầu ở góc phải, chuyển card sau khi mở note, đầu đổi hướng trong khi background của thân vẫn ở khung giữa, 1/1 PASS. Đã xem ảnh chụp thực tế và sửa phần tai bị cắt; chưa kiểm trên thiết bị vật lý hoặc toàn bộ browser suite.
+- Phạm vi commit dự kiến: `MascotPage.tsx`, `NoteMascot.tsx/.css`, `NotesPage.tsx`, `NotesZoomViewport.css`, E2E mascot và mục worklog này. Giữ nguyên các thay đổi backend/archive/config và công việc khác trong working tree; không deploy thủ công.
+
 ## Nhận diện note từ Reminder — 2026-10-27
 
 - Mỗi reminder gắn với đúng một note qua `noteId`; một note có thể có nhiều reminder. Trên trang Reminders, hiển thị đoạn nội dung ngắn (tối đa 180 ký tự) và màu nền của note; thêm liên kết `View note` mở đúng note dù có nhiều note trùng tiêu đề. Dữ liệu preview/màu lấy từ note đã được kiểm tra quyền sở hữu trong truy vấn reminder; không thay đổi schema hay dữ liệu.

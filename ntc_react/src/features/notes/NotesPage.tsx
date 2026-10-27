@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { lazy, Suspense, useState, useSyncExternalStore } from "react";
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DndContext,
@@ -69,7 +69,6 @@ function NoteCard({
   draggable,
   onOrganize,
   hasMascot = false,
-  mascotAnchor = "center",
 }: {
   note: Note;
   onOpen: () => void;
@@ -80,7 +79,6 @@ function NoteCard({
   draggable: boolean;
   onOrganize: (action: NoteOpenAction) => void;
   hasMascot?: boolean;
-  mascotAnchor?: "center" | "corner";
 }) {
   useLanguage();
   const guestMode = useAuth().status === "guest";
@@ -274,13 +272,9 @@ function NoteCard({
           )}
         </div>
       </div>
-      {/* Note mascot (bunny): sits on top of this card. Only rendered when
-          `hasMascot` is true, so it appears on the "last opened" card (corner
-          anchor) or on the first card (center anchor) when no note has been
-          opened yet this session. The mascot button is interactive (poke it
-          to make it blink) and does not interfere with card dragging. */}
+      {/* The bunny sits on one card at a time and follows the last opened note. */}
       {hasMascot ? (
-        <NoteMascot size={72} anchor={mascotAnchor} />
+        <NoteMascot size={72} />
       ) : null}
     </article>
   );
@@ -349,9 +343,13 @@ export default function NotesPage({
   // Pick a random card once when the list first loads and no note has been
   // opened yet this session. The initializer picks a stable index so the
   // bunny stays on the same card across re-renders.
-  const [randomMascotNoteId] = useState<string | null>(() =>
-    all.length ? all[Math.floor(Math.random() * all.length)].id : null,
-  );
+  const [randomMascotNoteId, setRandomMascotNoteId] = useState<string | null>(null);
+  useEffect(() => {
+    if (randomMascotNoteId || !all.length) return;
+    const id = all[Math.floor(Math.random() * all.length)].id;
+    const timer = window.setTimeout(() => setRandomMascotNoteId(id), 0);
+    return () => window.clearTimeout(timer);
+  }, [all, randomMascotNoteId]);
   const randomMascotTarget =
     lastOpenedNoteId === null ? randomMascotNoteId : null;
   const canDrag =
@@ -404,20 +402,18 @@ export default function NotesPage({
       group.findIndex((n) => n.id === over.id),
     );
   }
+  const activeNoteId = editor?.id ?? selected;
+  useEffect(() => {
+    if (!activeNoteId || trash) return;
+    const timer = window.setTimeout(() => setLastOpenedNoteId(activeNoteId), 500);
+    return () => window.clearTimeout(timer);
+  }, [activeNoteId, trash]);
   function closeEditor() {
-    const openedNoteId = editor?.id ?? selected;
     setEditor(null);
     if (params.has("note")) {
       const next = new URLSearchParams(params);
       next.delete("note");
       setParams(next, { replace: true });
-    }
-    if (openedNoteId) {
-      // Move the bunny to this card only after a short delay so the user
-      // sees the editor close first, then the mascot "hops" over.
-      window.setTimeout(() => {
-        setLastOpenedNoteId(openedNoteId);
-      }, 500);
     }
   }
   const groupSortingStrategy: SortingStrategy = (args) => {
@@ -453,7 +449,6 @@ export default function NotesPage({
                 trash={trash}
                 draggable={canDrag}
                 hasMascot={!!isTargetCard}
-                mascotAnchor={lastOpenedNoteId === note.id ? "corner" : "center"}
                 onOrganize={(action) => setEditor({ id: note.id, action })}
                 onOpen={() => {
                   if (trash) {

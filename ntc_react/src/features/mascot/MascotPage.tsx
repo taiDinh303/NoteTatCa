@@ -98,6 +98,8 @@ export type MascotPageProps = {
   className?: string;
   /** What a screen reader calls it. */
   label?: string;
+  /** Keep the center-frame body still while the head tracks the pointer. */
+  fixedBody?: boolean;
 };
 
 export function MascotPage(props: MascotPageProps) {
@@ -107,6 +109,7 @@ export function MascotPage(props: MascotPageProps) {
     size = 96,
     className = "",
     label = "mascot",
+    fixedBody = false,
   } = props;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -202,11 +205,13 @@ export function MascotPage(props: MascotPageProps) {
       return;
     }
 
-    squashRef.current?.animate(SQUASH, {
-      duration: SQUASH_MS,
-      easing: "linear",
-    });
-  }, []);
+    if (!fixedBody) {
+      squashRef.current?.animate(SQUASH, {
+        duration: SQUASH_MS,
+        easing: "linear",
+      });
+    }
+  }, [fixedBody]);
 
   return (
     <button
@@ -239,7 +244,18 @@ export function MascotPage(props: MascotPageProps) {
           transformOrigin: "50% 78%",
         }}
       >
+        {fixedBody ? (
+          <span
+            className="mascot-fixed-body"
+            style={{
+              ...layer,
+              backgroundImage: `url(${directions})`,
+              ...cell(DIRECTIONS.indexOf("center")),
+            }}
+          />
+        ) : null}
         <span
+          className={fixedBody ? "mascot-moving-head" : undefined}
           style={{
             ...layer,
             backgroundImage: `url(${directions})`,
@@ -250,6 +266,7 @@ export function MascotPage(props: MascotPageProps) {
         {/* Always mounted so the reactions sheet is fetched up front, never on
             the first click. */}
         <span
+          className={fixedBody ? "mascot-moving-head" : undefined}
           style={{
             ...layer,
             backgroundImage: `url(${reactions})`,

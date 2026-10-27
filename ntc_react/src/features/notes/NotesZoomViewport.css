@@ -65,6 +65,8 @@ html:has([data-notes-zoom]) {
   display: flow-root;
   position: absolute;
   inset: 0 auto auto 0;
+  /* Leave room for the bunny above the first card inside the scrollport. */
+  padding-top: 36px;
   transform-origin: 0 0;
   translate: none;
 }
