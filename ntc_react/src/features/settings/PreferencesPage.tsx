@@ -10,6 +10,7 @@ import PrivacySettings from "./PrivacySettings";
 import { useDisplayZoom } from "../../shared/displayZoom";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import "./preferences.css";
+import { MascotSettings } from "../mascot/MascotSettings";
 
 export default function PreferencesPage({
   section,
@@ -64,6 +65,7 @@ export default function PreferencesPage({
             </button>
           </div>
           <AppearanceZoomRow />
+          {!administration ? <MascotSettings /> : null}
         </div>
       ) : null}
     </section>

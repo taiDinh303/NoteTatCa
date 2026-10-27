@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Appearance: chọn/tắt mascot và ảnh riêng — 2026-10-27
+
+- Đặt mục Mascot trong Appearance (không tạo tab Pet riêng): bật/tắt, chọn đủ 53 nhân vật có sẵn từ bản page-mascot local, chia Animals/People/Robots, có preview và tên dịch Việt/Anh/Trung/Nhật. Gallery dùng ảnh lazy; Notes chỉ tải atlas của nhân vật đang chọn. Giữ license MIT đã có. Lựa chọn đổi ngay và lưu theo trình duyệt, đồng bộ tab bằng storage event; tắt/bật giữ nhân vật đã chọn.
+- Thêm ảnh riêng PNG/JPEG/WebP ≤512 KB, ≤4096×4096 px: kiểm decode, lưu local, chọn/gỡ ảnh, giữ khi reload; báo lỗi nếu đọc/lưu thất bại. Ảnh riêng đứng yên (UI ghi rõ), không gửi ảnh ra server hoặc gọi AI. Tạo nhân vật động bằng AI từ mô tả/ảnh vẫn chưa tích hợp; đã hỏi hướng ưu tiên, chưa có lựa chọn/provider/quota để triển khai runtime.
+- Kiểm chứng: React build/lint PASS; .NET Release 0 warning/0 error. Chromium 2/2 PASS: 53 lựa chọn, chọn Fox/reload/Notes, tắt không render mascot, bật giữ Fox, upload/reload/gỡ ảnh riêng, layout393px không tràn ngang; hồi quy chuyển card/hướng nhìn/menu PASS. Đã xem screenshot mobile; chưa test máy thật hay sync tài khoản (preference là local). Lần thử đầu guest không truy cập được Appearance theo route hiện hành; đổi test sang account fixture. Một ảnh PNG fixture hỏng bị decode từ chối; dùng asset WebP hợp lệ. Sửa hit area radio sau khi E2E phát hiện ảnh preview cản click.
+- Scope: UI/store mascot, Appearance, bản dịch, 104 WebP mới, E2E mới và worklog. Giữ các thay đổi backend/archive/config khác ngoài commit; không deploy thủ công.
+
 ## Sửa đường nối cổ và vùng bấm mascot — 2026-10-27
 
 - Nguyên nhân: dùng PNG nguồn chưa căn chỉnh rồi ghép đầu/thân bằng clip-path 78% làm đứt cổ khi đổi hướng. Chuyển sang hai atlas WebP đã build của bản gốc trong `D:\Tools\page-mascot\public\mascots`, bỏ hoàn toàn lớp cắt/ghép; giữ cách đổi hướng và hysteresis của bản gốc, tắt squash khi chạm để thân không co giãn.

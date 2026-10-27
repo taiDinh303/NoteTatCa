@@ -10,6 +10,7 @@
   z-index: 25;
   pointer-events: auto;
 }
+.note-mascot-custom { object-fit: contain; pointer-events: none; }
 
 /* The paws overlap the edge slightly, without covering the title. */
 .note-mascot-corner {
