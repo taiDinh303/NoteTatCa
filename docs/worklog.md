@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Sửa đường nối cổ và vùng bấm mascot — 2026-10-27
+
+- Nguyên nhân: dùng PNG nguồn chưa căn chỉnh rồi ghép đầu/thân bằng clip-path 78% làm đứt cổ khi đổi hướng. Chuyển sang hai atlas WebP đã build của bản gốc trong `D:\Tools\page-mascot\public\mascots`, bỏ hoàn toàn lớp cắt/ghép; giữ cách đổi hướng và hysteresis của bản gốc, tắt squash khi chạm để thân không co giãn.
+- Dịch vị trí từ right 14 sang 52 px trên desktop (mobile 48 px) để vùng bấm không cản nút menu của card phía trên. Chỉnh mép dưới theo khoảng trong suốt của atlas mới để thỏ đậu sát card.
+- Kiểm chứng: React build/lint PASS; .NET Release 0 warning/0 error; Chromium guest fixture 1/1 PASS kiểm tra chuyển sang card, atlas nguyên hình, hướng nhìn đổi và bấm mở menu card phía trên. Đã xem screenshot desktop; chưa đo frame time hay thử thiết bị vật lý. Scope: 3 file mascot, 2 WebP, E2E và worklog; các thay đổi khác giữ ngoài commit.
+
 ## Thỏ mascot đậu trên note vừa mở — 2026-10-27
 
 - Bắt đầu đếm 500 ms khi mở note (kể cả mở qua liên kết `?note=`), rồi chuyển thỏ sang card đó; hủy timer khi đổi/đóng note trước hạn. Thỏ luôn ở mép trên bên phải card, kể cả vị trí ngẫu nhiên ban đầu. Chừa 36 px phía trên canvas để tai không bị vùng cuộn cắt; hai chân nhô nhẹ qua viền card.

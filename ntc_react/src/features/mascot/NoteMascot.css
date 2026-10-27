@@ -13,17 +13,8 @@
 
 /* The paws overlap the edge slightly, without covering the title. */
 .note-mascot-corner {
-  bottom: calc(100% - 10px);
-  right: 14px;
-}
-
-/* The head occupies the upper part of each atlas cell. Keep the center
-   cell's torso on its own layer so pointer movement never shifts the paws. */
-.note-mascot .mascot-fixed-body {
-  clip-path: inset(78% 0 0 0);
-}
-.note-mascot .mascot-moving-head {
-  clip-path: inset(0 0 22% 0);
+  bottom: calc(100% - 16px);
+  right: 52px;
 }
 
 /* On small viewports, visually scale the bunny down (keeps the hit area
@@ -35,6 +26,6 @@
     scale: 0.78;
   }
   .note-mascot-corner {
-    right: 2px;
+    right: 48px;
   }
 }

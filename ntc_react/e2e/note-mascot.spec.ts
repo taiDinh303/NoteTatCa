@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("bunny moves to the opened card after 500ms and keeps its body still", async ({ page }) => {
+test("bunny uses the aligned atlas without a neck cut and leaves card actions clear", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/Home");
   await page.getByRole("main").getByRole("link", { name: "Try guest mode", exact: true }).click();
@@ -13,11 +13,19 @@ test("bunny moves to the opened card after 500ms and keeps its body still", asyn
   await expect(target.locator(".note-mascot")).toHaveCount(0);
   await expect(target.locator(".note-mascot"), { timeout: 2_000 }).toBeVisible();
   await expect(target.locator(".note-mascot")).toHaveAttribute("data-mascot-anchor", "corner");
-  const body = target.locator(".mascot-fixed-body");
-  const head = target.locator(".mascot-moving-head").first();
-  await expect(body).toHaveCSS("background-position", "50% 50%");
+  const head = target.locator(".mascot-directions");
+  await expect(head).toHaveCSS("clip-path", "none");
+  await expect(head).toHaveCSS("background-image", /bunny-directions.webp/);
   const before = await head.evaluate((el) => getComputedStyle(el).backgroundPosition);
   await page.mouse.move(0, 0);
   await expect.poll(() => head.evaluate((el) => getComputedStyle(el).backgroundPosition)).not.toBe(before);
-  await expect(body).toHaveCSS("background-position", "50% 50%");
+  await page.getByRole("dialog", { name: "View note" }).getByRole("button", { name: "Close", exact: true }).click();
+  const mascotBox = await target.locator(".note-mascot").boundingBox();
+  const cardBox = await target.boundingBox();
+  expect(cardBox!.x + cardBox!.width - mascotBox!.x - mascotBox!.width).toBeGreaterThan(45);
+  const actions = cards.first().getByRole("button", { name: /^Actions for / });
+  await actions.click();
+  await expect(page.getByRole("menu")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.screenshot({ path: "test-results/mascot-aligned.png" });
 });

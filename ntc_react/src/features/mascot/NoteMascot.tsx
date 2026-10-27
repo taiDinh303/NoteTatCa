@@ -24,12 +24,12 @@ export function NoteMascot({
       data-mascot-anchor="corner"
     >
       <MascotPage
-        directions="/mascots/bunny-directions.png"
-        reactions="/mascots/bunny-reactions.png"
+        directions="/mascots/bunny-directions.webp"
+        reactions="/mascots/bunny-reactions.webp"
         size={size}
         label={tr("mascot")}
         className="note-mascot-sprite"
-        fixedBody
+        disableSquash
       />
     </div>
   );
