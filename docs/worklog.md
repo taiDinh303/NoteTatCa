@@ -7,6 +7,7 @@
 - Nguyên nhân: dùng PNG nguồn chưa căn chỉnh rồi ghép đầu/thân bằng clip-path 78% làm đứt cổ khi đổi hướng. Chuyển sang hai atlas WebP đã build của bản gốc trong `D:\Tools\page-mascot\public\mascots`, bỏ hoàn toàn lớp cắt/ghép; giữ cách đổi hướng và hysteresis của bản gốc, tắt squash khi chạm để thân không co giãn.
 - Dịch vị trí từ right 14 sang 52 px trên desktop (mobile 48 px) để vùng bấm không cản nút menu của card phía trên. Chỉnh mép dưới theo khoảng trong suốt của atlas mới để thỏ đậu sát card.
 - Kiểm chứng: React build/lint PASS; .NET Release 0 warning/0 error; Chromium guest fixture 1/1 PASS kiểm tra chuyển sang card, atlas nguyên hình, hướng nhìn đổi và bấm mở menu card phía trên. Đã xem screenshot desktop; chưa đo frame time hay thử thiết bị vật lý. Scope: 3 file mascot, 2 WebP, E2E và worklog; các thay đổi khác giữ ngoài commit.
+- Đã push `a7bbf16329c0b4a58a852f44c16dd8a8de402d22` lên main; `git ls-remote origin refs/heads/main` xác nhận đúng SHA, đúng 7 file trong scope.
 
 ## Thỏ mascot đậu trên note vừa mở — 2026-10-27
 
