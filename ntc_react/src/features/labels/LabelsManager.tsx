@@ -1,9 +1,11 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useRef, useState, useSyncExternalStore } from "react";
 import { Pencil, Plus, Tag, Trash2 } from "lucide-react";
-import { labels, cache, workspace, labelMutations } from "../../app/runtime";
+import { toast } from "sonner";
+import { labelMutations } from "../../app/runtime";
 import { useLabels } from "../../shared/hooks";
 import type { Label } from "../../domain/models";
+import { errorMessage } from "../../shared/utils";
 import {
   Button,
   EmptyState,
@@ -24,7 +26,6 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
   );
   const [editing, setEditing] = useState<Label | null>(null);
   const [deleting, setDeleting] = useState<Label>();
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
   const [formKey, setFormKey] = useState(0);
   const list = useRef<HTMLDivElement>(null);
@@ -32,10 +33,6 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
     ...mutations.creating,
     ...(query.data?.pages.flatMap((p) => p.items) ?? []),
   ];
-  async function refresh() {
-    await cache.invalidateQueries({ queryKey: workspace.key("labels") });
-    await cache.invalidateQueries({ queryKey: workspace.key("notes") });
-  }
   return (
     <Modal
       open
@@ -68,16 +65,13 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
               void labelMutations.create(body).catch(() => {});
               return;
             }
-            setBusy(true);
-            void labels
-              .patch(editing, body)
-              .then(async () => {
-                setEditing(null);
-                setFormKey((k) => k + 1);
-                await refresh();
-              })
-              .catch(setError)
-              .finally(() => setBusy(false));
+            const target = editing;
+            setEditing(null);
+            setFormKey((k) => k + 1);
+            void labelMutations.patch(target, body).catch((failure) => {
+              setError(failure);
+              toast.error(errorMessage(failure));
+            });
           }}
         >
           <Field label={editing ? tr("Edit label") : tr("New label")}>
@@ -97,7 +91,7 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
               defaultValue={editing?.color ?? "#8c9d90"}
             />
           </label>
-          <Button busy={busy} type="submit">
+          <Button type="submit">
             {editing ? (
               tr("Save")
             ) : (
@@ -141,7 +135,10 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                 <div
                   className={`label-row ${deleting?.id === label.id ? "label-row-confirming" : ""}`}
                   key={label.id}
-                  aria-busy={label.id.startsWith("pending:")}
+                  aria-busy={
+                    label.id.startsWith("pending:") ||
+                    mutations.updating.includes(label.id)
+                  }
                   role={deleting?.id === label.id ? "group" : undefined}
                   aria-label={
                     deleting?.id === label.id
@@ -190,7 +187,10 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                       <span>{label.name}</span>
                       <IconButton
                         icon={Pencil}
-                        disabled={label.id.startsWith("pending:")}
+                        disabled={
+                          label.id.startsWith("pending:") ||
+                          mutations.updating.includes(label.id)
+                        }
                         label={tr("Edit label {0}", label.name)}
                         onClick={() => {
                           setDeleting(undefined);
@@ -200,7 +200,10 @@ export default function LabelsManager({ onClose }: { onClose: () => void }) {
                       />
                       <IconButton
                         icon={Trash2}
-                        disabled={label.id.startsWith("pending:")}
+                        disabled={
+                          label.id.startsWith("pending:") ||
+                          mutations.updating.includes(label.id)
+                        }
                         label={tr("Delete label {0}", label.name)}
                         onClick={() => setDeleting(label)}
                       />

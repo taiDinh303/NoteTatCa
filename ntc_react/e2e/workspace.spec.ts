@@ -1562,6 +1562,25 @@ test("creates reminders and reads the resulting inbox notification", async ({
   await expect(
     page.getByText("A note is waiting for you", { exact: true }),
   ).toBeVisible();
+  let releaseReadAll!: () => void;
+  const readAllGate = new Promise<void>((resolve) => {
+    releaseReadAll = resolve;
+  });
+  let failFirstReadAll = true;
+  await page.route("**/api/v1/notifications/read-all", async (route) => {
+    if (failFirstReadAll) {
+      failFirstReadAll = false;
+      await route.fulfill({ status: 503, body: "Unavailable" });
+      return;
+    }
+    await readAllGate;
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
+  await page.getByRole("button", { name: "Unread", exact: true }).click();
+  await expect(
+    page.getByText("A note is waiting for you", { exact: true }),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Mark all as read", exact: true })
     .click();
@@ -1569,6 +1588,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
   await expect(
     page.getByRole("heading", { name: "You’re all caught up", exact: true }),
   ).toBeVisible();
+  releaseReadAll();
 });
 
 test("updates profile and revokes another session", async ({ page }) => {

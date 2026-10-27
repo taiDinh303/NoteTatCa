@@ -1,10 +1,11 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpRight, Bell, CheckCheck, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { cache, inbox, workspace } from "../../app/runtime";
+import type { InboxItem, Page } from "../../domain/models";
 import { useAuth } from "../../shared/hooks";
 import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
@@ -26,11 +27,65 @@ export default function InboxPage() {
     refetchIntervalInBackground: false,
   });
   const items = query.data?.pages.flatMap((p) => p.items) ?? [];
-  async function refresh() {
-    await Promise.all([
+  function refresh() {
+    void Promise.all([
       cache.invalidateQueries({ queryKey: workspace.key("inbox") }),
       cache.invalidateQueries({ queryKey: workspace.key("unread") }),
+    ]).catch(() => {});
+  }
+  async function markAllRead() {
+    if (busy) return;
+    setBusy(true);
+    const owner = String(workspace.key("inbox")[1]);
+    await Promise.all([
+      cache.cancelQueries({ queryKey: workspace.key("inbox") }),
+      cache.cancelQueries({ queryKey: workspace.key("unread") }),
     ]);
+    const previous = cache.getQueriesData<
+      InfiniteData<Page<InboxItem>, number>
+    >({
+      queryKey: workspace.key("inbox"),
+    });
+    const countKey = workspace.key("unread");
+    const previousCount = cache.getQueryData<number>(countKey);
+    const now = new Date().toISOString();
+    for (const [key, data] of previous) {
+      if (!data) continue;
+      const unreadOnly = key[3] === true;
+      cache.setQueryData(key, {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          items: unreadOnly
+            ? []
+            : page.items.map((item) => ({
+                ...item,
+                readAt: item.readAt ?? now,
+              })),
+          totalItems: unreadOnly ? 0 : page.totalItems,
+          hasNextPage: unreadOnly ? false : page.hasNextPage,
+        })),
+      });
+    }
+    cache.setQueryData(countKey, 0);
+    try {
+      const count = await inbox.readAll();
+      toast.success(
+        count
+          ? tr("{0} notifications marked as read", count)
+          : tr("You’re all caught up"),
+      );
+      refresh();
+    } catch (error) {
+      if (workspace.key("inbox")[1] === owner) {
+        for (const [key, data] of previous) cache.setQueryData(key, data);
+        cache.setQueryData(countKey, previousCount);
+        refresh();
+      }
+      toast.error(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <>
@@ -55,21 +110,7 @@ export default function InboxPage() {
           className="inbox-mark-read"
           title={tr("Mark all as read")}
           disabled={busy}
-          onClick={() => {
-            setBusy(true);
-            void inbox
-              .readAll()
-              .then(async (count) => {
-                toast.success(
-                  count
-                    ? tr("{0} notifications marked as read", count)
-                    : tr("You’re all caught up"),
-                );
-                await refresh();
-              })
-              .catch((error) => toast.error(errorMessage(error)))
-              .finally(() => setBusy(false));
-          }}
+          onClick={() => void markAllRead()}
         >
           <CheckCheck size={16} aria-hidden />
           <span>{tr("Mark all as read")}</span>
@@ -100,12 +141,13 @@ export default function InboxPage() {
               <button
                 className="inbox-item-open"
                 onClick={() => {
-                  void (item.readAt ? Promise.resolve() : inbox.read(item.id))
-                    .then(async () => {
-                      await refresh();
-                      navigate(`/notes?note=${item.noteId}`);
-                    })
-                    .catch((error) => toast.error(errorMessage(error)));
+                  navigate(`/notes?note=${item.noteId}`);
+                  if (!item.readAt) {
+                    void inbox
+                      .read(item.id)
+                      .then(refresh)
+                      .catch((error) => toast.error(errorMessage(error)));
+                  }
                 }}
               >
                 <strong>{tr("A note is waiting for you")}</strong>

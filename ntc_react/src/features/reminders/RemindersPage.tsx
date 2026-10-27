@@ -45,6 +45,7 @@ export default function RemindersPage() {
   });
   const [editing, setEditing] = useState<Reminder>();
   const [pending, setPending] = useState<Reminder>();
+  const [toggling, setToggling] = useState<Reminder>();
   const [draft, setDraft] = useState<ReminderInput>();
   const [saveError, setSaveError] = useState<unknown>();
   const saveOwner = useRef("");
@@ -59,13 +60,19 @@ export default function RemindersPage() {
     ]);
   }
   async function toggle(reminder: Reminder) {
+    if (busy) return;
+    const owner = String(workspace.key("reminders")[1]);
     setBusy(reminder.id);
+    setToggling({ ...reminder, isActive: !reminder.isActive });
     try {
-      await reminders.patch(reminder, { isActive: !reminder.isActive });
-      await refresh();
+      const saved = await reminders.patch(reminder, {
+        isActive: !reminder.isActive,
+      });
+      commitReminder(saved, owner);
     } catch (error) {
       toast.error(errorMessage(error));
     } finally {
+      setToggling(undefined);
       setBusy(undefined);
     }
   }
@@ -103,7 +110,12 @@ export default function RemindersPage() {
       ) : (
         <div className="reminders-board">
           {items.map((item) => {
-            const reminder = pending?.id === item.id ? pending : item;
+            const reminder =
+              toggling?.id === item.id
+                ? toggling
+                : pending?.id === item.id
+                  ? pending
+                  : item;
             const saving = pending?.id === item.id;
             return (
               <article

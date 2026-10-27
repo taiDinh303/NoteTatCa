@@ -123,20 +123,33 @@ export class WorkspaceService {
     this.commit(optimistic);
     try {
       this.commit(await this.notes.pin(note));
-      await this.refreshNotes();
     } catch (error) {
       this.commit(note);
       throw error;
     }
+    void this.refreshNotes().catch(() => {});
   }
   async trash(note: Note) {
-    await this.notes.trash(note.id);
+    await this.cache.cancelQueries({ queryKey: this.key("notes") });
     this.commit({ ...note, deletedTime: new Date().toISOString() });
-    await this.refreshNotes();
+    try {
+      await this.notes.trash(note.id);
+    } catch (error) {
+      this.commit(note);
+      throw error;
+    }
+    void this.refreshNotes().catch(() => {});
   }
   async restore(note: Note) {
-    this.commit(await this.notes.restore(note.id));
-    await this.refreshNotes();
+    await this.cache.cancelQueries({ queryKey: this.key("notes") });
+    this.commit({ ...note, deletedTime: null });
+    try {
+      this.commit(await this.notes.restore(note.id));
+    } catch (error) {
+      this.commit(note);
+      throw error;
+    }
+    void this.refreshNotes().catch(() => {});
   }
   async delete(note: Note) {
     await this.notes.delete(note.id);

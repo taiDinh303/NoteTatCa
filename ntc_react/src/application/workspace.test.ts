@@ -30,6 +30,26 @@ const page: Page<Note> = {
   hasPreviousPage: false,
 };
 describe("private workspace cache", () => {
+  it("moves a note to Trash immediately and restores it if saving fails", async () => {
+    const cache = new QueryClient();
+    const repository = new NotesRepository(new ApiClient("/api/v1"));
+    let rejectSave!: (reason: Error) => void;
+    vi.spyOn(repository, "trash").mockImplementation(
+      () => new Promise((_, reject) => { rejectSave = reject; }),
+    );
+    const service = new WorkspaceService(repository, cache, () => "owner");
+    service.commit(note);
+    const pending = service.trash(note);
+    await vi.waitFor(() =>
+      expect(cache.getQueryData(service.key("trash-note", note.id))).toBeDefined(),
+    );
+    expect(cache.getQueryData(service.key("note", note.id))).toBeUndefined();
+    rejectSave(new Error("Unavailable"));
+    await expect(pending).rejects.toThrow("Unavailable");
+    expect(cache.getQueryData(service.key("note", note.id))).toBeDefined();
+    expect(cache.getQueryData(service.key("trash-note", note.id))).toBeUndefined();
+    cache.clear();
+  });
   it("keeps a partially loaded list stable when a new note is committed", () => {
     const cache = new QueryClient();
     const service = new WorkspaceService(

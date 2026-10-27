@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Phản hồi ngay cho các thao tác thường dùng — 2026-10-27
+
+- Rà các luồng ghi React: note đã autosave nội dung, đổi ghim và sắp xếp lạc quan; tạo/xóa label và tạo/sửa reminder đã lưu nền. Bổ sung: đưa note vào Trash/khôi phục hiển thị ngay với rollback khi API lỗi; đổi ghim không chờ vòng refresh sau khi server xác nhận. Sửa label cập nhật tên/màu trong cache trước khi PATCH xong, khóa chính dòng đang sửa và phục hồi dữ liệu cũ khi thất bại. Bật/tắt reminder phản hồi ngay trên thẻ và giữ thao tác đang gửi riêng với trạng thái lưu nội dung.
+- Inbox mở note ngay khi nhấn, gửi đánh dấu đã đọc trong nền. `Mark all as read` cập nhật danh sách và số chưa đọc ngay, khóa nút gửi lặp; khi API lỗi phục hồi snapshot và làm mới dữ liệu từ server. Kiểm owner trước khi rollback cache sau khi đổi tài khoản. Các thao tác cần kết quả máy chủ để quyết định bước tiếp theo (đăng nhập/đổi thông tin bảo mật, import backup, xóa vĩnh viễn) tiếp tục chờ phản hồi.
+- Kiểm chứng: Vitest workspace/label mutations 14/14 PASS, gồm rollback Trash và sửa label; browser reminder→Inbox với POST đánh dấu thất bại rồi thử lại và request thành công bị trì hoãn 1/1 PASS trên cổng test riêng (5173 đang phục vụ ứng dụng khác); React lint/build PASS, .NET Release 0 warning/0 error. Chưa chạy toàn browser suite, thiết bị vật lý hoặc đo frame rate thực tế. Một lần chạy E2E đầu mở nhầm ứng dụng ở cổng 5173, một lần đầu trên cổng riêng lộ thiếu refetch sau rollback Inbox; đã sửa và chạy lại PASS.
+- Phạm vi commit: workspace service/test, label mutations/manager/test, Inbox, RemindersPage, E2E workspace và mục worklog này. Giữ các thay đổi backend/archive/performance và file cấu hình local ngoài commit. Không migration/deploy thủ công/owner DB/email thật.
+
 ## Tự nhận múi giờ và lưu reminder trong nền — 2026-10-27
 
 - Bỏ ô nhập `Recurrence timezone` tự do trong biểu mẫu reminder. Giờ nhập là giờ địa phương của thiết bị; khi gửi, client tự lấy múi giờ IANA từ trình duyệt (fallback sang múi giờ tài khoản nếu trình duyệt không cung cấp). Người dùng chỉ chọn ngày/giờ, lịch lặp, ngày kết thúc và email tùy chọn. Biểu mẫu giải thích lời nhắc xuất hiện trong Inbox khi đến giờ; lịch lặp chạy theo giờ địa phương đã chọn; có thể sửa/tạm dừng và thông báo cũ được giữ.

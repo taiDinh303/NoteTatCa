@@ -43,6 +43,13 @@ function setup() {
   const repository = {
     create:
       vi.fn<(body: Pick<Label, "name" | "color" | "icon">) => Promise<Label>>(),
+    patch:
+      vi.fn<
+        (
+          label: Label,
+          body: Pick<Label, "name" | "color" | "icon">,
+        ) => Promise<Label>
+      >(),
     delete: vi.fn<(id: string) => Promise<unknown>>(),
   };
   const report = vi.fn();
@@ -71,6 +78,23 @@ function setup() {
     },
   };
 }
+it("updates a label before the request finishes and restores it on failure", async () => {
+  const f = setup(),
+    pending = gate<Label>();
+  f.repository.patch.mockReturnValue(pending.promise);
+  const task = f.service.patch(f.first, {
+    name: "Updated",
+    color: "#112233",
+    icon: null,
+  });
+  await vi.waitFor(() => expect(f.items()[0].name).toBe("Updated"));
+  expect(f.service.getSnapshot().updating).toEqual([f.first.id]);
+  pending.reject(new Error("Unavailable"));
+  await expect(task).rejects.toThrow("Unavailable");
+  expect(f.items()[0]).toEqual(f.first);
+  expect(f.service.getSnapshot().updating).toEqual([]);
+  f.cache.clear();
+});
 it("shows pending creates immediately without exposing temporary IDs to note-assignment cache", async () => {
   const f = setup(),
     pending = gate<Label>();

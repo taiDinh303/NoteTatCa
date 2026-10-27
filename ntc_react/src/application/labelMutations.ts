@@ -6,16 +6,17 @@ import type {
 import type { Label, Page } from "../domain/models";
 
 type LabelInput = Pick<Label, "name" | "color" | "icon">;
-type Snapshot = { creating: Label[]; deleting: string[] };
+type Snapshot = { creating: Label[]; deleting: string[]; updating: string[] };
 type Repository = {
   create: (input: LabelInput) => Promise<Label>;
+  patch: (label: Label, input: LabelInput) => Promise<Label>;
   delete: (id: string) => Promise<unknown>;
 };
 
 // Temporary create IDs stay in the manager, never in note-assignment queries.
 // Delete overlays survive modal remounts and are shared by label readers.
 export class LabelMutations {
-  private snapshot: Snapshot = { creating: [], deleting: [] };
+  private snapshot: Snapshot = { creating: [], deleting: [], updating: [] };
   private listeners = new Set<() => void>();
   private generation = 0;
   constructor(
@@ -42,7 +43,7 @@ export class LabelMutations {
   }
   reset = () => {
     this.generation++;
-    this.emit({ creating: [], deleting: [] });
+    this.emit({ creating: [], deleting: [], updating: [] });
   };
   private update(key: QueryKey, label: Label, remove: boolean) {
     const previous = this.cache.getQueryData<InfiniteData<Page<Label>>>(key);
@@ -125,6 +126,55 @@ export class LabelMutations {
         // Partial lists need background reconciliation for server page boundaries.
         if (reconcile)
           void this.cache.invalidateQueries({ queryKey: key }).catch(() => {});
+      }
+    }
+  }
+  async patch(label: Label, input: LabelInput) {
+    const owner = this.identity(),
+      generation = this.generation;
+    if (!owner || this.snapshot.updating.includes(label.id)) return;
+    const key = this.key("labels");
+    const current = () =>
+      owner === this.identity() && generation === this.generation;
+    const replace = (value: Label) => {
+      this.cache.setQueryData<InfiniteData<Page<Label>>>(
+        key,
+        (data) =>
+          data && {
+            ...data,
+            pages: data.pages.map((page) => ({
+              ...page,
+              items: page.items.map((item) =>
+                item.id === label.id ? value : item,
+              ),
+            })),
+          },
+      );
+    };
+    this.emit({
+      ...this.snapshot,
+      updating: [...this.snapshot.updating, label.id],
+    });
+    try {
+      await this.cache.cancelQueries({ queryKey: key });
+      if (!current()) return;
+      replace({ ...label, ...input });
+      const saved = await this.repository.patch(label, input);
+      if (!current()) return;
+      replace(saved);
+      void this.cache
+        .invalidateQueries({ queryKey: this.key("notes") })
+        .catch(() => {});
+      return saved;
+    } catch (error) {
+      if (current()) replace(label);
+      throw error;
+    } finally {
+      if (current()) {
+        this.emit({
+          ...this.snapshot,
+          updating: this.snapshot.updating.filter((id) => id !== label.id),
+        });
       }
     }
   }
