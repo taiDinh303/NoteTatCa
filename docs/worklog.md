@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nhận diện note từ Reminder — 2026-10-27
+
+- Mỗi reminder gắn với đúng một note qua `noteId`; một note có thể có nhiều reminder. Trên trang Reminders, hiển thị đoạn nội dung ngắn (tối đa 180 ký tự) và màu nền của note; thêm liên kết `View note` mở đúng note dù có nhiều note trùng tiêu đề. Dữ liệu preview/màu lấy từ note đã được kiểm tra quyền sở hữu trong truy vấn reminder; không thay đổi schema hay dữ liệu.
+- Kiểm chứng: React build/lint PASS; .NET Release build 0 warning/0 error; HTTP integration test kiểm tra preview giới hạn 180 ký tự, màu và cách ly hai tài khoản PASS; Playwright Chromium tạo reminder → trang Reminders → kiểm tra màu/preview → mở note 1/1 PASS (fixture local, cổng riêng). Chưa kiểm tra trên thiết bị vật lý.
+- Phạm vi publication: response/mapping reminder, model/cache/trang Reminders React, CSS hiển thị, HTTP test, E2E và mục worklog này. Giữ các thay đổi backup, cấu hình và công việc khác trong working tree ngoài commit; không deploy hay dùng dữ liệu thật.
+
 ## Gỡ pin/unpin pulse — 2026-10-27
 
 - Theo yêu cầu chủ dự án, gỡ hẳn tính năng pin/unpin pulse (CSS keyframe `editor-pin-pulse` + class `editor-pin-pulsed` trong `NoteEditor.tsx`). Giữ lại hover card lift (CSS `.note-card`).

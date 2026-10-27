@@ -6,6 +6,7 @@ import {
   Bell,
   CalendarDays,
   Clock3,
+  Eye,
   Mail,
   Pause,
   Pencil,
@@ -16,6 +17,7 @@ import { toast } from "sonner";
 import { cache, reminders, workspace } from "../../app/runtime";
 import type { Reminder, ReminderInput } from "../../domain/models";
 import { REPEAT_NAMES } from "../../domain/models";
+import { notePalette } from "../../domain/color";
 import { useAuth, useMe } from "../../shared/hooks";
 import {
   ActionMenu,
@@ -119,8 +121,16 @@ export default function RemindersPage() {
             const saving = pending?.id === item.id;
             return (
               <article
-                className={`reminder-card ${!reminder.isActive ? "paused" : ""}`}
+                className={`reminder-card ${!reminder.isActive ? "paused" : ""} ${reminder.noteColor ? "colored" : ""}`}
                 key={reminder.id}
+                style={
+                  reminder.noteColor
+                    ? {
+                        ...notePalette(reminder.noteColor),
+                        backgroundColor: reminder.noteColor,
+                      }
+                    : undefined
+                }
               >
                 <div className="reminder-card-icon">
                   <Bell size={20} />
@@ -129,6 +139,11 @@ export default function RemindersPage() {
                   <Link to={`/notes?note=${reminder.noteId}`}>
                     <h2>{reminder.noteTitle || tr("Untitled")}</h2>
                   </Link>
+                  {reminder.notePreview?.trim() ? (
+                    <p className="reminder-note-preview">
+                      {reminder.notePreview.trim()}
+                    </p>
+                  ) : null}
                   <p>
                     <Clock3 size={14} />
                     {dateTime(
@@ -161,6 +176,13 @@ export default function RemindersPage() {
                       ? tr("Active")
                       : tr("Paused")}
                 </span>
+                <Link
+                  className="reminder-open-note"
+                  to={`/notes?note=${reminder.noteId}`}
+                >
+                  <Eye size={15} aria-hidden />
+                  {tr("View note")}
+                </Link>
                 <ActionMenu
                   label={tr("Reminder actions")}
                   items={[

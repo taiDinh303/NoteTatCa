@@ -28,6 +28,8 @@ namespace NTC.ModelViews.ReminderModelView
 
         // optional hiển thị
         public string? NoteTitle { get; set; }
+        public string? NotePreview { get; set; }
+        public string? NoteColor { get; set; }
 
         // Audit
         public string? CreatedBy { get; set; }

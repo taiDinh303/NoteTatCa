@@ -26,6 +26,25 @@ public sealed class ServiceControllerTests
     private static Guid Version(JsonElement value) => value.GetProperty("version").GetGuid();
 
     [Fact]
+    public async Task Reminder_list_shows_a_bounded_preview_of_only_owned_notes()
+    {
+        using var f = new ApiFactory(); await f.InitializeAsync();
+        var (a, _) = await f.LoginAsync(); using var ca = a;
+        var (b, _) = await f.LoginAsync("b@example.test"); using var cb = b;
+        var content = "First detail that distinguishes this note. " + new string('x', 220);
+        var own = await ApiFactory.Data(await a.PostAsJsonAsync("/api/v1/notes", new { content, title = "Same title", backgroundColor = "#deedf8" }));
+        var other = await ApiFactory.Note(b, "Another user's secret", "Same title");
+        await ApiFactory.Data(await a.PostAsJsonAsync($"/api/v1/notes/{Id(own)}/reminders", new { reminderAt = f.Clock.GetUtcNow().AddHours(1) }));
+        await ApiFactory.Data(await b.PostAsJsonAsync($"/api/v1/notes/{Id(other)}/reminders", new { reminderAt = f.Clock.GetUtcNow().AddHours(1) }));
+        var items = (await ApiFactory.Data(await a.GetAsync("/api/v1/reminders"))).GetProperty("items");
+        var shown = Assert.Single(items.EnumerateArray());
+        Assert.Equal(Id(own), shown.GetProperty("noteId").GetGuid());
+        Assert.Equal("Same title", shown.GetProperty("noteTitle").GetString());
+        Assert.Equal(content[..180], shown.GetProperty("notePreview").GetString());
+        Assert.Equal("#deedf8", shown.GetProperty("noteColor").GetString());
+    }
+
+    [Fact]
     public async Task Tag_patch_preserves_omitted_values_clears_null_and_rejects_stale_or_foreign_edits()
     {
         using var f = new ApiFactory(); await f.InitializeAsync();

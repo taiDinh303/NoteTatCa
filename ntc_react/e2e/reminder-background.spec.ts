@@ -57,6 +57,19 @@ test("creates a reminder immediately while the request saves in background", asy
   expect(postedZone).toBe(
     await page.evaluate(() => Intl.DateTimeFormat().resolvedOptions().timeZone),
   );
+  await dialog.getByRole("button", { name: "Close dialog" }).click();
+  await page
+    .getByRole("dialog", { name: "Edit note", exact: true })
+    .getByRole("button", { name: "Close", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Reminders", exact: true }).click();
+  const card = page.locator(".reminder-card").filter({ hasText: "Project notes" });
+  await expect(card.getByText("Keep it simple.", { exact: false })).toBeVisible();
+  await expect(card).toHaveCSS("background-color", "rgb(222, 237, 248)");
+  await card.getByRole("link", { name: "View note", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "View note" })).toContainText(
+    "Make the important things easy to find.",
+  );
 });
 
 test("restores entered reminder details when background creation fails", async ({

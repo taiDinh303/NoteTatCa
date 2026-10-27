@@ -13,6 +13,8 @@ export function pendingReminder(
     id: initial?.id ?? `pending-${crypto.randomUUID()}`,
     noteId,
     noteTitle: initial?.noteTitle ?? title,
+    notePreview: initial?.notePreview ?? null,
+    noteColor: initial?.noteColor ?? null,
     nextOccurrenceAt: body.reminderAt,
     isActive: initial?.isActive ?? true,
     version: initial?.version ?? "",

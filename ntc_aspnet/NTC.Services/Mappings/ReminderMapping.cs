@@ -29,6 +29,10 @@ namespace NTC.Services.Mappings
 
                 // optional display
                 NoteTitle = reminder.Note?.Title,
+                NotePreview = reminder.Note?.Content is { Length: > 0 } content
+                    ? content[..Math.Min(content.Length, 180)]
+                    : null,
+                NoteColor = reminder.Note?.BackgroundColor,
 
                 // Audit
                 CreatedBy = reminder.CreatedBy,

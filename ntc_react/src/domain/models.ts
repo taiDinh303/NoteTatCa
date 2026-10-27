@@ -18,6 +18,8 @@ export interface Reminder {
   id: string;
   noteId: string;
   noteTitle: string | null;
+  notePreview: string | null;
+  noteColor: string | null;
   reminderAt: string;
   timeZoneId: string;
   repeatType: number;
