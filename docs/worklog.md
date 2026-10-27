@@ -7,6 +7,7 @@
 - Mỗi reminder gắn với đúng một note qua `noteId`; một note có thể có nhiều reminder. Trên trang Reminders, hiển thị đoạn nội dung ngắn (tối đa 180 ký tự) và màu nền của note; thêm liên kết `View note` mở đúng note dù có nhiều note trùng tiêu đề. Dữ liệu preview/màu lấy từ note đã được kiểm tra quyền sở hữu trong truy vấn reminder; không thay đổi schema hay dữ liệu.
 - Kiểm chứng: React build/lint PASS; .NET Release build 0 warning/0 error; HTTP integration test kiểm tra preview giới hạn 180 ký tự, màu và cách ly hai tài khoản PASS; Playwright Chromium tạo reminder → trang Reminders → kiểm tra màu/preview → mở note 1/1 PASS (fixture local, cổng riêng). Chưa kiểm tra trên thiết bị vật lý.
 - Phạm vi publication: response/mapping reminder, model/cache/trang Reminders React, CSS hiển thị, HTTP test, E2E và mục worklog này. Giữ các thay đổi backup, cấu hình và công việc khác trong working tree ngoài commit; không deploy hay dùng dữ liệu thật.
+- Đã push `f4f7434075fa6ff1a4336df4d4d69afaf4dfebe9` lên `main`; `git ls-remote origin refs/heads/main` trả đúng SHA. CSS hiển thị đã có trong HEAD trước commit này; commit này chứa đúng 8 file đã stage, các thay đổi khác giữ ngoài commit.
 
 ## Gỡ pin/unpin pulse — 2026-10-27
 
