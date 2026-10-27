@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Đồng nhất chiều rộng sidebar giữa Notes, Trash, Reminders và Inbox — 2026-10-27
+
+- Nguyên nhân: `NotesZoomViewport` tính `--workspace-sidebar-width` theo cỡ card nhưng xóa biến khi rời Notes/Trash; Reminders/Inbox quay về giá trị CSS mặc định hẹp hơn. Chuyển phép tính cỡ sidebar vào `AppShell` tồn tại xuyên các trang, dùng chung công thức cỡ card desktop và giữ nguyên chiều rộng khi chuyển mục. Không đổi cỡ card/gap theo mức zoom hoặc bố cục mobile.
+- Khi chạy zoom rộng hơn, bài 1024/1366px phát hiện 5px tràn ngang trong lúc sidebar đang animate từ giá trị CSS mặc định ngay sau reload. Áp dụng cỡ sidebar trước paint và tắt riêng transition khi khởi tạo/resize; thao tác mở/đóng vẫn animate như cũ. Chạy lại hai màn hình lỗi qua cả 5 mức zoom và grid/list đều PASS.
+- Kiểm chứng: browser E2E mới ở 1024/1366/1440/1920px chuyển Notes → Reminders → Inbox → Trash → Notes, đo sidebar và mép nội dung sai khác dưới 1px (4/4 PASS); sidebar live motion 4/4 PASS; zoom focused 1024/1366 dark 2/2 PASS. React lint và production build PASS; .NET Release `-warnaserror` 0 warning/0 error; docs verifier 50 Markdown/202 links/0 lỗi. Không dùng dữ liệu production/owner DB hoặc chạy migration/deploy thủ công. Chưa chạy lại toàn bộ zoom E2E sau sửa, thiết bị vật lý hoặc toàn browser suite.
+- Phạm vi commit/push sidebar: `AppShell`, `NotesZoomViewport`, công thức grid dùng chung, E2E chuyển trang và riêng mục worklog này. Các thay đổi backend/backup/hiệu năng đang có trong working tree được giữ ngoài commit.
+
 ## Xác minh lưu offline khi chuyển View/Edit — 2026-10-27
 
 - Theo yêu cầu ưu tiên số1, chạy lại `note-view-toggle` cũ:2/2FAIL vì test giả PATCH503 rồi chờ Edit báo lỗi, trong khi runtime ghi draft vào IndexedDB và mở View theo chính sách offline-first. Đọc `AutosaveCoordinator`, `OfflineNotesRepository`, `OfflineNotes` và viewer: View chờ flush; chỉ trả note sau ACK server hoặc local write; local write lỗi giữ Edit/draft/error. Không phát hiện lỗi runtime cần sửa trong phạm vi này.

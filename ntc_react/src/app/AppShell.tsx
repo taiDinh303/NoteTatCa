@@ -9,6 +9,7 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -44,6 +45,7 @@ import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 import { OfflineControls } from "./OfflineControls";
 import { GuestBanner } from "./GuestControls";
 import { useTheme } from "../shared/useTheme";
+import { desktopNoteWidth, DESKTOP_NOTE_GAP } from "../shared/workspaceGrid";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 const Sidebar = memo(function Sidebar({
   onLabels,
@@ -194,7 +196,40 @@ export default function AppShell() {
   const keepNavigation = useCallback(() => {}, []);
   const [search, setSearch] = useState(params.get("q") ?? "");
   const input = useRef<HTMLInputElement>(null);
+  const shell = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
+  useLayoutEffect(() => {
+    const element = shell.current;
+    if (!element) return;
+    function sizeSidebar() {
+      if (!element) return;
+      const column = element.querySelector<HTMLElement>(":scope > .main-column");
+      const workspace = column?.querySelector<HTMLElement>(".workspace-main");
+      if (!column || !workspace) return;
+      const style = getComputedStyle(workspace);
+      const fullWidth =
+        window.innerWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight);
+      const width = desktopNoteWidth(fullWidth) + DESKTOP_NOTE_GAP;
+      const next = `${width}px`;
+      if (element.style.getPropertyValue("--workspace-sidebar-width") === next)
+        return;
+      // A layout recalculation must not animate the main column from the CSS
+      // fallback width. Only an explicit sidebar toggle should animate it.
+      const transition = column.style.getPropertyValue("transition");
+      const priority = column.style.getPropertyPriority("transition");
+      column.style.setProperty("transition", "none", "important");
+      element.style.setProperty("--workspace-sidebar-width", next);
+      void column.offsetWidth;
+      if (transition)
+        column.style.setProperty("transition", transition, priority);
+      else column.style.removeProperty("transition");
+    }
+    sizeSidebar();
+    window.addEventListener("resize", sizeSidebar);
+    return () => window.removeEventListener("resize", sizeSidebar);
+  }, []);
   useEffect(() => {
     try {
       localStorage.setItem("ntc.sidebar.hidden.v1", String(sidebarHidden));
@@ -223,6 +258,7 @@ export default function AppShell() {
     location.pathname === "/notes" ? (params.get("q") ?? "") : search;
   return (
     <div
+      ref={shell}
       className={`app-shell customer-shell ${sidebarHidden ? "sidebar-hidden" : ""} ${settingsTitle ? "settings-area" : ""}`}
     >
       <a href="#workspace-main" className="skip-link">

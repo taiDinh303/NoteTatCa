@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { useDisplayZoom } from "../../shared/displayZoom";
 import { t as tr } from "../../shared/i18n";
+import { desktopNoteWidth, DESKTOP_NOTE_GAP } from "../../shared/workspaceGrid";
 import "./NotesZoomViewport.css";
 
 export function NotesZoomViewport({
@@ -40,12 +41,6 @@ export function NotesZoomViewport({
       ?.classList.contains("sidebar-hidden");
     const shell = view.closest<HTMLElement>(".customer-shell");
     const main = shell?.querySelector<HTMLElement>(":scope > .main-column");
-    const previousSidebarWidth = shell?.style.getPropertyValue(
-      "--workspace-sidebar-width",
-    );
-    const previousSidebarPriority = shell?.style.getPropertyPriority(
-      "--workspace-sidebar-width",
-    );
     // A native scrollbar spans the whole window while the note viewport stays
     // below the fixed controls. Both represent the same scroll offset/range.
     function updateScrollbar() {
@@ -289,32 +284,15 @@ export function NotesZoomViewport({
         (shell?.clientWidth ?? window.innerWidth) -
         parseFloat(mainStyle.paddingLeft) -
         parseFloat(mainStyle.paddingRight);
-      gap = desktop ? 20 : 16;
+      gap = desktop ? DESKTOP_NOTE_GAP : 16;
       const fullColumns = desktop
         ? Math.max(3, Math.round((fullWidth + gap) / (300 + gap)))
         : Math.max(1, Math.round((fullWidth + gap) / (300 + gap)));
-      const nextCardWidth =
-        window.innerWidth < 600
+      const nextCardWidth = desktop
+        ? desktopNoteWidth(fullWidth)
+        : window.innerWidth < 600
           ? Math.max(1, fullWidth - gap)
           : (fullWidth - (fullColumns - 1) * gap) / fullColumns;
-      if (desktop && shell && main) {
-        const sidebarWidth = `${nextCardWidth + gap}px`;
-        if (
-          shell.style.getPropertyValue("--workspace-sidebar-width") !==
-          sidebarWidth
-        ) {
-          // A window resize sets the new geometry before paint. Do not run a
-          // margin transition while the sidebar's width itself changes.
-          const transition = main.style.getPropertyValue("transition");
-          const priority = main.style.getPropertyPriority("transition");
-          main.style.setProperty("transition", "none", "important");
-          shell.style.setProperty("--workspace-sidebar-width", sidebarWidth);
-          void main.offsetWidth;
-          if (transition)
-            main.style.setProperty("transition", transition, priority);
-          else main.style.removeProperty("transition");
-        }
-      }
       const tracksChanged = Math.abs(nextCardWidth - cardWidth) > 0.01;
       cardWidth = nextCardWidth;
       if (
@@ -389,13 +367,6 @@ export function NotesZoomViewport({
       main?.removeEventListener("transitionend", sidebarFinished);
       window.clearTimeout(fitTimer);
       cancelReflow();
-      if (previousSidebarWidth)
-        shell?.style.setProperty(
-          "--workspace-sidebar-width",
-          previousSidebarWidth,
-          previousSidebarPriority,
-        );
-      else shell?.style.removeProperty("--workspace-sidebar-width");
       unsubscribe();
       view.removeEventListener("scroll", updateScrollbar);
       rail.removeEventListener("scroll", scrollNotes);
