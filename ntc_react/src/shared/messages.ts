@@ -2592,4 +2592,6 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "隐藏吉祥物",
     "マスコットを非表示に",
   ],
+  mascot: ["mascot", "吉祥物", "マスコット"],
+  "Boop the mascot": ["Boop mascot", "戳一下吉祥物", "マスコットをぽん"],
 };

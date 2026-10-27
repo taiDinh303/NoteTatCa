@@ -10,7 +10,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import type {
   ButtonHTMLAttributes,
   CSSProperties,
@@ -304,8 +303,6 @@ export function Modal({
   style?: CSSProperties;
 }) {
   useLanguage();
-  const reduced = useReducedMotion();
-  const Content = motion.create(Dialog.Content);
   return (
     <Dialog.Root
       open={open}
@@ -315,18 +312,12 @@ export function Modal({
     >
       <Dialog.Portal>
         <Dialog.Overlay className="modal-overlay" />
-        <Content
+        <Dialog.Content
           className={`modal ${wide ? "wide" : ""} ${className}`}
           style={style}
           onEscapeKeyDown={onEscapeKeyDown}
           onPointerDownOutside={(e) => {
             if (!dismissOnOutside) e.preventDefault();
-          }}
-          initial={{ opacity: 0, scale: 0.97, y: 4 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{
-            duration: reduced ? 0.05 : 0.18,
-            ease: [0.2, 0.8, 0.2, 1],
           }}
         >
           <div className={hideTitle ? "modal-title-hidden" : "modal-header"}>
@@ -347,7 +338,7 @@ export function Modal({
             ) : null}
           </div>
           {children}
-        </Content>
+        </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   );

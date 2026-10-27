@@ -1,0 +1,69 @@
+/* MascotPage — port of nilbuild/page-mascot, positioned bottom-right of the
+   customer workspace. The component's sprite layers are inline styles
+   (ported from the repo) so the file drops into any project; this CSS only
+   owns the floating position and the dismiss affordance. */
+.mascot-page {
+  /* The button itself carries all layout in inline styles. */
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Floating wrapper — fixed bottom-right of the workspace, above the note
+   canvas but outside the scroll region. Chrome: does not scale with Notes
+   zoom (DEC-031) because only the note list scales. */
+.mascot-floating {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+/* Keep the sprite transparent against the app background. */
+.mascot-floating .mascot-page {
+  background: transparent;
+}
+
+/* Dismiss button — small, top-right of the sprite, hover to fade. */
+.mascot-floating .mascot-dismiss {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #00000014;
+  transition: background 0.15s, color 0.15s;
+}
+.mascot-floating .mascot-dismiss:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.mascot-floating .mascot-dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Dark theme: soften the dismiss affordance. */
+[data-theme="dark"] .mascot-floating .mascot-dismiss {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* Small screens: shrink so the mascot does not crowd the note editor's
+   full-screen mobile layout. */
+@container viewport (max-width: 480px) {
+  .mascot-floating {
+    bottom: 16px;
+    right: 16px;
+  }
+}
