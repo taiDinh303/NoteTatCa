@@ -1,20 +1,18 @@
-/* NoteMascot — bunny rendered on the top-right edge of a note card.
-   The button itself is interactive (poke = expression). The sprite is
-   72px square on desktop; on mobile it scales down via a CSS
-   transform so the inline `width/height` from the <MascotPage> button still
-   drives the layout box while the visual size adapts.
-   z-index sits above the card's own content but below modals (71).
-*/
+/* The full sprite stays above the card. Atlas padding is excluded from the
+   wrapper height so every character shares the same visible floor. */
 .note-mascot {
   position: absolute;
-  z-index: 25;
+  z-index: 0;
   pointer-events: auto;
+  /* The card owns everything below its top edge, including hit testing.
+     Only transparent atlas padding is removed from this measured box. */
+  clip-path: inset(-100% -100% 0 -100%);
 }
 .note-mascot-custom { object-fit: contain; pointer-events: none; }
 
-/* The paws overlap the edge slightly, without covering the title. */
+/* Keep the painted floor and its hit area outside the card. */
 .note-mascot-corner {
-  bottom: calc(100% - 16px);
+  bottom: 100%;
   right: 52px;
 }
 

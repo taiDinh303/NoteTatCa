@@ -4,6 +4,7 @@ import "./MascotPage.css";
 import { useMascotPreference } from "./mascotPreference";
 import { useAccountMascot } from "./generatedMascot";
 import { useAuth } from "../../shared/hooks";
+import { useMascotFloor } from "./mascotFloor";
 
 /*
  * NoteMascot — the bunny that sits on top of a note card.
@@ -25,9 +26,31 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
   );
   const preset =
     character === "custom" || character === "generated" ? "bunny" : character;
+  const directions =
+    character === "generated" && generated
+      ? generated.directions
+      : `/mascots/${preset}-directions.webp`;
+  const reactions =
+    character === "generated" && generated
+      ? generated.reactions
+      : `/mascots/${preset}-reactions.webp`;
+  const floor = useMascotFloor(
+    directions,
+    reactions,
+    enabled && character !== "custom",
+  );
   if (!enabled) return null;
   return (
-    <div className="note-mascot note-mascot-corner" data-mascot-anchor="corner">
+    <div
+      className="note-mascot note-mascot-corner"
+      data-mascot-anchor="corner"
+      style={{
+        width: size,
+        height: size * (character === "custom" ? 1 : (floor ?? 1)),
+        visibility:
+          character !== "custom" && floor === undefined ? "hidden" : undefined,
+      }}
+    >
       {character === "custom" && customImage ? (
         <img
           src={customImage}
@@ -39,16 +62,8 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
       ) : (
         <MascotPage
           key={character}
-          directions={
-            character === "generated" && generated
-              ? generated.directions
-              : `/mascots/${preset}-directions.webp`
-          }
-          reactions={
-            character === "generated" && generated
-              ? generated.reactions
-              : `/mascots/${preset}-reactions.webp`
-          }
+          directions={directions}
+          reactions={reactions}
           size={size}
           label={tr("mascot")}
           className="note-mascot-sprite"
