@@ -8,6 +8,7 @@
 - Tách sprite thành thân cố định lấy từ khung giữa và lớp đầu đổi hướng/biểu cảm theo con trỏ. Tắt hiệu ứng co giãn toàn thân khi chạm đối với thỏ trên note; giữ phản ứng nét mặt. Giữ hai sprite local sẵn có từ page-mascot, không thêm dịch vụ ngoài.
 - Kiểm chứng tại `D:\My Projects\NoteTatCa`: React build và lint PASS; .NET Release build 0 warning/0 error. Playwright Chromium với fixture local ở cổng riêng: thỏ ban đầu ở góc phải, chuyển card sau khi mở note, đầu đổi hướng trong khi background của thân vẫn ở khung giữa, 1/1 PASS. Đã xem ảnh chụp thực tế và sửa phần tai bị cắt; chưa kiểm trên thiết bị vật lý hoặc toàn bộ browser suite.
 - Phạm vi commit dự kiến: `MascotPage.tsx`, `NoteMascot.tsx/.css`, `NotesPage.tsx`, `NotesZoomViewport.css`, E2E mascot và mục worklog này. Giữ nguyên các thay đổi backend/archive/config và công việc khác trong working tree; không deploy thủ công.
+- Đã push `30efac0b553db91e0568c6f6ec317aa35acd79db` lên `main`; `git ls-remote origin refs/heads/main` xác nhận đúng SHA. Commit gồm đúng 7 file trong phạm vi trên.
 
 ## Nhận diện note từ Reminder — 2026-10-27
 
