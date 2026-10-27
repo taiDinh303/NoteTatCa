@@ -8,6 +8,7 @@
 - Inbox mở note ngay khi nhấn, gửi đánh dấu đã đọc trong nền. `Mark all as read` cập nhật danh sách và số chưa đọc ngay, khóa nút gửi lặp; khi API lỗi phục hồi snapshot và làm mới dữ liệu từ server. Kiểm owner trước khi rollback cache sau khi đổi tài khoản. Các thao tác cần kết quả máy chủ để quyết định bước tiếp theo (đăng nhập/đổi thông tin bảo mật, import backup, xóa vĩnh viễn) tiếp tục chờ phản hồi.
 - Kiểm chứng: Vitest workspace/label mutations 14/14 PASS, gồm rollback Trash và sửa label; browser reminder→Inbox với POST đánh dấu thất bại rồi thử lại và request thành công bị trì hoãn 1/1 PASS trên cổng test riêng (5173 đang phục vụ ứng dụng khác); React lint/build PASS, .NET Release 0 warning/0 error. Chưa chạy toàn browser suite, thiết bị vật lý hoặc đo frame rate thực tế. Một lần chạy E2E đầu mở nhầm ứng dụng ở cổng 5173, một lần đầu trên cổng riêng lộ thiếu refetch sau rollback Inbox; đã sửa và chạy lại PASS.
 - Phạm vi commit: workspace service/test, label mutations/manager/test, Inbox, RemindersPage, E2E workspace và mục worklog này. Giữ các thay đổi backend/archive/performance và file cấu hình local ngoài commit. Không migration/deploy thủ công/owner DB/email thật.
+- Đã push `1e902ef9533d420891fed2f2de6718ce52800fb3` lên `main`; `git ls-remote origin refs/heads/main` trả đúng SHA. Commit chứa đúng 9 file trong phạm vi trên; các thay đổi khác còn trong working tree.
 
 ## Tự nhận múi giờ và lưu reminder trong nền — 2026-10-27
 
