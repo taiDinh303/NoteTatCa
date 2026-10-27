@@ -1624,6 +1624,27 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "アドレスを確認するか、アカウントに戻ってください。",
   ],
   "Date & time": ["Ngày & giờ", "日期与时间", "日時"],
+  "Your device timezone ({0}) is used automatically. The reminder appears in Inbox at this time.": [
+    "Tự dùng múi giờ của thiết bị ({0}). Đến giờ này, lời nhắc sẽ xuất hiện trong Hộp thư.",
+    "自动使用设备时区（{0}）。提醒会在此时间出现在收件箱中。",
+    "端末のタイムゾーン（{0}）を自動で使用します。この時刻に受信箱へ通知します。",
+  ],
+  "This reminder runs once. You can edit or pause it later. Past Inbox notifications stay.": [
+    "Chỉ nhắc một lần. Bạn có thể sửa hoặc tạm dừng sau; thông báo cũ trong Hộp thư vẫn được giữ.",
+    "仅提醒一次。之后可以编辑或暂停；收件箱中的历史通知会保留。",
+    "通知は1回です。後で編集・一時停止でき、受信箱の過去の通知は残ります。",
+  ],
+  "After the first reminder, it repeats at this local time until the selected end. You can edit or pause it later. Past Inbox notifications stay.": [
+    "Sau lần đầu, lời nhắc lặp lại vào giờ này theo lịch đã chọn đến khi kết thúc. Bạn có thể sửa hoặc tạm dừng; thông báo cũ vẫn được giữ.",
+    "首次提醒后，会按所选日程在当地此时重复，直到设定的结束时间。之后可编辑或暂停；历史通知保留。",
+    "初回以降、選択した終了条件まで現地のこの時刻に繰り返します。後で編集・一時停止でき、過去の通知は残ります。",
+  ],
+  "Saving in background…": ["Đang lưu trong nền…", "正在后台保存…", "バックグラウンドで保存中…"],
+  "Open a note and tap the bell. Choose a time and repeat schedule; your device timezone is used automatically.": [
+    "Mở ghi chú và nhấn chuông. Chọn giờ và lịch lặp; múi giờ thiết bị được dùng tự động.",
+    "打开笔记并点击铃铛。选择时间和重复日程；系统会自动使用设备时区。",
+    "ノートを開いてベルを押します。時刻と繰り返しを選ぶと、端末のタイムゾーンが自動で使われます。",
+  ],
   "Time input uses your browser’s timezone ({0}). Recurrence uses the timezone below.":
     [
       "Thời gian nhập theo múi giờ trình duyệt ({0}). Lịch lặp dùng múi giờ bên dưới.",

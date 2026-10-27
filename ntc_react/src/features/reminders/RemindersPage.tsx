@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cache, reminders, workspace } from "../../app/runtime";
-import type { Reminder } from "../../domain/models";
+import type { Reminder, ReminderInput } from "../../domain/models";
 import { REPEAT_NAMES } from "../../domain/models";
 import { useAuth, useMe } from "../../shared/hooks";
 import {
@@ -22,12 +22,14 @@ import {
   Button,
   ConfirmDialog,
   EmptyState,
+  ErrorBanner,
   ErrorPanel,
   Modal,
   Spinner,
 } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
 import { ReminderForm } from "./ReminderDialog";
+import { commitReminder, pendingReminder } from "./reminderCache";
 export default function RemindersPage() {
   useLanguage();
   const state = useAuth();
@@ -42,6 +44,10 @@ export default function RemindersPage() {
     refetchOnMount: "always",
   });
   const [editing, setEditing] = useState<Reminder>();
+  const [pending, setPending] = useState<Reminder>();
+  const [draft, setDraft] = useState<ReminderInput>();
+  const [saveError, setSaveError] = useState<unknown>();
+  const saveOwner = useRef("");
   const [deleting, setDeleting] = useState<Reminder>();
   const [busy, setBusy] = useState<string>();
   const items = query.data?.pages.flatMap((p) => p.items) ?? [];
@@ -74,7 +80,7 @@ export default function RemindersPage() {
           <strong>{tr("Let your notes find you.")}</strong>
           <p>
             {tr(
-              "Open any note and tap the bell to set a reminder. Recurring reminders follow your chosen timezone.",
+              "Open a note and tap the bell. Choose a time and repeat schedule; your device timezone is used automatically.",
             )}
           </p>
         </div>
@@ -96,75 +102,87 @@ export default function RemindersPage() {
         />
       ) : (
         <div className="reminders-board">
-          {items.map((reminder) => (
-            <article
-              className={`reminder-card ${!reminder.isActive ? "paused" : ""}`}
-              key={reminder.id}
-            >
-              <div className="reminder-card-icon">
-                <Bell size={20} />
-              </div>
-              <div className="reminder-card-content">
-                <Link to={`/notes?note=${reminder.noteId}`}>
-                  <h2>{reminder.noteTitle || tr("Untitled")}</h2>
-                </Link>
-                <p>
-                  <Clock3 size={14} />
-                  {dateTime(
-                    reminder.nextOccurrenceAt ?? reminder.reminderAt,
-                    reminder.timeZoneId,
-                  )}
-                </p>
-                <div className="reminder-meta">
-                  <span>
-                    {tr(REPEAT_NAMES[reminder.repeatType])}
-                    {reminder.repeatInterval > 1
-                      ? tr("· every {0}", reminder.repeatInterval)
-                      : ""}
-                  </span>
-                  <span>{reminder.timeZoneId}</span>
-                  {reminder.sendEmail ? (
-                    <span>
-                      <Mail size={11} />
-                      {tr("Email")}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-              <span
-                className={`status-pill ${reminder.isActive ? "success" : ""}`}
+          {items.map((item) => {
+            const reminder = pending?.id === item.id ? pending : item;
+            const saving = pending?.id === item.id;
+            return (
+              <article
+                className={`reminder-card ${!reminder.isActive ? "paused" : ""}`}
+                key={reminder.id}
               >
-                {reminder.isActive ? tr("Active") : tr("Paused")}
-              </span>
-              <ActionMenu
-                label={tr("Reminder actions")}
-                items={[
-                  {
-                    label: tr("Edit reminder"),
-                    icon: Pencil,
-                    action: () => setEditing(reminder),
-                    disabled: busy === reminder.id,
-                  },
-                  {
-                    label: reminder.isActive
-                      ? tr("Pause reminder")
-                      : tr("Enable reminder"),
-                    icon: reminder.isActive ? Pause : Play,
-                    action: () => void toggle(reminder),
-                    disabled: busy === reminder.id,
-                  },
-                  {
-                    label: tr("Delete reminder"),
-                    icon: Trash2,
-                    danger: true,
-                    separator: true,
-                    action: () => setDeleting(reminder),
-                    disabled: busy === reminder.id,
-                  },
-                ]}
-              />
-            </article>
-          ))}
+                <div className="reminder-card-icon">
+                  <Bell size={20} />
+                </div>
+                <div className="reminder-card-content">
+                  <Link to={`/notes?note=${reminder.noteId}`}>
+                    <h2>{reminder.noteTitle || tr("Untitled")}</h2>
+                  </Link>
+                  <p>
+                    <Clock3 size={14} />
+                    {dateTime(
+                      reminder.nextOccurrenceAt ?? reminder.reminderAt,
+                      reminder.timeZoneId,
+                    )}
+                  </p>
+                  <div className="reminder-meta">
+                    <span>
+                      {tr(REPEAT_NAMES[reminder.repeatType])}
+                      {reminder.repeatInterval > 1
+                        ? tr("· every {0}", reminder.repeatInterval)
+                        : ""}
+                    </span>
+                    <span>{reminder.timeZoneId}</span>
+                    {reminder.sendEmail ? (
+                      <span>
+                        <Mail size={11} />
+                        {tr("Email")}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <span
+                  className={`status-pill ${reminder.isActive ? "success" : ""}`}
+                >
+                  {saving
+                    ? tr("Saving in background…")
+                    : reminder.isActive
+                      ? tr("Active")
+                      : tr("Paused")}
+                </span>
+                <ActionMenu
+                  label={tr("Reminder actions")}
+                  items={[
+                    {
+                      label: tr("Edit reminder"),
+                      icon: Pencil,
+                      action: () => {
+                        setDraft(undefined);
+                        setSaveError(undefined);
+                        setEditing(reminder);
+                      },
+                      disabled: busy === reminder.id || saving,
+                    },
+                    {
+                      label: reminder.isActive
+                        ? tr("Pause reminder")
+                        : tr("Enable reminder"),
+                      icon: reminder.isActive ? Pause : Play,
+                      action: () => void toggle(reminder),
+                      disabled: busy === reminder.id || saving,
+                    },
+                    {
+                      label: tr("Delete reminder"),
+                      icon: Trash2,
+                      danger: true,
+                      separator: true,
+                      action: () => setDeleting(reminder),
+                      disabled: busy === reminder.id || saving,
+                    },
+                  ]}
+                />
+              </article>
+            );
+          })}
         </div>
       )}
       {query.hasNextPage ? (
@@ -179,23 +197,54 @@ export default function RemindersPage() {
       {editing ? (
         <Modal
           open
-          onClose={() => setEditing(undefined)}
+          onClose={() => {
+            setDraft(undefined);
+            setSaveError(undefined);
+            setEditing(undefined);
+          }}
           title={tr("Edit reminder")}
         >
           <div className="modal-body">
+            <ErrorBanner error={saveError} />
             <ReminderForm
               noteId={editing.noteId}
               initial={editing}
+              draft={draft}
               zone={
                 me.data?.account.timeZoneId ??
                 state.session?.timeZoneId ??
                 "Asia/Ho_Chi_Minh"
               }
-              onDone={async () => {
-                await refresh();
+              onStarted={(body) => {
+                setSaveError(undefined);
+                saveOwner.current = String(workspace.key("reminders")[1]);
+                setPending(
+                  pendingReminder(
+                    editing.noteId,
+                    editing.noteTitle,
+                    body,
+                    editing,
+                  ),
+                );
                 setEditing(undefined);
               }}
-              onCancel={() => setEditing(undefined)}
+              onDone={(saved) => {
+                commitReminder(saved, saveOwner.current);
+                setPending(undefined);
+                setDraft(undefined);
+              }}
+              onFailed={(failure, body) => {
+                setPending(undefined);
+                setDraft(body);
+                setSaveError(failure);
+                setEditing(editing);
+                toast.error(errorMessage(failure));
+              }}
+              onCancel={() => {
+                setDraft(undefined);
+                setSaveError(undefined);
+                setEditing(undefined);
+              }}
             />
           </div>
         </Modal>

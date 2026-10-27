@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Tự nhận múi giờ và lưu reminder trong nền — 2026-10-27
+
+- Bỏ ô nhập `Recurrence timezone` tự do trong biểu mẫu reminder. Giờ nhập là giờ địa phương của thiết bị; khi gửi, client tự lấy múi giờ IANA từ trình duyệt (fallback sang múi giờ tài khoản nếu trình duyệt không cung cấp). Người dùng chỉ chọn ngày/giờ, lịch lặp, ngày kết thúc và email tùy chọn. Biểu mẫu giải thích lời nhắc xuất hiện trong Inbox khi đến giờ; lịch lặp chạy theo giờ địa phương đã chọn; có thể sửa/tạm dừng và thông báo cũ được giữ.
+- Tạo/sửa đóng biểu mẫu ngay, hiện reminder với trạng thái `Đang lưu trong nền…` mà không đợi HTTP. Khi API xác nhận, cập nhật cache note/reminder theo owner rồi làm mới dữ liệu trong nền; khi lỗi, bỏ trạng thái tạm, mở lại biểu mẫu với dữ liệu đã nhập và báo lỗi. Chặn gửi hai lần và thao tác sửa/xóa trên reminder đang lưu. Không đổi backend/schema, không dùng email thật hay dữ liệu owner để test.
+- Kiểm chứng: Playwright mới 2/2 PASS (POST bị trì hoãn, timezone tự động, thành công và lỗi/khôi phục draft); hồi quy tạo reminder rồi nhận Inbox `workspace.spec.ts` 1/1 PASS. `npm --prefix ntc_react run build` PASS, `.NET Release` 0 warning/0 error. ESLint được chạy riêng. Chưa kiểm thiết bị vật lý hoặc toàn browser suite; thao tác rời khỏi trang trong lúc request thất bại vẫn cần cơ chế hàng đợi lưu lâu dài nếu muốn khôi phục draft giữa các trang.
+- Phạm vi dự kiến commit/push: `ReminderDialog.tsx`, `RemindersPage.tsx`, `reminderCache.ts`, E2E mới, 5 thông điệp giao diện mới và mục worklog này. Các thay đổi backup/backend/hiệu năng khác đang có trong working tree giữ ngoài commit; không migration hoặc deploy thủ công.
+
 ## Nội dung View note lên sát tiêu đề khi ẩn toolbar — 2026-10-27
 
 - Theo yêu cầu chủ dự án (ảnh 1/2 kèm): phần Edit đúng như hiện hành; phần View sau khi ẩn thanh công cụ thì nội dung phải được đưa lên gần tiêu đề, không giữ chỗ trống chiều cao toolbar.

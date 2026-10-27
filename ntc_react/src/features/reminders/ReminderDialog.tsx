@@ -1,6 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Bell, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
 import { cache, reminders, workspace } from "../../app/runtime";
 import type { Reminder, ReminderInput } from "../../domain/models";
@@ -16,30 +17,57 @@ import {
   Modal,
   Spinner,
 } from "../../shared/ui";
-import { dateTime } from "../../shared/utils";
+import { dateTime, errorMessage } from "../../shared/utils";
+import { commitReminder, pendingReminder } from "./reminderCache";
+
+function deviceZone(fallback: string) {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function ReminderForm({
   noteId,
   initial,
+  draft,
   zone,
+  onStarted,
   onDone,
+  onFailed,
   onCancel,
 }: {
   noteId: string;
   initial?: Reminder;
+  draft?: ReminderInput;
   zone: string;
-  onDone: () => Promise<void> | void;
+  onStarted: (body: ReminderInput) => void;
+  onDone: (saved: Reminder) => void;
+  onFailed: (error: unknown, body: ReminderInput) => void;
   onCancel: () => void;
 }) {
   useLanguage();
-  const [repeat, setRepeat] = useState(initial?.repeatType ?? 0);
-  const [days, setDays] = useState(initial?.repeatDays ?? 0);
-  const [ending, setEnding] = useState(
-    initial?.repeatCount ? "count" : initial?.repeatUntil ? "until" : "never",
+  const [repeat, setRepeat] = useState(
+    draft?.repeatType ?? initial?.repeatType ?? 0,
   );
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<unknown>();
+  const [days, setDays] = useState(
+    draft?.repeatDays ?? initial?.repeatDays ?? 0,
+  );
+  const [ending, setEnding] = useState(
+    draft?.repeatCount || initial?.repeatCount
+      ? "count"
+      : draft?.repeatUntil || initial?.repeatUntil
+        ? "until"
+        : "never",
+  );
+  const submitting = useRef(false);
+  const timeZone = deviceZone(zone);
   const [date] = useState(
-    () => new Date(initial?.reminderAt ?? Date.now() + 60 * 60 * 1000),
+    () =>
+      new Date(
+        draft?.reminderAt ?? initial?.reminderAt ?? Date.now() + 60 * 60 * 1000,
+      ),
   );
   const localInput = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
@@ -49,12 +77,11 @@ export function ReminderForm({
       className="reminder-form"
       onSubmit={(e) => {
         e.preventDefault();
+        if (submitting.current) return;
         const data = new FormData(e.currentTarget);
-        setBusy(true);
-        setError(undefined);
         const body: ReminderInput = {
           reminderAt: new Date(String(data.get("at"))).toISOString(),
-          timeZoneId: String(data.get("zone")),
+          timeZoneId: timeZone,
           repeatType: repeat,
           repeatInterval: repeat ? Number(data.get("interval")) : 1,
           repeatDays: repeat === 2 ? days : null,
@@ -66,24 +93,22 @@ export function ReminderForm({
               : null,
           sendEmail: data.get("email") === "on",
         };
+        submitting.current = true;
+        onStarted(body);
         void (
           initial
             ? reminders.patch(initial, body)
             : reminders.create(noteId, body)
         )
-          .then(async () => {
-            await onDone();
-          })
-          .catch(setError)
-          .finally(() => setBusy(false));
+          .then(onDone)
+          .catch((error) => onFailed(error, body));
       }}
     >
-      <ErrorBanner error={error} />
       <Field
         label={tr("Date & time")}
         hint={tr(
-          "Time input uses your browser’s timezone ({0}). Recurrence uses the timezone below.",
-          Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "Your device timezone ({0}) is used automatically. The reminder appears in Inbox at this time.",
+          timeZone,
         )}
       >
         <input
@@ -92,27 +117,6 @@ export function ReminderForm({
           defaultValue={localInput}
           required
         />
-      </Field>
-      <Field label={tr("Recurrence timezone")}>
-        <input
-          name="zone"
-          defaultValue={initial?.timeZoneId ?? zone}
-          list="timezones"
-          required
-          maxLength={100}
-        />
-        <datalist id="timezones">
-          {[
-            "Asia/Ho_Chi_Minh",
-            "UTC",
-            "Asia/Bangkok",
-            "Europe/London",
-            "America/New_York",
-            "Asia/Tokyo",
-          ].map((z) => (
-            <option key={z}>{z}</option>
-          ))}
-        </datalist>
       </Field>
       <div className="form-grid">
         <Field label={tr("Repeat")}>
@@ -134,7 +138,9 @@ export function ReminderForm({
               name="interval"
               min={1}
               max={365}
-              defaultValue={initial?.repeatInterval ?? 1}
+              defaultValue={
+                draft?.repeatInterval ?? initial?.repeatInterval ?? 1
+              }
               required
             />
           </Field>
@@ -172,7 +178,7 @@ export function ReminderForm({
                 min={1}
                 max={100000}
                 required
-                defaultValue={initial?.repeatCount ?? 10}
+                defaultValue={draft?.repeatCount ?? initial?.repeatCount ?? 10}
               />
             </Field>
           ) : ending === "until" ? (
@@ -181,10 +187,14 @@ export function ReminderForm({
                 type="datetime-local"
                 name="until"
                 defaultValue={
-                  initial?.repeatUntil
+                  draft?.repeatUntil || initial?.repeatUntil
                     ? new Date(
-                        new Date(initial.repeatUntil).getTime() -
-                          new Date(initial.repeatUntil).getTimezoneOffset() *
+                        new Date(
+                          (draft?.repeatUntil ?? initial?.repeatUntil)!,
+                        ).getTime() -
+                          new Date(
+                            (draft?.repeatUntil ?? initial?.repeatUntil)!,
+                          ).getTimezoneOffset() *
                             60000,
                       )
                         .toISOString()
@@ -201,20 +211,22 @@ export function ReminderForm({
         <input
           type="checkbox"
           name="email"
-          defaultChecked={initial?.sendEmail ?? true}
+          defaultChecked={draft?.sendEmail ?? initial?.sendEmail ?? true}
         />{" "}
         {tr("Also send an email reminder")}
       </label>
       <p className="field-hint">
         {tr(
-          "Reminders always appear in your inbox. Changing this schedule keeps past inbox notifications.",
+          repeat
+            ? "After the first reminder, it repeats at this local time until the selected end. You can edit or pause it later. Past Inbox notifications stay."
+            : "This reminder runs once. You can edit or pause it later. Past Inbox notifications stay.",
         )}
       </p>
       <div className="form-actions">
         <Button variant="secondary" onClick={onCancel} type="button">
           {tr("Cancel")}
         </Button>
-        <Button busy={busy} type="submit">
+        <Button type="submit">
           {initial ? tr("Save reminder") : tr("Set reminder")}
         </Button>
       </div>
@@ -239,7 +251,10 @@ export default function ReminderDialog({
   });
   const [editing, setEditing] = useState<Reminder | null | undefined>();
   const [deleting, setDeleting] = useState<Reminder>();
+  const [pending, setPending] = useState<Reminder>();
+  const [draft, setDraft] = useState<ReminderInput>();
   const [error, setError] = useState<unknown>();
+  const saveOwner = useRef("");
   async function refresh() {
     await Promise.all([
       query.refetch(),
@@ -262,9 +277,32 @@ export default function ReminderDialog({
             key={editing?.id ?? "new"}
             noteId={noteId}
             initial={editing ?? undefined}
+            draft={draft}
             zone={zone}
-            onDone={refresh}
-            onCancel={() => setEditing(undefined)}
+            onStarted={(body) => {
+              setError(undefined);
+              saveOwner.current = String(workspace.key("reminders")[1]);
+              setPending(
+                pendingReminder(noteId, title, body, editing ?? undefined),
+              );
+              setEditing(undefined);
+            }}
+            onDone={(saved) => {
+              commitReminder(saved, saveOwner.current);
+              setDraft(undefined);
+              setPending(undefined);
+            }}
+            onFailed={(failure, body) => {
+              setPending(undefined);
+              setDraft(body);
+              setError(failure);
+              setEditing(editing ?? null);
+              toast.error(errorMessage(failure));
+            }}
+            onCancel={() => {
+              setDraft(undefined);
+              setEditing(undefined);
+            }}
           />
         ) : (
           <>
@@ -275,7 +313,7 @@ export default function ReminderDialog({
                 error={query.error}
                 retry={() => void query.refetch()}
               />
-            ) : !query.data.length ? (
+            ) : !query.data.length && !pending ? (
               <EmptyState
                 icon={Bell}
                 title={tr("Give it a little nudge")}
@@ -283,43 +321,67 @@ export default function ReminderDialog({
               />
             ) : (
               <div className="reminder-list">
-                {query.data.map((reminder) => (
-                  <div className="reminder-row" key={reminder.id}>
-                    <Clock3 size={19} />
-                    <div>
-                      <strong>
-                        {dateTime(
-                          reminder.nextOccurrenceAt ?? reminder.reminderAt,
-                          reminder.timeZoneId,
-                        )}
-                      </strong>
-                      <span>
-                        {tr(REPEAT_NAMES[reminder.repeatType])} ·{" "}
-                        {reminder.isActive ? tr("Active") : tr("Paused")} ·{" "}
-                        {reminder.timeZoneId}
-                      </span>
+                {[
+                  ...query.data,
+                  ...(pending &&
+                  !query.data.some((item) => item.id === pending.id)
+                    ? [pending]
+                    : []),
+                ].map((item) => {
+                  const reminder = pending?.id === item.id ? pending : item;
+                  const saving =
+                    reminder.id.startsWith("pending-") ||
+                    pending?.id === reminder.id;
+                  return (
+                    <div className="reminder-row" key={reminder.id}>
+                      <Clock3 size={19} />
+                      <div>
+                        <strong>
+                          {dateTime(
+                            reminder.nextOccurrenceAt ?? reminder.reminderAt,
+                            reminder.timeZoneId,
+                          )}
+                        </strong>
+                        <span>
+                          {tr(REPEAT_NAMES[reminder.repeatType])} ·{" "}
+                          {saving
+                            ? tr("Saving in background…")
+                            : reminder.isActive
+                              ? tr("Active")
+                              : tr("Paused")}{" "}
+                          · {reminder.timeZoneId}
+                        </span>
+                      </div>
+                      <IconButton
+                        icon={Pencil}
+                        label={tr("Edit reminder")}
+                        onClick={() => {
+                          setDraft(undefined);
+                          setError(undefined);
+                          setEditing(reminder);
+                        }}
+                        disabled={saving}
+                      />
+                      <IconButton
+                        icon={Trash2}
+                        label={tr("Delete reminder")}
+                        onClick={() => setDeleting(reminder)}
+                        disabled={saving}
+                      />
                     </div>
-                    <IconButton
-                      icon={Pencil}
-                      label={tr("Edit reminder")}
-                      onClick={() => setEditing(reminder)}
-                    />
-                    <IconButton
-                      icon={Trash2}
-                      label={tr("Delete reminder")}
-                      onClick={() => setDeleting(reminder)}
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             <Button
               variant="secondary"
               disabled={
+                Boolean(pending) ||
                 (query.data?.filter((r) => r.isActive).length ?? 0) >= 5
               }
               onClick={() => {
                 setError(undefined);
+                setDraft(undefined);
                 setEditing(null);
               }}
             >
