@@ -1026,7 +1026,11 @@ strong {
   border-radius: 11px;
   box-shadow: 0 2px 4px #27344403;
   position: relative;
-  overflow: hidden;
+  /* overflow is visible so the note mascot (when anchored on top of this
+     card) can be placed above the card's top border without being clipped.
+     The card's own inner content (title, preview, footer) never overflows
+     the card's box, so nothing else needs overflow:hidden. */
+  overflow: visible;
   transition:
     box-shadow 0.2s,
     border-color 0.2s,

@@ -17,7 +17,7 @@ import "./MascotPage.css";
  * No chat logic — decorative only.
  */
 export function NoteMascot({
-  size = 72,
+  size = 88,
   anchor = "center",
 }: {
   size?: number;
