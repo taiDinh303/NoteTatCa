@@ -1,0 +1,26 @@
+/* NoteMascot — bunny rendered INSIDE a note card, absolutely positioned.
+   Two anchors:
+   - "center": the card has not been opened yet; the bunny sits in the
+     middle of the card's top area, gently overlapping the border.
+   - "corner": the card is the last-opened note; the bunny sits in the
+     top-right corner of the card.
+   The button itself is interactive (poke = blink + squash).
+   z-index sits above the card's own content but below modals (71).
+*/
+.note-mascot {
+  position: absolute;
+  z-index: 25;
+  pointer-events: auto;
+}
+.note-mascot-center {
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.note-mascot-corner {
+  top: -18px;
+  right: -6px;
+}
+.note-mascot-sprite {
+  display: block;
+}

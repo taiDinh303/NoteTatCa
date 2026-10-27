@@ -41,6 +41,8 @@ import { CardLabels } from "./CardLabels";
 import { animateNoteDrop, cancelNoteDrop } from "./noteMotion";
 import "./NoteMotion.css";
 import { NotesZoomViewport } from "./NotesZoomViewport";
+import { NoteMascot } from "../mascot/NoteMascot";
+import "../mascot/NoteMascot.css";
 import { workspace } from "../../app/runtime";
 import { useAuth, useDebounced, useLabels, useNotes } from "../../shared/hooks";
 import {
@@ -66,6 +68,8 @@ function NoteCard({
   onMove,
   draggable,
   onOrganize,
+  hasMascot = false,
+  mascotAnchor = "center",
 }: {
   note: Note;
   onOpen: () => void;
@@ -75,6 +79,8 @@ function NoteCard({
   onMove: (direction: number) => void;
   draggable: boolean;
   onOrganize: (action: NoteOpenAction) => void;
+  hasMascot?: boolean;
+  mascotAnchor?: "center" | "corner";
 }) {
   useLanguage();
   const guestMode = useAuth().status === "guest";
@@ -268,6 +274,14 @@ function NoteCard({
           )}
         </div>
       </div>
+      {/* Note mascot (bunny): sits on top of this card. Only rendered when
+          `hasMascot` is true, so it appears on the "last opened" card (corner
+          anchor) or on the first card (center anchor) when no note has been
+          opened yet this session. The mascot button is interactive (poke it
+          to make it blink) and does not interfere with card dragging. */}
+      {hasMascot ? (
+        <NoteMascot size={72} anchor={mascotAnchor} />
+      ) : null}
     </article>
   );
 }
@@ -301,6 +315,7 @@ export default function NotesPage({
     id?: string;
     action?: NoteOpenAction;
   } | null>(null);
+  const [lastOpenedNoteId, setLastOpenedNoteId] = useState<string | null>(null);
   const selected = params.get("note");
   const [view, setView] = useState(() => {
     try {
@@ -408,26 +423,39 @@ export default function NotesPage({
         </div>
 
         <div className={`note-grid ${view === "list" ? "list-view" : ""}`}>
-          {group.map((note, index) => (
-            <NoteCard
-              key={note.id}
-              note={note}
-              busy={pending === note.id}
-              trash={trash}
-              draggable={canDrag}
-              onOrganize={(action) => setEditor({ id: note.id, action })}
-              onOpen={() => {
-                if (trash) {
-                  navigate(`/trash?note=${note.id}`);
-                  setEditor({ id: note.id });
-                } else setEditor({ id: note.id });
-              }}
-              onAction={(action) => void act(note, action)}
-              onMove={(direction) =>
-                void reorder(group, index, index + direction)
-              }
-            />
-          ))}
+          {group.map((note, index) => {
+            const isTargetCard =
+              !trash &&
+              (lastOpenedNoteId === note.id ||
+                (lastOpenedNoteId === null &&
+                  group[0].id === note.id &&
+                  index === 0));
+            return (
+              <NoteCard
+                key={note.id}
+                note={note}
+                busy={pending === note.id}
+                trash={trash}
+                draggable={canDrag}
+                hasMascot={!!isTargetCard}
+                mascotAnchor={lastOpenedNoteId === note.id ? "corner" : "center"}
+                onOrganize={(action) => setEditor({ id: note.id, action })}
+                onOpen={() => {
+                  if (trash) {
+                    navigate(`/trash?note=${note.id}`);
+                    setEditor({ id: note.id });
+                  } else {
+                    setLastOpenedNoteId(note.id);
+                    setEditor({ id: note.id });
+                  }
+                }}
+                onAction={(action) => void act(note, action)}
+                onMove={(direction) =>
+                  void reorder(group, index, index + direction)
+                }
+              />
+            );
+          })}
         </div>
       </section>
     ) : null;
