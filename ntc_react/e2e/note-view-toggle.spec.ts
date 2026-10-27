@@ -32,7 +32,7 @@ for (const width of [393, 1280]) {
     await editor.getByRole("button", { name: "View", exact: true }).click();
     const viewer = page.getByRole("dialog", { name: "View note", exact: true });
     await expect(viewer.getByRole("region", { name: "Note content" })).toContainText("Draft survives failed View");
-    await expect(viewer.locator(".note-view-toolbar-space")).toHaveAttribute("aria-hidden", "true");
+    await expect(viewer.locator(".note-view-toolbar-space")).toHaveCount(0);
     await viewer.getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
     await expect(editor.getByText("Saved on this device; waiting to sync", { exact: true })).toBeVisible();

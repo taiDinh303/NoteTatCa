@@ -4,6 +4,10 @@
 
 ## Phạm vi và kiến trúc
 
+### Lịch sử, sao lưu và tải trang đầu — 2026-10-27
+
+View mở **Version history** từ popup Edited/Note information; lịch sử phân trang, restore giữ phiên bản hiện tại trong history và làm mới danh sách. Privacy có tải/nhập archive JSON cho account đang online; import thêm bản sao, không ghi đè, reminder nhập sẽ tắt. Guest/offline không gọi endpoint archive. `WorkspacePreparation` chỉ lấy trang note đầu để mở màn hình; nút Load more lấy trang sau, lọc trên dữ liệu chưa đầy đủ vẫn hỏi server. Số đo với1.000note giả và giới hạn xem [PERFORMANCE-NOTES-2026-10-27](PERFORMANCE-NOTES-2026-10-27.md).
+
 ### Hợp đồng lưu khi chuyển View ↔ Edit — 2026-10-27
 
 Nút View chờ `AutosaveCoordinator.flush()` hoàn tất; một phản hồi PATCH 503 có thể chuyển sang View nếu bản nháp đã được ghi thành công vào kho offline theo tài khoản. Khi mở lại Edit, trạng thái báo “Saved on this device; waiting to sync”; reload vẫn đọc bản local và khi có mạng, đồng bộ dùng version để tránh ghi đè thay đổi ngoài. Nếu cả server lẫn kho trên thiết bị không lưu được, giữ Edit, nội dung nháp và trạng thái lỗi. Trong lúc flush đang chờ, View bận và Close bị khóa. View giữ chỗ toolbar `aria-hidden` để ổn định hình học; toolbar định dạng thật chỉ tương tác ở Edit. Browser regression dùng fixture riêng kiểm các nhánh trên, tạo note mới, xung đột hai tab, reconnect và cô lập tài khoản; kết quả/giới hạn tại worklog.
@@ -12,9 +16,9 @@ Nút View chờ `AutosaveCoordinator.flush()` hoàn tất; một phản hồi PA
 
 Cụm nút footer của View không còn là vùng cuộn ngang `overflow-x:auto`. Nút giữ nguyên thứ tự và vị trí khi đủ chỗ; trên chiều rộng hẹp hoặc chuỗi dịch dài, chúng tự xuống hàng, không tạo thanh cuộn nhỏ cạnh View/Edit/Close. Chỉ vùng nội dung note tiếp tục cuộn theo nội dung của nó; không thay zoom, autosave hoặc hành vi các nút.
 
-### Giữ hình học View ↔ Edit — 2026-10-26
+### Giữ hình học View ↔ Edit — 2026-10-26 (cập nhật 2026-10-27)
 
-Header của hai chế độ dùng cùng chiều cao, lề ngang, cỡ chữ20px và ô icon28×36px. Khi note không có icon, nút thêm icon ở Edit nằm sau vùng tiêu đề để tiêu đề vẫn thẳng lề nội dung như View. Ô tiêu đề View một dòng với dấu ba chấm nếu quá dài, tương ứng input một dòng ở Edit. View giữ một chỗ trống không tương tác bằng đúng chiều cao toolbar định dạng; khi vào Edit, toolbar xuất hiện tại đó và dòng đầu nội dung không dịch chuyển. Footer hai chế độ có cùng lề/chiều cao, kể cả hàng nút dưới ở mobile; đường kẻ dùng viền trong suốt ở View để không làm đổi kích thước. Nút toàn màn hình, Close và icon/tiêu đề giữ tọa độ khi đổi chế độ. Thanh công cụ và các nút riêng của Edit vẫn chỉ xuất hiện ở Edit.
+Header của hai chế độ dùng cùng chiều cao, lề ngang, cỡ chữ20px và ô icon28×36px. Khi note không có icon, nút thêm icon ở Edit nằm sau vùng tiêu đề để tiêu đề vẫn thẳng lề nội dung như View. Ô tiêu đề View một dòng với dấu ba chấm nếu quá dài, tương ứng input một dòng ở Edit. Cập nhật 2026-10-27 theo yêu cầu chủ dự án: View không còn giữ chỗ trống chiều cao toolbar; khi ẩn toolbar, nội dung lên sát ngay dưới tiêu đề. Khi vào Edit, toolbar định dạng xuất hiện giữa tiêu đề và nội dung; dòng đầu nội dung có thể dịch xuống đúng chiều cao toolbar. Footer hai chế độ có cùng lề/chiều cao, kể cả hàng nút dưới ở mobile; đường kẻ dùng viền trong suốt ở View để không làm đổi kích thước. Nút toàn màn hình, Close và icon/tiêu đề giữ tọa độ khi đổi chế độ. Thanh công cụ và các nút riêng của Edit vẫn chỉ xuất hiện ở Edit.
 
 ### View ↔ Edit không phát lại fade — 2026-10-26
 

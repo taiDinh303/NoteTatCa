@@ -51,14 +51,18 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Edit", exact: true })
       .boundingBox())!;
     expect(stampBounds.x).toBeLessThan(editBounds.x);
-    expect(
-      Math.abs(
-        stampBounds.y +
-          stampBounds.height / 2 -
-          editBounds.y -
-          editBounds.height / 2,
-      ),
-    ).toBeLessThan(3);
+    if (width > 800) {
+      expect(
+        Math.abs(
+          stampBounds.y +
+            stampBounds.height / 2 -
+            editBounds.y -
+            editBounds.height / 2,
+        ),
+      ).toBeLessThan(3);
+    } else {
+      expect(editBounds.y).toBeGreaterThan(stampBounds.y + stampBounds.height / 2);
+    }
     await timestamp.click();
     const information = page.locator(".note-information");
     await expect(information).toContainText("Created");

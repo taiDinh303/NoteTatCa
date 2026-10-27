@@ -603,18 +603,18 @@ for (const [width, theme] of [
       const view = await measure();
       expect(view.actionOverflow).toBe("visible");
       expect(view.actionScrollRange).toBeLessThanOrEqual(1);
+      expect(view.toolbar).toBeNull();
       await dialog.getByRole("button", { name: "Edit", exact: true }).click();
       await expect(dialog.getByLabel("Note title", { exact: true })).toBeVisible();
       const edit = await measure();
+      expect(edit.toolbar).not.toBeNull();
       const near = (a: number, b: number) => expect(Math.abs(a - b)).toBeLessThan(1);
-      for (const key of ["title", "content", "close", "fullscreen"] as const) {
-        if (!view[key] || !edit[key]) continue;
-        near(view[key].x, edit[key].x);
-        near(view[key].y, edit[key].y);
-        near(view[key].height, edit[key].height);
+      for (const key of ["title", "close", "fullscreen", "heading"] as const) {
+        near(view[key]!.x, edit[key]!.x);
+        near(view[key]!.y, edit[key]!.y);
+        near(view[key]!.height, edit[key]!.height);
       }
-      near(view.heading!.height, edit.heading!.height);
-      near(view.toolbar!.height, edit.toolbar!.height);
+      expect(edit.content!.y - view.content!.y).toBeGreaterThanOrEqual(0);
       expect(view.fontSize).toBe(edit.fontSize);
       expect(view.fontWeight).toBe(edit.fontWeight);
       if (hasIcon) {

@@ -334,9 +334,6 @@ function NoteViewer({
         />
       </div>
       <div className="editor-scroll">
-        <div className="editor-toolbar note-view-toolbar-space" aria-hidden="true">
-          <span className="note-view-toolbar-size" />
-        </div>
         <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
           <ReadOnlyContent
             key={note.version}

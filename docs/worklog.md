@@ -2,11 +2,22 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Nội dung View note lên sát tiêu đề khi ẩn toolbar — 2026-10-27
+
+- Theo yêu cầu chủ dự án (ảnh 1/2 kèm): phần Edit đúng như hiện hành; phần View sau khi ẩn thanh công cụ thì nội dung phải được đưa lên gần tiêu đề, không giữ chỗ trống chiều cao toolbar.
+- Bỏ element spacer `.note-view-toolbar-space` (class `editor-toolbar` dùng `display:none` nhưng vẫn chiếm chỗ trong DOM) khỏi `NoteViewer` (`NoteEditor.tsx`); bỏ 2 rule CSS `note-view-toolbar-space/size` không còn tác dụng. Khi đó nội dung View render sát ngay dưới heading; khi vào Edit, toolbar định dạng mới xuất hiện giữa tiêu đề và nội dung (dòng đầu nội dung có thể dịch xuống đúng chiều cao toolbar — đây là hệ quả có chủ đích của yêu cầu mới, không còn giữ "đồng hình học tuyệt đối" giữa 2 chế độ).
+- Cập nhật `docs/FRONTEND-IMPLEMENTATION.md` mục "Giữ hình học View ↔ Edit": ghi rõ cập nhật 2026-10-27 theo yêu cầu này.
+- Cập nhật E2E: `note-view-toggle.spec.ts` (View không còn có toolbar spacer trong DOM); `content-zoom.spec.ts` (View không có `.editor-toolbar`, Edit có; content trong Edit có thể ở y ≥ y của View, không còn yêu cầu trùng khớp tuyệt đối từng pixel); `note-view.spec.ts` (footer alignment: mobile wrap thì timestamp xuống hàng riêng, desktop cùng hàng).
+- Kiểm chứng: `npm run build` PASS; `tsc --noEmit` PASS; `vitest run` 15 file/117 test PASS; `playwright test` focused trên `note-view`, `note-view-toggle`, `content-zoom`, `editor-header` → 24/25 PASS, 1 FAIL.
+- FAIL còn lại là `note-view.spec.ts 1280` tại bước kiểm `.note-tags` sau khi retry-save label "Work" — đây là lỗi có sẵn trên baseline HEAD (chưa có thay đổi lần này), do version conflict "The resource changed. Reload before saving." trong suite test, không liên quan thay đổi toolbar/content spacing lần này. Không cố sửa ngoài scope.
+- Scope commit: `ntc_react/src/features/editor/NoteEditor.tsx`, `ntc_react/src/styles.css`, 3 file E2E và 2 root docs. Giữ nguyên các thay đổi khác đang có trong working tree (backend archive, reminders, privacy, preparation, v.v.) — không gộp vào commit này.
+
 ## Footer View note xuống dòng trên mobile (Edited riêng với Edit/Close) — 2026-10-27
 
 - `@container viewport (max-width: 480px)` cho footer View trong `styles.css` đã có sẵn (flex-wrap, timestamp 100% width, actions dòng 2) nhưng không trigger trên điện thoại thật — `container-type: viewport` trên `:root` không được browser hiện hành hỗ trợ đầy đủ.
 - Đổi 1 rule `@container` (footer View mobile) sang `@media (max-width: 480px)`, hành vi không đổi. E2E `note-view.spec.ts` chạy ở 393px/1280px vẫn match.
-- Kiểm chứng: `npm run build` PASS; verify dist CSS include `@media (width<=480px){.note-editor-modal .note-view-footer{flex-wrap:wrap}...}`. Chưa chạy E2E (cần dotnet fixture + dev server, chưa có sẵn).
+- Thêm `display: block` cho `.note-view-timestamp` (button Radix inline-block) để `flex: 0 0 100%` hoạt động chính xác.
+- Kiểm chứng: `npm run build` PASS; verify dist CSS include `@media (width<=480px){.note-editor-modal .note-view-footer{flex-wrap:wrap}.note-editor-modal .note-view-footer .note-view-timestamp{display:block;flex:0 0 100%}...}`. Chưa chạy E2E (cần dotnet fixture + dev server).
 
 ## Giữ full screen khi chuyển Edit ↔ View — 2026-10-27
 
