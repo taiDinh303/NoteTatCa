@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Gỡ pin/unpin pulse — 2026-10-27
+
+- Theo yêu cầu chủ dự án, gỡ hẳn tính năng pin/unpin pulse (CSS keyframe `editor-pin-pulse` + class `editor-pin-pulsed` trong `NoteEditor.tsx`). Giữ lại hover card lift (CSS `.note-card`).
+- Kiểm chứng: `npm run typecheck` PASS; `npm run build` PASS. Scope commit: `ntc_react/src/styles.css`, `ntc_react/src/features/editor/NoteEditor.tsx`.
+
 ## Sửa lỗi giao diện modal (revert framer-motion, giữ CSS hover/pin) — 2026-10-27
 
 - Chủ dự án báo commit `f66db24` "Add motion to note modals..." gây lỗi giao diện trên `note-tat-ca.vercel.app/Home` và yêu cầu xem guest/home trước khi push. Root cause: `motion.create(Dialog.Content)` trong `Modal` (ui.tsx) đặt `transform`/`scale` inline (framer-motion), **xung đột với `transform: translate(-50%,-50%)`** dùng để center của CSS `.modal` (Radix). Modal note (cố tình `animation:none` để không nhảy) bị lệch tâm/vỡ layout.
