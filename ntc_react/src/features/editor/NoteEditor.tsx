@@ -9,13 +9,14 @@ import {
 } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { useBlocker } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   Bell,
   Check,
   Copy,
   Download,
   Eye,
+  History,
   Maximize2,
   Minimize2,
   Pencil,
@@ -30,7 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AutosaveCoordinator } from "../../application/autosave";
-import { notes, workspace, offline } from "../../app/runtime";
+import { api, notes, workspace, offline } from "../../app/runtime";
 import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom, EMOJIS } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
@@ -84,6 +85,7 @@ function NoteEditorSession({
   useLanguage();
   const [editing, setEditing] = useState(!noteId);
   const [createdId, setCreatedId] = useState<string>();
+  const [fullscreen, setFullscreen] = useState(false);
   const resolvedId = noteId ?? createdId;
   const query = useQuery({
     networkMode: "always",
@@ -122,7 +124,10 @@ function NoteEditorSession({
         note={query.data}
         onClose={onClose}
         onEdit={() => setEditing(true)}
+        onRestored={() => { void query.refetch(); void workspace.cache.invalidateQueries({ queryKey: workspace.key("notes") }); }}
         initialAction={initialAction}
+        fullscreen={fullscreen}
+        onFullscreenChange={setFullscreen}
       />
     );
   return (
@@ -134,6 +139,8 @@ function NoteEditorSession({
         setCreatedId(note.id);
         setEditing(false);
       }}
+      fullscreen={fullscreen}
+      onFullscreenChange={setFullscreen}
     />
   );
 }
@@ -254,17 +261,23 @@ function NoteViewer({
   note,
   onClose,
   onEdit,
+  onRestored,
   initialAction,
+  fullscreen,
+  onFullscreenChange,
 }: {
   note: Note;
   onClose: () => void;
   onEdit: () => void;
+  onRestored: () => void;
   initialAction?: NoteOpenAction;
+  fullscreen: boolean;
+  onFullscreenChange: (value: boolean) => void;
 }) {
   useLanguage();
   const me = useMe();
   const auth = useAuth();
-  const [fullscreen, setFullscreen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(
     initialAction === "reminder",
   );
@@ -289,6 +302,8 @@ function NoteViewer({
         onClose={() => setReminderOpen(false)}
       />
     );
+  if (historyOpen)
+    return <NoteHistory note={note} onClose={() => setHistoryOpen(false)} onRestored={onRestored} />;
   return (
     <Modal
       open
@@ -315,7 +330,7 @@ function NoteViewer({
           icon={fullscreen ? Minimize2 : Maximize2}
           label={fullscreen ? tr("Exit full screen") : tr("Enter full screen")}
           aria-pressed={fullscreen}
-          onClick={() => setFullscreen(value => !value)}
+          onClick={() => onFullscreenChange(!fullscreen)}
         />
       </div>
       <div className="editor-scroll">
@@ -368,6 +383,7 @@ function NoteViewer({
                   </dd>
                 </div>
               </dl>
+              {auth.status === "authenticated" ? <Button variant="secondary" onClick={() => setHistoryOpen(true)}><History size={15} />{tr("Version history")}</Button> : null}
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
@@ -385,14 +401,60 @@ function NoteViewer({
     </Modal>
   );
 }
+type NoteRevision = {
+  id: string;
+  savedAt: string;
+  title: string;
+  content: string;
+};
+function NoteHistory({ note, onClose, onRestored }: { note: Note; onClose: () => void; onRestored: () => void }) {
+  useLanguage();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>();
+  const history = useInfiniteQuery({
+    queryKey: workspace.key("note-revisions", note.id),
+    queryFn: ({ pageParam }) => api.request<{ items: NoteRevision[]; hasNextPage: boolean }>(`/notes/${note.id}/revisions?pageNumber=${pageParam}&pageSize=20`),
+    initialPageParam: 1,
+    getNextPageParam: (last, _pages, lastPage) => last.hasNextPage ? lastPage + 1 : undefined,
+  });
+  const items = history.data?.pages.flatMap(page => page.items) ?? [];
+  const restore = async (revision: NoteRevision) => {
+    setBusy(true); setError(undefined);
+    try {
+      await api.request(`/notes/${note.id}/revisions/${revision.id}/restore`, { method: "POST", body: { version: note.version } });
+      onRestored(); onClose();
+    } catch (caught) { setError(caught); }
+    finally { setBusy(false); }
+  };
+  return <Modal open wide title={tr("Version history")} onClose={onClose} className="note-history-modal">
+    <div className="modal-body">
+      <p>{tr("Current note is saved in history before restoration.")}</p>
+      <ErrorBanner error={error ?? history.error} />
+      {items.length === 0 && !history.isPending ? <p>{tr("No earlier versions yet.")}</p> : null}
+      <div className="note-history-list">
+        {items.map(item => <article key={item.id} className="note-history-item">
+          <div><strong>{item.title || tr("Untitled")}</strong> · <time dateTime={item.savedAt}>{dateTime(item.savedAt)}</time></div>
+          <p>{item.content.slice(0, 500)}</p>
+          <Button variant="secondary" disabled={busy} onClick={() => void restore(item)}>{tr("Restore this version")}</Button>
+        </article>)}
+      </div>
+      {history.hasNextPage ? <Button variant="secondary" disabled={busy || history.isFetchingNextPage} onClick={() => void history.fetchNextPage()}>{tr("Load older versions")}</Button> : null}
+    </div>
+    <div className="modal-footer"><Button variant="secondary" onClick={onClose}>{tr("Close")}</Button></div>
+  </Modal>;
+}
 function EditorSession({
   initial,
   onClose,
   onView,
+  fullscreen,
+  onFullscreenChange,
 }: {
   initial?: Note;
   onClose: () => void;
   onView: (note: Note) => void;
+  fullscreen: boolean;
+  onFullscreenChange: (value: boolean) => void;
 }) {
   useLanguage();
   const state = useAuth();
@@ -413,7 +475,6 @@ function EditorSession({
     coordinator.getSnapshot,
   );
   const labels = useLabels();
-  const [fullscreen, setFullscreen] = useState(false);
   const [characterCount, setCharacterCount] = useState(
     initial?.content.length ?? 0,
   );
@@ -603,7 +664,7 @@ function EditorSession({
                 fullscreen ? tr("Exit full screen") : tr("Enter full screen")
               }
               aria-pressed={fullscreen}
-              onClick={() => setFullscreen((current) => !current)}
+              onClick={() => onFullscreenChange(!fullscreen)}
             />
           </div>
         </div>
