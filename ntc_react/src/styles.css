@@ -4930,13 +4930,18 @@ td {
 .note-editor-modal .editor-heading .row-actions { flex-shrink: 0; }
 .note-editor-modal .editor-heading .row-actions { margin-left: auto; flex-wrap: nowrap; }
 @media (max-width: 480px) {
-  .note-editor-modal .note-view-footer { flex-wrap: wrap; }
-  .note-editor-modal .note-view-footer .note-view-timestamp { display: block; flex: 0 0 100%; }
+  .note-editor-modal .note-view-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    gap: 9px 0;
+  }
+  .note-editor-modal .note-view-footer .note-view-timestamp { grid-area: 1 / 1; }
   .note-editor-modal .note-view-footer .note-view-actions {
-    width: 100%;
+    grid-area: 2 / 1;
     justify-content: flex-end;
-    padding-top: 9px;
-    border-top: 1px solid transparent;
+    padding-top: 0;
+    border-top: 0;
   }
 }
 .note-icon-menu { z-index: 160; width: min(300px, calc(100vw / var(--interface-scale) - 24px)); padding: 12px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 30px #0003; }
