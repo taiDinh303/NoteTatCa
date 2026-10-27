@@ -1029,7 +1029,8 @@ strong {
   overflow: hidden;
   transition:
     box-shadow 0.2s,
-    border-color 0.2s;
+    border-color 0.2s,
+    transform 0.2s;
   min-height: 180px;
   display: flex;
   flex-direction: column;
@@ -1038,6 +1039,11 @@ strong {
 .note-card:hover {
   box-shadow: 0 7px 20px #2734440c;
   border-color: #d8dfe5;
+  transform: translateY(-2px);
+}
+/* Press feedback: card settles back down when actively pressed. */
+.note-card:active {
+  transform: translateY(0);
 }
 .note-card.colored {
   border-color: #414a470c;
@@ -1867,6 +1873,14 @@ strong {
 .reminder-card.paused {
   opacity: 0.7;
 }
+.reminder-card.colored {
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+.reminder-card.colored .reminder-card-icon,
+.reminder-card.colored .reminder-meta span {
+  background: color-mix(in srgb, currentColor 13%, transparent);
+  color: inherit;
+}
 .reminder-card-icon {
   width: 43px;
   height: 43px;
@@ -1894,6 +1908,30 @@ strong {
   color: var(--subtle);
   margin: 0 0 7px;
 }
+.reminder-card .reminder-note-preview {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.reminder-open-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.reminder-open-note:hover { text-decoration: underline; }
+.reminder-open-note:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
 .reminder-meta {
   display: flex;
   gap: 8px;
@@ -4728,6 +4766,26 @@ td {
 .editor-heading .editor-heading-action:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+/* Pin / unpin confirmation: a single soft pulse when the pin state flips. */
+.editor-pin-pulsed svg {
+  animation: editor-pin-pulse 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes editor-pin-pulse {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editor-pin-pulsed svg {
+    animation: none;
+  }
 }
 
 /* Workspace header spans the navigation and content columns. */

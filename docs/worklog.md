@@ -2,6 +2,15 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Thêm motion cho trang note (mở/đóng modal, hover, pin) — 2026-10-27
+
+- Yêu cầu chủ dự án: trang note "có sức sống" hơn khi xem và edit. Theo tư vấn turn trước, làm 3 mục ít code/tác dụng lớn, không phá hiện trạng.
+- Cài `framer-motion@^12.43.0` vào `ntc_react` (chưa có animation lib; chỉ dùng CSS + dnd-kit FLIP). Áp dụng vào `shared/ui.tsx` `Modal`: `motion.create(Dialog.Content)` cho entrance scale(0.97→1) + fade, `y 4→0`, 0.18s ease `[0.2,0.8,0.2,1]`; tôn trọng `useReducedMotion()`. Áp cho tất cả modal (kể cả note editor/viewer, đang có `animation:none` — CSS animation chỉ tắt keyframe, framer-motion vẫn chạy via transform/opacity). Giữ `Modal` base CSS `modal-in` cho fallback.
+- Hover card lift (CSS, `styles.css` `.note-card`): thêm `transform 0.2s` vào transition, `:hover translateY(-2px)` + shadow, `:active translateY(0)` (press feedback). CSS-only, không reflow sibling, không ảnh hưởng dnd-kit FLIP (FLIP set `transform` inline khi sắp xếp, thắng CSS).
+- Pin/unpin pulse (CSS keyframes, `styles.css`): `.editor-pin-pulsed svg` animation `editor-pin-pulse` 0.32s (scale 1→1.28→1); tắt khi `prefers-reduced-motion`. Trong `NoteEditor.tsx`, class `editor-pin-pulsed` bật khi `draft.isPinned`, chạy mỗi lần pin chuyển trạng thái.
+- Kiểm chứng: `npm run typecheck` PASS; `npm run build` PASS (2598 modules, 0.72s); `npm run test` (vitest) 15 file/119 test PASS. E2E `npx playwright` KHÔNG chạy được local (thiếu `dotnet` fixture + browser; config `playwright.config.ts` cần `dotnet run` FrontendFixture ở 5199). Không dùng để thay thế — chỉ ghi hạn chế. Bundle initial 213KB gzip (vượt ~13KB mức 200KB) do framer-motion; chunk RichEditor 516KB có sẵn từ trước, không do lần này.
+- Scope commit: `ntc_react/src/shared/ui.tsx`, `ntc_react/src/features/editor/NoteEditor.tsx`, `ntc_react/src/styles.css` (phần note-card + editor-pin), `ntc_react/package.json`, `ntc_react/package-lock.json` (chỉ framer-motion), `docs/worklog.md`. Giữ nguyên các thay đổi khác trong working tree (backend archive, reminders, privacy, preparation, v.v.). Không migration/deploy thủ công.
+
 ## Phản hồi ngay cho các thao tác thường dùng — 2026-10-27
 
 - Rà các luồng ghi React: note đã autosave nội dung, đổi ghim và sắp xếp lạc quan; tạo/xóa label và tạo/sửa reminder đã lưu nền. Bổ sung: đưa note vào Trash/khôi phục hiển thị ngay với rollback khi API lỗi; đổi ghim không chờ vòng refresh sau khi server xác nhận. Sửa label cập nhật tên/màu trong cache trước khi PATCH xong, khóa chính dòng đang sửa và phục hồi dữ liệu cũ khi thất bại. Bật/tắt reminder phản hồi ngay trên thẻ và giữ thao tác đang gửi riêng với trạng thái lưu nội dung.

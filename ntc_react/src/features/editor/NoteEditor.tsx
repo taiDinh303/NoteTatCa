@@ -650,7 +650,7 @@ function EditorSession({
             <IconButton
               icon={draft.isPinned ? PinOff : Pin}
               label={draft.isPinned ? tr("Unpin note") : tr("Pin note")}
-              className="editor-pin editor-heading-action"
+              className={`editor-pin editor-heading-action ${draft.isPinned ? "editor-pin-pulsed" : ""}`}
               aria-pressed={draft.isPinned}
               onClick={() => update({ isPinned: !draft.isPinned })}
             />
