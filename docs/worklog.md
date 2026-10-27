@@ -8,6 +8,7 @@
 - Thêm ảnh riêng PNG/JPEG/WebP ≤512 KB, ≤4096×4096 px: kiểm decode, lưu local, chọn/gỡ ảnh, giữ khi reload; báo lỗi nếu đọc/lưu thất bại. Ảnh riêng đứng yên (UI ghi rõ), không gửi ảnh ra server hoặc gọi AI. Tạo nhân vật động bằng AI từ mô tả/ảnh vẫn chưa tích hợp; đã hỏi hướng ưu tiên, chưa có lựa chọn/provider/quota để triển khai runtime.
 - Kiểm chứng: React build/lint PASS; .NET Release 0 warning/0 error. Chromium 2/2 PASS: 53 lựa chọn, chọn Fox/reload/Notes, tắt không render mascot, bật giữ Fox, upload/reload/gỡ ảnh riêng, layout393px không tràn ngang; hồi quy chuyển card/hướng nhìn/menu PASS. Đã xem screenshot mobile; chưa test máy thật hay sync tài khoản (preference là local). Lần thử đầu guest không truy cập được Appearance theo route hiện hành; đổi test sang account fixture. Một ảnh PNG fixture hỏng bị decode từ chối; dùng asset WebP hợp lệ. Sửa hit area radio sau khi E2E phát hiện ảnh preview cản click.
 - Scope: UI/store mascot, Appearance, bản dịch, 104 WebP mới, E2E mới và worklog. Giữ các thay đổi backend/archive/config khác ngoài commit; không deploy thủ công.
+- Đã push `9157026adf31e568f79752399c30526f5a2096e6` lên main; `git ls-remote origin refs/heads/main` xác nhận đúng SHA, 113 file đúng scope.
 
 ## Sửa đường nối cổ và vùng bấm mascot — 2026-10-27
 
