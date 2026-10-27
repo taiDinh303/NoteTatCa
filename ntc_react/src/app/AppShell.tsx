@@ -46,6 +46,8 @@ import { OfflineControls } from "./OfflineControls";
 import { GuestBanner } from "./GuestControls";
 import { useTheme } from "../shared/useTheme";
 import { desktopNoteWidth, DESKTOP_NOTE_GAP } from "../shared/workspaceGrid";
+import { FloatingMascot } from "../features/mascot/MascotPuppy";
+import "../features/mascot/MascotPuppy.css";
 const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 const Sidebar = memo(function Sidebar({
   onLabels,
@@ -436,6 +438,7 @@ export default function AppShell() {
         </Suspense>
       ) : null}
       <SessionExpiredDialog />
+      <FloatingMascot />
     </div>
   );
 }

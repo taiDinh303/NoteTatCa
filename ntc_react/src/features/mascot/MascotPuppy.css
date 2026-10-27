@@ -1,0 +1,106 @@
+/* MascotPuppy — floating AI mascot (decorative, no real chat yet). */
+.mascot-puppy {
+  position: relative;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  transition: transform 0.16s ease-out;
+}
+.mascot-puppy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+.mascot-puppy:hover {
+  transform: scale(1.06);
+}
+.mascot-puppy[data-pose="poking"] {
+  transform: rotate(-4deg) scale(0.96);
+}
+
+/* Gentle "breathing" idle loop (respects reduced motion globally). */
+.mascot-puppy svg {
+  animation: mascot-breathe 3.6s ease-in-out infinite;
+  transform-origin: 50% 62%;
+}
+.mascot-puppy[data-pose="poking"] svg {
+  animation: mascot-breathe-poke 0.5s ease-out;
+}
+@keyframes mascot-breathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+@keyframes mascot-breathe-poke {
+  0%   { transform: translateY(0) rotate(0); }
+  40%  { transform: translateY(1px) rotate(-3deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+
+/* Floating wrapper — bottom-right of workspace, above canvas but outside
+   the scroll region. Does not scale with Notes zoom (chrome, not content). */
+.mascot-floating {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+.mascot-floating .mascot-puppy {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: calc(56px + 14px);
+  height: calc(56px + 14px);
+  box-shadow: 0 6px 22px #29324020;
+}
+.mascot-dismiss {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.mascot-dismiss:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.mascot-dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* On very small screens, keep the mascot off-screen by default so it does
+   not compete with the editor's full-screen mobile layout. */
+@container viewport (max-width: 480px) {
+  .mascot-floating {
+    bottom: 18px;
+    right: 18px;
+  }
+  .mascot-floating .mascot-puppy {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Dark theme: soften the badge surface. */
+[data-theme="dark"] .mascot-floating .mascot-puppy {
+  background: var(--surface);
+  border-color: var(--border);
+}

@@ -1,5 +1,14 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Download notes, labels, reminders and version history as JSON. Import adds copies without replacing existing notes. Imported reminders stay off until you enable them.": ["Tải ghi chú, nhãn, lời nhắc và lịch sử phiên bản dưới dạng JSON. Nhập sẽ tạo bản sao, không ghi đè ghi chú hiện có. Lời nhắc được nhập sẽ tắt cho đến khi bạn bật lại.", "将笔记、标签、提醒和版本历史下载为 JSON。导入会添加副本，不会覆盖现有笔记。导入的提醒保持关闭，直到您重新启用。", "ノート、ラベル、リマインダー、版履歴を JSON でダウンロードします。インポートは既存のノートを上書きせずコピーを追加します。リマインダーは再び有効にするまでオフです。"],
+  "Download workspace backup": ["Tải bản sao lưu", "下载工作区备份", "ワークスペースのバックアップをダウンロード"],
+  "Import workspace backup": ["Nhập bản sao lưu", "导入工作区备份", "ワークスペースのバックアップをインポート"],
+  "Imported {0} notes and {1} labels.": ["Đã nhập {0} ghi chú và {1} nhãn.", "已导入 {0} 条笔记和 {1} 个标签。", "{0} 件のノートと {1} 個のラベルをインポートしました。"],
+  "Version history": ["Lịch sử phiên bản", "版本历史", "バージョン履歴"],
+  "Restore this version": ["Khôi phục phiên bản này", "恢复此版本", "この版を復元"],
+  "Current note is saved in history before restoration.": ["Ghi chú hiện tại được lưu vào lịch sử trước khi khôi phục.", "恢复前会将当前笔记保存到历史记录。", "復元前に現在のノートを履歴に保存します。"],
+  "No earlier versions yet.": ["Chưa có phiên bản cũ.", "尚无早期版本。", "以前の版はまだありません。"],
+  "Load older versions": ["Tải các phiên bản cũ hơn", "加载更早的版本", "古い版を読み込む"],
   "A little space for your notes, ideas and everyday plans.": ["Một góc nhỏ cho ghi chú, ý tưởng và kế hoạch mỗi ngày.", "为笔记、灵感和日常计划留一方空间。", "ノート、アイデア、毎日の計画のための小さな空間。"],
   "Explore NoteTatCa": ["Khám phá NoteTatCa", "探索 NoteTatCa", "NoteTatCa を探索"],
   "Resources": ["Thông tin", "资源", "リソース"],
@@ -2573,4 +2582,14 @@ export const messages: Record<string, readonly [string, string, string]> = {
   "Zoom out content": ["Thu nhỏ nội dung", "缩小内容", "本文を縮小"],
   "Zoom in content": ["Phóng to nội dung", "放大内容", "本文を拡大"],
   "Reset content zoom": ["Đặt lại nội dung về 100%", "重置内容为100%", "本文を100%に戻す"],
+  "Poke the mascot (decorative)": [
+    "Chạm vào mascot (trang trí)",
+    "戳一下吉祥物（装饰）",
+    "マスコットに触れる（装飾）",
+  ],
+  "Dismiss mascot": [
+    "Ẩn mascot",
+    "隐藏吉祥物",
+    "マスコットを非表示に",
+  ],
 };
