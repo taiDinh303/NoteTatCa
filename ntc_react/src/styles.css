@@ -4923,7 +4923,7 @@ td {
 }
 .note-editor-modal .editor-heading-no-icon .editor-title-wrap { order: 1; }
 .note-editor-modal .editor-heading-no-icon .editor-identity { order: 2; }
-.note-editor-modal .editor-heading-no-icon .row-actions { order: 3; }
+.note-editor-modal .editor-heading-no-icon .row-actions { order: 0; }
 .note-editor-modal .editor-footer { padding-inline: var(--note-chrome-inset); }
 .note-editor-modal .note-view-footer { border-top: 1px solid transparent; }
 .note-editor-modal .editor-heading .editor-identity,
