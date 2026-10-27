@@ -346,6 +346,14 @@ export default function NotesPage({
   const label = labels.data?.pages
     .flatMap((p) => p.items)
     .find((l) => l.id === tagId);
+  // Pick a random card once when the list first loads and no note has been
+  // opened yet this session. The initializer picks a stable index so the
+  // bunny stays on the same card across re-renders.
+  const [randomMascotNoteId] = useState<string | null>(() =>
+    all.length ? all[Math.floor(Math.random() * all.length)].id : null,
+  );
+  const randomMascotTarget =
+    lastOpenedNoteId === null ? randomMascotNoteId : null;
   const canDrag =
     !trash && !q && !tagId && !reminderView && !query.hasNextPage && !pending;
   const sensors = useSensors(
@@ -397,11 +405,19 @@ export default function NotesPage({
     );
   }
   function closeEditor() {
+    const openedNoteId = editor?.id ?? selected;
     setEditor(null);
     if (params.has("note")) {
       const next = new URLSearchParams(params);
       next.delete("note");
       setParams(next, { replace: true });
+    }
+    if (openedNoteId) {
+      // Move the bunny to this card only after a short delay so the user
+      // sees the editor close first, then the mascot "hops" over.
+      window.setTimeout(() => {
+        setLastOpenedNoteId(openedNoteId);
+      }, 500);
     }
   }
   const groupSortingStrategy: SortingStrategy = (args) => {
@@ -428,8 +444,7 @@ export default function NotesPage({
               !trash &&
               (lastOpenedNoteId === note.id ||
                 (lastOpenedNoteId === null &&
-                  group[0].id === note.id &&
-                  index === 0));
+                  randomMascotTarget === note.id));
             return (
               <NoteCard
                 key={note.id}
@@ -445,7 +460,6 @@ export default function NotesPage({
                     navigate(`/trash?note=${note.id}`);
                     setEditor({ id: note.id });
                   } else {
-                    setLastOpenedNoteId(note.id);
                     setEditor({ id: note.id });
                   }
                 }}

@@ -1,26 +1,46 @@
 /* NoteMascot — bunny rendered INSIDE a note card, absolutely positioned.
    Two anchors:
-   - "center": the card has not been opened yet; the bunny sits in the
-     middle of the card's top area, gently overlapping the border.
-   - "corner": the card is the last-opened note; the bunny sits in the
-     top-right corner of the card.
+   - "center" (random position on initial load / no note opened yet):
+     the bunny sits above the card's top edge, centered horizontally.
+   - "corner" (last-opened note, after it has been closed): the bunny sits
+     above the card's top-right corner.
    The button itself is interactive (poke = blink + squash).
    z-index sits above the card's own content but below modals (71).
+
+   `overflow: visible` on the card is NOT required — the mascot sits
+   outside the card's top border, and the card's own padding / overflow
+   handling already allows it (see .note-card). The top offset is tuned
+   so the full sprite (including the rabbit's ears) is visible.
 */
 .note-mascot {
   position: absolute;
   z-index: 25;
   pointer-events: auto;
 }
+
+/* Both anchors place the sprite so the rabbit's body sits on the card's
+   top edge and its ears stick up above the card boundary. A 72px sprite
+   with 48px of overlap leaves ~24px of ears visible above the card — the
+   same look as the reference screenshot. */
 .note-mascot-center {
-  top: -18px;
+  top: -48px;
   left: 50%;
   transform: translateX(-50%);
 }
 .note-mascot-corner {
-  top: -18px;
-  right: -6px;
+  top: -48px;
+  right: 4px;
 }
+
+/* Mobile: slightly smaller so the ears don't collide with the section
+   heading above the card. */
+@container viewport (max-width: 480px) {
+  .note-mascot-center,
+  .note-mascot-corner {
+    top: -40px;
+  }
+}
+
 .note-mascot-sprite {
   display: block;
 }
