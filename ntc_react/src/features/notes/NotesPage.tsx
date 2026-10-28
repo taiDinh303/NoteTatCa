@@ -100,12 +100,15 @@ function NoteCard({
     setNodeRef,
     transform,
     transition,
+    isSorting,
     isDragging,
     attributes,
     listeners,
   } = useSortable({
     id: note.id,
     disabled: !draggable,
+    // The release is animated once, from the actual painted positions below.
+    animateLayoutChanges: () => false,
     transition: { duration: 220, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
   });
   // The title/preview buttons are also drag surfaces. Keep action controls
@@ -134,7 +137,7 @@ function NoteCard({
         transform: transform
           ? `translate3d(calc(${transform.x}px / var(--notes-scale, 1)), calc(${transform.y}px / var(--notes-scale, 1)), 0)`
           : undefined,
-        transition: isDragging ? "none" : transition,
+        transition: !isDragging && isSorting ? transition : "none",
         backgroundColor: note.backgroundColor || undefined,
         opacity: isDragging ? 0.95 : 1,
       }}
@@ -349,12 +352,14 @@ export default function NotesPage({
       (a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity),
     );
   });
-  const pinLayout = useRef<ReturnType<typeof captureNoteLayout> | null>(null);
+  const motionLayout = useRef<ReturnType<typeof captureNoteLayout> | null>(
+    null,
+  );
   const layoutKey = all.map((note) => `${note.id}:${note.isPinned}`).join();
   useLayoutEffect(() => {
-    if (pinLayout.current) {
-      animateNoteLayout(pinLayout.current);
-      pinLayout.current = null;
+    if (motionLayout.current) {
+      animateNoteLayout(motionLayout.current);
+      motionLayout.current = null;
     }
   }, [layoutKey]);
   const label = labels.data?.pages
@@ -393,7 +398,7 @@ export default function NotesPage({
       if (action !== "pin") setPending(note.id);
       try {
         if (action === "pin") {
-          pinLayout.current = captureNoteLayout();
+          motionLayout.current = captureNoteLayout();
           await workspace.pin(note);
         } else if (action === "trash") await workspace.trash(note);
         else await workspace.restore(note);
@@ -410,15 +415,19 @@ export default function NotesPage({
     workspace.reorder(group, from, to);
   }
   function dragEnd(event: DragEndEvent) {
-    animateNoteDrop(event.active.id);
-    if (!event.over || event.active.id === event.over.id) return;
+    if (!event.over || event.active.id === event.over.id) {
+      animateNoteDrop(event.active.id);
+      return;
+    }
     const note = all.find((n) => n.id === event.active.id),
       over = all.find((n) => n.id === event.over!.id);
     if (!note || !over || note.isPinned !== over.isPinned) {
+      animateNoteDrop(event.active.id);
       toast.info(tr("Move notes within the same pinned group."));
       return;
     }
     const group = all.filter((n) => n.isPinned === note.isPinned);
+    motionLayout.current = captureNoteLayout();
     void reorder(
       group,
       group.findIndex((n) => n.id === note.id),

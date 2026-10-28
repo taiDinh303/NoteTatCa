@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Kéo3→2: bỏ animation thả chạy chồng — 2026-10-28
+
+- Theo mô tả/video người dùng: useSortable mặc định có derived FLIP sau đổi index, trong khi noteMotion thêm một FLIP rAF cho card thả; destination có thể đang mang transform của lớp còn lại, gây bay lại/nháy card cạnh trái. Tắt animateLayoutChanges sau drop của sortable; giữ sortable transition chỉ khi đang sorting. Khi thả hợp lệ, chụp toàn bộ vị trí đang vẽ rồi dùng cùng một layout-effect FLIP theoID cho các card bị ảnh hưởng (chung đường với pin). Không chạy rAF drop thêm ở nhánh này; cancel/ngoài nhóm giữ đường trả về cũ. Card thả có z-index tạm trong animation để tránh bị card khác đè, cleanup khi xong/hủy; không đổi API/order persist/card width/gap.
+- Validation: Chromium guest2/2 PASS tại1440×1000: tạo4card synthetic trong guest IndexedDB, kéo3→2 và2→3, lấy mẫu rAF450ms quanh release, active không bay khỏi ô đích24px và card trái không dịch quá1.1px; thứ tự và animation kết thúc đúng. Regression5/5 PASS cùng lượt38.1s: cross-group2chiều, pin/unpin nhanh+drag khi pin pending, reorder khi đang lưu, lỗi/retry. React production build, scoped ESLint và .NET Release strict0warning/0error PASS. Lỗi ngoặc test ở lượt đầu được sửa trước khi chạy2ca; chưa xem được video bằng decoder local (ffmpeg không có), không đo FPS trên thiết bị thật hoặc xem video production, không khẳng định mọi máy luôn60fps. Test thao tácguest, không đụng notes chủ dự án/DB thật/email/deploy/migrate.
+- Scope NotesPage/noteMotion, guest motion E2E mới và worklog; giữ dirty archive/history/performance/localconfig khác ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Guest copy: Delete viền đỏ, Close cuối hàng — 2026-10-28
 
 - Theo ảnh: Delete chữ/viền đỏ và hover nền đỏ nhạt, CSS chỉ trong footer guest; chuyển Close xuống cuối DOM sau Copy để tab order khớp vị trí ngoài cùng phải. Giữ3nút cùng hàng/cùng chiều cao, hành vi không đổi.

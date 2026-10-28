@@ -8,7 +8,10 @@ export function captureNoteLayout() {
   return new Map(
     [...document.querySelectorAll<HTMLElement>(".note-card")].map((node) => [
       node.dataset.testid!,
-      node.getBoundingClientRect(),
+      {
+        rect: node.getBoundingClientRect(),
+        dragging: node.classList.contains("dragging"),
+      },
     ]),
   );
 }
@@ -20,8 +23,9 @@ export function animateNoteLayout(
   nodes.forEach((node) => cancelNoteDrop(node.dataset.testid!.slice(5)));
   const destinations = nodes.map((node) => node.getBoundingClientRect());
   for (const [index, node] of nodes.entries()) {
-    const from = before.get(node.dataset.testid!);
-    if (!from) continue;
+    const captured = before.get(node.dataset.testid!);
+    if (!captured) continue;
+    const from = captured.rect;
     const to = destinations[index];
     const scale =
       parseFloat(getComputedStyle(node).getPropertyValue("--notes-scale")) || 1;
@@ -41,6 +45,17 @@ export function animateNoteLayout(
       },
     );
     animation.id = "note-drop";
+    if (captured.dragging) {
+      node.dataset.dropping = "true";
+      void animation.finished
+        .catch(() => {})
+        .finally(() => {
+          if (
+            !node.getAnimations().some((current) => current.id === "note-drop")
+          )
+            delete node.dataset.dropping;
+        });
+    }
   }
 }
 
