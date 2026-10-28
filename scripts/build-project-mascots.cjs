@@ -10,7 +10,11 @@ const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const root = path.resolve(__dirname, "..");
 const source = path.join(root, "assets/mascots/ntc-v1");
 const output = path.join(root, "ntc_react/public/mascots/ntc-v1");
-const names = [
+const outputFor = (name) =>
+  name === "paper"
+    ? path.join(root, "ntc_react/public/mascots/ntc-v2")
+    : output;
+const originalNames = [
   "cat",
   "fox",
   "owl",
@@ -20,12 +24,21 @@ const names = [
   "notebook",
   "paper",
 ];
+const names = [
+  ...originalNames,
+  ...fs
+    .readdirSync(source)
+    .filter((name) => name.endsWith(".png") && name !== "preview.png")
+    .map((name) => name.slice(0, -4))
+    .filter((name) => !originalNames.includes(name))
+    .sort(),
+];
 const TILE = 320,
   JOIN = 244,
   BASE = 300,
   BODY_WIDTH = 144;
 
-function cleanCell(canvas) {
+function cleanCell(canvas, strictEdges) {
   const c = canvas.getContext("2d"),
     w = canvas.width,
     h = canvas.height;
@@ -38,13 +51,17 @@ function cleanCell(canvas) {
     const group = [start];
     seen[start] = 1;
     let top = h,
-      bottom = -1;
+      bottom = -1,
+      left = w,
+      right = -1;
     for (let n = 0; n < group.length; n++) {
       const p = group[n],
         x = p % w,
         y = Math.floor(p / w);
       top = Math.min(top, y);
       bottom = Math.max(bottom, y);
+      left = Math.min(left, x);
+      right = Math.max(right, x);
       for (const q of [
         x > 0 ? p - 1 : -1,
         x < w - 1 ? p + 1 : -1,
@@ -56,7 +73,7 @@ function cleanCell(canvas) {
         group.push(q);
       }
     }
-    groups.push({ pixels: group, top, bottom });
+    groups.push({ pixels: group, top, bottom, left, right });
   }
   groups.sort((a, b) => b.pixels.length - a.pixels.length);
   const keep = new Uint8Array(w * h);
@@ -65,6 +82,11 @@ function cleanCell(canvas) {
     if (
       i &&
       (group.pixels.length < 60 ||
+        (strictEdges &&
+          (group.left === 0 ||
+            group.right === w - 1 ||
+            group.top === 0 ||
+            group.bottom === h - 1)) ||
         ((group.top === 0 || group.bottom === h - 1) &&
           group.bottom - group.top < h * 0.15))
     )
@@ -136,6 +158,7 @@ function anchor(canvas) {
 }
 
 async function pack(name) {
+  fs.mkdirSync(outputFor(name), { recursive: true });
   const image = await loadImage(path.join(source, name + ".png"));
   const cells = [];
   // The left 3x3 contains directions, the right 3x3 contains reactions.
@@ -149,7 +172,7 @@ async function pack(name) {
       const h = Math.round(((row + 1) * image.height) / 3) - y;
       const cell = createCanvas(w, h);
       cell.getContext("2d").drawImage(image, x, y, w, h, 0, 0, w, h);
-      cleanCell(cell);
+      cleanCell(cell, !originalNames.includes(name) || name === "paper");
       cells.push({ canvas: cell, anchor: anchor(cell) });
     }
   const neutral = cells[4],
@@ -219,7 +242,10 @@ async function pack(name) {
     })
       .webp({ lossless: true })
       .toFile(
-        path.join(output, `${name}-${kind ? "reactions" : "directions"}.webp`),
+        path.join(
+          outputFor(name),
+          `${name}-${kind ? "reactions" : "directions"}.webp`,
+        ),
       );
   }
   return {
@@ -256,22 +282,44 @@ async function pack(name) {
   );
   const previews = [];
   for (let i = 0; i < names.length; i++) {
+    const label = createCanvas(180, 180),
+      labelContext = label.getContext("2d");
+    labelContext.font = "14px sans-serif";
+    labelContext.fillStyle = "#56616f";
+    labelContext.textAlign = "center";
+    labelContext.fillText(names[i], 90, 175);
     previews.push({
-      input: await sharp(path.join(output, names[i] + "-directions.webp"))
+      input: await sharp(
+        path.join(outputFor(names[i]), names[i] + "-directions.webp"),
+      )
         .extract({ left: TILE, top: TILE, width: TILE, height: TILE })
         .resize(160, 160)
         .png()
         .toBuffer(),
-      left: (i % 4) * 180 + 10,
-      top: Math.floor(i / 4) * 180 + 10,
+      left: (i % 6) * 180 + 10,
+      top: Math.floor(i / 6) * 180,
+    });
+    previews.push({
+      input: label.toBuffer("image/png"),
+      left: (i % 6) * 180,
+      top: Math.floor(i / 6) * 180,
     });
   }
   await sharp({
-    create: { width: 720, height: 360, channels: 4, background: "#f7f7fb" },
+    create: {
+      width: 1080,
+      height: Math.ceil(names.length / 6) * 180,
+      channels: 4,
+      background: "#f7f7fb",
+    },
   })
     .composite(previews)
     .png()
     .toFile(path.join(source, "preview.png"));
+  await sharp(path.join(outputFor("paper"), "paper-directions.webp"))
+    .extract({ left: TILE, top: TILE, width: TILE, height: TILE })
+    .webp({ lossless: true })
+    .toFile(path.join(source, "paper-preview.webp"));
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

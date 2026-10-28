@@ -5,6 +5,68 @@ export const mascotGroups = [
     label: "NoteTatCa companions",
     names: ["cat", "fox", "owl", "bear", "bunny", "otter", "notebook", "paper"],
   },
+  {
+    label: "Animals",
+    names: [
+      "deer",
+      "dino",
+      "frog",
+      "hamster",
+      "hedgehog",
+      "koala",
+      "mouse",
+      "panda",
+      "penguin",
+      "pug",
+      "raccoon",
+      "redpanda",
+      "sheep",
+      "sloth",
+      "tiger",
+    ],
+  },
+  {
+    label: "People",
+    names: [
+      "afro",
+      "astronaut",
+      "bald",
+      "ballerina",
+      "beard",
+      "builder",
+      "cap",
+      "chef",
+      "glasses",
+      "grandpa",
+      "granny",
+      "hijabi",
+      "kamran",
+      "nurse",
+      "pirate",
+      "scientist",
+      "sikh",
+      "skater",
+      "wizard",
+    ],
+  },
+  {
+    label: "Robots",
+    names: [
+      "clockwork",
+      "crt",
+      "cube",
+      "drone",
+      "gearbot",
+      "knight",
+      "lantern",
+      "postbot",
+      "radio",
+      "rocket",
+      "scout",
+      "toaster",
+      "tv",
+    ],
+  },
 ] as const;
 export const mascotCharacters = mascotGroups.flatMap((group) => [
   ...group.names,
@@ -14,9 +76,10 @@ export type MascotCharacter =
 
 // Versioned URLs keep existing browser/CDN caches from serving the old artwork.
 export function mascotPresetSources(name: (typeof mascotCharacters)[number]) {
+  const version = name === "paper" ? "ntc-v2" : "ntc-v1";
   return {
-    directions: `/mascots/ntc-v1/${name}-directions.webp`,
-    reactions: `/mascots/ntc-v1/${name}-reactions.webp`,
+    directions: `/mascots/${version}/${name}-directions.webp`,
+    reactions: `/mascots/${version}/${name}-reactions.webp`,
   };
 }
 const key = "ntc.mascot.v1";

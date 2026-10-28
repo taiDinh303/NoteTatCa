@@ -6,10 +6,13 @@
 
 ### Bộ nhân vật riêng — 2026-10-28
 
-`/settings/appearance` thay gallery53preset bằng8nhân vật riêng NoteTatCa:
-Cat/Fox/Owl/Bear/Bunny/Otter/Notebook robot/Paper pal. Đầu giữ nét riêng,
+`/settings/appearance` có55nhân vật riêng NoteTatCa: bộ8đầu
+Cat/Fox/Owl/Bear/Bunny/Otter/Notebook robot/Paper pal cộng47nhân vật còn lại
+(15động vật/19người/13robot) theo xác nhận chủ dự án. Đầu giữ nét riêng,
 thân tái sử dụng pixel cố định xuyên18trạng thái, cùng đường vai/width/baseline.
-URL versioned `mascots/ntc-v1`, preference cũ có adapter về Bunny giữ off,
+URL versioned `mascots/ntc-v1`; Paper pal thiết kế lại giấy trắng/xám,
+mắt mực đen tối giản, bỏ tông da/be và dùngntc-v2để tránh cache bản cũ.
+Khôi phục53IDpreset cũ, ID không biết có adapter về Bunny giữ off,
 slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách kiểm tại
 [MASCOT-ARTWORK](MASCOT-ARTWORK.md); actual evidence tại worklog.
 
