@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot form dùng hết chiều rộng và nút chọn ảnh — 2026-10-28
+
+- Bỏ max-width640px của form AI, dùng width100%/min-width0 theo vùng Appearance; textarea/file input trải cùng mép phải. Trang trí native file-selector-button bằng nền accent-soft, border/bo góc/font cùng UI, hover và disabled; giữ file chooser/keyboard/upload validation hiện có. Thêm aria-label tên nhân vật cho radio để preview động không ghép tên Boop vào tên lựa chọn.
+- Validation: TypeScript/Vite production build PASS; .NET solution Release strict0warning/0error. Chromium Appearance regression1/1 PASS (53preset/select/reload/toggle, desktop và393px không overflow), đã xem screenshot desktop form rộng và nút mới. Lượt đầu timeout vì tên radio bị preview động ghép thành Boop the Fox Fox; thêm accessible label rõ ràng, finalPASS với timeout test120s. Không thêm test mirror cho CSS nhỏ; không đổi API/data/AI flow, không gọi AI thật. Scope MascotSettings.css/tsx và worklog, giữ dirty archive/backend ngoài commit. Push main theo quyền hiện có, kiểm remote; chưa xác minh hosting rollout.
+
 ## Mascot: thân sát mép note ở từng hướng nhìn — 2026-10-28
 
 - Theo4ảnh phản hồi: cách cũ dùng max đáy của cả18khung chỉ bảo đảm không lún, vẫn hở khi một khung có đáy cao hơn. Đo riêng từng cell hướng nhìn/biểu cảm ở vùng thân giữa30–70%, alpha>96 để loại bóng mờ; lưu9+9đáy và bù translateY riêng từng frame. Giữ atlas gốc, size80, khung neo/clip ở mép card và không đo trong pointermove. Không vẽ thêm thân hoặc cắt nối cổ; preset và generated đều dùng cơ chế này, preview chung không truyền floors giữ nguyên.

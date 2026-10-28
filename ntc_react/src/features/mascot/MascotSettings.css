@@ -117,10 +117,38 @@
   margin: 0 0 8px;
 }
 .mascot-ai-settings form {
-  max-width: 640px;
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: 14px;
   margin-top: 16px;
+}
+.mascot-ai-settings input[type="file"] {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  color: var(--subtle);
+  cursor: pointer;
+}
+.mascot-ai-settings input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 9px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms, border-color 150ms;
+}
+.mascot-ai-settings input[type="file"]:hover::file-selector-button {
+  border-color: var(--accent);
+}
+.mascot-ai-settings input[type="file"]:disabled,
+.mascot-ai-settings input[type="file"]:disabled::file-selector-button {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 .mascot-ai-settings textarea {
   resize: vertical;

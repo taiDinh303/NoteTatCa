@@ -68,6 +68,7 @@ export function MascotSettings() {
                   <input
                     type="radio"
                     name="mascot-character"
+                    aria-label={characterLabel(name)}
                     value={name}
                     checked={selectedCharacter === name}
                     onChange={() => setMascotPreference({ character: name })}
