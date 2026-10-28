@@ -278,9 +278,7 @@ test("declining the copy keeps guest data and account data separate", async ({
     .getByLabel("Password", { exact: true })
     .fill("Synthetic-password-123!");
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Keep guest data for later", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Open Keep local guest", exact: true }),
   ).toHaveCount(0);
@@ -294,9 +292,7 @@ test("declining the copy keeps guest data and account data separate", async ({
       exact: true,
     }),
   ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Keep guest data for later", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
   await page.getByRole("button", { name: "Account menu", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await page.goto("/guest");
@@ -331,9 +327,13 @@ test("discarding guest notes removes the copy menu and stays cleared after reloa
   expect(
     await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth),
   ).toBe(true);
-  await dialog
-    .getByRole("button", { name: "Skip and delete guest data", exact: true })
-    .click();
+  const rows = await dialog
+    .locator(".modal-footer .button")
+    .evaluateAll((nodes) =>
+      nodes.map((node) => node.getBoundingClientRect().top),
+    );
+  expect(Math.max(...rows) - Math.min(...rows)).toBeLessThan(2);
+  await dialog.getByRole("button", { name: "Delete", exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await page.getByRole("button", { name: "Account menu", exact: true }).click();
   await expect(

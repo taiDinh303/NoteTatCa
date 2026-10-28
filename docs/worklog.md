@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Guest copy: Delete / Close cùng hàng — 2026-10-28
+
+- Đổi hai nhãn button theo yêu cầu thành Delete và Close (dùng bản dịch chung); giữ nguyên hành vi discard/giữ dữ liệu. Footer nowrap, các button stretch cùng chiều cao; chữ dài của nút copy wrap trong nút trên mobile, không đẩy nút xuống hàng khác.
+- Validation: React TypeScript/Vite build PASS; scoped ESLint PASS; .NET Release strict0warning/0error. Chromium Close/giữ nguồn PASS; mobile393 Delete/reload/menu biến mất và assertion3button cùng top PASS sau thêm stretch (lượt đầu lệch10px do nút copy cao hơn, đã sửa). Không thêm test mới, cập nhật selector và assertion layout của ca hiện có; không DB/API/data change. Scope GuestControls/styles/guestE2E/worklog, giữ dirty khác ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Bỏ qua và xóa guest notes — 2026-10-28
 
 - Thêm Skip and delete guest data trong dialog copy, giữ lựa chọn để sau và copy. Xóa notes/labels/create-id/transfer metadata trong guest IndexedDB bằng transaction, tăng revision và thông báo thay đổi, đóng offer sau thành công; không reseed demo ngay và không gọi API xóa account. Snapshot exists=false làm menu Copy guest notes biến mất, reload không hỏi lại. Có mô tả rõ phạm vi xóa, translations Việt/Anh/Trung/Nhật, error giữ dialog nếu ghi local thất bại; khóa action trong lúc copy/xóa. Footer wrap ở mobile.

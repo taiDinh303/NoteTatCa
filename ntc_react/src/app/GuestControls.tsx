@@ -187,7 +187,7 @@ export function GuestImportOffer() {
               .finally(() => setBusy(false));
           }}
         >
-          {tr("Skip and delete guest data")}
+          {tr("Delete")}
         </Button>
         <Button
           variant="secondary"
@@ -197,7 +197,7 @@ export function GuestImportOffer() {
             setKept(false);
           }}
         >
-          {tr("Keep guest data for later")}
+          {tr("Close")}
         </Button>
         {!kept ? (
           <Button
