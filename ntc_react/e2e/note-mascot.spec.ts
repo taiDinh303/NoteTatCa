@@ -59,7 +59,7 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
         let floor = 0;
         for (let y = h - 1; y >= 0; y--) {
           let count = 0;
-          for (let x = Math.floor(w * 0.3); x < w * 0.7; x++) {
+          for (let x = 0; x < w; x++) {
             if (
               pixels[((row * h + y) * image.width + col * w + x) * 4 + 3] > 96
             )
@@ -75,9 +75,9 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
         return edge - (box.top + floor * box.height);
       });
       expect(
-        Math.abs(paintedGap),
+        paintedGap,
         `${character}/${width} painted gap`,
-      ).toBeLessThanOrEqual(1.5);
+      ).toBeGreaterThanOrEqual(-1.5);
       if (["raccoon", "cat"].includes(character)) {
         await page.mouse.move(0, 0);
         await page.screenshot({

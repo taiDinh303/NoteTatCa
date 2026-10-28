@@ -9,9 +9,9 @@
 `/settings/appearance` có55nhân vật riêng NoteTatCa: bộ8đầu
 Cat/Fox/Owl/Bear/Bunny/Otter/Notebook robot/Paper pal cộng47nhân vật còn lại
 (15động vật/19người/13robot) theo xác nhận chủ dự án. Đầu giữ nét riêng,
-thân tái sử dụng pixel cố định xuyên18trạng thái, cùng đường vai/width/baseline.
-URL versioned `mascots/ntc-v1`; Paper pal thiết kế lại giấy trắng/xám,
-mắt mực đen tối giản, bỏ tông da/be và dùngntc-v2để tránh cache bản cũ.
+Theo yêu cầu mới nhất: xuất nguyên18frame nguồn, scale đồng đều cả ảnh, không tách/ghép đầu và thân.
+URL hiện hành `mascots/ntc-v4`; Paper pal giữ hình giấy trắng/xám,
+mắt mực đen tối giản; bỏ toàn bộ ghép thân và blend đường cổ của bảnv3.
 Khôi phục53IDpreset cũ, ID không biết có adapter về Bunny giữ off,
 slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách kiểm tại
 [MASCOT-ARTWORK](MASCOT-ARTWORK.md); actual evidence tại worklog.

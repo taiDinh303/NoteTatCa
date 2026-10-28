@@ -1,4 +1,9 @@
 import { useEffect, useState } from "react";
+const wholeFrameFloor = {
+  directions: Array(9).fill(300 / 320),
+  reactions: Array(9).fill(300 / 320),
+  max: 300 / 320,
+};
 
 const floors = new Map<string, Promise<number[]>>();
 const resolvedFloors = new Map<string, number[]>();
@@ -67,7 +72,7 @@ export function useMascotFloor(
     value: { directions: number[]; reactions: number[]; max: number };
   }>();
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || directions.includes("/ntc-v4/")) return;
     let active = true;
     void Promise.all([floor(directions), floor(reactions)]).then(
       (values) => {
@@ -97,6 +102,7 @@ export function useMascotFloor(
       active = false;
     };
   }, [directions, reactions, key, enabled]);
+  if (directions.includes("/ntc-v4/")) return wholeFrameFloor;
   if (measured?.key === key) return measured.value;
   const cachedDirections = resolvedFloors.get(directions);
   const cachedReactions = resolvedFloors.get(reactions);

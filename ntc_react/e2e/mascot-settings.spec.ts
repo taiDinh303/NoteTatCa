@@ -93,7 +93,7 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v3\/koala-directions.webp/,
+    /ntc-v4\/koala-directions.webp/,
   );
   await page.evaluate(() => {
     localStorage.setItem("ntc.mascot.v1", "on:retired-example");
@@ -101,6 +101,6 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v3\/bunny-directions.webp/,
+    /ntc-v4\/bunny-directions.webp/,
   );
 });
