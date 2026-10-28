@@ -66,6 +66,19 @@ test("creates a reminder immediately while the request saves in background", asy
   const card = page.locator(".reminder-card").filter({ hasText: "Project notes" });
   await expect(card.getByText("Keep it simple.", { exact: false })).toBeVisible();
   await expect(card).toHaveCSS("background-color", "rgb(222, 237, 248)");
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((value) => document.documentElement.dataset.theme = value, theme);
+    const status = card.locator(".status-pill");
+    await expect(status).toHaveCSS("color", theme === "dark" ? "rgb(181, 235, 199)" : "rgb(32, 92, 56)");
+    await card.getByRole("button", { name: "Reminder actions" }).click();
+    await page.getByRole("menuitem", { name: "Pause reminder" }).click();
+    await expect(status).toHaveText("Paused");
+    await expect(status).toHaveCSS("color", theme === "dark" ? "rgb(255, 218, 150)" : "rgb(117, 70, 0)");
+    await expect(card).toHaveCSS("opacity", "1");
+    await card.getByRole("button", { name: "Reminder actions" }).click();
+    await page.getByRole("menuitem", { name: "Enable reminder" }).click();
+    await expect(status).toHaveText("Active");
+  }
   await card.getByRole("link", { name: "View note", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "View note" })).toContainText(
     "Make the important things easy to find.",

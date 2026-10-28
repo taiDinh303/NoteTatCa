@@ -1885,7 +1885,28 @@ strong {
   border-radius: 11px;
 }
 .reminder-card.paused {
-  opacity: 0.7;
+  opacity: 1;
+}
+.reminder-card .status-pill {
+  background: #fff1d6;
+  color: #754600;
+  border: 1px solid #c8943b;
+  font-weight: 600;
+}
+.reminder-card .status-pill.success {
+  background: #e4f5ea;
+  color: #205c38;
+  border-color: #71a885;
+}
+[data-theme="dark"] .reminder-card .status-pill {
+  background: #4a3418;
+  color: #ffda96;
+  border-color: #a47b3d;
+}
+[data-theme="dark"] .reminder-card .status-pill.success {
+  background: #203e2c;
+  color: #b5ebc7;
+  border-color: #639b75;
 }
 .reminder-card.colored {
   border-color: color-mix(in srgb, currentColor 18%, transparent);

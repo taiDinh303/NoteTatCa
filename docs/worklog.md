@@ -1,3 +1,8 @@
+## Reminder: trạng thái rõ màu trong dark/light — 2026-10-28
+
+- Sửa status pill bị màu chữ từ note kế thừa trên nền dark: scope riêng reminder, Active xanh lá và Paused hổ phách với foreground/background/border rõ ràng cho cả hai theme. Bỏ opacity toàn card khi paused để nội dung luôn rõ; giữ màu note và lưu nền hiện có.
+- Validation: Chromium reminder-background 2/2 PASS, gồm tạo nền, pause/enable và kiểm màu cả light/dark; React production build, focused ESLint PASS; .NET Release strict 0 warnings/errors. Không DB/email thật/deploy/migrate hoặc thiết bị vật lý. Publication chỉ styles.css, reminder-background.spec.ts và entry này; giữ nguyên mọi staged/working changes ngoài scope. Fetch divergence 0/0, push main và kiểm remote sau push.
+
 # WORKLOG — NoteTatCa
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
