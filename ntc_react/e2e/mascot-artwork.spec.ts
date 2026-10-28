@@ -51,7 +51,8 @@ test("all project companions have one identical torso across all eighteen frames
             right = Math.max(right, x);
             bottom = Math.max(bottom, y);
           }
-          for (const cell of cells) {
+          if (y < 276) continue;
+        for (const cell of cells) {
             // Browser premultiplication may round near-transparent colors; allow 1/255.
             if (
               Math.abs(cell[p + 3] - ref[p + 3]) > 1 ||
@@ -74,8 +75,8 @@ test("all project companions have one identical torso across all eighteen frames
       return { changed, bodyWidth: right - left + 1, bottom, edgePixels };
     }, mascotPresetSources(name));
     expect(result.changed, name + " torso changes").toBe(0);
-    expect(result.bodyWidth, name + " width").toBeGreaterThanOrEqual(142);
-    expect(result.bodyWidth, name + " width").toBeLessThanOrEqual(146);
+    expect(result.bodyWidth, name + " width").toBeGreaterThanOrEqual(182);
+    expect(result.bodyWidth, name + " width").toBeLessThanOrEqual(186);
     expect(result.bottom, name + " baseline").toBe(299);
     expect(result.edgePixels, name + " clipped pixels").toBe(0);
   }
@@ -86,7 +87,7 @@ test("paper pal uses the cool white redesign instead of the beige portrait", asy
 }) => {
   await page.goto("/Home");
   const sources = mascotPresetSources("paper");
-  expect(sources.directions).toContain("/ntc-v2/");
+  expect(sources.directions).toContain("/ntc-v3/");
   const warmRatio = await page.evaluate(async (source) => {
     const image = new Image();
     image.src = source;

@@ -2,12 +2,14 @@ import { useSyncExternalStore } from "react";
 
 export const mascotGroups = [
   {
-    label: "NoteTatCa companions",
-    names: ["cat", "fox", "owl", "bear", "bunny", "otter", "notebook", "paper"],
-  },
-  {
     label: "Animals",
     names: [
+      "cat",
+      "fox",
+      "owl",
+      "bear",
+      "bunny",
+      "otter",
       "deer",
       "dino",
       "frog",
@@ -65,6 +67,8 @@ export const mascotGroups = [
       "scout",
       "toaster",
       "tv",
+      "notebook",
+      "paper",
     ],
   },
 ] as const;
@@ -76,7 +80,7 @@ export type MascotCharacter =
 
 // Versioned URLs keep existing browser/CDN caches from serving the old artwork.
 export function mascotPresetSources(name: (typeof mascotCharacters)[number]) {
-  const version = name === "paper" ? "ntc-v2" : "ntc-v1";
+  const version = "ntc-v3";
   return {
     directions: `/mascots/${version}/${name}-directions.webp`,
     reactions: `/mascots/${version}/${name}-reactions.webp`,

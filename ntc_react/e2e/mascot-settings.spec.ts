@@ -16,9 +16,7 @@ test("appearance remembers presets and provides no second custom-upload slot", a
   const toggle = page.getByRole("switch", { name: "Show mascot" });
   await expect(toggle).toBeChecked();
   await expect(page.getByRole("radio")).toHaveCount(55);
-  await expect(
-    page.getByText("NoteTatCa companions", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Animals", { exact: true })).toBeVisible();
   for (const name of [
     "Cat",
     "Fox",
@@ -95,7 +93,7 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v1\/koala-directions.webp/,
+    /ntc-v3\/koala-directions.webp/,
   );
   await page.evaluate(() => {
     localStorage.setItem("ntc.mascot.v1", "on:retired-example");
@@ -103,6 +101,6 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v1\/bunny-directions.webp/,
+    /ntc-v3\/bunny-directions.webp/,
   );
 });

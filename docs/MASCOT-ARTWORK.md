@@ -1,3 +1,5 @@
+CURRENT correction 2026-10-28: gallery now Animals/People/Robots only; notebook/paper are Robots. All active atlases use ntc-v3. Sheep regenerated, body width184 (previous144), centered at the neck rather than silhouette center. Head horizontal scale matches each direction's neck width. A32px overlap blends the natural head/beard into the canonical torso; pixel-fixed lower chest startsy276, baseline300. Earlier descriptions below document v1/v2 history, not the corrected geometry.
+
 # Bộ nhân vật riêng NoteTatCa — 2026-10-28
 
 CURRENT: Appearance dùng 55 preset riêng: bộ8đầu (Cat, Fox, Owl, Bear, Bunny,

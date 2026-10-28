@@ -10,10 +10,7 @@ const { createCanvas, loadImage } = require("@napi-rs/canvas");
 const root = path.resolve(__dirname, "..");
 const source = path.join(root, "assets/mascots/ntc-v1");
 const output = path.join(root, "ntc_react/public/mascots/ntc-v1");
-const outputFor = (name) =>
-  name === "paper"
-    ? path.join(root, "ntc_react/public/mascots/ntc-v2")
-    : output;
+const outputFor = (_name) => path.join(root, "ntc_react/public/mascots/ntc-v3");
 const originalNames = [
   "cat",
   "fox",
@@ -36,7 +33,7 @@ const names = [
 const TILE = 320,
   JOIN = 244,
   BASE = 300,
-  BODY_WIDTH = 144;
+  BODY_WIDTH = 184;
 
 function cleanCell(canvas, strictEdges) {
   const c = canvas.getContext("2d"),
@@ -150,6 +147,7 @@ function anchor(canvas) {
   if (!best) throw new Error("Missing neck anchor");
   return {
     neck: best.y,
+    neckWidth: best.span,
     cx: (best.left + best.right) / 2,
     floor,
     head: bounds(pixels, w, h, 0, best.y),
@@ -186,7 +184,7 @@ async function pack(name) {
     a.neck,
     b.width,
     a.floor - a.neck + 1,
-    (TILE - BODY_WIDTH) / 2,
+    TILE / 2 - ((a.cx - b.left) * BODY_WIDTH) / b.width,
     JOIN,
     BODY_WIDTH,
     BASE - JOIN,
@@ -205,20 +203,40 @@ async function pack(name) {
   const frames = cells.map(({ canvas, anchor: p }) => {
     const frame = createCanvas(TILE, TILE),
       c = frame.getContext("2d");
+    const sx = Math.min(
+      ((BODY_WIDTH / b.width) * a.neckWidth) / p.neckWidth,
+      (TILE * 0.5 - 14) / Math.max(p.cx - p.head.left, p.head.right - p.cx + 1),
+    );
+    c.drawImage(body, 0, 0);
     c.save();
     c.beginPath();
-    c.rect(0, 0, TILE, JOIN);
+    c.rect(0, 0, TILE, JOIN + 32);
     c.clip();
     c.drawImage(
       canvas,
-      TILE / 2 - p.cx * scale,
+      TILE / 2 - p.cx * sx,
       JOIN - p.neck * scale,
-      canvas.width * scale,
+      canvas.width * sx,
       canvas.height * scale,
     );
     c.restore();
     // The same torso pixels in all 18 frames. This deliberately cannot drift.
-    c.drawImage(body, 0, 0);
+    for (let y = JOIN; y < JOIN + 32; y++) {
+      c.globalAlpha = (y - JOIN) / 31;
+      c.drawImage(body, 0, y, TILE, 1, 0, y, TILE, 1);
+    }
+    c.globalAlpha = 1;
+    c.drawImage(
+      body,
+      0,
+      JOIN + 32,
+      TILE,
+      TILE - JOIN - 32,
+      0,
+      JOIN + 32,
+      TILE,
+      TILE - JOIN - 32,
+    );
     return frame;
   });
   for (let kind = 0; kind < 2; kind++) {
@@ -319,7 +337,7 @@ async function pack(name) {
   await sharp(path.join(outputFor("paper"), "paper-directions.webp"))
     .extract({ left: TILE, top: TILE, width: TILE, height: TILE })
     .webp({ lossless: true })
-    .toFile(path.join(source, "paper-preview.webp"));
+    .toFile(path.join(source, "paper-preview-v3.webp"));
 })().catch((e) => {
   console.error(e);
   process.exitCode = 1;

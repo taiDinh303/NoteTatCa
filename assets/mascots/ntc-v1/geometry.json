@@ -2,11 +2,11 @@
   "tile": 320,
   "shoulderLine": 244,
   "baseline": 300,
-  "bodyWidth": 144,
+  "bodyWidth": 184,
   "details": [
     {
       "name": "cat",
-      "headScale": 0.8470588235294118,
+      "headScale": 0.8613569321533924,
       "anchors": [
         {
           "neck": 193,
@@ -198,7 +198,7 @@
     },
     {
       "name": "owl",
-      "headScale": 0.6101694915254238,
+      "headScale": 0.7796610169491526,
       "anchors": [
         {
           "neck": 208,
@@ -678,7 +678,7 @@
     },
     {
       "name": "paper",
-      "headScale": 1.006993006993007,
+      "headScale": 1.1343283582089552,
       "anchors": [
         {
           "neck": 277,
@@ -870,7 +870,7 @@
     },
     {
       "name": "astronaut",
-      "headScale": 0.7461139896373057,
+      "headScale": 0.9533678756476683,
       "anchors": [
         {
           "neck": 248,
@@ -966,7 +966,7 @@
     },
     {
       "name": "bald",
-      "headScale": 0.782608695652174,
+      "headScale": 1,
       "anchors": [
         {
           "neck": 236,
@@ -1158,7 +1158,7 @@
     },
     {
       "name": "beard",
-      "headScale": 0.9113924050632911,
+      "headScale": 0.9898305084745763,
       "anchors": [
         {
           "neck": 232,
@@ -1254,7 +1254,7 @@
     },
     {
       "name": "builder",
-      "headScale": 0.8571428571428571,
+      "headScale": 0.9240506329113924,
       "anchors": [
         {
           "neck": 226,
@@ -1350,7 +1350,7 @@
     },
     {
       "name": "cap",
-      "headScale": 0.8323699421965318,
+      "headScale": 0.9306122448979591,
       "anchors": [
         {
           "neck": 244,
@@ -1542,7 +1542,7 @@
     },
     {
       "name": "clockwork",
-      "headScale": 0.7346938775510204,
+      "headScale": 0.9387755102040817,
       "anchors": [
         {
           "neck": 222,
@@ -1638,7 +1638,7 @@
     },
     {
       "name": "crt",
-      "headScale": 0.8089887640449438,
+      "headScale": 0.9419354838709677,
       "anchors": [
         {
           "neck": 241,
@@ -1734,7 +1734,7 @@
     },
     {
       "name": "cube",
-      "headScale": 0.8470588235294118,
+      "headScale": 0.9700996677740864,
       "anchors": [
         {
           "neck": 229,
@@ -1926,7 +1926,7 @@
     },
     {
       "name": "dino",
-      "headScale": 0.8571428571428571,
+      "headScale": 0.9743589743589743,
       "anchors": [
         {
           "neck": 237,
@@ -2022,7 +2022,7 @@
     },
     {
       "name": "drone",
-      "headScale": 0.8323699421965318,
+      "headScale": 0.9831649831649831,
       "anchors": [
         {
           "neck": 223,
@@ -2118,7 +2118,7 @@
     },
     {
       "name": "frog",
-      "headScale": 0.7955801104972375,
+      "headScale": 1,
       "anchors": [
         {
           "neck": 226,
@@ -2214,7 +2214,7 @@
     },
     {
       "name": "gearbot",
-      "headScale": 0.7058823529411765,
+      "headScale": 0.9019607843137255,
       "anchors": [
         {
           "neck": 214,
@@ -2406,7 +2406,7 @@
     },
     {
       "name": "grandpa",
-      "headScale": 0.8888888888888888,
+      "headScale": 0.9421487603305785,
       "anchors": [
         {
           "neck": 235,
@@ -2502,7 +2502,7 @@
     },
     {
       "name": "granny",
-      "headScale": 0.8834355828220859,
+      "headScale": 1.0133333333333334,
       "anchors": [
         {
           "neck": 220,
@@ -2598,7 +2598,7 @@
     },
     {
       "name": "hamster",
-      "headScale": 0.6824644549763034,
+      "headScale": 0.8720379146919431,
       "anchors": [
         {
           "neck": 227,
@@ -2694,7 +2694,7 @@
     },
     {
       "name": "hedgehog",
-      "headScale": 0.7422680412371134,
+      "headScale": 0.9484536082474226,
       "anchors": [
         {
           "neck": 255,
@@ -2790,7 +2790,7 @@
     },
     {
       "name": "hijabi",
-      "headScale": 0.8571428571428571,
+      "headScale": 1.027027027027027,
       "anchors": [
         {
           "neck": 226,
@@ -2886,7 +2886,7 @@
     },
     {
       "name": "kamran",
-      "headScale": 0.7868852459016393,
+      "headScale": 1.005464480874317,
       "anchors": [
         {
           "neck": 226,
@@ -2982,7 +2982,7 @@
     },
     {
       "name": "knight",
-      "headScale": 0.7236180904522613,
+      "headScale": 0.9246231155778895,
       "anchors": [
         {
           "neck": 222,
@@ -3174,7 +3174,7 @@
     },
     {
       "name": "lantern",
-      "headScale": 0.8520710059171598,
+      "headScale": 1.0178571428571428,
       "anchors": [
         {
           "neck": 228,
@@ -3462,7 +3462,7 @@
     },
     {
       "name": "panda",
-      "headScale": 0.6050420168067226,
+      "headScale": 0.773109243697479,
       "anchors": [
         {
           "neck": 220,
@@ -3558,7 +3558,7 @@
     },
     {
       "name": "penguin",
-      "headScale": 0.5783132530120482,
+      "headScale": 0.7389558232931727,
       "anchors": [
         {
           "neck": 213,
@@ -3654,7 +3654,7 @@
     },
     {
       "name": "pirate",
-      "headScale": 0.7539267015706806,
+      "headScale": 0.874251497005988,
       "anchors": [
         {
           "neck": 241,
@@ -3750,7 +3750,7 @@
     },
     {
       "name": "postbot",
-      "headScale": 0.7659574468085106,
+      "headScale": 0.8,
       "anchors": [
         {
           "neck": 220,
@@ -3846,7 +3846,7 @@
     },
     {
       "name": "pug",
-      "headScale": 0.7539267015706806,
+      "headScale": 0.9633507853403142,
       "anchors": [
         {
           "neck": 215,
@@ -3942,7 +3942,7 @@
     },
     {
       "name": "raccoon",
-      "headScale": 0.7912087912087912,
+      "headScale": 0.9240506329113924,
       "anchors": [
         {
           "neck": 249,
@@ -4038,7 +4038,7 @@
     },
     {
       "name": "radio",
-      "headScale": 0.8,
+      "headScale": 0.8271954674220963,
       "anchors": [
         {
           "neck": 236,
@@ -4134,7 +4134,7 @@
     },
     {
       "name": "redpanda",
-      "headScale": 0.7128712871287128,
+      "headScale": 0.9108910891089109,
       "anchors": [
         {
           "neck": 219,
@@ -4230,7 +4230,7 @@
     },
     {
       "name": "rocket",
-      "headScale": 0.7741935483870968,
+      "headScale": 0.989247311827957,
       "anchors": [
         {
           "neck": 213,
@@ -4422,7 +4422,7 @@
     },
     {
       "name": "scout",
-      "headScale": 0.7346938775510204,
+      "headScale": 0.9387755102040817,
       "anchors": [
         {
           "neck": 231,
@@ -4518,103 +4518,103 @@
     },
     {
       "name": "sheep",
-      "headScale": 0.5217391304347826,
+      "headScale": 0.8846153846153846,
       "anchors": [
         {
-          "neck": 225,
-          "cx": 174.5,
-          "floor": 272
+          "neck": 228,
+          "cx": 130.5,
+          "floor": 320
         },
         {
-          "neck": 238,
-          "cx": 147,
-          "floor": 272
+          "neck": 229,
+          "cx": 130,
+          "floor": 321
+        },
+        {
+          "neck": 235,
+          "cx": 135,
+          "floor": 320
         },
         {
           "neck": 224,
-          "cx": 121.5,
-          "floor": 272
+          "cx": 131,
+          "floor": 316
         },
         {
-          "neck": 213,
-          "cx": 173.5,
-          "floor": 258
+          "neck": 224,
+          "cx": 128.5,
+          "floor": 316
         },
         {
-          "neck": 223,
-          "cx": 147,
-          "floor": 258
+          "neck": 224,
+          "cx": 126.5,
+          "floor": 316
         },
         {
-          "neck": 214,
-          "cx": 122,
-          "floor": 258
+          "neck": 218,
+          "cx": 132.5,
+          "floor": 310
         },
         {
-          "neck": 205,
-          "cx": 172.5,
-          "floor": 246
+          "neck": 218,
+          "cx": 130.5,
+          "floor": 310
         },
         {
-          "neck": 211,
-          "cx": 147.5,
-          "floor": 246
-        },
-        {
-          "neck": 205,
-          "cx": 124.5,
-          "floor": 246
-        },
-        {
-          "neck": 248,
-          "cx": 156,
-          "floor": 272
-        },
-        {
-          "neck": 248,
-          "cx": 141,
-          "floor": 272
-        },
-        {
-          "neck": 247,
+          "neck": 218,
           "cx": 125.5,
-          "floor": 272
-        },
-        {
-          "neck": 221,
-          "cx": 165,
-          "floor": 258
+          "floor": 310
         },
         {
           "neck": 228,
-          "cx": 151,
-          "floor": 258
+          "cx": 132,
+          "floor": 320
         },
         {
-          "neck": 223,
-          "cx": 122.5,
-          "floor": 258
+          "neck": 229,
+          "cx": 129,
+          "floor": 321
         },
         {
-          "neck": 201,
-          "cx": 179,
-          "floor": 246
+          "neck": 228,
+          "cx": 128.5,
+          "floor": 320
         },
         {
-          "neck": 201,
-          "cx": 170,
-          "floor": 246
+          "neck": 224,
+          "cx": 130.5,
+          "floor": 316
         },
         {
-          "neck": 203,
-          "cx": 165.5,
-          "floor": 246
+          "neck": 224,
+          "cx": 128,
+          "floor": 316
+        },
+        {
+          "neck": 229,
+          "cx": 129,
+          "floor": 316
+        },
+        {
+          "neck": 222,
+          "cx": 131.5,
+          "floor": 310
+        },
+        {
+          "neck": 220,
+          "cx": 129,
+          "floor": 312
+        },
+        {
+          "neck": 218,
+          "cx": 128.5,
+          "floor": 310
         }
       ]
     },
     {
       "name": "sikh",
-      "headScale": 0.8228571428571428,
+      "headScale": 0.9956331877729258,
       "anchors": [
         {
           "neck": 235,
@@ -4710,7 +4710,7 @@
     },
     {
       "name": "skater",
-      "headScale": 0.8470588235294118,
+      "headScale": 0.8613569321533924,
       "anchors": [
         {
           "neck": 239,
@@ -4806,7 +4806,7 @@
     },
     {
       "name": "sloth",
-      "headScale": 0.7384615384615385,
+      "headScale": 0.9435897435897436,
       "anchors": [
         {
           "neck": 239,
@@ -4902,7 +4902,7 @@
     },
     {
       "name": "tiger",
-      "headScale": 0.6889952153110048,
+      "headScale": 0.8803827751196173,
       "anchors": [
         {
           "neck": 220,
@@ -4998,7 +4998,7 @@
     },
     {
       "name": "toaster",
-      "headScale": 0.8181818181818182,
+      "headScale": 0.9798657718120806,
       "anchors": [
         {
           "neck": 220,
@@ -5094,7 +5094,7 @@
     },
     {
       "name": "tv",
-      "headScale": 0.935064935064935,
+      "headScale": 0.9419354838709677,
       "anchors": [
         {
           "neck": 240,
@@ -5190,7 +5190,7 @@
     },
     {
       "name": "wizard",
-      "headScale": 0.6697674418604651,
+      "headScale": 0.8538011695906432,
       "anchors": [
         {
           "neck": 240,
