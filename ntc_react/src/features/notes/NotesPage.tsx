@@ -274,7 +274,7 @@ function NoteCard({
       </div>
       {/* The bunny sits on one card at a time and follows the last opened note. */}
       {hasMascot ? (
-        <NoteMascot size={72} />
+        <NoteMascot size={80} />
       ) : null}
     </article>
   );

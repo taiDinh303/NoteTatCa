@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot lớn hơn một chút — 2026-10-28
+
+- Tăng size ở card72→80px (~11%), giữ cơ chế đo mép alpha/căn chân và scale mobile. Không đổi asset, vị trí ngang hay logic tương tác. Scope NotesPage.tsx và entry này; giữ các thay đổi archive/backend khác ngoài commit.
+- Validation: TypeScript/Vite production build PASS; ESLint NotesPage.tsx PASS (full lint không thu được exit status sau khi process kết thúc; không ghi full lint PASS). Sửa một giá trị kích cỡ, không thêm test mirror; chưa chạy lại browser/thiết bị thật. Cơ chế căn theo size giữ nguyên từ hồi quy53preset trước. Push main theo quyền hiện có, kiểm remote sau push; không deploy thủ công.
+
 ## Mascot: căn toàn thân trên mép card — 2026-10-27
 
 - Publication xác minh: `20e477664f5330a1cf6098e0db01204eb6349b32` đã push main,5file đúng scope; `git ls-remote origin refs/heads/main` khớp SHA. Chưa xác minh hosting rollout.
