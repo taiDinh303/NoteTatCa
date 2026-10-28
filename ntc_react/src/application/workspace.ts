@@ -5,6 +5,8 @@ import { NotesRepository } from "../infrastructure/repositories";
 import { NoteOrderCoordinator } from "./noteOrder";
 export class WorkspaceService {
   readonly order: NoteOrderCoordinator;
+  private pinQueue: Promise<void> = Promise.resolve();
+  private pinRevisions = new Map<string, number>();
   constructor(
     readonly notes: NotesRepository,
     readonly cache: QueryClient,
@@ -118,16 +120,67 @@ export class WorkspaceService {
     await this.cache.invalidateQueries({ queryKey: this.key("unread") });
   }
   async pin(note: Note) {
-    await this.cache.cancelQueries({ queryKey: this.key("notes") });
-    const optimistic = { ...note, isPinned: !note.isPinned };
+    const owner = this.identity();
+    const revisionKey = `${owner}:${note.id}`;
+    const revision = (this.pinRevisions.get(revisionKey) ?? 0) + 1;
+    this.pinRevisions.set(revisionKey, revision);
+    const latest = () =>
+      this.pinRevisions.get(revisionKey) === revision &&
+      this.identity() === owner;
+    const hold = this.order.hold();
+    const originalPosition =
+      this.order
+        .getSnapshot()
+        .groups.get(note.isPinned)
+        ?.ids.indexOf(note.id) ?? 0;
+    const cancellation = this.cache.cancelQueries({
+      queryKey: this.key("notes"),
+    });
+    const target = this.cache
+      .getQueriesData<InfiniteData<Page<Note>>>({ queryKey: this.key("notes") })
+      .flatMap(([, data]) => data?.pages.flatMap((page) => page.items) ?? [])
+      .filter(
+        (item) =>
+          item.id !== note.id &&
+          item.isPinned !== note.isPinned &&
+          !item.deletedTime,
+      );
+    const optimistic = {
+      ...note,
+      isPinned: !note.isPinned,
+      pinnedAt: note.isPinned ? null : new Date().toISOString(),
+      sortOrder: Math.min(1000, ...target.map((item) => item.sortOrder)) - 1000,
+    };
+    this.order.membership(note.id, optimistic.isPinned);
     this.commit(optimistic);
+    const previous = this.pinQueue;
+    let done!: () => void;
+    this.pinQueue = new Promise<void>((resolve) => {
+      done = resolve;
+    });
     try {
-      this.commit(await this.notes.pin(note));
+      await Promise.all([previous, hold.ready, cancellation]);
+      if (this.identity() !== owner) throw new Error("Account changed");
+      const fresh = await this.notes.find(note.id);
+      if (this.identity() !== owner) throw new Error("Account changed");
+      const saved =
+        fresh.isPinned === optimistic.isPinned
+          ? fresh
+          : await this.notes.pin(fresh);
+      if (latest()) {
+        await this.cache.cancelQueries({ queryKey: this.key("notes") });
+        if (latest()) this.commit(saved);
+      }
     } catch (error) {
-      this.commit(note);
+      if (latest()) {
+        this.order.membership(note.id, note.isPinned, originalPosition);
+        this.commit(note);
+      }
       throw error;
+    } finally {
+      done();
+      hold.release();
     }
-    void this.refreshNotes().catch(() => {});
   }
   async trash(note: Note) {
     await this.cache.cancelQueries({ queryKey: this.key("notes") });

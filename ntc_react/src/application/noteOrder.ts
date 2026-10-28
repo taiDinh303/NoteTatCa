@@ -10,6 +10,33 @@ export class NoteOrderCoordinator {
   private timer?: ReturnType<typeof setTimeout>;
   private running = false;
   private readyAt = 0;
+  private holds = 0;
+  private idleWaiters = new Set<() => void>();
+  hold() {
+    this.holds++;
+    clearTimeout(this.timer);
+    const ready = this.running
+      ? new Promise<void>((resolve) => this.idleWaiters.add(resolve))
+      : Promise.resolve();
+    return {
+      ready,
+      release: () => {
+        this.holds--;
+        if (!this.holds) this.schedule(0);
+      },
+    };
+  }
+  membership(id: string, pinned: boolean, position = 0) {
+    if (this.owner !== this.identity()) return;
+    const groups = new Map(this.snapshot.groups);
+    for (const [key, group] of groups) {
+      const ids = group.ids.filter((item) => item !== id);
+      if (key === pinned)
+        ids.splice(Math.min(Math.max(0, position), ids.length), 0, id);
+      groups.set(key, { ...group, ids, revision: group.revision + 1 });
+    }
+    this.update(groups);
+  }
   constructor(
     private identity: () => string | undefined,
     private load: (pinned: boolean) => Promise<Note[]>,
@@ -81,11 +108,13 @@ export class NoteOrderCoordinator {
     this.schedule(0);
   };
   private async flush() {
-    if (this.running || this.owner !== this.identity()) return;
+    if (this.running || this.holds || this.owner !== this.identity()) return;
     this.running = true;
     const generation = this.generation;
     const valid = () =>
-      generation === this.generation && this.owner === this.identity();
+      generation === this.generation &&
+      this.owner === this.identity() &&
+      !this.holds;
     try {
       for (const pinned of [true, false]) {
         if (!valid()) return;
@@ -159,6 +188,8 @@ export class NoteOrderCoordinator {
       }
     } finally {
       if (generation === this.generation) this.running = false;
+      this.idleWaiters.forEach((resolve) => resolve());
+      this.idleWaiters.clear();
       if (valid()) {
         if ([...this.snapshot.groups.values()].some((group) => !group.error))
           this.schedule(Math.max(0, this.readyAt - Date.now()));

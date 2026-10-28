@@ -1,5 +1,14 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { lazy, Suspense, useEffect, useState, useSyncExternalStore } from "react";
+import {
+  lazy,
+  Suspense,
+  useEffect,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DndContext,
@@ -38,7 +47,12 @@ import type { Note, NoteFilter } from "../../domain/models";
 import { sortNotes } from "../../domain/models";
 import { notePalette } from "../../domain/color";
 import { CardLabels } from "./CardLabels";
-import { animateNoteDrop, cancelNoteDrop } from "./noteMotion";
+import {
+  animateNoteDrop,
+  cancelNoteDrop,
+  captureNoteLayout,
+  animateNoteLayout,
+} from "./noteMotion";
 import "./NoteMotion.css";
 import { NotesZoomViewport } from "./NotesZoomViewport";
 import { NoteMascot } from "../mascot/NoteMascot";
@@ -120,7 +134,7 @@ function NoteCard({
         transform: transform
           ? `translate3d(calc(${transform.x}px / var(--notes-scale, 1)), calc(${transform.y}px / var(--notes-scale, 1)), 0)`
           : undefined,
-        transition: transition,
+        transition: isDragging ? "none" : transition,
         backgroundColor: note.backgroundColor || undefined,
         opacity: isDragging ? 0.95 : 1,
       }}
@@ -273,9 +287,7 @@ function NoteCard({
         </div>
       </div>
       {/* The bunny sits on one card at a time and follows the last opened note. */}
-      {hasMascot ? (
-        <NoteMascot size={80} />
-      ) : null}
+      {hasMascot ? <NoteMascot size={80} /> : null}
     </article>
   );
 }
@@ -337,13 +349,23 @@ export default function NotesPage({
       (a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity),
     );
   });
+  const pinLayout = useRef<ReturnType<typeof captureNoteLayout> | null>(null);
+  const layoutKey = all.map((note) => `${note.id}:${note.isPinned}`).join();
+  useLayoutEffect(() => {
+    if (pinLayout.current) {
+      animateNoteLayout(pinLayout.current);
+      pinLayout.current = null;
+    }
+  }, [layoutKey]);
   const label = labels.data?.pages
     .flatMap((p) => p.items)
     .find((l) => l.id === tagId);
   // Pick a random card once when the list first loads and no note has been
   // opened yet this session. The initializer picks a stable index so the
   // bunny stays on the same card across re-renders.
-  const [randomMascotNoteId, setRandomMascotNoteId] = useState<string | null>(null);
+  const [randomMascotNoteId, setRandomMascotNoteId] = useState<string | null>(
+    null,
+  );
   useEffect(() => {
     if (randomMascotNoteId || !all.length) return;
     const id = all[Math.floor(Math.random() * all.length)].id;
@@ -352,8 +374,7 @@ export default function NotesPage({
   }, [all, randomMascotNoteId]);
   const randomMascotTarget =
     lastOpenedNoteId === null ? randomMascotNoteId : null;
-  const canDrag =
-    !trash && !q && !tagId && !reminderView && !query.hasNextPage && !pending;
+  const canDrag = !trash && !q && !tagId && !reminderView && !query.hasNextPage;
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 7 } }),
     useSensor(TouchSensor, {
@@ -363,25 +384,27 @@ export default function NotesPage({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
-  async function act(
-    note: Note,
-    action: "pin" | "trash" | "restore" | "delete",
-  ) {
-    if (action === "delete") {
-      setConfirm({ note, action });
-      return;
-    }
-    setPending(note.id);
-    try {
-      if (action === "pin") await workspace.pin(note);
-      else if (action === "trash") await workspace.trash(note);
-      else await workspace.restore(note);
-    } catch (error) {
-      toast.error(errorMessage(error));
-    } finally {
-      setPending(undefined);
-    }
-  }
+  const act = useCallback(
+    async (note: Note, action: "pin" | "trash" | "restore" | "delete") => {
+      if (action === "delete") {
+        setConfirm({ note, action });
+        return;
+      }
+      if (action !== "pin") setPending(note.id);
+      try {
+        if (action === "pin") {
+          pinLayout.current = captureNoteLayout();
+          await workspace.pin(note);
+        } else if (action === "trash") await workspace.trash(note);
+        else await workspace.restore(note);
+      } catch (error) {
+        toast.error(errorMessage(error));
+      } finally {
+        if (action !== "pin") setPending(undefined);
+      }
+    },
+    [],
+  );
   function reorder(group: Note[], from: number, to: number) {
     if (from === to || to < 0 || to >= group.length) return;
     workspace.reorder(group, from, to);
@@ -405,7 +428,10 @@ export default function NotesPage({
   const activeNoteId = editor?.id ?? selected;
   useEffect(() => {
     if (!activeNoteId || trash) return;
-    const timer = window.setTimeout(() => setLastOpenedNoteId(activeNoteId), 500);
+    const timer = window.setTimeout(
+      () => setLastOpenedNoteId(activeNoteId),
+      500,
+    );
     return () => window.clearTimeout(timer);
   }, [activeNoteId, trash]);
   function closeEditor() {
@@ -439,8 +465,7 @@ export default function NotesPage({
             const isTargetCard =
               !trash &&
               (lastOpenedNoteId === note.id ||
-                (lastOpenedNoteId === null &&
-                  randomMascotTarget === note.id));
+                (lastOpenedNoteId === null && randomMascotTarget === note.id));
             return (
               <NoteCard
                 key={note.id}

@@ -1063,6 +1063,7 @@ strong {
   will-change: transform;
 }
 .note-card.draggable { cursor: grab; }
+.note-card.draggable:hover { transform: none; }
 .note-card.draggable.dragging { cursor: grabbing; }
 .note-card.draggable .note-open,
 .note-card.draggable .note-card-identity { cursor: inherit; }

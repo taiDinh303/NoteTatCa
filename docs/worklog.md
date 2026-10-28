@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Pin/unpin và kéo thả cập nhật tức thì — 2026-10-28
+
+- Theo2ảnh: optimistic pin trước đây chỉ đổi isPinned nên giữ sortOrder nhóm cũ, server trả min−1000 mới nhảy lên đầu. Nay đặt ngay sortOrder/pinnedAt theo đầu nhóm đích, cập nhật membership overlay đang reorder; bỏ invalidate/refetch toàn list sau pin, hủy stale reads trước commit ack. Pin queue dùng version mới nhất, giữ thao tác mới nhất khi pin/unpin nhanh, không khóa toàn danh sách hoặc nút pin trong lúc lưu; rollback lỗi giữ vị trí source trong overlay. Reorder coordinator tạm ngưng write/đợi write đang chạy xong trước pin, nhưng tiếp tục nhận và hiển thị vị trí kéo mới; resume sau các pin pending để tránh conflict/membership cũ.
+- Animation: chụp vị trí trước pin và FLIP translate220ms bằng ID sau React layout (kể cả chuyển nhóm/remount); retarget từ vị trí đang vẽ khi pin tiếp, respect reduced motion. Bỏ transform transition trong lúc isDragging và hover translate của card draggable để không trễ con trỏ/đổi origin; thả vẫn animate về ô đích. Không đổi card width/gap/zoom hay API/backend.
+- Validation:14/14 Vitest workspace/order PASS, gồm pin/head trước delayed save, rollback/error và hold reorder trong lúc pin; scoped ESLint PASS, TypeScript/Vite build PASS; .NET solution Release strict0warnings/0errors. Chromium final5/5 PASS cùng một lượt (39.5s): delayed pin→top, kéo note khác và unpin trước ack; kéo tiếp khi reorder pending; failure/retry/reload; giữ card kéo qua nhóm sai cả2chiều. Test cross-group ban đầu vướng CSS transition lag15–18px (đã sửa runtime), baseline font/reflow chưa ổn và auto-scroll viewport720px; test chờ font/stable hover, viewport1440×1100, đo scroll+rect cùng frame, cho1.1CSSpx rounding pointer. Retry test nay đợi ack+reconcile trước reload (banner mất ngay khi retry không chứng minh đã lưu). Một lượt bị fixtureECONNREFUSED vì chạy chồng server, không tínhPASS; cuối chạy tuần tự. Chưa đo frame-time trên PC/mobile vật lý hay chứng minh mọi máy đều60fps; không ownerDB/email thật/deploy/migrate.
+- Scope: workspace/order coordinator, note motion/Page, một rule CSS, tests và entry này; giữ archive/history/performance/local config dirty ngoài commit. Publication main theo quyền hiện có, kiểm remote sau push.
+
 ## Mascot form dùng hết chiều rộng và nút chọn ảnh — 2026-10-28
 
 - Bỏ max-width640px của form AI, dùng width100%/min-width0 theo vùng Appearance; textarea/file input trải cùng mép phải. Trang trí native file-selector-button bằng nền accent-soft, border/bo góc/font cùng UI, hover và disabled; giữ file chooser/keyboard/upload validation hiện có. Thêm aria-label tên nhân vật cho radio để preview động không ghép tên Boop vào tên lựa chọn.

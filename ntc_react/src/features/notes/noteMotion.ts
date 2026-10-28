@@ -4,6 +4,46 @@ function cardFor(id: string | number) {
   );
 }
 
+export function captureNoteLayout() {
+  return new Map(
+    [...document.querySelectorAll<HTMLElement>(".note-card")].map((node) => [
+      node.dataset.testid!,
+      node.getBoundingClientRect(),
+    ]),
+  );
+}
+
+export function animateNoteLayout(
+  before: ReturnType<typeof captureNoteLayout>,
+) {
+  const nodes = [...document.querySelectorAll<HTMLElement>(".note-card")];
+  nodes.forEach((node) => cancelNoteDrop(node.dataset.testid!.slice(5)));
+  const destinations = nodes.map((node) => node.getBoundingClientRect());
+  for (const [index, node] of nodes.entries()) {
+    const from = before.get(node.dataset.testid!);
+    if (!from) continue;
+    const to = destinations[index];
+    const scale =
+      parseFloat(getComputedStyle(node).getPropertyValue("--notes-scale")) || 1;
+    const x = (from.x - to.x) / scale,
+      y = (from.y - to.y) / scale;
+    if (Math.hypot(x, y) < 1) continue;
+    const animation = node.animate(
+      [
+        { transform: `translate3d(${x}px, ${y}px, 0)` },
+        { transform: "translate3d(0, 0, 0)" },
+      ],
+      {
+        duration: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? 0
+          : 220,
+        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      },
+    );
+    animation.id = "note-drop";
+  }
+}
+
 export function cancelNoteDrop(id: string | number) {
   cardFor(id)
     ?.getAnimations()
@@ -21,11 +61,7 @@ export function animateNoteDrop(id: string | number) {
     if (!node.isConnected || node.classList.contains("dragging")) return;
     const to = node.getBoundingClientRect();
     const zoom =
-      parseFloat(
-        getComputedStyle(node).getPropertyValue(
-          "--notes-scale",
-        ),
-      ) || 1;
+      parseFloat(getComputedStyle(node).getPropertyValue("--notes-scale")) || 1;
     const x = (from.x - to.x) / zoom;
     const y = (from.y - to.y) / zoom;
     if (Math.hypot(x, y) < 1) return;

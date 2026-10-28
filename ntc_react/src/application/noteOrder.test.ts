@@ -58,6 +58,21 @@ it("coalesces rapid changes and publishes only after debounce", async () => {
   expect(f.move).not.toHaveBeenCalled();
   expect(f.publish).toHaveBeenCalledTimes(1);
 });
+it("holds reorder persistence during a pin while accepting immediate new positions", async () => {
+  vi.useFakeTimers();
+  const f = setup();
+  const hold = f.queue.hold();
+  await hold.ready;
+  f.queue.reorder(f.server, 0, 2);
+  await vi.advanceTimersByTimeAsync(1000);
+  expect(f.load).not.toHaveBeenCalled();
+  expect(f.queue.getSnapshot().groups.get(false)?.ids).toEqual(["b", "c", "a"]);
+  f.queue.membership("b", true);
+  expect(f.queue.getSnapshot().groups.get(false)?.ids).toEqual(["c", "a"]);
+  hold.release();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(f.load).toHaveBeenCalled();
+});
 it("keeps accepting moves in flight, serializes writes and converges to newest order", async () => {
   vi.useFakeTimers();
   const f = setup();
@@ -144,22 +159,45 @@ it("converges for every three-card permutation", async () => {
     expect(f.move.mock.calls.length).toBeLessThanOrEqual(3);
   }
 });
-it('ignores an in-flight response after the account changes', async () => {
-  vi.useFakeTimers(); const f = setup(); let release!: () => void;
-  const blocked = new Promise<void>(resolve => { release = resolve; });
-  f.load.mockImplementationOnce(async () => { await blocked; return f.server; });
-  f.queue.reorder(f.server, 0, 2); await vi.advanceTimersByTimeAsync(400);
-  f.changeOwner(); release(); await vi.advanceTimersByTimeAsync(0);
-  expect(f.move).not.toHaveBeenCalled(); expect(f.publish).not.toHaveBeenCalled();
+it("ignores an in-flight response after the account changes", async () => {
+  vi.useFakeTimers();
+  const f = setup();
+  let release!: () => void;
+  const blocked = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  f.load.mockImplementationOnce(async () => {
+    await blocked;
+    return f.server;
+  });
+  f.queue.reorder(f.server, 0, 2);
+  await vi.advanceTimersByTimeAsync(400);
+  f.changeOwner();
+  release();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(f.move).not.toHaveBeenCalled();
+  expect(f.publish).not.toHaveBeenCalled();
   expect(f.queue.getSnapshot().groups.size).toBe(0);
 });
-it('reset clears pending order and allows a fresh batch for the same owner', async () => {
-  vi.useFakeTimers(); const f = setup(); let release!: () => void;
-  const blocked = new Promise<void>(resolve => { release = resolve; });
-  f.load.mockImplementationOnce(async () => { await blocked; return f.server; });
-  f.queue.reorder(f.server, 0, 2); await vi.advanceTimersByTimeAsync(400);
-  f.queue.reset(); release(); await vi.advanceTimersByTimeAsync(0);
-  expect(f.queue.getSnapshot().groups.size).toBe(0); expect(f.move).not.toHaveBeenCalled();
-  f.queue.reorder(f.server, 0, 2); await vi.advanceTimersByTimeAsync(400);
-  expect(f.server.map(n => n.id)).toEqual(['b','c','a']);
+it("reset clears pending order and allows a fresh batch for the same owner", async () => {
+  vi.useFakeTimers();
+  const f = setup();
+  let release!: () => void;
+  const blocked = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  f.load.mockImplementationOnce(async () => {
+    await blocked;
+    return f.server;
+  });
+  f.queue.reorder(f.server, 0, 2);
+  await vi.advanceTimersByTimeAsync(400);
+  f.queue.reset();
+  release();
+  await vi.advanceTimersByTimeAsync(0);
+  expect(f.queue.getSnapshot().groups.size).toBe(0);
+  expect(f.move).not.toHaveBeenCalled();
+  f.queue.reorder(f.server, 0, 2);
+  await vi.advanceTimersByTimeAsync(400);
+  expect(f.server.map((n) => n.id)).toEqual(["b", "c", "a"]);
 });

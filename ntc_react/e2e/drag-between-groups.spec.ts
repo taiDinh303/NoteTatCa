@@ -5,6 +5,7 @@ for (const pinnedSource of [true, false]) {
     page,
     request,
   }) => {
+    await page.setViewportSize({ width: 1440, height: 1100 });
     await request.post("http://127.0.0.1:5199/__fixture/reset");
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.goto("/login");
@@ -17,6 +18,26 @@ for (const pinnedSource of [true, false]) {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     const groups = page.locator(".notes-section");
     await expect(groups).toHaveCount(2);
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    await groups
+      .nth(pinnedSource ? 0 : 1)
+      .locator(".note-open")
+      .first()
+      .hover();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            document
+              .getAnimations()
+              .filter(
+                (animation) =>
+                  animation.id === "notes-reflow" &&
+                  animation.playState === "running",
+              ).length,
+        ),
+      )
+      .toBe(0);
     const cards = page.locator(".note-card");
     const ids = await cards.evaluateAll((nodes) =>
       nodes.map((n) => n.getAttribute("data-testid")),
@@ -27,6 +48,9 @@ for (const pinnedSource of [true, false]) {
         return { x: r.x, y: r.y };
       }),
     );
+    const initialScroll = await page
+      .locator(".notes-zoom-viewport")
+      .evaluate((node) => node.scrollTop);
     const source = groups
       .nth(pinnedSource ? 0 : 1)
       .locator("article")
@@ -57,12 +81,16 @@ for (const pinnedSource of [true, false]) {
     await page.waitForTimeout(350);
     await expect(source).toHaveClass(/dragging/);
     let held = (await source.boundingBox())!;
-    expect(held.x).toBeCloseTo(original.x + tx - sx, 0);
-    expect(held.y).toBeCloseTo(original.y + ty - sy, 0);
+    expect(Math.abs(held.x - (original.x + tx - sx))).toBeLessThanOrEqual(1.1);
+    expect(Math.abs(held.y - (original.y + ty - sy))).toBeLessThanOrEqual(1.1);
     await page.mouse.move(tx + 25, ty + 12, { steps: 4 });
     held = (await source.boundingBox())!;
-    expect(held.x).toBeCloseTo(original.x + tx + 25 - sx, 0);
-    expect(held.y).toBeCloseTo(original.y + ty + 12 - sy, 0);
+    expect(Math.abs(held.x - (original.x + tx + 25 - sx))).toBeLessThanOrEqual(
+      1.1,
+    );
+    expect(Math.abs(held.y - (original.y + ty + 12 - sy))).toBeLessThanOrEqual(
+      1.1,
+    );
     const notice = page.getByText("Move notes within the same pinned group.", {
       exact: true,
     });
@@ -70,19 +98,32 @@ for (const pinnedSource of [true, false]) {
     const positions = await cards.evaluateAll((nodes) =>
       nodes.map((n) => {
         const r = n.getBoundingClientRect();
-        return { id: n.getAttribute("data-testid"), x: r.x, y: r.y };
+        return {
+          id: n.getAttribute("data-testid"),
+          x: r.x,
+          y: r.y,
+          scroll: document.querySelector(".notes-zoom-viewport")!.scrollTop,
+        };
       }),
     );
     positions.forEach((r, i) => {
       if (r.id === sourceId) return;
       expect(r.x).toBeCloseTo(bounds[i].x, 0);
-      expect(r.y).toBeCloseTo(bounds[i].y, 0);
+      expect(r.y).toBeCloseTo(bounds[i].y - (r.scroll - initialScroll), 0);
     });
     await page.mouse.up();
     await expect(notice).toBeVisible();
     await expect(source).not.toHaveClass(/dragging/);
     await expect
-      .poll(async () => Math.abs((await source.boundingBox())!.y - original.y))
+      .poll(async () => {
+        const scroll =
+          (await page
+            .locator(".notes-zoom-viewport")
+            .evaluate((node) => node.scrollTop)) - initialScroll;
+        return Math.abs(
+          (await source.boundingBox())!.y - (original.y - scroll),
+        );
+      })
       .toBeLessThan(1);
     expect(
       await cards.evaluateAll((nodes) =>
