@@ -4,6 +4,8 @@
 
 ## Mascot: căn toàn thân trên mép card — 2026-10-27
 
+- Publication xác minh: `20e477664f5330a1cf6098e0db01204eb6349b32` đã push main,5file đúng scope; `git ls-remote origin refs/heads/main` khớp SHA. Chưa xác minh hosting rollout.
+
 - Theo hai ảnh chủ dự án: bỏ offset chung hạ16px khiến nhân vật có atlas ít padding bị lún vào card. Đọc alpha của9hướng+9biểu cảm một lần/source, cache kết quả; wrapper lấy chiều cao tới mép vẽ thấp nhất, neo bottom100% và scale mobile từ đáy. Không đo trong pointermove, không sửa/cắt nối atlas; lúc asset chưa đo xong chưa hiện vị trí sai. Tắt mascot không đo/tải atlas. Clip chỉ ở mép dưới wrapper để vùng note luôn ưu tiên vẽ/hit-test, không cho mascot tràn vào nội dung card; giữ nguyên vị trí ngang và chuyển hướng.
 - Validation: TypeScript/Vite build và ESLint PASS; .NET solution Release strict0warning/0error. Chromium2/2 PASS: kiểm53preset ở1440/393px (106lượt) nằm ngoài mép trên card, cùng hồi quy mở note→500ms/chuyển card/hướng nhìn/menu; đã xem screenshot raccoon desktop và cat mobile, toàn thân không lún. Lượt đầu không chạy do cổng5173đã dùng; config tạm chuyển5175, finalPASS, config tạm đã xóa. Chưa test thiết bị vật lý/AI artwork thật; không thay DB/API/secret. Scope chỉ NoteMascot.tsx/css, hook mascotFloor, E2E và worklog; giữ archive/history/performance dirty ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
 
