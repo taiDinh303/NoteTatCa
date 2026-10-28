@@ -15,7 +15,7 @@ import {
 import { validateDocument } from "../domain/document";
 import { ApiError } from "../infrastructure/http";
 import type { GuestData, GuestStore } from "../infrastructure/guestStore";
-import { GUEST_OWNER } from "../infrastructure/guestStore";
+import { GUEST_OWNER, emptyGuest } from "../infrastructure/guestStore";
 import { offlinePage } from "./offline";
 
 function plain(node: RichNode): string {
@@ -263,6 +263,13 @@ export class GuestWorkspace {
       data.creates = {};
       data.transfers = {};
     });
+  }
+  async discard() {
+    await this.change((data) => {
+      const revision = data.revision;
+      Object.assign(data, emptyGuest(), { revision });
+    });
+    this.closeImport();
   }
   async list(filter: NoteFilter, page = 1) {
     const data = await this.store.read();

@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Bỏ qua và xóa guest notes — 2026-10-28
+
+- Thêm Skip and delete guest data trong dialog copy, giữ lựa chọn để sau và copy. Xóa notes/labels/create-id/transfer metadata trong guest IndexedDB bằng transaction, tăng revision và thông báo thay đổi, đóng offer sau thành công; không reseed demo ngay và không gọi API xóa account. Snapshot exists=false làm menu Copy guest notes biến mất, reload không hỏi lại. Có mô tả rõ phạm vi xóa, translations Việt/Anh/Trung/Nhật, error giữ dialog nếu ghi local thất bại; khóa action trong lúc copy/xóa. Footer wrap ở mobile.
+- Validation:10/10 guest Vitest PASS gồm discard/refresh không tự tạo lại dữ liệu; Chromium2/2 PASS: giữ guest để sau không copy và discard mobile393→menu biến mất→reload vẫn không hỏi/copy; form không overflow. React TypeScript/Vite build và focused ESLint PASS; .NET solution Release strict0warning/0error. Không ownerDB/email thật/deploy/migrate; không xóa dữ liệu thật trong browser chủ dự án. Scope GuestControls, guest service/test, guest E2E, messages, scoped footer CSS và worklog; giữ dirty archive/history/performance ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Pin/unpin và kéo thả cập nhật tức thì — 2026-10-28
 
 - Theo2ảnh: optimistic pin trước đây chỉ đổi isPinned nên giữ sortOrder nhóm cũ, server trả min−1000 mới nhảy lên đầu. Nay đặt ngay sortOrder/pinnedAt theo đầu nhóm đích, cập nhật membership overlay đang reorder; bỏ invalidate/refetch toàn list sau pin, hủy stale reads trước commit ack. Pin queue dùng version mới nhất, giữ thao tác mới nhất khi pin/unpin nhanh, không khóa toàn danh sách hoặc nút pin trong lúc lưu; rollback lỗi giữ vị trí source trong overlay. Reorder coordinator tạm ngưng write/đợi write đang chạy xong trước pin, nhưng tiếp tục nhận và hiển thị vị trí kéo mới; resume sau các pin pending để tránh conflict/membership cũ.

@@ -149,7 +149,7 @@ export function GuestImportOffer() {
       <div className="modal-body">
         <p>
           {tr(
-            "Copy {0} notes and {1} labels as new items. Existing account notes will not be overwritten. Guest data is cleared only after a successful copy.",
+            "Copy {0} notes and {1} labels as new items. Existing account notes will not be overwritten. Guest data is cleared after a successful copy.",
             snapshot.notes,
             snapshot.labels,
           )}
@@ -167,8 +167,28 @@ export function GuestImportOffer() {
           </p>
         ) : null}
         <ErrorBanner error={error} />
+        <p className="field-hint">
+          {tr(
+            "Skipping deletes guest notes and labels from this browser without copying. Your account notes are kept.",
+          )}
+        </p>
       </div>
       <div className="modal-footer guest-import-footer">
+        <Button
+          variant="ghost"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true);
+            setError(undefined);
+            void guest
+              .discard()
+              .then(() => setKept(false))
+              .catch(setError)
+              .finally(() => setBusy(false));
+          }}
+        >
+          {tr("Skip and delete guest data")}
+        </Button>
         <Button
           variant="secondary"
           disabled={busy}

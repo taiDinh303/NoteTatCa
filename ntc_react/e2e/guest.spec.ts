@@ -3,7 +3,10 @@ import type { Page } from "@playwright/test";
 const fixture = "http://127.0.0.1:5199";
 async function start(page: Page) {
   await page.goto("/Home");
-  await page.getByRole("main").getByRole("link", { name: "Try guest mode", exact: true }).click();
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
   await expect(
     page.getByRole("complementary", { name: "Guest mode", exact: true }),
   ).toBeVisible();
@@ -32,11 +35,22 @@ async function nav(page: Page, name: RegExp) {
   if (await open.isVisible()) await open.click();
   await page.getByRole("link", { name }).first().click();
 }
-test("guest cannot enter account/admin routes or authorize backend requests", async ({ page, request }) => {
+test("guest cannot enter account/admin routes or authorize backend requests", async ({
+  page,
+  request,
+}) => {
   await start(page);
-  for (const path of ["/settings/account", "/admin/overview", "/reminders", "/notifications"]) {
-    await page.goto(path); await expect(page).toHaveURL(/\/notes$/);
-    await expect(page.getByRole("complementary", { name: "Guest mode", exact: true })).toBeVisible();
+  for (const path of [
+    "/settings/account",
+    "/admin/overview",
+    "/reminders",
+    "/notifications",
+  ]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/notes$/);
+    await expect(
+      page.getByRole("complementary", { name: "Guest mode", exact: true }),
+    ).toBeVisible();
   }
   expect((await request.get(fixture + "/api/v1/notes")).status()).toBe(401);
 });
@@ -95,14 +109,12 @@ for (const width of [320, 1440])
     await expect(
       page.getByRole("button", { name: "Open Guest custom note", exact: true }),
     ).toBeVisible();
-    const card = page
-      .getByRole("article")
-      .filter({
-        has: page.getByRole("button", {
-          name: "Open Guest custom note",
-          exact: true,
-        }),
-      });
+    const card = page.getByRole("article").filter({
+      has: page.getByRole("button", {
+        name: "Open Guest custom note",
+        exact: true,
+      }),
+    });
     await expect(card).toContainText("Guest label");
     await page
       .getByRole("button", { name: "Pin Guest custom note", exact: true })
@@ -173,8 +185,15 @@ test("sign-in offers a safe copy, retry keeps the source and does not duplicate 
   await start(page);
   await write(page, "Guest to account");
   await write(page, "Guest trash to account");
-  await page.getByRole("button", { name: "Actions for Guest trash to account", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Move to trash", exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: "Actions for Guest trash to account",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Move to trash", exact: true })
+    .click();
   let fail = true;
   await page.route("**/api/v1/notes", async (route) => {
     if (fail && route.request().method() === "POST") {
@@ -218,7 +237,12 @@ test("sign-in offers a safe copy, retry keeps the source and does not duplicate 
     page.getByRole("button", { name: "Open Project notes", exact: true }),
   ).toBeVisible();
   await nav(page, /^Trash/);
-  await expect(page.getByRole("button", { name: "Restore Guest trash to account", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Restore Guest trash to account",
+      exact: true,
+    }),
+  ).toBeVisible();
   await expect(page.getByText("30 days left", { exact: true })).toBeVisible();
   await nav(page, /^All notes/);
   await page.reload();
@@ -279,4 +303,50 @@ test("declining the copy keeps guest data and account data separate", async ({
   await expect(
     page.getByRole("button", { name: "Open Keep local guest", exact: true }),
   ).toBeVisible();
+});
+
+test("discarding guest notes removes the copy menu and stays cleared after reload", async ({
+  page,
+  request,
+}) => {
+  await request.post(fixture + "/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 852 });
+  await start(page);
+  await page
+    .getByRole("complementary", { name: "Guest mode", exact: true })
+    .getByRole("button", { name: "Sign in", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("b@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("Synthetic-password-123!");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  const dialog = page.getByRole("dialog", {
+    name: "Copy guest notes to your account?",
+    exact: true,
+  });
+  await expect(dialog).toBeVisible();
+  expect(
+    await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
+  await dialog
+    .getByRole("button", { name: "Skip and delete guest data", exact: true })
+    .click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await expect(
+    page.getByRole("menuitem", { name: "Copy guest notes", exact: true }),
+  ).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Notes", exact: true }),
+  ).toBeAttached();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await expect(
+    page.getByRole("menuitem", { name: "Copy guest notes", exact: true }),
+  ).toHaveCount(0);
 });

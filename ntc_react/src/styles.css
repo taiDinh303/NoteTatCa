@@ -1378,6 +1378,8 @@ strong {
 .modal-body .error-banner {
   margin-top: 12px;
 }
+.guest-import-footer { flex-wrap: wrap; }
+.guest-import-footer .button { max-width: 100%; white-space: normal; }
 .dropdown {
   background: var(--surface);
   border: 1px solid var(--border);

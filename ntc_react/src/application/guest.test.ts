@@ -32,6 +32,27 @@ function setup() {
   return { store, guest: new GuestWorkspace(store) };
 }
 describe("local guest workspace", () => {
+  it("discards local guest data and the copy offer without reseeding it", async () => {
+    const f = setup();
+    await f.guest.ensure();
+    f.guest.requestImport();
+    await f.guest.discard();
+    expect(f.guest.getSnapshot()).toMatchObject({
+      exists: false,
+      notes: 0,
+      labels: 0,
+      importOpen: false,
+    });
+    expect(await f.store.read()).toMatchObject({
+      initialized: false,
+      notes: [],
+      labels: [],
+      creates: {},
+      transfers: {},
+    });
+    await f.guest.refresh();
+    expect(f.guest.getSnapshot().exists).toBe(false);
+  });
   it("seeds once and persists CRUD, labels and 30-day trash across service instances", async () => {
     const f = setup();
     await f.guest.ensure();
