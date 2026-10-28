@@ -1,5 +1,6 @@
 import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { NoteMascot } from "../mascot/NoteMascot";
+import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
   Suspense,
@@ -75,7 +76,7 @@ function ZoomSession({ children }: { children: React.ReactNode }) {
   const zoom = useMemo(() => ({ percent, target, setTarget, handTarget, setHandTarget }), [target, handTarget]);
   return (
     <ContentZoomSession.Provider value={zoom}>
-      {children}
+      <MascotAnimationSession>{children}</MascotAnimationSession>
     </ContentZoomSession.Provider>
   );
 }

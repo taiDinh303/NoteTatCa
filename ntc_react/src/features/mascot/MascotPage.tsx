@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { MascotAnimationContext } from "./mascotAnimation";
 import type { CSSProperties } from "react";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { X } from "lucide-react";
@@ -38,8 +39,8 @@ const REACTIONS = [
   "delighted",
 ] as const;
 
-type Direction = (typeof DIRECTIONS)[number];
-type Reaction = (typeof REACTIONS)[number];
+export type Direction = (typeof DIRECTIONS)[number];
+export type Reaction = (typeof REACTIONS)[number];
 
 /* Clockwise from the right, matching atan2 with y pointing down. */
 const CLOCKWISE: Direction[] = [
@@ -116,10 +117,18 @@ export function MascotPage(props: MascotPageProps) {
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const squashRef = useRef<HTMLSpanElement>(null);
-  const timersRef = useRef<number[]>([]);
-  const boopsRef = useRef({ count: 0, at: 0 });
-  const [direction, setDirection] = useState<Direction>("center");
-  const [reaction, setReaction] = useState<Reaction | null>(null);
+  const localTimers = useRef<number[]>([]);
+  const localBoops = useRef({ count: 0, at: 0 });
+  const [localDirection, setLocalDirection] = useState<Direction>("center");
+  const [localReaction, setLocalReaction] = useState<Reaction | null>(null);
+  const session = useContext(MascotAnimationContext);
+  const timersRef = session?.timers ?? localTimers;
+  const boopsRef = session?.boops ?? localBoops;
+  const direction = session?.direction ?? localDirection;
+  const setDirection = session?.setDirection ?? setLocalDirection;
+  const reaction = session ? session.reaction : localReaction;
+  const setReaction = session?.setReaction ?? setLocalReaction;
+  const shared = !!session;
 
   /* Cursor following with hysteresis + dead zone (ported from repo). */
   useEffect(() => {
@@ -171,17 +180,19 @@ export function MascotPage(props: MascotPageProps) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("scroll", aim);
     };
-  }, []);
+  }, [setDirection]);
 
   useEffect(() => {
+    if (shared) return;
+    const timers = timersRef.current;
     return () => {
-      timersRef.current.forEach(window.clearTimeout);
+      timers.forEach(window.clearTimeout);
     };
-  }, []);
+  }, [shared, timersRef]);
 
-  const boop = useCallback(() => {
+  const boop = () => {
     timersRef.current.forEach(window.clearTimeout);
-    timersRef.current = [];
+    timersRef.current.length = 0;
 
     const later = (ms: number, next: Reaction | null) => {
       timersRef.current.push(window.setTimeout(() => setReaction(next), ms));
@@ -212,7 +223,7 @@ export function MascotPage(props: MascotPageProps) {
         easing: "linear",
       });
     }
-  }, [disableSquash]);
+  };
 
   return (
     <button

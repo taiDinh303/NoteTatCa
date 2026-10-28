@@ -12,7 +12,7 @@ import { useMascotFloor } from "./mascotFloor";
  * the cursor and blinks/squashes when poked.
  *
  * The bunny always perches on the top-right edge of its card.
- * - It is only rendered outside the editor, on the notes list page.
+ * The same perch is used by list cards and the opened note frame.
  *
  * No chat logic — decorative only.
  */

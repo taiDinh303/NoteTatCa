@@ -482,7 +482,7 @@ export default function NotesPage({
                 busy={pending === note.id}
                 trash={trash}
                 draggable={canDrag}
-                hasMascot={!!isTargetCard}
+                hasMascot={!!isTargetCard && !editor && !selected}
                 onOrganize={(action) => setEditor({ id: note.id, action })}
                 onOpen={() => {
                   if (trash) {

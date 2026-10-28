@@ -110,14 +110,12 @@ test("bunny uses the aligned atlas without a neck cut and leaves card actions cl
   const target = page.locator(`[data-testid="${targetId}"]`);
   await target.locator(".note-open").click();
   await expect(target.locator(".note-mascot")).toHaveCount(0);
-  await expect(target.locator(".note-mascot"), {
-    timeout: 2_000,
-  }).toBeVisible();
-  await expect(target.locator(".note-mascot")).toHaveAttribute(
-    "data-mascot-anchor",
-    "corner",
-  );
-  const head = target.locator(".mascot-directions");
+  const openedMascot = page
+    .getByRole("dialog", { name: "View note" })
+    .locator(".note-mascot");
+  await expect(openedMascot).toBeVisible();
+  await expect(openedMascot).toHaveAttribute("data-mascot-anchor", "corner");
+  const head = openedMascot.locator(".mascot-directions");
   await expect(head).toHaveCSS("clip-path", "none");
   await expect(head).toHaveCSS("background-image", /bunny-directions.webp/);
   const before = await head.evaluate(
@@ -127,6 +125,8 @@ test("bunny uses the aligned atlas without a neck cut and leaves card actions cl
   await expect
     .poll(() => head.evaluate((el) => getComputedStyle(el).backgroundPosition))
     .not.toBe(before);
+  // The selected list-card perch changes after the existing 500 ms delay.
+  await page.waitForTimeout(550);
   await page
     .getByRole("dialog", { name: "View note" })
     .getByRole("button", { name: "Close", exact: true })

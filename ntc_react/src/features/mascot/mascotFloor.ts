@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 const floors = new Map<string, Promise<number[]>>();
+const resolvedFloors = new Map<string, number[]>();
 
 // Atlas padding differs by character. Measure once, never during pointer motion.
 function floor(source: string): Promise<number[]> {
@@ -41,7 +42,9 @@ function floor(source: string): Promise<number[]> {
             }
           }
         }
-        resolve(Array.from({ length: 9 }, (_, i) => bottoms[i] || 1));
+        const values = Array.from({ length: 9 }, (_, i) => bottoms[i] || 1);
+        resolvedFloors.set(source, values);
+        resolve(values);
       } catch (error) {
         reject(error);
       }
@@ -94,5 +97,14 @@ export function useMascotFloor(
       active = false;
     };
   }, [directions, reactions, key, enabled]);
-  return measured?.key === key ? measured.value : undefined;
+  if (measured?.key === key) return measured.value;
+  const cachedDirections = resolvedFloors.get(directions);
+  const cachedReactions = resolvedFloors.get(reactions);
+  return cachedDirections && cachedReactions
+    ? {
+        directions: cachedDirections,
+        reactions: cachedReactions,
+        max: Math.max(...cachedDirections, ...cachedReactions),
+      }
+    : undefined;
 }

@@ -2,6 +2,13 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot liên tục khi đổi View/Edit, chỉ hiện một con — 2026-10-28
+
+- Theo video/mô tả: mascot trước đây giữ direction/reaction/timers trong component mode nên remount khi View↔Edit, đồng thời floor hook chờ effect lại làm hidden một frame. Thêm MascotAnimationSession ở ZoomSession xuyên suốt phiên note: giữ chung hướng nhìn, biểu cảm, chuỗi boop và timers; cleanup khi đóng phiên, không khi đổi mode. Giữ array timers ổn định, không reset animation. Cache alpha floors đã resolve được đọc đồng bộ cho mode mới, tránh pha hide/đổi chiều cao. View/Edit bên trong vẫn độc lập để giữ flow autosave, khung/thông số/animation none đã có giữ nguyên khi thay content.
+- List NoteMascot không render khi editor/selected đang mở (kể cả note mới); đóng mới hiện lại trên card đã chọn, giữ delay500ms đổi đích. Preview/gallery bên ngoài session giữ state riêng như trước. Không thay API/data/account hoặc thêm animation tự chạy.
+- Validation: Chromium5ca PASS: View/Edit geometry393/1440, controlled-clock test boop→đổi mode3vòng giữ blink→heart sau130ms→kết thúc đúng timer, luôn1mascot và đóng khung thì list hiện lại; hồi quy53preset×desktop/mobile và boop/direction/menu/perch PASS. React TypeScript/Vite build, focused ESLint PASS sau bỏ useCallback không phù hợp ref context (lint ban đầu báo memoization deps); .NET Release strict0warning/0error. Chưa đo frame-time/video production/thiết bị thật; không gọi DB/email thật/deploy/migrate. Rà React skill: hook unconditional, session cleanup, context chỉ cho motion, không thêm fetch hoặc đo theo pointer.
+- Scope mascot session/context/runtime/cache, NoteEditor/NotesPage,2E2E và entry này; giữ dirty archive/history/performance/localconfig ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Mascot hiện chung ở cả View/Edit — 2026-10-28
 
 - Theo chỉnh yêu cầu: Edit/New cũng render cùng NoteMascot80px ở góc trên phải như View, cùng headroom/height/position; cả2ẩn mascot khi fullscreen. Modal editor overflow visible để không cắt mascot, header/footer kế thừa bo góc nhằm giữ màu note đúng khung; content vẫn scroll riêng. Preference bật/tắt dùng chung.

@@ -15,6 +15,8 @@ for (const width of [393, 1440]) {
     const viewer = page.getByRole("dialog", { name: "View note", exact: true });
     const mascot = viewer.locator(".note-mascot");
     await expect(mascot).toBeVisible();
+    await expect(page.locator(".note-card .note-mascot")).toHaveCount(0);
+    await expect(page.locator(".note-mascot")).toHaveCount(1);
     const frame = (await viewer.boundingBox())!,
       pet = (await mascot.boundingBox())!;
     expect(pet.y).toBeGreaterThanOrEqual(0);
@@ -54,3 +56,44 @@ for (const width of [393, 1440]) {
     await expect(mascot).toHaveCount(0);
   });
 }
+
+test("one note mascot keeps its reaction and timers across View/Edit", async ({
+  page,
+}) => {
+  await page.goto("/Home");
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
+  await page.locator(".note-card .note-open").first().click();
+  const view = page.getByRole("dialog", { name: "View note", exact: true });
+  await expect(view.locator(".note-mascot")).toBeVisible();
+  await page.clock.install();
+  await page.clock.pauseAt(new Date());
+  await view.locator(".note-mascot button").click();
+  await expect(view.locator(".mascot-reactions")).toHaveCSS("opacity", "1");
+  for (let i = 0; i < 3; i++) {
+    await view.getByRole("button", { name: "Edit", exact: true }).click();
+    const edit = page.getByRole("dialog", { name: "Edit note", exact: true });
+    await expect(edit.locator(".note-mascot")).toBeVisible();
+    await expect(edit.locator(".mascot-reactions")).toHaveCSS("opacity", "1");
+    await expect(edit.locator(".mascot-reactions")).toHaveCSS(
+      "background-position",
+      "0% 0%",
+    );
+    await expect(page.locator(".note-mascot")).toHaveCount(1);
+    await edit.getByRole("button", { name: "View", exact: true }).click();
+    await expect(view.locator(".mascot-reactions")).toHaveCSS("opacity", "1");
+    await expect(page.locator(".note-mascot")).toHaveCount(1);
+  }
+  await page.clock.runFor(130);
+  await expect(view.locator(".mascot-reactions")).toHaveCSS(
+    "background-position",
+    "50% 0%",
+  );
+  await page.clock.runFor(500);
+  await expect(view.locator(".mascot-reactions")).toHaveCSS("opacity", "0");
+  await view.getByRole("button", { name: "Close", exact: true }).click();
+  await page.clock.runFor(600);
+  await expect(page.locator(".note-card .note-mascot")).toBeVisible();
+});
