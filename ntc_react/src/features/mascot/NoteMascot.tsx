@@ -46,7 +46,7 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
       data-mascot-anchor="corner"
       style={{
         width: size,
-        height: size * (character === "custom" ? 1 : (floor ?? 1)),
+        height: size * (character === "custom" ? 1 : (floor?.max ?? 1)),
         visibility:
           character !== "custom" && floor === undefined ? "hidden" : undefined,
       }}
@@ -68,6 +68,7 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
           label={tr("mascot")}
           className="note-mascot-sprite"
           disableSquash
+          floors={floor}
         />
       )}
     </div>

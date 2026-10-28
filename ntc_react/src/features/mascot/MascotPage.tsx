@@ -100,6 +100,7 @@ export type MascotPageProps = {
   label?: string;
   /** Aligned note sprites stay planted when clicked. */
   disableSquash?: boolean;
+  floors?: { directions: number[]; reactions: number[]; max: number };
 };
 
 export function MascotPage(props: MascotPageProps) {
@@ -110,6 +111,7 @@ export function MascotPage(props: MascotPageProps) {
     className = "",
     label = "mascot",
     disableSquash = false,
+    floors,
   } = props;
 
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -145,8 +147,7 @@ export function MascotPage(props: MascotPageProps) {
       const angle = Math.atan2(dy, dx);
       if (
         sector !== -1 &&
-        Math.abs(wrap(angle - sector * SECTOR)) <
-          SECTOR / 2 + HYSTERESIS
+        Math.abs(wrap(angle - sector * SECTOR)) < SECTOR / 2 + HYSTERESIS
       ) {
         return;
       }
@@ -250,6 +251,9 @@ export function MascotPage(props: MascotPageProps) {
             ...layer,
             backgroundImage: `url(${directions})`,
             ...cell(DIRECTIONS.indexOf(direction)),
+            transform: floors
+              ? `translateY(${size * (floors.max - floors.directions[DIRECTIONS.indexOf(direction)])}px)`
+              : undefined,
             opacity: reaction ? 0 : 1,
           }}
         />
@@ -261,6 +265,9 @@ export function MascotPage(props: MascotPageProps) {
             ...layer,
             backgroundImage: `url(${reactions})`,
             ...cell(REACTIONS.indexOf(reaction ?? "blink")),
+            transform: floors
+              ? `translateY(${size * (floors.max - floors.reactions[REACTIONS.indexOf(reaction ?? "blink")])}px)`
+              : undefined,
             opacity: reaction ? 1 : 0,
           }}
         />

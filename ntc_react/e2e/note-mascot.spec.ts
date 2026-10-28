@@ -38,6 +38,46 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
       );
       expect(geometry.height).toBeGreaterThan(25);
       expect(geometry.clip).not.toBe("none");
+      // Check painted torso pixels, not just the transparent wrapper bounds.
+      const paintedGap = await mascot.evaluate(async (element) => {
+        const layer = element.querySelector<HTMLElement>(".mascot-directions")!;
+        const style = getComputedStyle(layer);
+        const image = new Image();
+        image.src = style.backgroundImage.slice(5, -2);
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(image, 0, 0);
+        const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
+        const w = image.width / 3,
+          h = image.height / 3;
+        const positions = style.backgroundPosition.split(" ").map(parseFloat);
+        const col = Math.round(positions[0] / 50),
+          row = Math.round(positions[1] / 50);
+        let floor = 0;
+        for (let y = h - 1; y >= 0; y--) {
+          let count = 0;
+          for (let x = Math.floor(w * 0.3); x < w * 0.7; x++) {
+            if (
+              pixels[((row * h + y) * image.width + col * w + x) * 4 + 3] > 96
+            )
+              count++;
+          }
+          if (count >= 2) {
+            floor = (y + 1) / h;
+            break;
+          }
+        }
+        const box = layer.getBoundingClientRect();
+        const edge = element.closest(".note-card")!.getBoundingClientRect().top;
+        return edge - (box.top + floor * box.height);
+      });
+      expect(
+        Math.abs(paintedGap),
+        `${character}/${width} painted gap`,
+      ).toBeLessThanOrEqual(1.5);
       if (["raccoon", "cat"].includes(character)) {
         await page.mouse.move(0, 0);
         await page.screenshot({

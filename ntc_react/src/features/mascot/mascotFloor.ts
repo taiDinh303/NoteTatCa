@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-const floors = new Map<string, Promise<number>>();
+const floors = new Map<string, Promise<number[]>>();
 
 // Atlas padding differs by character. Measure once, never during pointer motion.
-function floor(source: string): Promise<number> {
+function floor(source: string): Promise<number[]> {
   const cached = floors.get(source);
   if (cached) return cached;
-  const result = new Promise<number>((resolve, reject) => {
+  const result = new Promise<number[]>((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
       try {
@@ -23,25 +23,25 @@ function floor(source: string): Promise<number> {
         );
         const width = Math.floor(canvas.width / 3);
         const height = Math.floor(canvas.height / 3);
-        let bottom = 0;
+        const bottoms: number[] = [];
         for (let cell = 0; cell < 9; cell++) {
           for (let y = height - 1; y >= 0; y--) {
             let pixels = 0;
-            for (let x = 0; x < width; x++) {
+            for (let x = Math.floor(width * 0.3); x < width * 0.7; x++) {
               const offset =
                 ((Math.floor(cell / 3) * height + y) * canvas.width +
                   (cell % 3) * width +
                   x) *
                 4;
-              if (data[offset + 3] > 16) pixels++;
+              if (data[offset + 3] > 96) pixels++;
             }
             if (pixels >= 2) {
-              bottom = Math.max(bottom, (y + 1) / height);
+              bottoms[cell] = (y + 1) / height;
               break;
             }
           }
         }
-        resolve(bottom || 1);
+        resolve(Array.from({ length: 9 }, (_, i) => bottoms[i] || 1));
       } catch (error) {
         reject(error);
       }
@@ -59,16 +59,35 @@ export function useMascotFloor(
   enabled: boolean,
 ) {
   const key = directions + reactions;
-  const [measured, setMeasured] = useState<{ key: string; value: number }>();
+  const [measured, setMeasured] = useState<{
+    key: string;
+    value: { directions: number[]; reactions: number[]; max: number };
+  }>();
   useEffect(() => {
     if (!enabled) return;
     let active = true;
     void Promise.all([floor(directions), floor(reactions)]).then(
       (values) => {
-        if (active) setMeasured({ key, value: Math.max(...values) });
+        if (active)
+          setMeasured({
+            key,
+            value: {
+              directions: values[0],
+              reactions: values[1],
+              max: Math.max(...values.flat()),
+            },
+          });
       },
       () => {
-        if (active) setMeasured({ key, value: 1 });
+        if (active)
+          setMeasured({
+            key,
+            value: {
+              directions: Array(9).fill(1),
+              reactions: Array(9).fill(1),
+              max: 1,
+            },
+          });
       },
     );
     return () => {

@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot: thân sát mép note ở từng hướng nhìn — 2026-10-28
+
+- Theo4ảnh phản hồi: cách cũ dùng max đáy của cả18khung chỉ bảo đảm không lún, vẫn hở khi một khung có đáy cao hơn. Đo riêng từng cell hướng nhìn/biểu cảm ở vùng thân giữa30–70%, alpha>96 để loại bóng mờ; lưu9+9đáy và bù translateY riêng từng frame. Giữ atlas gốc, size80, khung neo/clip ở mép card và không đo trong pointermove. Không vẽ thêm thân hoặc cắt nối cổ; preset và generated đều dùng cơ chế này, preview chung không truyền floors giữ nguyên.
+- Validation: React TypeScript/Vite build PASS; ESLint focused4file PASS. Full ESLint cuối cùng kết thúc exit0 PASS; process đã tự kết thúc trước lệnh dừng nên không có process bị dừng. .NET solution Release strict0warning/0error. Chromium2/2 PASS:53preset×desktop1440/mobile393 (106lượt), kiểm cả đáy pixel thân thực tế và mép wrapper, hồi quy chuyển card/hướng nhìn/menu; đã xem raccoon desktop không còn khoảng hở. Lượt đầu phát hiện offset1px bổ sung bị tính thêm border, đã bỏ offset và finalPASS. Chưa test thiết bị thật/ảnhAI thật. Rà React skill: hooks unconditional/cleanup, cache source, không thêm fetch API hoặc đo theo chuột. Scope mascot runtime/E2E/worklog, giữ dirty archive/backend/config ngoài commit; không migrate/deploy thủ công.
+
 ## Mascot lớn hơn một chút — 2026-10-28
 
 - Tăng size ở card72→80px (~11%), giữ cơ chế đo mép alpha/căn chân và scale mobile. Không đổi asset, vị trí ngang hay logic tương tác. Scope NotesPage.tsx và entry này; giữ các thay đổi archive/backend khác ngoài commit.
