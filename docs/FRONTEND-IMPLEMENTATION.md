@@ -4,6 +4,15 @@
 
 ## Phạm vi và kiến trúc
 
+### Bộ nhân vật riêng — 2026-10-28
+
+`/settings/appearance` thay gallery53preset bằng8nhân vật riêng NoteTatCa:
+Cat/Fox/Owl/Bear/Bunny/Otter/Notebook robot/Paper pal. Đầu giữ nét riêng,
+thân tái sử dụng pixel cố định xuyên18trạng thái, cùng đường vai/width/baseline.
+URL versioned `mascots/ntc-v1`, preference cũ có adapter về Bunny giữ off,
+slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách kiểm tại
+[MASCOT-ARTWORK](MASCOT-ARTWORK.md); actual evidence tại worklog.
+
 ### Lịch sử, sao lưu và tải trang đầu — 2026-10-27
 
 View mở **Version history** từ popup Edited/Note information; lịch sử phân trang, restore giữ phiên bản hiện tại trong history và làm mới danh sách. Privacy có tải/nhập archive JSON cho account đang online; import thêm bản sao, không ghi đè, reminder nhập sẽ tắt. Guest/offline không gọi endpoint archive. `WorkspacePreparation` chỉ lấy trang note đầu để mở màn hình; nút Load more lấy trang sau, lọc trên dữ liệu chưa đầy đủ vẫn hỏi server. Số đo với1.000note giả và giới hạn xem [PERFORMANCE-NOTES-2026-10-27](PERFORMANCE-NOTES-2026-10-27.md).

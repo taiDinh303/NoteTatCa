@@ -1,5 +1,8 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "NoteTatCa companions": ["Bạn đồng hành NoteTatCa", "NoteTatCa 小伙伴", "NoteTatCaの仲間"],
+  "mascot.notebook": ["Robot sổ tay", "笔记本机器人", "ノートロボット"],
+  "mascot.paper": ["Bạn giấy", "纸张伙伴", "紙の仲間"],
   "Your custom mascot": ["Nhân vật riêng của bạn", "你的自定义吉祥物", "自分のカスタムマスコット"],
   "One free custom mascot per account. Edit it or delete it before creating a new one.": ["Mỗi tài khoản có 1 nhân vật riêng miễn phí. Chỉnh sửa hoặc xóa nhân vật hiện tại trước khi tạo mới.", "每个账户可免费拥有一个自定义吉祥物。创建新角色前，请编辑或删除现有角色。", "各アカウントに無料のカスタムマスコットを1体。新規作成前に現在のものを編集または削除してください。"],
   "Edit mascot": ["Chỉnh sửa nhân vật", "编辑吉祥物", "マスコットを編集"],

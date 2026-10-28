@@ -15,7 +15,23 @@ test("appearance remembers presets and provides no second custom-upload slot", a
   await page.goto("/settings/appearance");
   const toggle = page.getByRole("switch", { name: "Show mascot" });
   await expect(toggle).toBeChecked();
-  await expect(page.getByRole("radio")).toHaveCount(53);
+  await expect(page.getByRole("radio")).toHaveCount(8);
+  await expect(
+    page.getByText("NoteTatCa companions", { exact: true }),
+  ).toBeVisible();
+  for (const name of [
+    "Cat",
+    "Fox",
+    "Owl",
+    "Bear",
+    "Bunny",
+    "Otter",
+    "Notebook robot",
+    "Paper pal",
+  ]) {
+    await page.getByRole("radio", { name, exact: true }).check();
+    await expect(page.getByRole("radio", { name, exact: true })).toBeChecked();
+  }
   await page.getByRole("radio", { name: "Fox", exact: true }).check();
   await page.reload();
   await expect(
@@ -55,4 +71,25 @@ test("appearance remembers presets and provides no second custom-upload slot", a
     path: "test-results/mascot-appearance-mobile.png",
     fullPage: true,
   });
+});
+
+test("retired presets preserve the disabled preference and fall back to the new bunny", async ({
+  page,
+}) => {
+  await page.goto("/Home");
+  await page.evaluate(() => localStorage.setItem("ntc.mascot.v1", "off:koala"));
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
+  await expect(page.locator(".note-card").first()).toBeVisible();
+  await expect(page.locator(".note-mascot")).toHaveCount(0);
+  await page.evaluate(() => {
+    localStorage.setItem("ntc.mascot.v1", "on:koala");
+    window.dispatchEvent(new Event("ntc:mascot-change"));
+  });
+  await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
+    "background-image",
+    /ntc-v1\/bunny-directions.webp/,
+  );
 });

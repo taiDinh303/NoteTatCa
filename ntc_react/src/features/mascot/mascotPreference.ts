@@ -2,72 +2,8 @@ import { useSyncExternalStore } from "react";
 
 export const mascotGroups = [
   {
-    label: "Animals",
-    names: [
-      "bear",
-      "bunny",
-      "cat",
-      "deer",
-      "dino",
-      "fox",
-      "frog",
-      "hamster",
-      "hedgehog",
-      "koala",
-      "mouse",
-      "otter",
-      "owl",
-      "panda",
-      "penguin",
-      "pug",
-      "raccoon",
-      "redpanda",
-      "sheep",
-      "sloth",
-      "tiger",
-    ],
-  },
-  {
-    label: "People",
-    names: [
-      "afro",
-      "astronaut",
-      "bald",
-      "ballerina",
-      "beard",
-      "builder",
-      "cap",
-      "chef",
-      "glasses",
-      "grandpa",
-      "granny",
-      "hijabi",
-      "kamran",
-      "nurse",
-      "pirate",
-      "scientist",
-      "sikh",
-      "skater",
-      "wizard",
-    ],
-  },
-  {
-    label: "Robots",
-    names: [
-      "clockwork",
-      "crt",
-      "cube",
-      "drone",
-      "gearbot",
-      "knight",
-      "lantern",
-      "postbot",
-      "radio",
-      "rocket",
-      "scout",
-      "toaster",
-      "tv",
-    ],
+    label: "NoteTatCa companions",
+    names: ["cat", "fox", "owl", "bear", "bunny", "otter", "notebook", "paper"],
   },
 ] as const;
 export const mascotCharacters = mascotGroups.flatMap((group) => [
@@ -75,6 +11,14 @@ export const mascotCharacters = mascotGroups.flatMap((group) => [
 ]);
 export type MascotCharacter =
   (typeof mascotCharacters)[number] | "custom" | "generated";
+
+// Versioned URLs keep existing browser/CDN caches from serving the old artwork.
+export function mascotPresetSources(name: (typeof mascotCharacters)[number]) {
+  return {
+    directions: `/mascots/ntc-v1/${name}-directions.webp`,
+    reactions: `/mascots/ntc-v1/${name}-reactions.webp`,
+  };
+}
 const key = "ntc.mascot.v1";
 const imageKey = "ntc.mascot.image.v1";
 const eventName = "ntc:mascot-change";
@@ -92,7 +36,7 @@ function read() {
       character === "generated" ||
       mascotCharacters.some((name) => name === character))
     ? value
-    : "on:bunny";
+    : `${enabled === "off" ? "off" : "on"}:bunny`;
 }
 function subscribe(listener: () => void) {
   const storage = (event: StorageEvent) => {

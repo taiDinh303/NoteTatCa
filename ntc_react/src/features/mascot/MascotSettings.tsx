@@ -1,6 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   mascotGroups,
+  mascotPresetSources,
   setMascotPreference,
   useMascotPreference,
 } from "./mascotPreference";
@@ -18,6 +19,8 @@ function characterLabel(name: string) {
     postbot: "Post bot",
     crt: "CRT",
     tv: "TV",
+    notebook: "Notebook robot",
+    paper: "Paper pal",
   };
   return translated === `mascot.${name}`
     ? (english[name] ?? name[0].toUpperCase() + name.slice(1))
@@ -75,8 +78,7 @@ export function MascotSettings() {
                   />
                   <MascotPage
                     key={name}
-                    directions={`/mascots/${name}-directions.webp`}
-                    reactions={`/mascots/${name}-reactions.webp`}
+                    {...mascotPresetSources(name)}
                     size={72}
                     label={characterLabel(name)}
                     className="mascot-choice-page"

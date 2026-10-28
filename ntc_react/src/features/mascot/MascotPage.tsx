@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { MascotAnimationContext } from "./mascotAnimation";
+import { mascotPresetSources } from "./mascotPreference";
 import type { CSSProperties } from "react";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { X } from "lucide-react";
@@ -11,8 +12,8 @@ import "./MascotPage.css";
  * (head directions + reactions) that follows the cursor and blinks
  * when poked. No chat logic, no external calls — pure local animation.
  *
- * Sprite sheets: /mascots/<name>-directions.png and /mascots/<name>-reactions.png
- * (copied from D:\Tools\page-mascot\characters/<name>/, MIT-licensed).
+ * Project artwork: /mascots/ntc-v1/<name>-{directions,reactions}.webp.
+ * Original generated art and fixed-torso assembly: docs/MASCOT-ARTWORK.md.
  */
 
 const DIRECTIONS = [
@@ -295,8 +296,7 @@ export function FloatingMascot() {
   return (
     <div className="mascot-floating">
       <MascotPage
-        directions="/mascots/bunny-directions.png"
-        reactions="/mascots/bunny-reactions.png"
+        {...mascotPresetSources("bunny")}
         size={96}
         label={tr("mascot")}
       />

@@ -1,17 +1,17 @@
 import { MascotPage } from "./MascotPage";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./MascotPage.css";
-import { useMascotPreference } from "./mascotPreference";
+import { mascotPresetSources, useMascotPreference } from "./mascotPreference";
 import { useAccountMascot } from "./generatedMascot";
 import { useAuth } from "../../shared/hooks";
 import { useMascotFloor } from "./mascotFloor";
 
 /*
- * NoteMascot — the bunny that sits on top of a note card.
- * Uses the sprite-sheet mascot (port of nilbuild/page-mascot, MIT). It follows
- * the cursor and blinks/squashes when poked.
+ * NoteMascot — the selected companion sitting on top of a note card.
+ * Uses original project sprites and the page-mascot runtime (MIT).
+ * Follows the cursor and changes expression when poked, with a fixed torso.
  *
- * The bunny always perches on the top-right edge of its card.
+ * The companion always perches on the top-right edge of its card.
  * The same perch is used by list cards and the opened note frame.
  *
  * No chat logic — decorative only.
@@ -26,14 +26,15 @@ export function NoteMascot({ size = 88 }: { size?: number }) {
   );
   const preset =
     character === "custom" || character === "generated" ? "bunny" : character;
+  const sources = mascotPresetSources(preset);
   const directions =
     character === "generated" && generated
       ? generated.directions
-      : `/mascots/${preset}-directions.webp`;
+      : sources.directions;
   const reactions =
     character === "generated" && generated
       ? generated.reactions
-      : `/mascots/${preset}-reactions.webp`;
+      : sources.reactions;
   const floor = useMascotFloor(
     directions,
     reactions,
