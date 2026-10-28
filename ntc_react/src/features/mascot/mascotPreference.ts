@@ -80,7 +80,7 @@ export type MascotCharacter =
 
 // Versioned URLs keep existing browser/CDN caches from serving the old artwork.
 export function mascotPresetSources(name: (typeof mascotCharacters)[number]) {
-  const version = "ntc-v4";
+  const version = "ntc-v5";
   return {
     directions: `/mascots/${version}/${name}-directions.webp`,
     reactions: `/mascots/${version}/${name}-reactions.webp`,

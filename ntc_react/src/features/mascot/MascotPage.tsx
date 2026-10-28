@@ -12,8 +12,8 @@ import "./MascotPage.css";
  * (head directions + reactions) that follows the cursor and blinks
  * when poked. No chat logic, no external calls — pure local animation.
  *
- * Project artwork: /mascots/ntc-v1/<name>-{directions,reactions}.webp.
- * Original generated art and fixed-torso assembly: docs/MASCOT-ARTWORK.md.
+ * Project artwork: /mascots/ntc-v5/<name>-{directions,reactions}.webp.
+ * Whole-frame artwork, dimensions and anchors: docs/MASCOT-ARTWORK.md.
  */
 
 const DIRECTIONS = [
@@ -102,7 +102,13 @@ export type MascotPageProps = {
   label?: string;
   /** Aligned note sprites stay planted when clicked. */
   disableSquash?: boolean;
-  floors?: { directions: number[]; reactions: number[]; max: number };
+  floors?: {
+    directions: number[];
+    reactions: number[];
+    max: number;
+    directionsX?: number[];
+    reactionsX?: number[];
+  };
 };
 
 export function MascotPage(props: MascotPageProps) {
@@ -130,6 +136,16 @@ export function MascotPage(props: MascotPageProps) {
   const reaction = session ? session.reaction : localReaction;
   const setReaction = session?.setReaction ?? setLocalReaction;
   const shared = !!session;
+  // All v5 species share a larger square canvas. Draw it at the same pixel
+  // density as the old canvas so long ears/hats use headroom, not smaller faces.
+  const artSize = directions.includes("/ntc-v5/") ? size * 1.4 : size;
+  const artBox: CSSProperties = {
+    inset: "auto",
+    left: (size - artSize) / 2,
+    top: (size - artSize) * (floors?.max ?? 384 / 448),
+    width: artSize,
+    height: artSize,
+  };
 
   /* Cursor following with hysteresis + dead zone (ported from repo). */
   useEffect(() => {
@@ -261,10 +277,11 @@ export function MascotPage(props: MascotPageProps) {
           className="mascot-directions"
           style={{
             ...layer,
+            ...artBox,
             backgroundImage: `url(${directions})`,
             ...cell(DIRECTIONS.indexOf(direction)),
             transform: floors
-              ? `translateY(${size * (floors.max - floors.directions[DIRECTIONS.indexOf(direction)])}px)`
+              ? `translate(${artSize * (0.5 - (floors.directionsX?.[DIRECTIONS.indexOf(direction)] ?? 0.5))}px, ${artSize * (floors.max - floors.directions[DIRECTIONS.indexOf(direction)])}px)`
               : undefined,
             opacity: reaction ? 0 : 1,
           }}
@@ -275,10 +292,11 @@ export function MascotPage(props: MascotPageProps) {
           className="mascot-reactions"
           style={{
             ...layer,
+            ...artBox,
             backgroundImage: `url(${reactions})`,
             ...cell(REACTIONS.indexOf(reaction ?? "blink")),
             transform: floors
-              ? `translateY(${size * (floors.max - floors.reactions[REACTIONS.indexOf(reaction ?? "blink")])}px)`
+              ? `translate(${artSize * (0.5 - (floors.reactionsX?.[REACTIONS.indexOf(reaction ?? "blink")] ?? 0.5))}px, ${artSize * (floors.max - floors.reactions[REACTIONS.indexOf(reaction ?? "blink")])}px)`
               : undefined,
             opacity: reaction ? 1 : 0,
           }}

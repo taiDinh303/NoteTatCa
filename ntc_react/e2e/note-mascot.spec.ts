@@ -72,10 +72,10 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
           const col = Math.round(positions[0] / 50),
             row = Math.round(positions[1] / 50);
           const moduleUrl = "/src/features/mascot/mascotBodyFloor.ts";
-          const { mascotBodyFloor } = await import(
+          const { mascotBodyAnchor } = await import(
             /* @vite-ignore */ moduleUrl
           );
-          const floor = mascotBodyFloor(
+          const anchor = mascotBodyAnchor(
             ctx.getImageData(col * w, row * h, w, h).data,
             w,
             h,
@@ -84,12 +84,24 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
           const edge = element
             .closest(".note-card")!
             .getBoundingClientRect().top;
-          return edge - (box.top + floor * box.height);
+          const wrapper = element.getBoundingClientRect();
+          return {
+            gap: edge - (box.top + anchor.floor * box.height),
+            horizontal:
+              box.left +
+              anchor.center * box.width -
+              (wrapper.left + wrapper.width / 2),
+            bodyWidth: anchor.width * box.width,
+          };
         });
         expect(
-          Math.abs(paintedGap),
+          Math.abs(paintedGap.gap),
           `${character}/${width} painted gap`,
         ).toBeLessThanOrEqual(1.1);
+        expect(
+          Math.abs(paintedGap.horizontal),
+          character + "/" + width + " horizontal drift",
+        ).toBeLessThanOrEqual(0.65);
       }
       if (["raccoon", "cat"].includes(character)) {
         await page.mouse.move(0, 0);

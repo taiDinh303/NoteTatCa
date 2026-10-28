@@ -10,8 +10,8 @@
 Cat/Fox/Owl/Bear/Bunny/Otter/Notebook robot/Paper pal cộng47nhân vật còn lại
 (15động vật/19người/13robot) theo xác nhận chủ dự án. Đầu giữ nét riêng,
 Theo yêu cầu mới nhất: xuất nguyên18frame nguồn, scale đồng đều cả ảnh, không tách/ghép đầu và thân.
-URL hiện hành `mascots/ntc-v4`; Paper pal giữ hình giấy trắng/xám,
-mắt mực đen tối giản; bỏ toàn bộ ghép thân và blend đường cổ của bảnv3.
+URL hiện hành `mascots/ntc-v5`; Paper pal giữ hình giấy trắng/xám,
+bỏ toàn bộ ghép thân và blend đường cổ của bảnv3.
 Khôi phục53IDpreset cũ, ID không biết có adapter về Bunny giữ off,
 slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách kiểm tại
 [MASCOT-ARTWORK](MASCOT-ARTWORK.md); actual evidence tại worklog.
@@ -19,7 +19,11 @@ slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách ki
 2026-10-29: Note và gallery neo theo đáy thành phần nhân vật của từng frame
 (alpha liên thông), thay đáy canvas cố định khiến thân hở/nhảy. Chỉ translate
 nguyên frame, không sửa atlas hay ghép ảnh; cache18đáy/source pair và giữ
-cache đồng bộ qua View/Edit.
+cache đồng bộ qua View/Edit. Bộv5vẽ lại55con cùng phong cách; chuẩn hóa
+toàn bộ frame448, atlas1344lossless, cỡ thân trung tâm140px và khung có
+headroom chung. Neo thêm tâmXtheo thân để đầu quay không kéo thân lệch.
+Wizard che miệng bằng râu dài; mẫu râu/ria khác giữ đúng giải phẫu khi mở
+miệng. Chi tiết nguồn, prompt, gutter và phép kiểm tại tài liệu artwork.
 
 ### Lịch sử, sao lưu và tải trang đầu — 2026-10-27
 

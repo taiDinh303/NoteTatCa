@@ -6,7 +6,7 @@ test("paper pal uses the cool white redesign instead of the beige portrait", asy
 }) => {
   await page.goto("/Home");
   const sources = mascotPresetSources("paper");
-  expect(sources.directions).toContain("/ntc-v4/");
+  expect(sources.directions).toContain("/ntc-v5/");
   const warmRatio = await page.evaluate(async (source) => {
     const image = new Image();
     image.src = source;
@@ -14,7 +14,8 @@ test("paper pal uses the cool white redesign instead of the beige portrait", asy
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 320;
     const c = canvas.getContext("2d")!;
-    c.drawImage(image, 320, 320, 320, 320, 0, 0, 320, 320);
+    const tile = image.width / 3;
+    c.drawImage(image, tile, tile, tile, tile, 0, 0, 320, 320);
     const pixels = c.getImageData(0, 0, 320, 320).data;
     let warm = 0,
       opaque = 0;

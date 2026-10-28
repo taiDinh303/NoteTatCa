@@ -19,12 +19,15 @@ function MascotChoicePreview({
 }) {
   const sources = mascotPresetSources(name);
   const floors = useMascotFloor(sources.directions, sources.reactions, true);
+  const headroom = sources.directions.includes("/ntc-v5/") ? 72 * 0.4 : 0;
   return (
     <span
       style={{
         display: "block",
         width: 72,
-        height: 72,
+        height: 72 + headroom,
+        paddingTop: headroom,
+        boxSizing: "border-box",
         visibility: floors ? "visible" : "hidden",
       }}
     >

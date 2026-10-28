@@ -74,6 +74,14 @@ test("appearance remembers presets and provides no second custom-upload slot", a
     path: "test-results/mascot-appearance-mobile.png",
     fullPage: true,
   });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const dark = page.getByRole("switch", { name: "Dark mode", exact: true });
+  await dark.click();
+  await expect(dark).toBeChecked();
+  await page.screenshot({
+    path: "test-results/mascot-appearance-dark.png",
+    fullPage: true,
+  });
 });
 
 test("legacy presets retain their choice and disabled state; unknown presets fall back", async ({
@@ -93,7 +101,7 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v4\/koala-directions.webp/,
+    /ntc-v5\/koala-directions.webp/,
   );
   await page.evaluate(() => {
     localStorage.setItem("ntc.mascot.v1", "on:retired-example");
@@ -101,6 +109,6 @@ test("legacy presets retain their choice and disabled state; unknown presets fal
   });
   await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
     "background-image",
-    /ntc-v4\/bunny-directions.webp/,
+    /ntc-v5\/bunny-directions.webp/,
   );
 });

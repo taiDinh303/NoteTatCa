@@ -1,6 +1,7 @@
-import { mascotBodyFloor } from "./mascotBodyFloor";
+import { mascotBodyAnchor } from "./mascotBodyFloor";
 import { useEffect, useState } from "react";
 
+const centers = new Map<string, number[]>();
 const floors = new Map<string, Promise<number[]>>();
 const resolvedFloors = new Map<string, number[]>();
 
@@ -21,6 +22,7 @@ function floor(source: string): Promise<number[]> {
         const width = Math.floor(canvas.width / 3);
         const height = Math.floor(canvas.height / 3);
         const bottoms: number[] = [];
+        const horizontal: number[] = [];
         for (let cell = 0; cell < 9; cell++) {
           const tile = context.getImageData(
             (cell % 3) * width,
@@ -28,9 +30,12 @@ function floor(source: string): Promise<number[]> {
             width,
             height,
           );
-          bottoms[cell] = mascotBodyFloor(tile.data, width, height);
+          const anchor = mascotBodyAnchor(tile.data, width, height);
+          bottoms[cell] = anchor.floor;
+          horizontal[cell] = anchor.center;
         }
         const values = Array.from({ length: 9 }, (_, i) => bottoms[i] || 1);
+        centers.set(source, horizontal);
         resolvedFloors.set(source, values);
         resolve(values);
       } catch (error) {
@@ -52,7 +57,13 @@ export function useMascotFloor(
   const key = directions + reactions;
   const [measured, setMeasured] = useState<{
     key: string;
-    value: { directions: number[]; reactions: number[]; max: number };
+    value: {
+      directions: number[];
+      reactions: number[];
+      max: number;
+      directionsX?: number[];
+      reactionsX?: number[];
+    };
   }>();
   useEffect(() => {
     if (!enabled) return;
@@ -63,6 +74,8 @@ export function useMascotFloor(
           setMeasured({
             key,
             value: {
+              directionsX: centers.get(directions),
+              reactionsX: centers.get(reactions),
               directions: values[0],
               reactions: values[1],
               max: Math.max(...values.flat()),
@@ -91,6 +104,8 @@ export function useMascotFloor(
   const cachedReactions = resolvedFloors.get(reactions);
   return cachedDirections && cachedReactions
     ? {
+        directionsX: centers.get(directions),
+        reactionsX: centers.get(reactions),
         directions: cachedDirections,
         reactions: cachedReactions,
         max: Math.max(...cachedDirections, ...cachedReactions),
