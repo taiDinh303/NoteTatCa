@@ -1,3 +1,8 @@
+## Mở note trực tiếp trên Reminders — 2026-10-28
+
+- Bỏ link/nút View note, cả bề mặt card dùng button tiêu đề với vùng click phủ card, hỗ trợ Tab/Enter/focus ring. Menu actions có lớp riêng để không mở note ngoài ý muốn. Lazy-load NoteEditor hiện có ngay trên /reminders, đóng trở lại danh sách giữ URL; hỗ trợ View/Edit/mascot/autosave hiện có, không thêm API hoặc đổi ownership.
+- Validation: Chromium reminder-background 2/2 PASS: tạo/lỗi lưu nền, pause/enable cả hai theme qua menu, click thân card mở đúng nội dung, URL vẫn /reminders, sang Edit rồi đóng và mở lại bằng Enter. React production build + focused ESLint PASS; .NET Release strict 0 warnings/errors. Không ownerDB/email thật/deploy/migrate/thiết bị vật lý. Scope publication RemindersPage/styles/reminder-background E2E/worklog; giữ dirty archive/history/performance khác. Push main theo quyền hiện có, kiểm remote SHA sau push.
+
 ## Reminder: trạng thái rõ màu trong dark/light — 2026-10-28
 
 - Sửa status pill bị màu chữ từ note kế thừa trên nền dark: scope riêng reminder, Active xanh lá và Paused hổ phách với foreground/background/border rõ ràng cho cả hai theme. Bỏ opacity toàn card khi paused để nội dung luôn rõ; giữ màu note và lưu nền hiện có.

@@ -1876,6 +1876,7 @@ strong {
   gap: 12px;
 }
 .reminder-card {
+  position: relative;
   display: flex;
   gap: 17px;
   align-items: center;
@@ -1955,18 +1956,24 @@ strong {
   line-height: 1.5;
   margin-bottom: 10px;
 }
-.reminder-open-note {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: none;
+.reminder-card-open {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
 }
-.reminder-open-note:hover { text-decoration: underline; }
-.reminder-open-note:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
+.reminder-card-open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.reminder-card-open:focus-visible { outline: none; }
+.reminder-card-open:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 3px; }
+.reminder-card-actions { position: relative; z-index: 1; }
 .reminder-meta {
   display: flex;
   gap: 8px;

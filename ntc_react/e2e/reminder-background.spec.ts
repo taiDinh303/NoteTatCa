@@ -63,26 +63,57 @@ test("creates a reminder immediately while the request saves in background", asy
     .getByRole("button", { name: "Close", exact: true })
     .click();
   await page.getByRole("link", { name: "Reminders", exact: true }).click();
-  const card = page.locator(".reminder-card").filter({ hasText: "Project notes" });
-  await expect(card.getByText("Keep it simple.", { exact: false })).toBeVisible();
+  const card = page
+    .locator(".reminder-card")
+    .filter({ hasText: "Project notes" });
+  await expect(
+    card.getByText("Keep it simple.", { exact: false }),
+  ).toBeVisible();
   await expect(card).toHaveCSS("background-color", "rgb(222, 237, 248)");
   for (const theme of ["light", "dark"]) {
-    await page.evaluate((value) => document.documentElement.dataset.theme = value, theme);
+    await page.evaluate(
+      (value) => (document.documentElement.dataset.theme = value),
+      theme,
+    );
     const status = card.locator(".status-pill");
-    await expect(status).toHaveCSS("color", theme === "dark" ? "rgb(181, 235, 199)" : "rgb(32, 92, 56)");
+    await expect(status).toHaveCSS(
+      "color",
+      theme === "dark" ? "rgb(181, 235, 199)" : "rgb(32, 92, 56)",
+    );
     await card.getByRole("button", { name: "Reminder actions" }).click();
     await page.getByRole("menuitem", { name: "Pause reminder" }).click();
     await expect(status).toHaveText("Paused");
-    await expect(status).toHaveCSS("color", theme === "dark" ? "rgb(255, 218, 150)" : "rgb(117, 70, 0)");
+    await expect(status).toHaveCSS(
+      "color",
+      theme === "dark" ? "rgb(255, 218, 150)" : "rgb(117, 70, 0)",
+    );
     await expect(card).toHaveCSS("opacity", "1");
     await card.getByRole("button", { name: "Reminder actions" }).click();
     await page.getByRole("menuitem", { name: "Enable reminder" }).click();
     await expect(status).toHaveText("Active");
   }
-  await card.getByRole("link", { name: "View note", exact: true }).click();
+  await expect(card.getByText("View note", { exact: true })).toHaveCount(0);
+  await card.click({ position: { x: 100, y: 65 } });
   await expect(page.getByRole("dialog", { name: "View note" })).toContainText(
     "Make the important things easy to find.",
   );
+  await expect(page).toHaveURL(/\/reminders$/);
+  await page
+    .getByRole("dialog", { name: "View note" })
+    .getByRole("button", { name: "Edit", exact: true })
+    .click();
+  await expect(page.getByRole("dialog", { name: "Edit note" })).toBeVisible();
+  await page
+    .getByRole("dialog", { name: "Edit note" })
+    .getByRole("button", { name: "Close", exact: true })
+    .click();
+  await expect(card).toBeVisible();
+  await expect(page).toHaveURL(/\/reminders$/);
+  await card
+    .getByRole("button", { name: "Project notes", exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "View note" })).toBeVisible();
 });
 
 test("restores entered reminder details when background creation fails", async ({

@@ -1,12 +1,11 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
   Bell,
   CalendarDays,
   Clock3,
-  Eye,
   Mail,
   Pause,
   Pencil,
@@ -32,6 +31,7 @@ import {
 import { dateTime, errorMessage } from "../../shared/utils";
 import { ReminderForm } from "./ReminderDialog";
 import { commitReminder, pendingReminder } from "./reminderCache";
+const NoteEditor = lazy(() => import("../editor/NoteEditor"));
 export default function RemindersPage() {
   useLanguage();
   const state = useAuth();
@@ -46,6 +46,7 @@ export default function RemindersPage() {
     refetchOnMount: "always",
   });
   const [editing, setEditing] = useState<Reminder>();
+  const [openedNote, setOpenedNote] = useState<string>();
   const [pending, setPending] = useState<Reminder>();
   const [toggling, setToggling] = useState<Reminder>();
   const [draft, setDraft] = useState<ReminderInput>();
@@ -136,9 +137,14 @@ export default function RemindersPage() {
                   <Bell size={20} />
                 </div>
                 <div className="reminder-card-content">
-                  <Link to={`/notes?note=${reminder.noteId}`}>
-                    <h2>{reminder.noteTitle || tr("Untitled")}</h2>
-                  </Link>
+                  <h2>
+                    <button
+                      className="reminder-card-open"
+                      onClick={() => setOpenedNote(reminder.noteId)}
+                    >
+                      {reminder.noteTitle || tr("Untitled")}
+                    </button>
+                  </h2>
                   {reminder.notePreview?.trim() ? (
                     <p className="reminder-note-preview">
                       {reminder.notePreview.trim()}
@@ -176,44 +182,39 @@ export default function RemindersPage() {
                       ? tr("Active")
                       : tr("Paused")}
                 </span>
-                <Link
-                  className="reminder-open-note"
-                  to={`/notes?note=${reminder.noteId}`}
-                >
-                  <Eye size={15} aria-hidden />
-                  {tr("View note")}
-                </Link>
-                <ActionMenu
-                  label={tr("Reminder actions")}
-                  items={[
-                    {
-                      label: tr("Edit reminder"),
-                      icon: Pencil,
-                      action: () => {
-                        setDraft(undefined);
-                        setSaveError(undefined);
-                        setEditing(reminder);
+                <div className="reminder-card-actions">
+                  <ActionMenu
+                    label={tr("Reminder actions")}
+                    items={[
+                      {
+                        label: tr("Edit reminder"),
+                        icon: Pencil,
+                        action: () => {
+                          setDraft(undefined);
+                          setSaveError(undefined);
+                          setEditing(reminder);
+                        },
+                        disabled: busy === reminder.id || saving,
                       },
-                      disabled: busy === reminder.id || saving,
-                    },
-                    {
-                      label: reminder.isActive
-                        ? tr("Pause reminder")
-                        : tr("Enable reminder"),
-                      icon: reminder.isActive ? Pause : Play,
-                      action: () => void toggle(reminder),
-                      disabled: busy === reminder.id || saving,
-                    },
-                    {
-                      label: tr("Delete reminder"),
-                      icon: Trash2,
-                      danger: true,
-                      separator: true,
-                      action: () => setDeleting(reminder),
-                      disabled: busy === reminder.id || saving,
-                    },
-                  ]}
-                />
+                      {
+                        label: reminder.isActive
+                          ? tr("Pause reminder")
+                          : tr("Enable reminder"),
+                        icon: reminder.isActive ? Pause : Play,
+                        action: () => void toggle(reminder),
+                        disabled: busy === reminder.id || saving,
+                      },
+                      {
+                        label: tr("Delete reminder"),
+                        icon: Trash2,
+                        danger: true,
+                        separator: true,
+                        action: () => setDeleting(reminder),
+                        disabled: busy === reminder.id || saving,
+                      },
+                    ]}
+                  />
+                </div>
               </article>
             );
           })}
@@ -227,6 +228,14 @@ export default function RemindersPage() {
         >
           {tr("Load more reminders")}
         </Button>
+      ) : null}
+      {openedNote ? (
+        <Suspense fallback={<Spinner label={tr("Opening editor…")} />}>
+          <NoteEditor
+            noteId={openedNote}
+            onClose={() => setOpenedNote(undefined)}
+          />
+        </Suspense>
       ) : null}
       {editing ? (
         <Modal
