@@ -4466,7 +4466,15 @@ td {
   height: calc(100dvh / var(--interface-scale) - 176px);
   animation: none;
 }
-.modal.note-editor-modal.note-viewer { overflow: visible; }
+.modal.note-editor-modal { overflow: visible; }
+.note-editor-modal > .editor-heading {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+.note-editor-modal > .editor-footer {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+}
 .modal.note-editor-modal.fullscreen {
   inset: 0;
   transform: none;

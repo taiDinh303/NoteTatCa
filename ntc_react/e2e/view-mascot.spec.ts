@@ -30,7 +30,10 @@ for (const width of [393, 1440]) {
     const editing = (await editor.boundingBox())!;
     expect(Math.abs(editing.height - frame.height)).toBeLessThan(1);
     expect(Math.abs(editing.y - frame.y)).toBeLessThan(1);
-    await expect(editor.locator(".note-mascot")).toHaveCount(0);
+    await expect(editor.locator(".note-mascot")).toBeVisible();
+    const editPet = (await editor.locator(".note-mascot").boundingBox())!;
+    expect(Math.abs(editPet.x - pet.x)).toBeLessThan(1);
+    expect(Math.abs(editPet.y - pet.y)).toBeLessThan(1);
     await editor.getByRole("button", { name: "View", exact: true }).click();
     await expect(mascot).toBeVisible();
     if (width > 800) {

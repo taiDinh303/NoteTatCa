@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot hiện chung ở cả View/Edit — 2026-10-28
+
+- Theo chỉnh yêu cầu: Edit/New cũng render cùng NoteMascot80px ở góc trên phải như View, cùng headroom/height/position; cả2ẩn mascot khi fullscreen. Modal editor overflow visible để không cắt mascot, header/footer kế thừa bo góc nhằm giữ màu note đúng khung; content vẫn scroll riêng. Preference bật/tắt dùng chung.
+- Validation: TypeScript/Vite build, focused ESLint PASS; .NET Release strict0warning/0error. Chromium2/2 PASS393/1440: mascot Edit visible và cùngx/y View<1px, frame giữ nguyên, View→Edit→View, fullscreen desktop/tắt preference; không DB/API/data change. Scope NoteEditor/styles/view-mascot test/worklog; giữ dirty khác ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Mascot trên View, giảm chiều cao chung View/Edit — 2026-10-28
 
 - Theo ảnh/yêu cầu bổ sung: khung thường View/Edit cùng height viewport−176px (chừa88px mỗi phía ở scale1), giữ width/header/footer và kích thước khi đổi mode. View render NoteMascot80px trên mép trên phải, dùng cùng preference/atlas/căn đáy như danh sách; chỉ View overflow visible cho mascot ngoài khung, content tiếp tục có scroll riêng. Edit chưa hiện mascot. Desktop fullscreen giữ kín viewport và ẩn mascot ngoài mép; mobile khung thường cũng giảm height, bỏ rule tự ép fullviewport đã làm mascot khuất. Giữ nút fullscreen mobile ẩn theo hành vi trước.

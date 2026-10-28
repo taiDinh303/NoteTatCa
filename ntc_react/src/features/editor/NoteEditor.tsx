@@ -576,6 +576,7 @@ function EditorSession({
             : {}),
         }}
       >
+        {!fullscreen ? <NoteMascot size={80} /> : null}
         <div
           className={`editor-heading ${draft.iconEmoji ? "" : "editor-heading-no-icon"}`}
           style={{
