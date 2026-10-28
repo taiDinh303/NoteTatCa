@@ -4463,9 +4463,10 @@ td {
   animation: none;
 }
 .modal.note-editor-modal {
-  height: calc(90dvh / var(--interface-scale));
+  height: calc(100dvh / var(--interface-scale) - 176px);
   animation: none;
 }
+.modal.note-editor-modal.note-viewer { overflow: visible; }
 .modal.note-editor-modal.fullscreen {
   inset: 0;
   transform: none;
@@ -4504,15 +4505,11 @@ td {
 @container viewport (max-width: 480px) { .note-view-timestamp { font-size: 10px; } }
 .note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
-  .modal.note-editor-modal {
-    inset: 0;
-    transform: none;
-    width: calc(100vw / var(--interface-scale));
-    height: calc(100dvh / var(--interface-scale));
+  .modal.note-editor-modal:not(.fullscreen) {
+    width: calc(100vw / var(--interface-scale) - 18px);
     max-width: none;
-    max-height: calc(100dvh / var(--interface-scale));
-    border: 0;
-    border-radius: 0;
+    max-height: calc(100dvh / var(--interface-scale) - 176px);
+    border-radius: 12px;
   }
   .note-editor-modal .editor-size-toggle {
     display: none;

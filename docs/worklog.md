@@ -2,6 +2,12 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Mascot trên View, giảm chiều cao chung View/Edit — 2026-10-28
+
+- Theo ảnh/yêu cầu bổ sung: khung thường View/Edit cùng height viewport−176px (chừa88px mỗi phía ở scale1), giữ width/header/footer và kích thước khi đổi mode. View render NoteMascot80px trên mép trên phải, dùng cùng preference/atlas/căn đáy như danh sách; chỉ View overflow visible cho mascot ngoài khung, content tiếp tục có scroll riêng. Edit chưa hiện mascot. Desktop fullscreen giữ kín viewport và ẩn mascot ngoài mép; mobile khung thường cũng giảm height, bỏ rule tự ép fullviewport đã làm mascot khuất. Giữ nút fullscreen mobile ẩn theo hành vi trước.
+- Validation: React TypeScript/Vite production build và focused ESLint PASS; .NET Release strict0warning/0error. Chromium guest2/2 PASS tại393/1440×900: mascot không ngoài màn hình, đáy sát mép, boop không đóng dialog, View/Edit cùng height/top, desktop fullscreen/thoát, tắt preference ẩn mascot. Đã xem screenshot desktop/mobile. Lượt đầu mobile bị rule auto-fullscreen cũ đẩy mascot y−51px, sửa rule khung thường và finalPASS. Không dùng DB/email/notes thật, chưa test keyboard vật lý/thiết bị thật/landscape quá thấp; không deploy/migrate.
+- Scope NoteEditor.tsx/styles/view-mascot E2E/worklog; giữ archive/history/performance dirty ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Kéo3→2: bỏ animation thả chạy chồng — 2026-10-28
 
 - Theo mô tả/video người dùng: useSortable mặc định có derived FLIP sau đổi index, trong khi noteMotion thêm một FLIP rAF cho card thả; destination có thể đang mang transform của lớp còn lại, gây bay lại/nháy card cạnh trái. Tắt animateLayoutChanges sau drop của sortable; giữ sortable transition chỉ khi đang sorting. Khi thả hợp lệ, chụp toàn bộ vị trí đang vẽ rồi dùng cùng một layout-effect FLIP theoID cho các card bị ảnh hưởng (chung đường với pin). Không chạy rAF drop thêm ở nhánh này; cancel/ngoài nhóm giữ đường trả về cũ. Card thả có z-index tạm trong animation để tránh bị card khác đè, cleanup khi xong/hủy; không đổi API/order persist/card width/gap.

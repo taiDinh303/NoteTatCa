@@ -1,4 +1,6 @@
 import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
+import { NoteMascot } from "../mascot/NoteMascot";
+import "../mascot/NoteMascot.css";
 import {
   Suspense,
   useEffect,
@@ -318,6 +320,7 @@ function NoteViewer({
         ...(note.backgroundColor ? { "--surface": note.backgroundColor } : {}),
       }}
     >
+      {!fullscreen ? <NoteMascot size={80} /> : null}
       <div className="editor-heading note-view-heading">
         <div className="editor-identity note-view-identity">
           {note.iconEmoji ? (
