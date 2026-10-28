@@ -39,7 +39,7 @@ import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom, EMOJIS } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
 import { useAuth, useLabels, useMe } from "../../shared/hooks";
-import { dateTime } from "../../shared/utils";
+import { dateTime, errorMessage } from "../../shared/utils";
 import {
   ActionMenu,
   Button,
@@ -329,13 +329,23 @@ function NoteViewer({
           ) : null}
           {note.title ? <h2 className="note-heading-title">{note.title}</h2> : null}
         </div>
-        <IconButton
-          className="editor-size-toggle"
-          icon={fullscreen ? Minimize2 : Maximize2}
-          label={fullscreen ? tr("Exit full screen") : tr("Enter full screen")}
-          aria-pressed={fullscreen}
-          onClick={() => onFullscreenChange(!fullscreen)}
-        />
+        <div className="row-actions">
+          <IconButton
+            className="editor-pin editor-heading-action"
+            icon={note.isPinned ? PinOff : Pin}
+            label={note.isPinned ? tr("Unpin note") : tr("Pin note")}
+            aria-pressed={note.isPinned}
+            disabled={!!note.deletedTime}
+            onClick={() => { void workspace.pin(note).catch(error => toast.error(errorMessage(error))); }}
+          />
+          <IconButton
+            className="editor-heading-action editor-size-toggle"
+            icon={fullscreen ? Minimize2 : Maximize2}
+            label={fullscreen ? tr("Exit full screen") : tr("Enter full screen")}
+            aria-pressed={fullscreen}
+            onClick={() => onFullscreenChange(!fullscreen)}
+          />
+        </div>
       </div>
       <div className="editor-scroll">
         <Suspense fallback={<Spinner label={tr("Loading note…")} />}>

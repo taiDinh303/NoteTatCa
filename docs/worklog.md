@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Header note: pin/fullscreen cùng góc phải và pin ở View — 2026-10-28
+
+- Bỏ thứ tự CSS đẩy row-actions của editor không icon lên trước title; nay title→thêm icon→actions, actions vẫn margin-left:auto. View thêm row-actions cùng class/size, pin/unpin dùng workspace optimistic queue/lưu nền đã có, báo lỗi toast; pin disabled với note trong trash. Fullscreen giữ hành vi hiện tại. Không đổi note content/mode/session mascot.
+- Validation: React TypeScript/Vite build, focused ESLint, .NET Release strict0warning/0error PASS. Chromium guest2/2 PASS: không icon với title trống/có title, pin/fullscreen ở>70%width cùng y, tọa độ2nút giữa View/Edit lệch<1px, Viewpin→Edit cùng trạng thái→Editunpin→View đúng trạng thái. Không DB/email thật/deploy/migrate; chưa test thiết bị vật lý. Scope NoteEditor/styles/headerE2E mới/worklog, giữ dirty archive/history/performance/localconfig ngoài commit. Push main theo quyền hiện có, kiểm remote sau push.
+
 ## Mascot liên tục khi đổi View/Edit, chỉ hiện một con — 2026-10-28
 
 - Theo video/mô tả: mascot trước đây giữ direction/reaction/timers trong component mode nên remount khi View↔Edit, đồng thời floor hook chờ effect lại làm hidden một frame. Thêm MascotAnimationSession ở ZoomSession xuyên suốt phiên note: giữ chung hướng nhìn, biểu cảm, chuỗi boop và timers; cleanup khi đóng phiên, không khi đổi mode. Giữ array timers ổn định, không reset animation. Cache alpha floors đã resolve được đọc đồng bộ cho mode mới, tránh pha hide/đổi chiều cao. View/Edit bên trong vẫn độc lập để giữ flow autosave, khung/thông số/animation none đã có giữ nguyên khi thay content.
