@@ -1380,6 +1380,13 @@ strong {
 }
 .guest-import-footer { flex-wrap: nowrap; align-items: stretch; }
 .guest-import-footer .button { min-width: 0; max-width: 100%; white-space: normal; }
+.guest-import-footer .guest-discard-button {
+  border-color: #b95252;
+  color: #b95252;
+}
+.guest-import-footer .guest-discard-button:hover:not(:disabled) {
+  background: #b9525214;
+}
 .dropdown {
   background: var(--surface);
   border: 1px solid var(--border);

@@ -2,6 +2,11 @@
 
 > 2026-10-24 Asia/Bangkok | CURRENT React và backend local; khảo sát cũ được giữ ở cuối file.
 
+## Guest copy: Delete viền đỏ, Close cuối hàng — 2026-10-28
+
+- Theo ảnh: Delete chữ/viền đỏ và hover nền đỏ nhạt, CSS chỉ trong footer guest; chuyển Close xuống cuối DOM sau Copy để tab order khớp vị trí ngoài cùng phải. Giữ3nút cùng hàng/cùng chiều cao, hành vi không đổi.
+- Validation: React production build PASS; final TypeScript và focused ESLint PASS sau thêm class; .NET Release strict0warning/0error; scoped diff checkPASS. Không chạy lại browser cho đổi thứ tự/CSS nhỏ, chưa xác minh screenshot runtime lượt này. Scope GuestControls/styles/worklog; giữ dirty khác ngoài commit. Push main theo quyền hiện có và kiểm remote sau push.
+
 ## Guest copy: Delete / Close cùng hàng — 2026-10-28
 
 - Đổi hai nhãn button theo yêu cầu thành Delete và Close (dùng bản dịch chung); giữ nguyên hành vi discard/giữ dữ liệu. Footer nowrap, các button stretch cùng chiều cao; chữ dài của nút copy wrap trong nút trên mobile, không đẩy nút xuống hàng khác.

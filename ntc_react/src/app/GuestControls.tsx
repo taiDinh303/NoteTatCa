@@ -176,6 +176,7 @@ export function GuestImportOffer() {
       <div className="modal-footer guest-import-footer">
         <Button
           variant="ghost"
+          className="guest-discard-button"
           disabled={busy}
           onClick={() => {
             setBusy(true);
@@ -188,16 +189,6 @@ export function GuestImportOffer() {
           }}
         >
           {tr("Delete")}
-        </Button>
-        <Button
-          variant="secondary"
-          disabled={busy}
-          onClick={() => {
-            guest.closeImport();
-            setKept(false);
-          }}
-        >
-          {tr("Close")}
         </Button>
         {!kept ? (
           <Button
@@ -227,6 +218,16 @@ export function GuestImportOffer() {
             {tr("Copy to my account")}
           </Button>
         ) : null}
+        <Button
+          variant="secondary"
+          disabled={busy}
+          onClick={() => {
+            guest.closeImport();
+            setKept(false);
+          }}
+        >
+          {tr("Close")}
+        </Button>
       </div>
     </Modal>
   );
