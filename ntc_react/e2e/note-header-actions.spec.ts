@@ -67,6 +67,24 @@ for (const title of ["", "Plain title"]) {
         .boundingBox())!;
     expect(Math.abs(editedPin.x - pin.x)).toBeLessThan(1);
     expect(Math.abs(editedSize.x - size.x)).toBeLessThan(1);
+    const iconButton = edit.getByRole("button", {
+      name: "Choose note icon",
+      exact: true,
+    });
+    const emptyIcon = (await iconButton.boundingBox())!;
+    const titleBefore = (await edit
+      .getByRole("textbox", { name: "Note title", exact: true })
+      .boundingBox())!;
+    expect(emptyIcon.x).toBeLessThan(titleBefore.x);
+    await iconButton.click();
+    await page.locator(".note-icon-grid button").nth(1).click();
+    const chosenIcon = (await iconButton.boundingBox())!;
+    const titleAfter = (await edit
+      .getByRole("textbox", { name: "Note title", exact: true })
+      .boundingBox())!;
+    expect(Math.abs(chosenIcon.x - emptyIcon.x)).toBeLessThan(1);
+    expect(chosenIcon.width).toBe(emptyIcon.width);
+    expect(Math.abs(titleAfter.x - titleBefore.x)).toBeLessThan(1);
     await editPin.click();
     await edit.getByRole("button", { name: "View", exact: true }).click();
     await expect(viewPin).toHaveAttribute("aria-pressed", before!);

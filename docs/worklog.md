@@ -1,3 +1,8 @@
+## Icon note: nút thêm và emoji chung vị trí — 2026-10-28
+
+- Bỏ thứ tự CSS riêng đẩy nút thêm icon sang sau title; dùng thứ tự DOM identity→title→actions cho cả có/chưa icon. Cùng width28/height36 để thêm emoji không dịch tiêu đề; pin/fullscreen vẫn margin-left:auto bên phải.
+- Validation Chromium header 2/2 PASS: tiêu đề trống/có chữ, vị trí và width icon trước/sau chọn giữ nguyên, title x lệch<1px, pin/fullscreen View/Edit giữ vị trí/trạng thái. React production build + focused ESLint PASS; .NET Release strict 0warning/0error. Không DB/email thật/deploy/migrate. Scope styles/header E2E/entry này; giữ nguyên thay đổi mascot/archive/history/performance đang có. Push main theo quyền hiện có và kiểm remote SHA.
+
 ## Mở note trực tiếp trên Reminders — 2026-10-28
 
 - Bỏ link/nút View note, cả bề mặt card dùng button tiêu đề với vùng click phủ card, hỗ trợ Tab/Enter/focus ring. Menu actions có lớp riêng để không mở note ngoài ý muốn. Lazy-load NoteEditor hiện có ngay trên /reminders, đóng trở lại danh sách giữ URL; hỗ trợ View/Edit/mascot/autosave hiện có, không thêm API hoặc đổi ownership.
