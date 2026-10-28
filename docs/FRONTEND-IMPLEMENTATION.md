@@ -16,6 +16,11 @@ Khôi phục53IDpreset cũ, ID không biết có adapter về Bunny giữ off,
 slot custom/generated không đổi. Nguồn/prompt/script/geometry và cách kiểm tại
 [MASCOT-ARTWORK](MASCOT-ARTWORK.md); actual evidence tại worklog.
 
+2026-10-29: Note và gallery neo theo đáy thành phần nhân vật của từng frame
+(alpha liên thông), thay đáy canvas cố định khiến thân hở/nhảy. Chỉ translate
+nguyên frame, không sửa atlas hay ghép ảnh; cache18đáy/source pair và giữ
+cache đồng bộ qua View/Edit.
+
 ### Lịch sử, sao lưu và tải trang đầu — 2026-10-27
 
 View mở **Version history** từ popup Edited/Note information; lịch sử phân trang, restore giữ phiên bản hiện tại trong history và làm mới danh sách. Privacy có tải/nhập archive JSON cho account đang online; import thêm bản sao, không ghi đè, reminder nhập sẽ tắt. Guest/offline không gọi endpoint archive. `WorkspacePreparation` chỉ lấy trang note đầu để mở màn hình; nút Load more lấy trang sau, lọc trên dữ liệu chưa đầy đủ vẫn hỏi server. Số đo với1.000note giả và giới hạn xem [PERFORMANCE-NOTES-2026-10-27](PERFORMANCE-NOTES-2026-10-27.md).

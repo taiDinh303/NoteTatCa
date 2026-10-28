@@ -17,8 +17,13 @@ Các bản đó chỉ còn lịch sử, không được runtime chọn.
   Nguồn có mảnh từ ô cạnh, khoảng trắng hoặc chi tiết đã cắt ngay trong PNG
   thì bản xuất vẫn giữ đúng nguồn; không tự sửa bằng cắt/ghép. Độ rộng thân
   hoặc tư thế thay đổi vốn có trong nguồn cũng được giữ.
-- Note dùng nguyên chiều cao300/320, không còn bù vị trí từng phần dựa
-  trên dải thân giữa ảnh. Giữ3nhóm Animals/People/Robots,55ID/preference và
+- Cập nhật2026-10-29: Note và gallery đo riêng đáy nhân vật chính của18frame
+  từ các vùng alpha liên thông, bỏ qua mảnh/symbol nhỏ rời bên dưới và nhận
+  thân robot tách đầu khi đủ lớn/gần. Dịch nguyên frame theo chênh lệch đáy
+  tới cùng một mép neo. Bỏ giả định300/320là đáy thân nhìn thấy: đó chỉ là
+  đáy canvas xuất, có thể chứa pixel mờ/mảnh rời. Không đo lại khi rê chuột;
+  cache theoURLvà đọc kết quả đồng bộ khi View/Edit remount.
+  Giữ3nhóm Animals/People/Robots,55ID/preference và
   slot custom/generated. Không thay nguồn/flow AI riêng của tài khoản.
 
 Chạy từ root với sharp và @napi-rs/canvas trong workspace image runtime:

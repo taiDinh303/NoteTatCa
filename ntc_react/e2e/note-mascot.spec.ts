@@ -4,7 +4,7 @@ import { mascotCharacters } from "../src/features/mascot/mascotPreference";
 test("every preset keeps its full opaque body above the card on desktop and mobile", async ({
   page,
 }) => {
-  test.setTimeout(90_000);
+  test.setTimeout(240_000);
   await page.goto("/Home");
   await page
     .getByRole("main")
@@ -38,46 +38,59 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
       );
       expect(geometry.height).toBeGreaterThan(25);
       expect(geometry.clip).not.toBe("none");
-      // Check painted torso pixels, not just the transparent wrapper bounds.
-      const paintedGap = await mascot.evaluate(async (element) => {
-        const layer = element.querySelector<HTMLElement>(".mascot-directions")!;
-        const style = getComputedStyle(layer);
-        const image = new Image();
-        image.src = style.backgroundImage.slice(5, -2);
-        await image.decode();
-        const canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        const ctx = canvas.getContext("2d")!;
-        ctx.drawImage(image, 0, 0);
-        const pixels = ctx.getImageData(0, 0, image.width, image.height).data;
-        const w = image.width / 3,
-          h = image.height / 3;
-        const positions = style.backgroundPosition.split(" ").map(parseFloat);
-        const col = Math.round(positions[0] / 50),
-          row = Math.round(positions[1] / 50);
-        let floor = 0;
-        for (let y = h - 1; y >= 0; y--) {
-          let count = 0;
-          for (let x = 0; x < w; x++) {
-            if (
-              pixels[((row * h + y) * image.width + col * w + x) * 4 + 3] > 96
-            )
-              count++;
-          }
-          if (count >= 2) {
-            floor = (y + 1) / h;
-            break;
-          }
-        }
-        const box = layer.getBoundingClientRect();
-        const edge = element.closest(".note-card")!.getBoundingClientRect().top;
-        return edge - (box.top + floor * box.height);
-      });
-      expect(
-        paintedGap,
-        `${character}/${width} painted gap`,
-      ).toBeGreaterThanOrEqual(-1.5);
+      for (let frame = 0; frame < 9; frame++) {
+        await mascot.evaluate((el, frame) => {
+          const r = el.getBoundingClientRect();
+          window.dispatchEvent(
+            new PointerEvent("pointermove", {
+              clientX: r.x + r.width / 2 + ((frame % 3) - 1) * 220,
+              clientY: r.y + r.height / 2 + (Math.floor(frame / 3) - 1) * 220,
+            }),
+          );
+        }, frame);
+        await expect(mascot.locator(".mascot-directions")).toHaveCSS(
+          "background-position",
+          (frame % 3) * 50 + "% " + Math.floor(frame / 3) * 50 + "%",
+        );
+        // Check the character's main body, not detached atlas noise.
+        const paintedGap = await mascot.evaluate(async (element) => {
+          const layer =
+            element.querySelector<HTMLElement>(".mascot-directions")!;
+          const style = getComputedStyle(layer);
+          const image = new Image();
+          image.src = style.backgroundImage.slice(5, -2);
+          await image.decode();
+          const canvas = document.createElement("canvas");
+          canvas.width = image.width;
+          canvas.height = image.height;
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(image, 0, 0);
+
+          const w = image.width / 3,
+            h = image.height / 3;
+          const positions = style.backgroundPosition.split(" ").map(parseFloat);
+          const col = Math.round(positions[0] / 50),
+            row = Math.round(positions[1] / 50);
+          const moduleUrl = "/src/features/mascot/mascotBodyFloor.ts";
+          const { mascotBodyFloor } = await import(
+            /* @vite-ignore */ moduleUrl
+          );
+          const floor = mascotBodyFloor(
+            ctx.getImageData(col * w, row * h, w, h).data,
+            w,
+            h,
+          );
+          const box = layer.getBoundingClientRect();
+          const edge = element
+            .closest(".note-card")!
+            .getBoundingClientRect().top;
+          return edge - (box.top + floor * box.height);
+        });
+        expect(
+          Math.abs(paintedGap),
+          `${character}/${width} painted gap`,
+        ).toBeLessThanOrEqual(1.1);
+      }
       if (["raccoon", "cat"].includes(character)) {
         await page.mouse.move(0, 0);
         await page.screenshot({

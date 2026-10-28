@@ -9,7 +9,36 @@ import { useAuth } from "../../shared/hooks";
 import { MascotAiSettings } from "./MascotAiSettings";
 import { useAccountMascot } from "./generatedMascot";
 import { MascotPage } from "./MascotPage";
+import { useMascotFloor } from "./mascotFloor";
 import "./MascotSettings.css";
+
+function MascotChoicePreview({
+  name,
+}: {
+  name: Parameters<typeof mascotPresetSources>[0];
+}) {
+  const sources = mascotPresetSources(name);
+  const floors = useMascotFloor(sources.directions, sources.reactions, true);
+  return (
+    <span
+      style={{
+        display: "block",
+        width: 72,
+        height: 72,
+        visibility: floors ? "visible" : "hidden",
+      }}
+    >
+      <MascotPage
+        {...sources}
+        size={72}
+        label={characterLabel(name)}
+        className="mascot-choice-page"
+        disableSquash
+        floors={floors}
+      />
+    </span>
+  );
+}
 
 function characterLabel(name: string) {
   const translated = tr(`mascot.${name}`);
@@ -76,14 +105,7 @@ export function MascotSettings() {
                     checked={selectedCharacter === name}
                     onChange={() => setMascotPreference({ character: name })}
                   />
-                  <MascotPage
-                    key={name}
-                    {...mascotPresetSources(name)}
-                    size={72}
-                    label={characterLabel(name)}
-                    className="mascot-choice-page"
-                    disableSquash
-                  />
+                  <MascotChoicePreview name={name} />
                   <span>{characterLabel(name)}</span>
                 </label>
               ))}
