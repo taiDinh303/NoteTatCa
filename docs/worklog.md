@@ -5,6 +5,8 @@
 
 ## Mascot grouping and size correction — 2026-10-28
 
+- Publication verified:405a7da5a7fb6876a71952cd296214fe6d01fced,120files, main remote SHA matched after push. No hosting rollout verification.
+
 - Merged six animals into Animals and notebook/paper into Robots. Regenerated sheep using built-in image_gen. Increased canonical torso width144→184 and aligned its neck center with the head anchor. Final React build PASS. Earlier focused Chromium6/6 PASS; final five browser behavior checks PASS and rerun2/2 artwork checks PASS18.6s. Initial lower-band width assertion failed on hedgehog because it measured only the tapered bottom; width now measured over the full neutral torso, unchanged pixels checked belowy276. Torso width184, per-angle neck width matching and32px head/neck overlap replace hard horizontal cut; bottom chest remains pixel-fixed fromy276. All preset URLs use ntc-v3. Reviewed right-looking sheep/owl/fox/wizard contact sheet: hard collar cut removed. Full ESLint and .NET Release strict PASS0warnings/errors. Preview export initially failed due to an open image file; changed output to paper-preview-v3.webp and rebuilt successfully. No ownerDB/email/deploy/migration; full device/production validation not run; existing unrelated changes preserved. Publication scope only mascot assets/catalog/build script,2tests,artwork docs/worklog.
 
 ## Mở note trực tiếp trên Reminders — 2026-10-28
