@@ -1,5 +1,33 @@
 import { expect, test } from "@playwright/test";
 
+test("retired mascot preferences fall back while preserving enabled state", async ({
+  page,
+}) => {
+  await page.goto("/Home");
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Try guest mode", exact: true })
+    .click();
+  for (const name of ["wizard", "knight", "gearbot", "sheep", "dino"]) {
+    for (const enabled of ["on", "off"]) {
+      await page.evaluate(
+        ({ name, enabled }) => {
+          localStorage.setItem("ntc.mascot.v1", `${enabled}:${name}`);
+          window.dispatchEvent(new Event("ntc:mascot-change"));
+        },
+        { name, enabled },
+      );
+      if (enabled === "off")
+        await expect(page.locator(".note-mascot")).toHaveCount(0);
+      else
+        await expect(page.locator(".note-mascot .mascot-directions")).toHaveCSS(
+          "background-image",
+          /bunny-directions.webp/,
+        );
+    }
+  }
+});
+
 test("appearance remembers presets and provides no second custom-upload slot", async ({
   page,
 }) => {
@@ -15,12 +43,29 @@ test("appearance remembers presets and provides no second custom-upload slot", a
   await page.goto("/settings/appearance");
   const toggle = page.getByRole("switch", { name: "Show mascot" });
   await expect(toggle).toBeChecked();
-  await expect(page.getByRole("radio")).toHaveCount(55);
-  await page.mouse.move(0, 0);
-  for (const layer of await page
-    .locator(".mascot-choice-page .mascot-directions")
-    .all())
-    await expect(layer).toHaveCSS("background-position", "50% 50%");
+  await expect(page.getByRole("radio")).toHaveCount(50);
+  for (const name of ["Wizard", "Knight", "Gear bot", "Sheep", "Dino"])
+    await expect(page.getByRole("radio", { name, exact: true })).toHaveCount(0);
+  const foxLayer = page
+    .getByRole("radio", { name: "Fox", exact: true })
+    .locator("..")
+    .locator(".mascot-directions");
+  await page
+    .getByRole("radio", { name: "Fox", exact: true })
+    .scrollIntoViewIfNeeded();
+  await expect(foxLayer).toBeVisible();
+  const foxBox = (await page
+    .getByRole("radio", { name: "Fox", exact: true })
+    .locator("..")
+    .locator(".mascot-choice-page")
+    .boundingBox())!;
+  await page.mouse.move(foxBox.x - 200, foxBox.y + foxBox.height / 2);
+  await expect(foxLayer).toHaveCSS("background-position", "0% 50%");
+  await page.mouse.move(
+    foxBox.x + foxBox.width + 200,
+    foxBox.y + foxBox.height / 2,
+  );
+  await expect(foxLayer).toHaveCSS("background-position", "100% 50%");
   await expect(page.getByText("Animals", { exact: true })).toBeVisible();
   for (const name of [
     "Cat",
@@ -33,8 +78,6 @@ test("appearance remembers presets and provides no second custom-upload slot", a
     "Paper pal",
     "Koala",
     "Grandpa",
-    "Wizard",
-    "Gear bot",
     "TV",
   ]) {
     await page.getByRole("radio", { name, exact: true }).check();

@@ -1,6 +1,8 @@
 # Fox size standard — 2026-10-30
 
-Current correction: owner rejected uniform-size claims. Display uses whole-character optical scales in mascotCalibration.ts; source chest width is not a head-size acceptance test. Gallery fixes the center gaze. Bald/Wizard sources restored before flattening/widening. See calibration-preview.png and root docs/worklog.md. Targets below describe source export before display calibration.
+Active catalog:50presets. wizard/knight/gearbot/sheep/dino retired; public atlases removed. Raw/prompt archives remain, retired.json prevents rebuilding these entries. Saved retired choices fall back to Bunny while preserving enabled state.
+
+Current correction: owner rejected uniform-size claims. Display uses whole-character optical scales in mascotCalibration.ts; source chest width is not a head-size acceptance test. Gallery follows the pointer. Bald/Wizard sources restored before flattening/widening. See calibration-preview.png and root docs/worklog.md. Targets below describe source export before display calibration.
 
 User selected Fox as the anatomical size reference for all 55 characters.
 All Animals, People and Robots use the same size targets regardless of species,

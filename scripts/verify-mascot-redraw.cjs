@@ -12,7 +12,7 @@ const root = path.resolve(__dirname, ".."),
   const geometry = JSON.parse(
     fs.readFileSync(path.join(src, "../geometry.json")),
   );
-  assert.equal(geometry.details.length, 55);
+  assert.equal(geometry.details.length, version === "ntc-v6" ? 50 : 55);
   const only = process.argv
     .find((arg) => arg.startsWith("--character="))
     ?.slice(12);
@@ -29,10 +29,12 @@ const root = path.resolve(__dirname, ".."),
         throw Error(name + ": " + (error.stderr?.toString() || error.message));
       }
       if ((i + 1) % 10 === 0)
-        console.log("Verified " + (i + 1) + "/55 characters");
+        console.log(
+          "Verified " + (i + 1) + "/" + geometry.details.length + " characters",
+        );
     }
     console.log(
-      "PASS: 990 intact frames, 55 characters, expanded PNGs match the runtime atlases.",
+      `PASS: ${geometry.details.length * 18} intact frames, ${geometry.details.length} characters, expanded PNGs match the runtime atlases.`,
     );
     return;
   }

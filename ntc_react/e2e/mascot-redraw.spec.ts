@@ -5,7 +5,7 @@ import {
   mascotCharacters,
   mascotPresetSources,
 } from "../src/features/mascot/mascotPreference";
-test("all55 redrawn mascots: real cursor directions keep calibrated whole characters planted", async ({
+test("all50 redrawn mascots: real cursor directions keep calibrated whole characters planted", async ({
   page,
 }) => {
   test.setTimeout(240000);
@@ -89,7 +89,7 @@ test("all55 redrawn mascots: real cursor directions keep calibrated whole charac
   }
 });
 
-test("all110 redrawn atlases use the same transparent high-resolution canvas", async ({
+test("all100 redrawn atlases use the same transparent high-resolution canvas", async ({
   page,
 }) => {
   await page.goto("/Home");

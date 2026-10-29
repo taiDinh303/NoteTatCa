@@ -1,5 +1,14 @@
 # React NoteTatCa — triển khai 2026-10-18
 
+## Danh sách50 mascot và hướng nhìn Appearance — 2026-10-30
+
+CURRENT mới nhất: gỡ Wizard, Knight, Gear bot, Sheep và Dino khỏi danh sách
+và public atlas v6; còn50preset. Preference cũ trỏ vào các ID này fallback
+Bunny và giữ bật/tắt. Source/prompt cũ giữ lịch sử, retired.json ngăn packer
+sinh lại atlas đã gỡ. Geometry/metadata/bảng so được lọc theo50ID còn lại.
+`/settings/appearance` đã bỏ fixedDirection và lại nhìn theo chuột; hướng
+trên note giữ nguyên. Các đoạn nói gallery cố định hướng ở dưới là lịch sử.
+
 ## Hiệu chỉnh sau phản hồi trực quan — 2026-10-30
 
 Chủ dự án bác bỏ nhận định bộ v6 đã đồng đều: test cỡ thân/neo không chứng minh

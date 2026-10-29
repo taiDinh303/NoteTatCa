@@ -104,7 +104,6 @@ export type MascotPageProps = {
   label?: string;
   /** Aligned note sprites stay planted when clicked. */
   disableSquash?: boolean;
-  fixedDirection?: Direction;
   floors?: {
     directions: number[];
     reactions: number[];
@@ -134,8 +133,7 @@ export function MascotPage(props: MascotPageProps) {
   const session = useContext(MascotAnimationContext);
   const timersRef = session?.timers ?? localTimers;
   const boopsRef = session?.boops ?? localBoops;
-  const direction =
-    props.fixedDirection ?? session?.direction ?? localDirection;
+  const direction = session?.direction ?? localDirection;
   const setDirection = session?.setDirection ?? setLocalDirection;
   const reaction = session ? session.reaction : localReaction;
   const setReaction = session?.setReaction ?? setLocalReaction;
@@ -157,7 +155,6 @@ export function MascotPage(props: MascotPageProps) {
 
   /* Cursor following with hysteresis + dead zone (ported from repo). */
   useEffect(() => {
-    if (props.fixedDirection) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
       return;
     }
@@ -206,7 +203,7 @@ export function MascotPage(props: MascotPageProps) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("scroll", aim);
     };
-  }, [setDirection, props.fixedDirection]);
+  }, [setDirection]);
 
   useEffect(() => {
     if (shared) return;

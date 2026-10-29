@@ -1,5 +1,12 @@
 import { expect, test } from "vitest";
 import { mascotArtScale, mascotDirectionFrame } from "./mascotGeometry";
+import { mascotCharacters } from "./mascotPreference";
+
+test("retired mascots are absent from the selectable catalog", () => {
+  expect(mascotCharacters).toHaveLength(50);
+  for (const name of ["wizard", "knight", "gearbot", "sheep", "dino"])
+    expect(mascotCharacters).not.toContain(name);
+});
 
 test("corrects opposite horizontal robot gaze without flipping their artwork", () => {
   for (const name of ["gearbot", "knight"])

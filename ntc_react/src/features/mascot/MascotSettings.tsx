@@ -40,7 +40,6 @@ function MascotChoicePreview({
         label={characterLabel(name)}
         className="mascot-choice-page"
         disableSquash
-        fixedDirection="center"
         floors={floors}
       />
     </span>

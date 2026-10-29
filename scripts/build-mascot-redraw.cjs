@@ -12,9 +12,16 @@ const root = path.resolve(__dirname, ".."),
   source = path.join(root, "assets/mascots", version);
 const output = path.join(root, "ntc_react/public/mascots", version);
 const rawSource = path.join(source, "raw");
+const retired =
+  version === "ntc-v6" ? require("../assets/mascots/ntc-v6/retired.json") : [];
 const names = fs
   .readdirSync(rawSource)
-  .filter((n) => n.endsWith(".png") && n !== "preview.png")
+  .filter(
+    (n) =>
+      n.endsWith(".png") &&
+      n !== "preview.png" &&
+      !retired.includes(n.slice(0, -4)),
+  )
   .map((n) => n.slice(0, -4))
   .sort();
 const TILE = version === "ntc-v6" ? 640 : 448,
@@ -235,8 +242,11 @@ async function pack(name) {
   return { name, scale, transforms };
 }
 (async () => {
-  if (!process.argv.includes("--partial") && names.length !== 55)
-    throw Error("All55redrawn sources required");
+  if (
+    !process.argv.includes("--partial") &&
+    names.length !== (version === "ntc-v6" ? 50 : 55)
+  )
+    throw Error("All active redrawn sources required");
   fs.mkdirSync(output, { recursive: true });
   if (inspectOnly) {
     const failures = [];

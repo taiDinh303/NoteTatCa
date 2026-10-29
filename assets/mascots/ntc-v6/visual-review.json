@@ -106,12 +106,6 @@
       "neutralFrameVisuallyReviewed": true
     },
     {
-      "name": "dino",
-      "directionsSha256": "36e4b738deb51ccb204aced309bf4065199f1ed3b4fdad12b8fc2c6ba2e5019d",
-      "pngSha256": "73ef17edeba253070a949935d3312aefa7f21932f26f9574c88f8ced9e0f93c7",
-      "neutralFrameVisuallyReviewed": true
-    },
-    {
       "name": "drone",
       "directionsSha256": "021a89151a8ea7625296b90de8012ed0654cbc20726ec852a85d5b9b0e0cd9e5",
       "pngSha256": "70855ef9ab47fb5341e86d81feae71af9454a3c47eb62a59a67cc2778260fcde",
@@ -127,12 +121,6 @@
       "name": "frog",
       "directionsSha256": "8e84404ac020fe0355fd10219fb16d892e36e193f4abad0b4b74c933ea97cea7",
       "pngSha256": "49a763f37ee5c41200350d58b40cfc152212416c5daf7baac8785390dd96462d",
-      "neutralFrameVisuallyReviewed": true
-    },
-    {
-      "name": "gearbot",
-      "directionsSha256": "0cb9d1d1883c1a9368dcdf47a2117102838426bb3b9358d5d93db0941947bc62",
-      "pngSha256": "74183ce5ed3edd6e93a2ee506810098a82ca7a49dcdecf639e83986040e25028",
       "neutralFrameVisuallyReviewed": true
     },
     {
@@ -175,12 +163,6 @@
       "name": "kamran",
       "directionsSha256": "b25120ff6bf10a3dcb47a78b5591c8f392d72806a73bf1ad6420fdc3ed78c9b4",
       "pngSha256": "ec2be9ee5c5c844434486cd026cef35a0319b245d0edaf9ded81091e77c6d231",
-      "neutralFrameVisuallyReviewed": true
-    },
-    {
-      "name": "knight",
-      "directionsSha256": "d6bf580af1c3be141288fe7bcbfcab66efce10efb473284d2232d3c74b9d38c6",
-      "pngSha256": "5cc7eb3edd74dc048569d2ac038eaf2d6d71a12323191ea7e45a0e47d36092b7",
       "neutralFrameVisuallyReviewed": true
     },
     {
@@ -298,12 +280,6 @@
       "neutralFrameVisuallyReviewed": true
     },
     {
-      "name": "sheep",
-      "directionsSha256": "a144abc363ff5fc8b9edb2a951e600587c03154d84ab4f07fb37841529e00611",
-      "pngSha256": "39a30433e28846e84f2deba5cd91afe9d158ae725f43d1206773ba903acb9502",
-      "neutralFrameVisuallyReviewed": true
-    },
-    {
       "name": "sikh",
       "directionsSha256": "b19c9e98c54b618d1ed8b900a4fa43bd6cfc9a4586d57a870f661e980d78f483",
       "pngSha256": "73d023eb7151dd4174f0a5c61db79768dd3f6541a7ce18d79a84a5ac7052c4ee",
@@ -337,12 +313,6 @@
       "name": "tv",
       "directionsSha256": "c4affed5d92816f1fd05e5a525fb1cedaf3ec0a84204fa555cc09393bd9ba666",
       "pngSha256": "8caf22da39e3da3cb71c1a821c4904c4e85ca089aa89c590cf99158016118b29",
-      "neutralFrameVisuallyReviewed": true
-    },
-    {
-      "name": "wizard",
-      "directionsSha256": "d6e5bb4dcaac823567880065ebe6f472f142913f1b8171d0c7884a544debf7f2",
-      "pngSha256": "d24d298f2d38e69e15cfc2edfd13463e856d26c6d3a21ab5e6a7730bc617194e",
       "neutralFrameVisuallyReviewed": true
     }
   ],
