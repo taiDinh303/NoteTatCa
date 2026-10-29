@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { MascotAnimationContext } from "./mascotAnimation";
 import { mascotPresetSources } from "./mascotPreference";
-import { mascotArtScale } from "./mascotGeometry";
+import { mascotArtScale, mascotDirectionFrame } from "./mascotGeometry";
 import type { CSSProperties } from "react";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { X } from "lucide-react";
@@ -87,6 +87,7 @@ function wrap(angle: number) {
 
 const layer: CSSProperties = {
   position: "absolute",
+  pointerEvents: "none",
   inset: 0,
   backgroundSize: "300% 300%",
   backgroundRepeat: "no-repeat",
@@ -103,6 +104,7 @@ export type MascotPageProps = {
   label?: string;
   /** Aligned note sprites stay planted when clicked. */
   disableSquash?: boolean;
+  fixedDirection?: Direction;
   floors?: {
     directions: number[];
     reactions: number[];
@@ -132,7 +134,8 @@ export function MascotPage(props: MascotPageProps) {
   const session = useContext(MascotAnimationContext);
   const timersRef = session?.timers ?? localTimers;
   const boopsRef = session?.boops ?? localBoops;
-  const direction = session?.direction ?? localDirection;
+  const direction =
+    props.fixedDirection ?? session?.direction ?? localDirection;
   const setDirection = session?.setDirection ?? setLocalDirection;
   const reaction = session ? session.reaction : localReaction;
   const setReaction = session?.setReaction ?? setLocalReaction;
@@ -140,6 +143,10 @@ export function MascotPage(props: MascotPageProps) {
   // All v5 species share a larger square canvas. Draw it at the same pixel
   // density as the old canvas so long ears/hats use headroom, not smaller faces.
   const artSize = size * mascotArtScale(directions);
+  const directionFrame = mascotDirectionFrame(
+    directions,
+    DIRECTIONS.indexOf(direction),
+  );
   const artBox: CSSProperties = {
     inset: "auto",
     left: (size - artSize) / 2,
@@ -150,6 +157,7 @@ export function MascotPage(props: MascotPageProps) {
 
   /* Cursor following with hysteresis + dead zone (ported from repo). */
   useEffect(() => {
+    if (props.fixedDirection) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
       return;
     }
@@ -198,7 +206,7 @@ export function MascotPage(props: MascotPageProps) {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("scroll", aim);
     };
-  }, [setDirection]);
+  }, [setDirection, props.fixedDirection]);
 
   useEffect(() => {
     if (shared) return;
@@ -280,9 +288,9 @@ export function MascotPage(props: MascotPageProps) {
             ...layer,
             ...artBox,
             backgroundImage: `url(${directions})`,
-            ...cell(DIRECTIONS.indexOf(direction)),
+            ...cell(directionFrame),
             transform: floors
-              ? `translate(${artSize * (0.5 - (floors.directionsX?.[DIRECTIONS.indexOf(direction)] ?? 0.5))}px, ${artSize * (floors.max - floors.directions[DIRECTIONS.indexOf(direction)])}px)`
+              ? `translate(${artSize * (0.5 - (floors.directionsX?.[directionFrame] ?? 0.5))}px, ${artSize * (floors.max - floors.directions[directionFrame])}px)`
               : undefined,
             opacity: reaction ? 0 : 1,
           }}

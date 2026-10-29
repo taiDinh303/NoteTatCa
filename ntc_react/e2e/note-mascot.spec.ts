@@ -1,3 +1,4 @@
+import { mascotDirectionFrame } from "../src/features/mascot/mascotGeometry";
 import { expect, test } from "@playwright/test";
 import { mascotCharacters } from "../src/features/mascot/mascotPreference";
 
@@ -50,7 +51,15 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
         }, frame);
         await expect(mascot.locator(".mascot-directions")).toHaveCSS(
           "background-position",
-          (frame % 3) * 50 + "% " + Math.floor(frame / 3) * 50 + "%",
+          (mascotDirectionFrame(
+            `/mascots/ntc-v6/${character}-directions.webp`,
+            frame,
+          ) %
+            3) *
+            50 +
+            "% " +
+            Math.floor(frame / 3) * 50 +
+            "%",
         );
         // Check the character's main body, not detached atlas noise.
         const paintedGap = await mascot.evaluate(async (element) => {

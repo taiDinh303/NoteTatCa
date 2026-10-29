@@ -1,5 +1,23 @@
 # Mascot artwork — chuẩn Fox cho v6, 2026-10-30
 
+## Hiệu chỉnh sau phản hồi trực quan — 2026-10-30
+
+Chủ dự án bác bỏ nhận định bộ v6 đã đồng đều: test cỡ thân/neo không chứng minh
+cỡ đầu. Hiện tại hiệu chỉnh phóng/thu đồng dạng cả nhân vật bằng
+`ntc_react/src/features/mascot/mascotCalibration.ts`, lấy Fox=1, giữ tỉ lệ đầu
+nguyên bản; không ép mọi đầu vào cùng W/H. Các con lớn/nhỏ được chỉnh riêng,
+Grandpa/Granny được cân lại. Bald và Wizard dùng bản nguồn trước các lần làm
+xẹp/bè đầu. Hệ số là hiệu chỉnh quang học thủ công, không phải phép nhận dạng
+đầu tự động hoặc chứng nhận mọi landmark bằng pixel tuyệt đối.
+
+Gallery cố định hướng trung tâm để so sánh công bằng; trên note vẫn theo chuột.
+Gear bot/Knight đảo mapping cột ngang của9frame, dùng cùng index cho ảnh và
+điểm neo; không lật bitmap hoặc phụ kiện. URL có revision để tránh cache cũ.
+Bảng so hiện hành: `assets/mascots/ntc-v6/calibration-preview.png`.
+Các target188×120/thân140 bên dưới mô tả lịch sử xuất ảnh; không còn dùng
+thân35CSSpx cho mọi con làm bằng chứng đồng đều đầu. Runtime áp dụng hệ số
+cho cả hai trục, nên cỡ thân hiển thị có thể khác nhau để giữ giải phẫu tự nhiên.
+
 CURRENT: toàn bộ 55 preset dùng `ntc-v6`. Chuẩn chung từ
 `assets/mascots/ntc-v6/fox-size-reference.png`: đầu chính target188×120,
 thân140×54, không đổi cỡ theo loài/tuổi hoặc động vật/người/robot.

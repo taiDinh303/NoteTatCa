@@ -29,8 +29,8 @@
     },
     {
       "name": "bald",
-      "directionsSha256": "df9a21e5d7316bbebd6f49756e5a33c870679c0e2867afdb374a49c3afd0c224",
-      "pngSha256": "0c22787777221ea7abc213113a776d6f5a742a5ed90be414d5bb43ad053960e9",
+      "directionsSha256": "ce122b617b10d0f5dd0544a1c259d60f833c5ffb530acffd514dda2d06eac08a",
+      "pngSha256": "9cf038ec8102880c2134d7c760f878dabb976eb9bb33e663939c50e50bd86854",
       "neutralFrameVisuallyReviewed": true
     },
     {
@@ -341,9 +341,11 @@
     },
     {
       "name": "wizard",
-      "directionsSha256": "ebe2d9ff750af94ba6e21d7efc7433290de71a759513a3a64c4eb2449d1de485",
-      "pngSha256": "c8e7083e79c6c435706f977bbde422cec42d0ebf282676e09dd9aa6c1c9379ac",
+      "directionsSha256": "d6e5bb4dcaac823567880065ebe6f472f142913f1b8171d0c7884a544debf7f2",
+      "pngSha256": "d24d298f2d38e69e15cfc2edfd13463e856d26c6d3a21ab5e6a7730bc617194e",
       "neutralFrameVisuallyReviewed": true
     }
-  ]
+  ],
+  "status": "Prior acceptance rejected by owner; optical display correction reviewed separately",
+  "calibration": "ntc_react/src/features/mascot/mascotCalibration.ts"
 }

@@ -16,6 +16,11 @@ test("appearance remembers presets and provides no second custom-upload slot", a
   const toggle = page.getByRole("switch", { name: "Show mascot" });
   await expect(toggle).toBeChecked();
   await expect(page.getByRole("radio")).toHaveCount(55);
+  await page.mouse.move(0, 0);
+  for (const layer of await page
+    .locator(".mascot-choice-page .mascot-directions")
+    .all())
+    await expect(layer).toHaveCSS("background-position", "50% 50%");
   await expect(page.getByText("Animals", { exact: true })).toBeVisible();
   for (const name of [
     "Cat",

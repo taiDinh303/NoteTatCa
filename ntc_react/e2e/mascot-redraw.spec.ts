@@ -1,9 +1,11 @@
+import { mascotDirectionFrame } from "../src/features/mascot/mascotGeometry";
+import { mascotCalibration } from "../src/features/mascot/mascotCalibration";
 import { test, expect } from "@playwright/test";
 import {
   mascotCharacters,
   mascotPresetSources,
 } from "../src/features/mascot/mascotPreference";
-test("all55 redrawn mascots: real cursor directions keep the chest planted and equal size", async ({
+test("all55 redrawn mascots: real cursor directions keep calibrated whole characters planted", async ({
   page,
 }) => {
   test.setTimeout(240000);
@@ -31,7 +33,15 @@ test("all55 redrawn mascots: real cursor directions keep the chest planted and e
       );
       await expect(mascot.locator(".mascot-directions")).toHaveCSS(
         "background-position",
-        (frame % 3) * 50 + "% " + Math.floor(frame / 3) * 50 + "%",
+        (mascotDirectionFrame(
+          mascotPresetSources(character).directions,
+          frame,
+        ) %
+          3) *
+          50 +
+          "% " +
+          Math.floor(frame / 3) * 50 +
+          "%",
       );
       const metrics = await mascot.evaluate(async (element) => {
         const layer = element.querySelector<HTMLElement>(".mascot-directions")!,
@@ -67,7 +77,10 @@ test("all55 redrawn mascots: real cursor directions keep the chest planted and e
       expect(Math.abs(metrics.x), character + " x/" + frame).toBeLessThan(0.65);
       expect(Math.abs(metrics.y), character + " y/" + frame).toBeLessThan(1.1);
       if (frame === 4)
-        expect(metrics.width, character + " body size").toBeCloseTo(35, 0);
+        expect(metrics.width, character + " body size").toBeCloseTo(
+          35 * mascotCalibration[character],
+          0,
+        );
       if (frame === 7)
         await page.screenshot({
           path: "test-results/redraw-down-" + character + ".png",
