@@ -1,3 +1,8 @@
+## Bunny: sửa hướng trái/phải — 2026-10-30
+
+- Theo ảnh/phản hồi chủ dự án: đối chiếu trực tiếp atlas Bunny xác định chỉ hai ô nhìn ngang3/5 bị đảo, còn4hướng chéo/up/down đúng. mascotDirectionFrame chỉ hoán đổi3↔5 riêng Bunny v6, không đảo cả3cặp cột và không mirror/sửa pixel, scale hoặc phụ kiện. Cùng mapped index tiếp tục dùng cho bitmap và điểm neo trên note/Appearance. Mẫu khác và50preset giữ nguyên.
+- Vitest geometry3/3PASS, gồm bảng Bunny[0,1,2,5,4,3,6,7,8] để bảo vệ các góc không lỗi. React production build/fullESLint PASS; .NET solution Release strict PASS0warnings/errors. Chromium hồi quy5/5PASS1.9m (50×5chuột/anchor,100atlas,Appearance/Foxpointer/select/reload/toggle,retired fallback10tổhợp vàlegacy). Thêm ca Bunny riêng trongAppearance di chuột trái/phải, kiểm ônguồn5/3 và ảnhchụp để đối chiếu trực quan; final BunnyAppearance1/1PASS23.4s; đã xem hai ảnhchuộttrái/phải, đầu Bunny quay đúng phía. Tổng6ca Chromium khác nhauPASS; không đổi assertion để lấyPASS. Các test chỉ dùng syntheticSQLite/capturedmail, không DB/email/AI thật, fullbackend suite, migration/manualdeploy hoặc hosting rollout.
+- Scope publication chỉ mascotGeometry.ts, unit tương ứng, bunny-gaze.spec.ts mới và entry worklog này. Giữ mọi dirtybackend/archive/performance/config vàdraftngoàiscope. Pushmain theo quyền hiện có và kiểmSHAremote saupush.
 ## Gỡ5mascot và bật hướng nhìn Appearance — 2026-10-30
 
 - Theo yêu cầu chủ dự án: gỡ Wizard/Knight/Gear bot/Sheep/Dino khỏi catalog, còn50preset. Xóa10public atlas v6 của5ID và test Wizard headroom đã lỗi thời; raw/prompt giữ lịch sử. retired.json được packer dùng để không sinh lại5con; metadata/geometry/preview lọc còn50. Verifier kỳ vọng50con/900frame cho v6, các phiên bản lịch sử giữ nguyên.

@@ -14,6 +14,8 @@ export function mascotArtScale(source: string) {
 }
 
 export function mascotDirectionFrame(source: string, index: number) {
+  if (/\/ntc-v6\/bunny-directions\.webp(?:\?|$)/.test(source))
+    return index === 3 ? 5 : index === 5 ? 3 : index;
   return /\/ntc-v6\/(gearbot|knight)-directions\.webp(?:\?|$)/.test(source)
     ? Math.floor(index / 3) * 3 + 2 - (index % 3)
     : index;
