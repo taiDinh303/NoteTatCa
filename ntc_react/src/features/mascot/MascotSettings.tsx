@@ -10,6 +10,7 @@ import { MascotAiSettings } from "./MascotAiSettings";
 import { useAccountMascot } from "./generatedMascot";
 import { MascotPage } from "./MascotPage";
 import { useMascotFloor } from "./mascotFloor";
+import { mascotArtScale } from "./mascotGeometry";
 import "./MascotSettings.css";
 
 function MascotChoicePreview({
@@ -19,7 +20,9 @@ function MascotChoicePreview({
 }) {
   const sources = mascotPresetSources(name);
   const floors = useMascotFloor(sources.directions, sources.reactions, true);
-  const headroom = sources.directions.includes("/ntc-v5/") ? 72 * 0.4 : 0;
+  // The larger transparent canvas must not turn into empty gallery layout space.
+  // The exported v6 frames need <6px above this preview; retain the v5 allowance.
+  const headroom = 72 * Math.min(0.4, mascotArtScale(sources.directions) - 1);
   return (
     <span
       style={{

@@ -1,4 +1,38 @@
-# Mascot artwork — đồng bộ toàn bộ 55 nhân vật, 2026-10-29
+# Mascot artwork — chuẩn Fox cho v6, 2026-10-30
+
+CURRENT: toàn bộ 55 preset dùng `ntc-v6`. Chuẩn chung từ
+`assets/mascots/ntc-v6/fox-size-reference.png`: đầu chính target188×120,
+thân140×54, không đổi cỡ theo loài/tuổi hoặc động vật/người/robot.
+Tai, mũ, sừng, anten dùng phần đệm; riêng Wizard loại cả mũ và râu khỏi
+phép so đầu, tăng phần mặt thật và giữ râu che miệng ở mọi biểu cảm.
+
+- Nguồn55PNG trong `assets/mascots/ntc-v6/raw`; Fox giữ bản được chọn,
+  54nhân vật khác vẽ lại/chỉnh bằng built-in image_gen. Prompt và các lần
+  chỉnh ở `prompts/fox-uniform/`; bản nguồn trước đợt sửa được giữ local.
+- 55PNG chuẩn hóa3840×1920 và55WebP cùng bộ trong `ntc-v6/`.
+  Runtime110WebP1920×1920, ô640×640, center320/baseline576.
+  Mỗi ảnh chứa đủ18frame,9hướng và9biểu cảm theo mapping cũ.
+- Một scale đồng dạng chung cho18frame/con; dịch nguyên frame theo thân.
+  Không ghép đầu/thân, mask cổ hoặc co giãn từng bộ phận bằng code.
+  Script ưu tiên gutter trống, hỗ trợ hình so le bằng rectangle nguyên
+  component; từ chối mép nguồn/rectangle chồng pixel có alpha>96.
+- Renderer dùng artSize=2×size, giữ mật độ cũ: thân140px thành35CSSpx
+  ở size80. Gallery dành headroom theo canvas mới; custom/generated giữ
+  flow cũ. Điểm neo tiếp tục được đo/cache, không xử lý pixel trong pointermove.
+- Đầu được rà trực quan theo guide; các target không phải kết quả nhận
+  dạng giải phẫu tự động hoặc bảo đảm mọi nét đầu giống pixel giữa55con.
+  Verifier kiểm990frame từ nguồn+transform, coverage pixel hiển thị,
+  alpha và màu, PNG chuẩn hóa so atlas. RGB dưới alpha0 không có ý nghĩa
+  hiển thị nên không dùng làm điều kiện lỗi; alpha và màu pixel có alpha>0
+  của PNG/WebP chuẩn hóa được so chính xác. Verifier chạy từng con trong
+  tiến trình riêng và tái sử dụng canvas để giới hạn bộ nhớ.
+
+Validation:12/12Chromium (10hồi quy +2Wizard View/Edit ở393/1440),
+990/990verifier,5Vitest neo thân,3test tách frame,4config,ESLint,
+React production build và.NET Release strict/9focused mascot tests PASS.
+Chi tiết/giới hạn/publication ở worklog; chưa xác minh hosting rollout.
+
+## Lịch sử v5 — 2026-10-29
 
 CURRENT theo yêu cầu mới nhất: giữ nguyên toàn bộ đầu, cổ, thân và biểu cảm
 trong từng frame của55nhân vật. Bỏ hoàn toàn cách ghép thân canonical,

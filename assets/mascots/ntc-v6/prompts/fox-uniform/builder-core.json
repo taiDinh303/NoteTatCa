@@ -1,0 +1,14 @@
+{
+  "name": "builder",
+  "prompt": "Targeted anatomy EDIT of existing18-sprite sheet. Make the actual human face/skull20%WIDER and15%TALLER, excluding hardhat, same body size. Move/enlarge hardhat upward/outward to fit bigger face without shrinking it. This is a deliberate relative proportion change, NOT a request to enlarge the entire image or body. All55characters must have same188x120corehead and140x54body at final scale. Ears/hats/antennas/projectinghair excluded; they expand into padding. Keep identity/colors/style/18state mapping, cohesive whole drawings/no pasted seams. All18same front-facing upperchest; left3cols9directionsUL/U/UR;L/center/R;DL/D/DR ALLeyesOPEN, neutralpleasant and bottomcenterlookDOWN. Right3colsblink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Preserve glasses/mustache in every state where applicable. Reset spacing: SMALL complete portraits on MUCH LARGER genuinely transparent6x3canvas2:1; portraits occupy LESS THAN60%eachcellwidth/height, huge clear gutters and outermargins, repair any cut accessories. Do NOT copy old close-packed layout. No text/boxes/grid/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-25a0cd76-3e90-42f4-80da-87204a520e7a.png",
+  "mode": "built-in image_gen"
+}

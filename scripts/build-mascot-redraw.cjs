@@ -3,20 +3,23 @@ const fs = require("node:fs"),
   path = require("node:path"),
   sharp = require("sharp");
 const { createCanvas, loadImage } = require("@napi-rs/canvas");
+const { mascotSourceFrames } = require("./mascot-source-frames.cjs");
 const {
   mascotBodyAnchor,
 } = require("../ntc_react/src/features/mascot/mascotBodyFloor.ts");
 const root = path.resolve(__dirname, ".."),
-  source = path.join(root, "assets/mascots/ntc-v5");
-const output = path.join(root, "ntc_react/public/mascots/ntc-v5");
+  version = process.env.NTC_MASCOT_VERSION || "ntc-v5",
+  source = path.join(root, "assets/mascots", version);
+const output = path.join(root, "ntc_react/public/mascots", version);
 const rawSource = path.join(source, "raw");
 const names = fs
   .readdirSync(rawSource)
   .filter((n) => n.endsWith(".png") && n !== "preview.png")
   .map((n) => n.slice(0, -4))
   .sort();
-const TILE = 448,
-  BASE = 384;
+const TILE = version === "ntc-v6" ? 640 : 448,
+  BASE = TILE - 64;
+const inspectOnly = process.argv.includes("--inspect-source");
 async function writeCanonical(name) {
   const data = Buffer.alloc(TILE * 6 * TILE * 3 * 4);
   for (let kind = 0; kind < 2; kind++) {
@@ -40,6 +43,12 @@ async function writeCanonical(name) {
   await sharp(data, { raw: { width: TILE * 6, height: TILE * 3, channels: 4 } })
     .webp({ lossless: true })
     .toFile(path.join(source, name + ".webp"));
+  if (version === "ntc-v6")
+    await sharp(data, {
+      raw: { width: TILE * 6, height: TILE * 3, channels: 4 },
+    })
+      .png()
+      .toFile(path.join(source, name + ".png"));
 }
 async function pack(name) {
   const im = await loadImage(path.join(rawSource, name + ".png")),
@@ -49,6 +58,15 @@ async function pack(name) {
   const allPixels = full
     .getContext("2d")
     .getImageData(0, 0, im.width, im.height).data;
+  let wholeFrames;
+  try {
+    wholeFrames =
+      version === "ntc-v6"
+        ? mascotSourceFrames(allPixels, im.width, im.height)
+        : undefined;
+  } catch (error) {
+    throw Error(name + ": " + error.message);
+  }
   // Generated grids have real transparent gutters, but not necessarily at
   // exact sixths/thirds. Partition there, without masking any artwork pixels.
   function boundaries(count, horizontal, start = 0, end) {
@@ -80,7 +98,7 @@ async function pack(name) {
         }
       }
       // Never deliberately cut a solid component to force an even grid.
-      if (minimum > 0)
+      if (minimum > 0 && version !== "ntc-v6")
         console.warn(
           `${name}: no clear ${horizontal ? "column" : "row"} gutter ${k} (${minimum} pixels)`,
         );
@@ -92,14 +110,30 @@ async function pack(name) {
     columns = rows
       .slice(0, -1)
       .map((start, row) => boundaries(6, true, start, rows[row + 1]));
+  // A tall afro/hat in one column must not force the row cut through another
+  // character. Locate each column's row gutters through its central region.
+  const columnRows =
+    version === "ntc-v6"
+      ? Array.from({ length: 6 }, (_, col) =>
+          boundaries(
+            3,
+            false,
+            Math.round(((col + 0.2) * im.width) / 6),
+            Math.round(((col + 0.8) * im.width) / 6),
+          ),
+        )
+      : undefined;
   for (let kind = 0; kind < 2; kind++)
     for (let i = 0; i < 9; i++) {
       const col = (i % 3) + kind * 3,
         row = Math.floor(i / 3),
-        x = columns[row][col],
-        y = rows[row];
-      const w = columns[row][col + 1] - x,
-        h = rows[row + 1] - y;
+        frame = wholeFrames?.[row * 6 + col],
+        y = frame ? frame.y : columnRows ? columnRows[col][row] : rows[row],
+        endY = columnRows ? columnRows[col][row + 1] : rows[row + 1],
+        cellColumns = columnRows ? boundaries(6, true, y, endY) : columns[row],
+        x = frame ? frame.x : cellColumns[col];
+      const w = frame ? frame.w : cellColumns[col + 1] - x,
+        h = frame ? frame.h : endY - y;
       const canvas = createCanvas(w, h),
         c = canvas.getContext("2d");
       c.drawImage(im, x, y, w, h, 0, 0, w, h);
@@ -187,22 +221,36 @@ async function pack(name) {
         chestFloor: BASE,
       });
     }
-    await sharp(atlas.toBuffer("image/png"))
-      .webp({ lossless: true })
-      .toFile(
-        path.join(
-          output,
-          name + "-" + (kind ? "reactions" : "directions") + ".webp",
-        ),
-      );
+    if (!inspectOnly)
+      await sharp(atlas.toBuffer("image/png"))
+        .webp({ lossless: true })
+        .toFile(
+          path.join(
+            output,
+            name + "-" + (kind ? "reactions" : "directions") + ".webp",
+          ),
+        );
   }
-  await writeCanonical(name);
+  if (!inspectOnly) await writeCanonical(name);
   return { name, scale, transforms };
 }
 (async () => {
   if (!process.argv.includes("--partial") && names.length !== 55)
     throw Error("All55redrawn sources required");
   fs.mkdirSync(output, { recursive: true });
+  if (inspectOnly) {
+    const failures = [];
+    for (const name of names) {
+      try {
+        await pack(name);
+        console.log("Source OK: " + name);
+      } catch (error) {
+        failures.push(String(error));
+      }
+    }
+    if (failures.length) throw Error(failures.join("\n"));
+    return;
+  }
   if (process.argv.includes("--canonical-only")) {
     for (const name of names) await writeCanonical(name);
     return;
@@ -217,9 +265,25 @@ async function pack(name) {
         fs.readFileSync(path.join(source, "geometry.json")),
       ).details.filter((item) => !selected.includes(item.name))
     : [];
+  const failures = [];
   for (const name of selected) {
-    details.push(await pack(name));
+    try {
+      details.push(await pack(name));
+    } catch (error) {
+      if (!process.argv.includes("--keep-going")) throw error;
+      failures.push(String(error));
+      continue;
+    }
     console.log("Packed " + name);
+    // A later rejected source must not discard transforms for completed files.
+    fs.writeFileSync(
+      path.join(source, "geometry.json"),
+      JSON.stringify(
+        { mode: "whole-frame", tile: TILE, baseline: BASE, details },
+        null,
+        2,
+      ) + "\n",
+    );
   }
   details.sort((a, b) => a.name.localeCompare(b.name));
   fs.writeFileSync(
@@ -230,6 +294,8 @@ async function pack(name) {
       2,
     ) + "\n",
   );
+  if (failures.length) throw Error(failures.join("\n"));
+  if (process.argv.includes("--no-preview")) return;
   const previews = [];
   for (let i = 0; i < names.length; i++) {
     const label = createCanvas(244, 244),

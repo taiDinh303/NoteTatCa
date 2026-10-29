@@ -2,6 +2,24 @@
 
 > CURRENT: đã triển khai React tại ntc_react theo yêu cầu người dùng. Kiểm chứng local được ghi ở cuối; cloud/external providers chưa phát hành.
 
+## Mascot v6 theo chuẩn Fox — 2026-10-30
+
+55preset cùng chuẩn đầu chính target188×120/thân140×54, không lấy kích cỡ
+thực của loài làm tỉ lệ. Ô ảnh640×640 có thêm đệm cho tai/mũ/phụ kiện;
+Wizard tăng phần mặt thật, không tính mũ/râu vào đầu và giữ miệng được râu
+che kín. PNG chuẩn hóa3840×1920, atlas runtime1920×1920 tại ntc-v6.
+artSize=2×size giữ thân35CSSpx ở size80; gallery có headroom tương ứng,
+giữ55ID, preference và luồng custom/generated. Bộ nguồn/prompt và chuẩn
+được ghi ở [MASCOT-ARTWORK](MASCOT-ARTWORK.md).
+
+Actual validation:10/10Chromium hồi quy +2/2Wizard View/Edit393/1440;
+990frame nguồn/transform/PNG/atlas,5unit neo thân,3test tách frame,
+4config,fullESLint và production build PASS. .NET Release strict và
+9focused mascot tests PASS; chỉ fixture SQLite/captured mail/fake generator.
+Không khẳng định phép nhận dạng giải phẫu tự động hoặc pixel đầu tuyệt đối
+giữa mọi nhân vật; đầu được rà bằng bảng guide Fox. Không production rollout,
+thiết bị vật lý, owner DB hoặc email thật; xem worklog cho publication.
+
 ## Phạm vi và kiến trúc
 
 ### Bộ nhân vật riêng — 2026-10-28

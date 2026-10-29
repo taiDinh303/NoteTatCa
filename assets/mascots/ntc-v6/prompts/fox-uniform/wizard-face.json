@@ -1,0 +1,20 @@
+{
+  "name": "wizard",
+  "prompt": "Precisely EDIT the WIZARD18-sprite sheet (image1). Image2 Fox is the size reference. CRITICAL: make the OLD MAN'S ACTUAL BARE HEAD/FACE about60% BIGGER in width AND height relative to his unchanged purple upper-chest body. His face is currently tiny because hat and beard consumed headsize. Match the Fox's actual core HEAD188wide120high EXCLUDING HAT, HAIR, EARS AND BEARD. Broad large forehead, cheeks, large expressive purple eyes and nose; wide short skull, same core head size as every animal/person/robot. Do NOT count any white beard/mustache or purple hat as the measured head. Body remains140wide54high. Move/enlarge hat UPWARD/OUTWARD into extra transparent canvas, without shrinking actual face. Long white beard flows OVER the purple chest from below the enlarged face, stays inside the sprite, never counted as corehead or bodywidth. Mouth ALWAYS fully hidden behind long white mustache/beard, all18frames: no mouth hole even surprise/hearts/delight, expressions via eyes/brows/cheeks. No pasted head/body seam, redraw cohesive character. Exactly6columns3rows: left3colsUL/U/UR;L/center/R;DL/D/DR ALL9eyesOPEN, pleasant neutral, bottomcenterlookDOWNnot sad; right3colsblink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Same18front-facing planted upper chests. Increase transparent CANVAS/PADDING so hat/beard fit with HUGE clear gutters and40pxminimum outerpadding per conceptual640cell; sprites MUST NOT touch. No text/grid/guideboxes/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "excluded": [
+    "hat",
+    "hair",
+    "ears",
+    "beard"
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-ef76b094-6e43-4f48-8662-23471d93bc1b.png",
+  "mode": "built-in image_gen"
+}

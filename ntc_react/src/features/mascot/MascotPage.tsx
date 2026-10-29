@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { MascotAnimationContext } from "./mascotAnimation";
 import { mascotPresetSources } from "./mascotPreference";
+import { mascotArtScale } from "./mascotGeometry";
 import type { CSSProperties } from "react";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { X } from "lucide-react";
@@ -12,7 +13,7 @@ import "./MascotPage.css";
  * (head directions + reactions) that follows the cursor and blinks
  * when poked. No chat logic, no external calls — pure local animation.
  *
- * Project artwork: /mascots/ntc-v5/<name>-{directions,reactions}.webp.
+ * Project artwork: /mascots/ntc-v6/<name>-{directions,reactions}.webp.
  * Whole-frame artwork, dimensions and anchors: docs/MASCOT-ARTWORK.md.
  */
 
@@ -138,11 +139,11 @@ export function MascotPage(props: MascotPageProps) {
   const shared = !!session;
   // All v5 species share a larger square canvas. Draw it at the same pixel
   // density as the old canvas so long ears/hats use headroom, not smaller faces.
-  const artSize = directions.includes("/ntc-v5/") ? size * 1.4 : size;
+  const artSize = size * mascotArtScale(directions);
   const artBox: CSSProperties = {
     inset: "auto",
     left: (size - artSize) / 2,
-    top: (size - artSize) * (floors?.max ?? 384 / 448),
+    top: (size - artSize) * (floors?.max ?? 0.9),
     width: artSize,
     height: artSize,
   };

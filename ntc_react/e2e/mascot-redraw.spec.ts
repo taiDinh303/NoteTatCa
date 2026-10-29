@@ -97,8 +97,8 @@ test("all110 redrawn atlases use the same transparent high-resolution canvas", a
           if (data[i] === 0) transparent++;
         return { width: image.width, height: image.height, transparent };
       }, source);
-      expect(metrics.width, name).toBe(1344);
-      expect(metrics.height, name).toBe(1344);
+      expect(metrics.width, name).toBe(1920);
+      expect(metrics.height, name).toBe(1920);
       expect(metrics.transparent, name).toBeGreaterThan(
         metrics.width * metrics.height * 0.15,
       );

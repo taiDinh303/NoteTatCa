@@ -1,0 +1,14 @@
+{
+  "name": "hijabi",
+  "prompt": "Targeted anatomy EDIT of existing18-sprite sheet. Make actual skin face/skull30%WIDER, SAME HEIGHT, same body size. Loosen lavender hijab around the larger face, do not count hijab fabric as the head. Change these relative proportions; DO NOT enlarge body or whole sprite to compensate. Final allcharacters same188x120corehead/140x54body. Do not count hats/earrings/beard/hairbun as corehead. Preserve identity/colors/style/accessories. Whole coherent redraw/no pasted head/body seam. ALL18front-facing compact upperchests same silhouette. Preserve6columns3rows mapping: left3cols9gazesUL/U/UR;L/center/R;DL/D/DR,ALLeyesOPEN,neutralpleasant/downpupilsbottomcenter. Right3colsblink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Preserve glasses/beard/mustache consistency, mouth below mustache. ComposeSMALLcompleteportraits on MUCH LARGER genuinely transparent2:1canvas, portraitsLESS THAN60%cellwidth/height, hugecleargutters/outerpadding, no clippedhair/hats/FX. No text/grid/guideboxes/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-b025746b-ab3a-43d3-aa1c-9da98ce6fbf8.png",
+  "mode": "built-in image_gen"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "wizard",
+  "prompt": "ONE precise change to all18wizard portraits: make the exposed SKIN FACE/FOREHEAD/CHEEKS 20% WIDER horizontally, SAME FACE HEIGHT. Spread the eye/cheek positions slightly and reduce thick white side-hair volume so the bare face fills more of the space under the hat. Increase FACE WIDTH, NOT the hat, beard or whole sprite. Keep purple chest/body EXACTLY its current width,height,position; keep hat/beard dimensions and empty gutters unchanged. The head must read large even when hat+beard ignored. Same old wizard identity/colors. Mouth always completely hidden behind mustache/beard, all18states. All9gazeeyesOPEN, preserve18mapping6x3. Coherent anatomy/no pasted seam. Preserve genuine transparency and LARGE padding, no croppedstars/hat/beard. No text/boxes/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "excluded": [
+    "hat",
+    "beard"
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-a47c6583-de7e-4f79-9c2b-1568fd21c8b0.png",
+  "mode": "built-in image_gen"
+}

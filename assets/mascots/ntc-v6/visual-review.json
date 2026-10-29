@@ -1,0 +1,349 @@
+{
+  "version": "ntc-v6",
+  "reviewedOn": "2026-10-30",
+  "reference": "fox-size-reference.png",
+  "coreHeadTargetPx": [
+    188,
+    120
+  ],
+  "bodyTargetPx": [
+    140,
+    54
+  ],
+  "tilePx": 640,
+  "baselinePx": 576,
+  "method": "Agent visual comparison of all 55 neutral frames against the Fox guide; not automatic anatomical recognition or an exact pixel-size assertion for hidden head landmarks.",
+  "wizard": "Hat and beard excluded from the actual head/face comparison; mouth concealed in all states.",
+  "entries": [
+    {
+      "name": "afro",
+      "directionsSha256": "be67934b58dc1c39e7babc7c5cda8d53117ff10694542d7b02696443eca3d6e1",
+      "pngSha256": "5b8fbcb84a233f1ab54da38db3bf4037fc8307493ca907086d3b6935fb2c633f",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "astronaut",
+      "directionsSha256": "eb2d780cd84386989709ca62d5cb278efbf7a8d7b769076d0f71d6161746c7d9",
+      "pngSha256": "ee15f52ba893168ab806dd061fccdfbb6c9752c95374c6756d0ab8627a116abf",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "bald",
+      "directionsSha256": "df9a21e5d7316bbebd6f49756e5a33c870679c0e2867afdb374a49c3afd0c224",
+      "pngSha256": "0c22787777221ea7abc213113a776d6f5a742a5ed90be414d5bb43ad053960e9",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "ballerina",
+      "directionsSha256": "3e05dbeeb0e8f9593c47ec9007ef61071f8fda0c5c407140cb8b4bf2ec7657e1",
+      "pngSha256": "aaf75f3b8d9eb7b636e2b5a471e3f62e6dde5c2faf10515d4e8d78af1835d660",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "bear",
+      "directionsSha256": "83f70dff7576417e25b68e61f2907c807d68945eadbe0d3382119f531bf20516",
+      "pngSha256": "42794bff0c2f3d530e6b7240f7cc78e64dd278843116b47e15f2de5054839659",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "beard",
+      "directionsSha256": "5305a8868cb777c2eadbee967679383036393af2af672fdec3c8a4c3adb96000",
+      "pngSha256": "1e74b6f7d666ebf1884d23f5fd57f0392aef41382b92fb56be4db1ebc76ac030",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "builder",
+      "directionsSha256": "293fb8853e3508df759cd6f218ddcac008ebb46cd2473699f10876c46084f2f5",
+      "pngSha256": "4a6113f0bc84adcbe394eb51137137a8eb5a5d7bf13404721cf28f78431f14fe",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "bunny",
+      "directionsSha256": "d4069ee5c9ca6d05945a88dc83eb5fddceb8df5404c35e3aac71bafe30e1bc31",
+      "pngSha256": "0c866233eb1e534fb3e57c53160a01e3efc91fb589310f2659d8d87d535291f1",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "cap",
+      "directionsSha256": "444fd373b296e8d0e4faeafbc4be3c175ad060c3fd881c00adeae14a2ecb808e",
+      "pngSha256": "d3ebb79a3ab1fcced364e559245d83f4e25c59ee51855309398869ca06e27718",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "cat",
+      "directionsSha256": "3c297f41cc696f5880d06be7495fb6e6d404eb18ca881961c621674c788e575f",
+      "pngSha256": "f8b5a0d5b9868abc9677d6a5db2b27754967e6faf64f0e2a5ef62fedab2f3d61",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "chef",
+      "directionsSha256": "2a444b87c0157056f76e942b04db9025a487bade8b60cedad3aff096e5f2baa5",
+      "pngSha256": "d7aa489bdc384e8259303482e0c6f6eae690dee155069e893ee74acefe4a190d",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "clockwork",
+      "directionsSha256": "85529b59af6b916c4da62af1730f40c8a41f8fc7f779f9f1900c3db25e343979",
+      "pngSha256": "5ebba99305b53796dfb46b18a0bbeb467da1e833dab1efab9e8f31af8af3f4f8",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "crt",
+      "directionsSha256": "0f4379451949c3e921525bb3fd3671308ae00e2aee374adb1bfb80e9a95daa13",
+      "pngSha256": "e03dd33560832ab008dfb25d3fbbd52d5884d0b8dddd3c7520fa2faae57e3593",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "cube",
+      "directionsSha256": "9fa4e3d838b9a08ce83012d9b1eb3dabf3734121548144aa7fd29a92c89c135c",
+      "pngSha256": "ea4ee19cdd7a99bd3341034e569cbb9d0d2785ff87745bdcbeb0be523d8e42a2",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "deer",
+      "directionsSha256": "56b789fecb897a7bea508250dcdf4c766d477a3e398ec66d32f04e2469a21a6e",
+      "pngSha256": "e275d99396d04cb85778861cc36eeeff1af606e9e7988101ac24f1f2a1fedfab",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "dino",
+      "directionsSha256": "36e4b738deb51ccb204aced309bf4065199f1ed3b4fdad12b8fc2c6ba2e5019d",
+      "pngSha256": "73ef17edeba253070a949935d3312aefa7f21932f26f9574c88f8ced9e0f93c7",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "drone",
+      "directionsSha256": "021a89151a8ea7625296b90de8012ed0654cbc20726ec852a85d5b9b0e0cd9e5",
+      "pngSha256": "70855ef9ab47fb5341e86d81feae71af9454a3c47eb62a59a67cc2778260fcde",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "fox",
+      "directionsSha256": "dd2a00984255a9946e2482b0ee4d2bbddd8bd0ffc22a1daacc912dc7e51c3ff4",
+      "pngSha256": "37326b3c56e48e8e72b24bcba008d6d935d0855983b3e10e0ca2fec12cff5d7a",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "frog",
+      "directionsSha256": "8e84404ac020fe0355fd10219fb16d892e36e193f4abad0b4b74c933ea97cea7",
+      "pngSha256": "49a763f37ee5c41200350d58b40cfc152212416c5daf7baac8785390dd96462d",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "gearbot",
+      "directionsSha256": "0cb9d1d1883c1a9368dcdf47a2117102838426bb3b9358d5d93db0941947bc62",
+      "pngSha256": "74183ce5ed3edd6e93a2ee506810098a82ca7a49dcdecf639e83986040e25028",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "glasses",
+      "directionsSha256": "6032aa193926b6b449639429bf140712fbd9d26a9b71a7850ae6922a8350d444",
+      "pngSha256": "452a4f0cfbb13b4249d6673e6e7911d754ea1045512195d138979bf8a53dcfc5",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "grandpa",
+      "directionsSha256": "d74b30664f2bad318e59e5a5ed25b04fa9e3e2760f4ef6d42f5bd07ad53ebacf",
+      "pngSha256": "6164d5144adaef874cd40f8a23f2e03ef027a2e566b241028ba850079bde9c3d",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "granny",
+      "directionsSha256": "a10e75bb188a9fd679725552faf79be503adb5f981c23ae409fc748f3ebfc92d",
+      "pngSha256": "b2e87fadedf8aa156bcfd75979eee2617ae1fe1b68afde9415f4d5ecd5ca1110",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "hamster",
+      "directionsSha256": "8497a3739d84938e4da9fe981781318346f0bf579db2d3fe082c11bdcee223cc",
+      "pngSha256": "781f55b1f405507c30ba558b94c3faf48540e0ba1c62a7026143bfd5d20108bd",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "hedgehog",
+      "directionsSha256": "6fc59767b3b9ab319410d07dd114195424f672e8ce75edafc83ee29b37efac3c",
+      "pngSha256": "f074153016e8405e8970d808e109b1147ba4e0c5a7059905da1e8195f4a818c2",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "hijabi",
+      "directionsSha256": "52821aadec333ea68dee5900abf63ee58204c24b867052539e2a996bcaf06672",
+      "pngSha256": "b149057518fd51f7ab4d944206717c3b7c08869b73041e4a346683c0fe8f880c",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "kamran",
+      "directionsSha256": "b25120ff6bf10a3dcb47a78b5591c8f392d72806a73bf1ad6420fdc3ed78c9b4",
+      "pngSha256": "ec2be9ee5c5c844434486cd026cef35a0319b245d0edaf9ded81091e77c6d231",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "knight",
+      "directionsSha256": "d6bf580af1c3be141288fe7bcbfcab66efce10efb473284d2232d3c74b9d38c6",
+      "pngSha256": "5cc7eb3edd74dc048569d2ac038eaf2d6d71a12323191ea7e45a0e47d36092b7",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "koala",
+      "directionsSha256": "575c768e4dabb6b0b5e7de48b39b166128fb81b417fd43a096bc1de1c481a46e",
+      "pngSha256": "385803e944969f0d01048cd1161c37386e8949e85b47456f8a2114577d0beca8",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "lantern",
+      "directionsSha256": "665ec373e27cbc72c50779e4cb3f6989fe8f8e0eeca6faac014e9b84b4333088",
+      "pngSha256": "36d37593c22b2f87ba636879f6d0d3efd08b0c2c708733ce06ec39a62f5c1593",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "mouse",
+      "directionsSha256": "1a6ca6f1ba117cefe86efd47fe8025b33355e2d646f1a8825b44c36f839df0c6",
+      "pngSha256": "6439d9537e66197c7dc342beb0b31dc0b15b77fb1338e8d06fb6850988601c8f",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "notebook",
+      "directionsSha256": "ebaccd6ca36b365ffa518a8f1bd675875d71ceef7701348d313bb16a9aaa46af",
+      "pngSha256": "8ca56be5aa81e0b3858727e2acf4e84b1f4afcc2db90861206004b3ba9799628",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "nurse",
+      "directionsSha256": "f3234d5087f272f2ee0186dcc58cfed8f7a958eaf7e034d24d2fc03c6381bbbc",
+      "pngSha256": "7d4d7e5986a1da24d273bf8a1c1ad233b28ba6f2cc1ac68b821af2f6074aff17",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "otter",
+      "directionsSha256": "c54515283ae3d26a5502e19c57e1d53b4d5405b8d02d4af7ff7887c28bf6be3d",
+      "pngSha256": "b3e6c995978eb8ed4d0e17c9765c27b4249882004fa91eac8d0ff37ca9a6df42",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "owl",
+      "directionsSha256": "974ba6c3740b32923d908e3eb575916fcc98340256c6c5efd41a1908495e58f1",
+      "pngSha256": "1161b8d8b868446cd7def2f87b8546fe1057a13acc5674f0e2a88ece0748d3ae",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "panda",
+      "directionsSha256": "33d939f63040c437f2c677679908e2d44acda50194a856fb1f5347d0095fde69",
+      "pngSha256": "3a18662b8a8cf2dd2558554513a12c2c52240fb51e4d4b918d2493258507cb91",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "paper",
+      "directionsSha256": "8f8e661ba21744af704b96491158811f3079ff815c5e2736898718280c458edd",
+      "pngSha256": "67b1c5a0c285bff6f73f4ad2b7ba1d6c5fb3a42e00e899a3756d50773d7988f8",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "penguin",
+      "directionsSha256": "f3e5eb5504b2be46ea80e5ab49bfb74c4a1bc7dd9fb77d68d59d55002fcfcfd1",
+      "pngSha256": "010115c3da3e40bf894a4c41c03df716f38d7d652536dda515f6736770d30cb2",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "pirate",
+      "directionsSha256": "bbc21d0bd1a54d93aedaf7353f9ec2c5bdb3b7df185069ba105bfecbac0b765e",
+      "pngSha256": "c3d5e7d6360f45565a9fd9b47ccca9af173398ca3492b5309450f3b3d19edcfb",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "postbot",
+      "directionsSha256": "1631d208e34d6c7bd78dec800cdff8f675828448256f78cfe9827ebf437fcfa5",
+      "pngSha256": "4c9cac89d8ecb0e8db4090efb63d63f0d8358a12251a0f3388b9debbf12c2e46",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "pug",
+      "directionsSha256": "fa5ceabd2a4922860bbbc4dc777fd6558fbb2f95d93d4ffba8a7b9f210825a4b",
+      "pngSha256": "9b7bf26f003806752dd707acf92c5b6bed6735e8646cc3705dc7a8424a5704c5",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "raccoon",
+      "directionsSha256": "0da31a6a058e40bd2139d3535f213d8af54d2003db677f1cc34220fbe4db02f8",
+      "pngSha256": "fd363963e9e6b808bcfefbd5efd608f60aa83389e70a1e81ac5f364f5d551144",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "radio",
+      "directionsSha256": "919211d4a400538ac4bd6ab38c253437f440e8c4067d621869db00f9d1ac6143",
+      "pngSha256": "c569b985a3e422e6fe3d0d2da7be2ebdf152aa655fc0e3d9de879189169d66e6",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "redpanda",
+      "directionsSha256": "cd54fcff53987057a4c9e9f06751b8b3f67659960c78314f0ba84ed8b2140bf3",
+      "pngSha256": "5700a17c67e949fd9b4e0435308faa5019975451e3acfbac08ae0b8a7fab125c",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "rocket",
+      "directionsSha256": "7efa7b7fe6b23840f27141df335c19f53f58f18bf2d5f856cc442b6f257bcb0e",
+      "pngSha256": "cbf9bd3efd35c709ebb3c7b3670fec32bee9f68c2a7ea37bc5ae2ae5a4e3af1d",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "scientist",
+      "directionsSha256": "970e17debacf6b448707a8712fda2d672b526ede8ed032c5c90b7ef719cf4296",
+      "pngSha256": "415fb5684cb4f5ac04e57e21bdbb6c059a9c36fef04bfba1aa284769ca73d6a3",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "scout",
+      "directionsSha256": "9266847f07aeebed37b9e4e35f953a52cec807f5e600c1cb31c25b55f9ef4530",
+      "pngSha256": "f74dce08ac50b43896ddc41677e035401964f9f1b319be5c682cb660bc75bc0e",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "sheep",
+      "directionsSha256": "a144abc363ff5fc8b9edb2a951e600587c03154d84ab4f07fb37841529e00611",
+      "pngSha256": "39a30433e28846e84f2deba5cd91afe9d158ae725f43d1206773ba903acb9502",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "sikh",
+      "directionsSha256": "b19c9e98c54b618d1ed8b900a4fa43bd6cfc9a4586d57a870f661e980d78f483",
+      "pngSha256": "73d023eb7151dd4174f0a5c61db79768dd3f6541a7ce18d79a84a5ac7052c4ee",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "skater",
+      "directionsSha256": "0852c3c5eb0b95e726489b736ce4bd12425183218cbbf04cf9eeff8786319e4b",
+      "pngSha256": "afadb9d2707990beffabeedea79d7bef54d492f6178724cfdfb4bdf78a20611f",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "sloth",
+      "directionsSha256": "195bbddba815c5489dde575a314830d20cb94fcfaa2479aed95f6e24abd92d5c",
+      "pngSha256": "310c41007419a0b6c6dd0cd054dd9f6d0bdd3bb73462b8168bd0cfd747084e6c",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "tiger",
+      "directionsSha256": "82b2c67affe8ef77b6f791ea4bf627b4568e9aba86a714063a06be2f88cef3bd",
+      "pngSha256": "997eb9289605d2b8a246b29c1f69a6507470df655520a558fc6cdccbb8d56a72",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "toaster",
+      "directionsSha256": "2b75166822c4bbb6caebf1d6b19263319c4e9dbb9be0f37e7eadb698f320f910",
+      "pngSha256": "1a4598d0758e4ae9fedf97d4643ccf55146eda8961e4c0e6baf9764b2c3c1366",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "tv",
+      "directionsSha256": "c4affed5d92816f1fd05e5a525fb1cedaf3ec0a84204fa555cc09393bd9ba666",
+      "pngSha256": "8caf22da39e3da3cb71c1a821c4904c4e85ca089aa89c590cf99158016118b29",
+      "neutralFrameVisuallyReviewed": true
+    },
+    {
+      "name": "wizard",
+      "directionsSha256": "ebe2d9ff750af94ba6e21d7efc7433290de71a759513a3a64c4eb2449d1de485",
+      "pngSha256": "c8e7083e79c6c435706f977bbde422cec42d0ebf282676e09dd9aa6c1c9379ac",
+      "neutralFrameVisuallyReviewed": true
+    }
+  ]
+}

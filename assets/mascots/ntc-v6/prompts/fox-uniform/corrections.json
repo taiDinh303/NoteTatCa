@@ -1,0 +1,50 @@
+[
+  {
+    "name": "astronaut",
+    "change": "Make the ACTUAL human face/skull inside the helmet25%WIDER and25%TALLER, while body size stays exactly unchanged. Enlarge helmet/visor around the larger head as needed; helmet is excluded from head size."
+  },
+  {
+    "name": "ballerina",
+    "change": "Make the core human head20%SHORTER VERTICALLY, same WIDTH and same body size. Bun/ribbon extend above the shortened skull and are not counted as head."
+  },
+  {
+    "name": "beard",
+    "change": "Make the actual face/skull20%WIDER and10%TALLER, excluding hair/beard, same body size. Preserve full neat beard/mustache; mouth correctly below mustache."
+  },
+  {
+    "name": "builder",
+    "change": "Make the actual human face/skull20%WIDER and15%TALLER, excluding hardhat, same body size. Move/enlarge hardhat upward/outward to fit bigger face without shrinking it."
+  },
+  {
+    "name": "chef",
+    "change": "Make the actual human face/skull20%WIDER and15%TALLER, excluding toque/mustache, same body size. Move/enlarge toque upward/outward to fit bigger face without shrinking it."
+  },
+  {
+    "name": "grandpa",
+    "change": "Make core head/face20%WIDER, SAME HEIGHT, keep body size unchanged. Glasses/mustache stay consistent, mouth below mustache."
+  },
+  {
+    "name": "granny",
+    "change": "Make core head/face20%WIDER, SAME HEIGHT, keep body size unchanged. Bun/glasses are outside core size."
+  },
+  {
+    "name": "hijabi",
+    "change": "Make actual skin face/skull30%WIDER, SAME HEIGHT, same body size. Loosen lavender hijab around the larger face, do not count hijab fabric as the head."
+  },
+  {
+    "name": "kamran",
+    "change": "Make actual face/skull25%WIDER and10%TALLER, same body size, beard and glasses consistent, mouth below mustache."
+  },
+  {
+    "name": "scientist",
+    "change": "Make actual face/skull20%WIDER, SAME HEIGHT, same body size. Hair/goggles extend into headroom and do not consume face size."
+  },
+  {
+    "name": "sikh",
+    "change": "Make actual face/skull35%WIDER and20%TALLER, same body size. Turban and beard excluded from head size; enlarge turban upward/outward around larger face, beard flows over chest."
+  },
+  {
+    "name": "skater",
+    "change": "Make actual face/skull15%WIDER and10%TALLER, same body size. Beanie excluded from head size, expands upward/outward as needed."
+  }
+]

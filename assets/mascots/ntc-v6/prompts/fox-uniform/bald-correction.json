@@ -1,0 +1,14 @@
+{
+  "name": "bald",
+  "prompt": "EDIT this FOX18-sprite sheet into BALD MAN mascot. Keep EXACTLY the Fox's WIDE SHORT core head outline and relative size, same short chest silhouette and body proportions, SAME18pose mapping! Replace fox features/fur with friendly medium-brown-skinned bald man's face, expressive brown eyes, no beard, simple blue shirt on short shoulders. REMOVE foxears/muzzle/fur/tail. Head must be a WIDE SHORT chibi oval (188width120height), NOT a tall round human skull. Body140width54height. Allcharacters shareFoxsizes no anatomy-basedsizechanges. REDRAW cohesive whole portraits, never pasted parts. Exactly6columns3rows transparent2:1sheet; left3cols UL/U/UR;L/center/R;DL/D/DR with ALLeyesOPEN, neutral pleasant gaze, pupilsdown bottomcenter; right3cols blink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Expand blank transparent canvas around each portrait so portraits occupy LESS THAN HALF width/height of their cell. HUGE empty gutters between every row,column and outeredges, no clipped details. All18chestsidentical front-facing silhouette; head/gazeonlymoves. Preserve Fox reference's head-to-body width/height ratios precisely even though human. No text/boxes/background/grid.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-0c198fab-09f4-41bb-8eb0-8d090e094318.png",
+  "mode": "built-in image_gen"
+}

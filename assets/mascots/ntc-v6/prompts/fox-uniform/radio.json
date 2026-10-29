@@ -1,0 +1,15 @@
+{
+  "name": "radio",
+  "prompt": "Create a NEW production sprite sheet with EXACTLY18 SMALL busts on a MUCH LARGER genuinely TRANSPARENT canvas. Exact SIX columns THREE rows,2:1 sheet. Reference is ONLY Fox numerical proportions, not Fox identity. All subjects, including humans and robots, have the SAME absolute sizes as Fox: core head188W120H excluding ears/hats/hair/accessories; short upper-chest body140W54H. No species-specific scaling or equivalent-area changes. Body only shoulders/upper chest, no long torso, belly, feet, legs or hands. In conceptual640squarecell: center320,headbottom522,bodybaseline576. Ears/hats/antennae extend into generous blank area WITHOUT shrinking head. Portraits occupy only40%cellwidth/height; MORE THAN HALF the canvas stays transparent! Large clear gutters between every sprite, no overlapping/touching/cut details. 18identical compact front-facing body silhouettes, gentle head/gaze turns only. LEFT3cols9gazes: UL/U/UR;L/center/R;DL/D/DR,ALL eyesOPEN and neutral pleasant mouth, bottom-center pupilsDOWN. RIGHT3cols9reactions: blink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Consistent head/body scale across frames. Polished cute detailed chibi illustration matching reference rendering. Preserve each subject's species anatomy, animals never human shoulders/clothes, robots mechanical. Keep coherent whole drawings; no pasted head/body seams. No text/lines/guideboxes/background/checkerboard.  SUBJECT: a cute vintage RADIO ROBOT with a walnut-brown rounded radio-shaped head, cream face panel with expressive black eyes, a small short antenna and two tiny brass knobs, brown mechanical shoulders.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "cell": 640,
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-67d925fc-df1b-4cc3-97ae-899c8bb476f9.png",
+  "mode": "built-in image_gen"
+}

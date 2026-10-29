@@ -1,0 +1,14 @@
+{
+  "name": "bald",
+  "prompt": "Precise proportion EDIT. In ALL18sprites, make each bald man's head 25% SHORTER VERTICALLY while keeping its present WIDTH unchanged. Head should visibly become a WIDE, FLAT horizontal oval, not round. Lower crown/top of skull toward eyes; chin and attachment stay fixed. Preserve body's exact current width/height/position, blue shirt, skin color and identity. Redraw the head coherently at the new shorter proportions, no seam/cut-and-paste. Do not compensate by enlarging the head horizontally or changing body size. Facial features fit inside the shorter head. Keep6columns3rows and same18gazes/reactions; all left9eyes OPEN and pupils down in bottomcenter. Keep transparent background. Add generous transparent gutters/outer padding around complete sprites if needed, no cropping. No text/diagram/guideboxes. This is intentional very wide stylized chibi head geometry.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-4215b82c-9792-4ebd-81ca-1e3f1ea0b224.png",
+  "mode": "built-in image_gen"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "bald",
+  "prompt": "EDIT only the body proportions of all18bald-man sprites. Keep the newly wide/flat head EXACTLY as shown: same head width,height,features,skin,color,pose. Make the blue-shirt upper chest/shoulder body 25% TALLER VERTICALLY, same body WIDTH. Extend body downward, chest only, no legs/hands/fullbody. This makes head and chest match the Fox standard188x120head140x54body after uniform sizing. Same identity, colors,6x3mapping and expressions/gazes. Allleft9eyesOPEN. Coherent whole drawing, no seams. Extra true transparent padding between rows/columns andouteredges; move whole portraits apart as needed so none touch. Do not resize head to fill new space. No text/guideboxes/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-cf7034f6-6b3a-4c14-a1f0-4c6dfc3371af.png",
+  "mode": "built-in image_gen"
+}

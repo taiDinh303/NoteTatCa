@@ -1,0 +1,18 @@
+{
+  "name": "wizard",
+  "prompt": "Targeted EDIT: Wizard's actual BARE FACE, excluding ALL hat/hair/beard, must be larger relative to torso. Keep current face WIDTH, make exposed forehead/cheek FACE 20%TALLER vertically, moving hat UP to reveal taller forehead. Make ONLY PURPLE COAT SHOULDERS 15%NARROWER horizontally, same chest height. Keep beard/mustache covering mouth completely ALL18states. Do not enlarge coat to compensate; keep wideshortface, hugeeyes, elder identity/colors. Head/hat/beard coherent no pasted seams. CRITICAL COMPOSITION RESET: place the18complete sprites MUCH FARTHER APART on a MUCH LARGER transparent canvas, exactly6columns3rows2:1. Each portrait must occupy LESS THAN60%of each squarecell width/height. At least60px transparent gutter on all4sides of EVERYsprite in conceptual640cell; outerhatstarscurrentlytouchrightedge, repair them fully inside. More than HALF canvas is transparent; do NOT copy old close-packed layout. All18same compact front-facing body, gazeonlyturns. Left3cols9eyesOPEN directionsUL/U/UR;L/center/R;DL/D/DR. Right3colsblink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. No text/guideboxes/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "excluded": [
+    "hat",
+    "beard"
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-2c798e67-1acd-49ca-a71e-375d6674ef17.png",
+  "mode": "built-in image_gen"
+}

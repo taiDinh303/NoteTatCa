@@ -1,0 +1,14 @@
+{
+  "name": "fox",
+  "mode": "Retained owner-selected original Fox artwork",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "reference": "fox-size-reference.png",
+  "sourceSha256": "5a6db7de7cba6d297b4ed544406ef2d151ec656f905d19dc26de1f0d096c2b58"
+}

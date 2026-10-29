@@ -6,7 +6,7 @@ test("paper pal uses the cool white redesign instead of the beige portrait", asy
 }) => {
   await page.goto("/Home");
   const sources = mascotPresetSources("paper");
-  expect(sources.directions).toContain("/ntc-v5/");
+  expect(sources.directions).toContain("/ntc-v6/");
   const warmRatio = await page.evaluate(async (source) => {
     const image = new Image();
     image.src = source;

@@ -1,0 +1,14 @@
+{
+  "name": "astronaut",
+  "prompt": "Targeted anatomy EDIT of existing18-sprite sheet. Make the ACTUAL human face/skull inside the helmet25%WIDER and25%TALLER, while body size stays exactly unchanged. Enlarge helmet/visor around the larger head as needed; helmet is excluded from head size. This is a deliberate relative proportion change, NOT a request to enlarge the entire image or body. All55characters must have same188x120corehead and140x54body at final scale. Ears/hats/antennas/projectinghair excluded; they expand into padding. Keep identity/colors/style/18state mapping, cohesive whole drawings/no pasted seams. All18same front-facing upperchest; left3cols9directionsUL/U/UR;L/center/R;DL/D/DR ALLeyesOPEN, neutralpleasant and bottomcenterlookDOWN. Right3colsblink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Preserve glasses/mustache in every state where applicable. Reset spacing: SMALL complete portraits on MUCH LARGER genuinely transparent6x3canvas2:1; portraits occupy LESS THAN60%eachcellwidth/height, huge clear gutters and outermargins, repair any cut accessories. Do NOT copy old close-packed layout. No text/boxes/grid/background.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-541b05e3-bcb0-4169-8402-eb597b78cb31.png",
+  "mode": "built-in image_gen"
+}

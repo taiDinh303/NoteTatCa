@@ -1,0 +1,15 @@
+{
+  "name": "cat",
+  "prompt": "Create a NEW production sprite sheet, NOT a close-packed contact sheet. Reference image is a MEASUREMENT guide: all character heads and bodies have same dimensions as Fox (not the fox identity). Character: charcoal/cream tuxedo kitten with amber eyes, polished cute detailed mascot illustration. 18 SMALL coherent upper-chest portraits on a MUCH LARGER genuinely TRANSPARENT canvas, exact SIX columns THREE rows,2:1 aspect ratio. Critical composition: each sprite fills ONLY 40% of its square cell's WIDTH and 40% HEIGHT, with LARGE transparent gaps, especially above and between rows. In each conceptual640px square: HEAD(face/skull, excluding ears/accessories)188W120H, BODY140W54H; headbottom522,bodybottom576,center320. Ears freely extend above head, never counted in head size, no clipping. LEFT three columns 9gazes arranged UL/U/UR,L/center/R,DL/D/DR. EyesOPEN in all9gazes, including downward. RIGHT3cols blink/hearts/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. IDENTICAL front-facing upper-chest body in every frame, no tall/full body or human shoulders; natural kitten fur chest. Same head size and body size in all18frames, no species-size differences. More than HALF THE CANVAS MUST BE EMPTY transparent padding. Do NOT enlarge portraits to fill cells. No outlines/labels/text/grid/guide boxes/background. Preserve coherent anatomy, no cut/paste.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "cell": 640,
+  "generatedFile": "Generated images are saved to C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba as C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-8486edd0-0acc-49ec-9e67-ac244b83ef80.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+  "mode": "built-in image_gen"
+}

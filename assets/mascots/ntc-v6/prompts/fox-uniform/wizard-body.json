@@ -1,0 +1,18 @@
+{
+  "name": "wizard",
+  "prompt": "SINGLE targeted proportion EDIT of all18wizard sprites: make ONLY the PURPLE ROBE/SHOULDER BODY at the bottom 40% NARROWER horizontally (new width60%ofcurrent), and10%shorter vertically. Keep the ENTIRE HEAD/FACE, eyes, white hair, mustache, beard and hat EXACTLY the same size as currently shown. Do NOT shrink the face/head/hat/beard. This must visibly become a LARGE HEAD on a much narrower short purple chest, big-headed chibi. Currently the purple shoulders are much too wide relative to his actual small face. The long beard can overlap the narrowed chest. Same colors/identity and whole coherent drawing, no seam/cut-and-paste. All18chests same front-facing silhouette. Mouth remains entirely concealed by white mustache/beard in every frame, all9gaze eyesOPEN. Keep6columns3rows/18state mapping. Add LARGE TRANSPARENT GUTTERS and outer padding, enlarge canvas as needed to preserve whole hat/beard. No background/text/guideboxes.",
+  "head": [
+    188,
+    120
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "excluded": [
+    "hat",
+    "beard"
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a187fc-a259-7190-b430-d361c39133ba\\exec-9695dc64-2517-4cd2-af54-626d8378fb5c.png",
+  "mode": "built-in image_gen"
+}
