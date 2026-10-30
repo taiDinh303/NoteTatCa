@@ -4815,6 +4815,15 @@ td {
   outline-offset: 2px;
 }
 
+.note-editor-modal .icon-button.active:not(.editor-heading-action) {
+  background: var(--hover);
+  color: var(--text);
+}
+.note-editor-modal .button:focus-visible,
+.note-editor-modal .icon-button:focus-visible {
+  outline-color: var(--text);
+}
+
 /* Workspace header spans the navigation and content columns. */
 .customer-shell > .topbar {
   display: grid;

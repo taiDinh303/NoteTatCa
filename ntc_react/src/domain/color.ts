@@ -20,5 +20,7 @@ export function notePalette(hex?: string | null) {
     "--text": foreground,
     "--subtle": foreground,
     "--muted": foreground,
+    // Hover surfaces must follow the note, rather than the surrounding app theme.
+    "--hover": foreground === "#ffffff" ? "#ffffff1a" : "#20282414",
   };
 }
