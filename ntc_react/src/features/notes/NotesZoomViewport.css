@@ -87,6 +87,8 @@ html:has([data-notes-zoom]) {
 .notes-zoom-layer .notes-section {
   width: 100%;
 }
+.note-group-content[hidden] { display: none; }
+.note-group-toggle { flex-shrink: 0; width: 32px; height: 32px; }
 
 @container viewport (max-width: 800px) {
   /* Mobile companions are paused, so the first row needs no hat headroom. */

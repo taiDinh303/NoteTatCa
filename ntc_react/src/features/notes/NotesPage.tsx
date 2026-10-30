@@ -31,6 +31,8 @@ import {
   ArrowDown,
   ArrowUp,
   Bell,
+  ChevronDown,
+  ChevronRight,
   FileText,
   LayoutGrid,
   List,
@@ -74,6 +76,14 @@ import { errorMessage } from "../../shared/utils";
 import { loadNoteEditor, warmNoteEditor } from "../editor/loadNoteEditor";
 const NoteEditor = lazy(loadNoteEditor);
 import type { NoteOpenAction } from "../editor/NoteEditor";
+type NoteGroup = "pinned" | "normal";
+const collapsedGroupsKey = "ntc.note-groups.v1";
+function readCollapsedGroups(): Record<NoteGroup, boolean> {
+  try {
+    const value = JSON.parse(localStorage.getItem(collapsedGroupsKey) ?? "null");
+    return { pinned: value?.pinned === true, normal: value?.normal === true };
+  } catch { return { pinned: false, normal: false }; }
+}
 function NoteCard({
   note,
   onOpen,
@@ -311,6 +321,13 @@ export default function NotesPage({
   const navigate = useNavigate();
   const q = useDebounced(params.get("q") ?? "");
   const [pinFilter, setPinFilter] = useState("all");
+  const [collapsedGroups, setCollapsedGroups] = useState(readCollapsedGroups);
+  function toggleGroup(key: NoteGroup) {
+    const next = { ...collapsedGroups, [key]: !collapsedGroups[key] };
+    setCollapsedGroups(next);
+    try { localStorage.setItem(collapsedGroupsKey, JSON.stringify(next)); }
+    catch { /* Collapsing still works when preference storage is unavailable. */ }
+  }
   const filter: NoteFilter = {
     ...(q ? { q } : {}),
     ...(tagId ? { tagId } : {}),
@@ -455,26 +472,36 @@ export default function NotesPage({
       setParams(next, { replace: true });
     }
   }
+  const visibleNotes = trash ? all : all.filter(note => !collapsedGroups[note.isPinned ? "pinned" : "normal"]);
   const groupSortingStrategy: SortingStrategy = (args) => {
     if (
-      all[args.activeIndex]?.isPinned !== all[args.overIndex]?.isPinned ||
-      all[args.index]?.isPinned !== all[args.activeIndex]?.isPinned
+      visibleNotes[args.activeIndex]?.isPinned !== visibleNotes[args.overIndex]?.isPinned ||
+      visibleNotes[args.index]?.isPinned !== visibleNotes[args.activeIndex]?.isPinned
     )
       return null;
     return rectSortingStrategy(args);
   };
-  const renderGroup = (group: Note[], title: string) =>
+  const renderGroup = (group: Note[], title: string, key?: NoteGroup) =>
     group.length ? (
-      <section className="notes-section">
+      <section className="notes-section" data-note-group={key}>
         <div className="section-heading">
           <h2>
             {title}
             <span>{group.length}</span>
           </h2>
+          {key ? <IconButton
+            className="note-group-toggle"
+            icon={collapsedGroups[key] ? ChevronRight : ChevronDown}
+            label={tr(collapsedGroups[key] ? "Expand {0}" : "Collapse {0}", title)}
+            aria-expanded={!collapsedGroups[key]}
+            aria-controls={`note-group-${key}`}
+            onClick={() => toggleGroup(key)}
+          /> : null}
         </div>
 
+        <div id={key ? `note-group-${key}` : undefined} className="note-group-content" hidden={key ? collapsedGroups[key] : false}>
         <div className={`note-grid ${view === "list" ? "list-view" : ""}`}>
-          {group.map((note, index) => {
+          {(!key || !collapsedGroups[key]) && group.map((note, index) => {
             const isTargetCard =
               !trash &&
               (lastOpenedNoteId === note.id ||
@@ -503,6 +530,7 @@ export default function NotesPage({
               />
             );
           })}
+        </div>
         </div>
       </section>
     ) : null;
@@ -638,7 +666,7 @@ export default function NotesPage({
             onDragEnd={dragEnd}
           >
             <SortableContext
-              items={all.map((n) => n.id)}
+              items={visibleNotes.map((n) => n.id)}
               strategy={groupSortingStrategy}
             >
               {trash ? (
@@ -648,12 +676,14 @@ export default function NotesPage({
                   {renderGroup(
                     all.filter((n) => n.isPinned),
                     tr("Pinned"),
+                    "pinned",
                   )}
                   {renderGroup(
                     all.filter((n) => !n.isPinned),
                     all.some((n) => n.isPinned)
                       ? tr("Everything else")
                       : tr("All notes"),
+                    "normal",
                   )}
                 </>
               )}
