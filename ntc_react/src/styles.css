@@ -4470,6 +4470,33 @@ td {
   font-size: 21px;
   margin: 0 0 20px;
 }
+/* List routes share one fixed-width shell and one toolbar baseline. */
+html:has([data-workspace-list]) { scrollbar-gutter: auto; }
+.customer-shell[data-workspace-list] {
+  height: 100dvh; min-height: 0; display: flex; flex-direction: column;
+}
+.customer-shell[data-workspace-list] > .topbar { flex-shrink: 0; }
+.customer-shell[data-workspace-list] > .main-column { flex: 1; min-height: 0; }
+.customer-shell[data-workspace-list] .workspace-main {
+  display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  padding-top: 16px; padding-bottom: 20px;
+}
+.customer-shell[data-workspace-list] .workspace-main > * { flex-shrink: 0; }
+.customer-shell[data-workspace-list] .workspace-toolbar,
+.customer-shell[data-workspace-list] .inbox-header {
+  min-height: 46px; margin-bottom: 12px; flex-shrink: 0;
+}
+.customer-shell[data-workspace-list] .workspace-toolbar { align-items: flex-start; }
+.customer-shell[data-workspace-list] .workspace-toolbar > .quick-capture,
+.customer-shell[data-workspace-list] .workspace-toolbar > .row-actions { margin-top: 6px; }
+.customer-shell[data-workspace-list] .inbox-header { align-items: center; }
+.customer-shell[data-workspace-list] .inbox-tabs button { height: 34px; padding-block: 0; }
+.customer-shell[data-workspace-list] .inbox-scroll { flex: 1 1 0; min-height: 0; overflow-y: auto; }
+.customer-shell[data-workspace-list] .reminders-scroll { flex: 1 1 0; min-height: 0; overflow-y: auto; }
+.customer-shell[data-workspace-list] .reminder-toolbar { justify-content: flex-start; }
+.customer-shell[data-workspace-list] .reminder-toolbar > .button { height: 34px; min-height: 34px; padding-block: 6px; margin-top: 6px; }
+.customer-shell[data-workspace-list] .inbox-mark-read { height: 34px; padding-block: 0; }
+.note-open-loading { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: #20293655; }
 .labels-heading {
   width: 100%;
   background: transparent;

@@ -1,7 +1,6 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
 import { ArrowUpRight, Bell, CheckCheck, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { cache, inbox, workspace } from "../../app/runtime";
@@ -9,10 +8,12 @@ import type { InboxItem, Page } from "../../domain/models";
 import { useAuth } from "../../shared/hooks";
 import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
+import { loadNoteEditor, warmNoteEditor } from "../editor/loadNoteEditor";
+const NoteEditor = lazy(loadNoteEditor);
 export default function InboxPage() {
   useLanguage();
   const state = useAuth();
-  const navigate = useNavigate();
+  const [openedNote, setOpenedNote] = useState<string>();
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [busy, setBusy] = useState(false);
   const query = useInfiniteQuery({
@@ -116,6 +117,7 @@ export default function InboxPage() {
           <span>{tr("Mark all as read")}</span>
         </button>
       </div>
+      <div className="inbox-scroll" role="region" aria-label={tr("All notifications")} tabIndex={0}>
       {query.isPending ? (
         <Spinner />
       ) : query.isError ? (
@@ -140,8 +142,11 @@ export default function InboxPage() {
               </div>
               <button
                 className="inbox-item-open"
+                onPointerEnter={warmNoteEditor}
+                onFocus={warmNoteEditor}
+                onTouchStart={warmNoteEditor}
                 onClick={() => {
-                  navigate(`/notes?note=${item.noteId}`);
+                  setOpenedNote(item.noteId);
                   if (!item.readAt) {
                     void inbox
                       .read(item.id)
@@ -174,6 +179,12 @@ export default function InboxPage() {
             {tr("Load more notifications")}
           </Button>
         </div>
+      ) : null}
+      </div>
+      {openedNote ? (
+        <Suspense fallback={<div className="note-open-loading"><Spinner label={tr("Opening editor…")} /></div>}>
+          <NoteEditor noteId={openedNote} onClose={() => setOpenedNote(undefined)} />
+        </Suspense>
       ) : null}
     </>
   );

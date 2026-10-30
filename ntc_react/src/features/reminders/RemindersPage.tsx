@@ -83,6 +83,10 @@ export default function RemindersPage() {
   return (
     <>
       <h1 className="sr-only">{tr("Reminders")}</h1>
+      <div className="workspace-toolbar reminder-toolbar">
+        <Link className="button secondary" to="/notes">{tr("Go to notes")}</Link>
+      </div>
+      <div className="reminders-scroll" role="region" aria-label={tr("Reminders")} tabIndex={0}>
       <div className="feature-banner">
         <div className="feature-icon">
           <CalendarDays size={27} />
@@ -95,9 +99,6 @@ export default function RemindersPage() {
             )}
           </p>
         </div>
-        <Link className="button secondary" to="/notes">
-          {tr("Go to notes")}
-        </Link>
       </div>
       {query.isPending ? (
         <Spinner label={tr("Finding your reminders…")} />
@@ -230,6 +231,7 @@ export default function RemindersPage() {
           {tr("Load more reminders")}
         </Button>
       ) : null}
+      </div>
       {openedNote ? (
         <Suspense fallback={<Spinner label={tr("Opening editor…")} />}>
           <NoteEditor
