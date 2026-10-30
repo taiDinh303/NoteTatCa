@@ -1,3 +1,9 @@
+## Badge Notifications đồng nhất sidebar — 2026-10-30
+
+- Theoảnh/yêu cầu chủ dự án: mở rộng CSS nav-count dùng chung cho settings-link, nên sốNotifications có margin-left:auto, nền bo10px, min-width20px, padding1px7px, font11px/600/tabular-nums giống All notes/Reminders/Trash; active badge dùng màu text chung. Áp dụng sidebar PC và drawer mobile; giữ unread query/count, thứ tự menu và route.
+- Actual validation: Chromium sidebar-counts2/2PASS393/1440 với unread7, một Notifications ở đúng vị trí và reminder count; React TypeScript/Vite production build PASS; .NET Release -warnaserror -m:1 PASS0warnings/errors; scoped diffcheckPASS. Chỉ thay2selector CSS, không thêm test mirror hoặc chạy fullsuite; chưa visualQA/device thật/production rollout. Tests dùng fixture synthetic riêng, không ownerDB/email thật/migrate/manualdeploy.
+- Publication scope2files: styles.css và riêng entryworklog này. Fetch trước publication HEAD=origin/main=a265bc4 divergence0/0; pushmain theo quyềnReact đã có, kiểm remote SHA saupush. Giữ backend/archive/privacy/messages/mascot/assets và các entryworklog có sẵn ngoài scope.
+
 ## Mobile: auto-sync gọn, một mục Notifications và một cột 100% — 2026-10-30
 
 - Theo3ảnh/yêu cầu chủ dự án: bỏ hàng sync khỏi workspace cả PC/mobile, giữ auto-sync trong runtime. Sync now và Review sync ở menu tài khoản; dialog Review sync giữ trạng thái pending/offline/error, backup, conflict copy/discard và confirm. Logout protection và trạng thái lưu trong editor giữ nguyên. Sidebar/drawer chỉ còn một Notifications dưới Settings, trên Help & feedback, badge unread và active route dùng chung /notifications; bỏ Inbox ở primary nav và mục mobile trùng.

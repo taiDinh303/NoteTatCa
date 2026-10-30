@@ -586,7 +586,8 @@ strong {
   color: #bc862f;
   font-weight: 600;
 }
-.primary-nav .nav-count {
+.primary-nav .nav-count,
+.settings-link .nav-count {
   margin-left: auto;
   min-width: 20px;
   padding: 1px 7px;
@@ -598,7 +599,8 @@ strong {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
-.primary-nav a.active .nav-count {
+.primary-nav a.active .nav-count,
+.settings-link.active .nav-count {
   color: var(--text);
 }
 .sidebar-section-heading {
