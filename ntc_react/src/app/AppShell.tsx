@@ -61,12 +61,21 @@ const Sidebar = memo(function Sidebar({
   mobile?: boolean;
 }) {
   useLanguage();
-  const guestMode = useAuth().status === "guest";
+  const sidebarAuth = useAuth();
+  const guestMode = sidebarAuth.status === "guest";
   const query = useLabels();
   const notesQuery = useNotes({});
   const trashQuery = useNotes({ trash: true });
+  const remindersQuery = useNotes({ hasReminder: true });
+  const unreadQuery = useQuery({
+    queryKey: workspace.key("unread"),
+    queryFn: () => inbox.count(),
+    enabled: sidebarAuth.status === "authenticated",
+    staleTime: 30_000,
+  });
   const notesCount = notesQuery.data?.pages[0]?.totalItems;
   const trashCount = trashQuery.data?.pages[0]?.totalItems;
+  const remindersCount = remindersQuery.data?.pages[0]?.totalItems;
   const { pathname } = useLocation();
   const allLabels = query.data?.pages.flatMap((p) => p.items) ?? [];
   return (
@@ -86,10 +95,12 @@ const Sidebar = memo(function Sidebar({
             <NavLink to="/reminders" onClick={onNavigate}>
               <CalendarDays size={19} />
               {tr("Reminders")}
+              {typeof remindersCount === "number" ? <span className="nav-count" aria-hidden="true">{remindersCount}</span> : null}
             </NavLink>
             <NavLink to="/notifications" onClick={onNavigate}>
               <Bell size={19} />
               {tr("Inbox")}
+              {typeof unreadQuery.data === "number" ? <span className="nav-count" aria-hidden="true">{unreadQuery.data}</span> : null}
             </NavLink>
           </>
         ) : null}

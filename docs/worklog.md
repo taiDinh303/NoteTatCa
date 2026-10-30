@@ -1,3 +1,9 @@
+## Sidebar: số note có nhắc lịch và số thông báo chưa đọc — 2026-10-30
+
+- Theo ảnh/yêu cầu: thêm badgeReminders từ totalItems của useNotes(hasReminder:true), khớp trang Reminders; server lọc note có ít nhất1reminder active/chưa xóa, không đếm số occurrence hay sốlịch. Inbox badge dùng unreadquery cùng ownerkey với header/InboxPage, không lấy tổng thông báo đã đọc, không thêm polling riêng. Queryunread chỉ enabledauthenticated, không gọi khi guest/offline. Undefined chưa hiện số;0thật vẫn hiện. Sidebar và mobile drawer dùng cùngcomponent, giữ tên/route hiện tại.
+- Đề xuấtUX: Reminders quản lý lịch, Inbox/Thông báo nhận sự kiệnđãđếnhạn và đãđọc; không gộp2con số. Tham khảo primary Notion Inbox https://www.notion.com/help/updates-and-notifications và reminders https://www.notion.com/en-gb/help/reminders : reminder đến hạn là một loại notification, Inbox còn có mentions/updates; không khẳng định mọiapp đều có2menu giốngnhau. Chưa tự đổi tên hoặc thêm thông báo bảo mật/cộng tác không cóbackend.
+- Actual Chromium3/3PASS:2case393/1440 fixturelogin/mockunread7 kiểm badgeInbox và sốReminders,1existingflow tạo lịch/dispatchsynthetic/read-all lỗi→retry. React TypeScript/Vite build/fullESLint và Release strictPASS. Không fullsuite/ownerDB/email thật/migrate/manualdeploy/physicaldevice/productionverification. Scope3files AppShell,testsidebar-counts vàentryworklog; giữemail/backend/privacy/asset/config khác. Pushmain theoquyềnReactđãcó, kiểmremoteSHA.
+
 ## List width kéo ra/vào giống sidebar, không bị reduced-motion rút tức thì — 2026-10-30
 
 - Theo2ảnh và yêu cầu user: explicit width transition180ms dùng inlineimportant (kể cả transition-duration) như ngoại lệ sidebar, thay nhánh reduce→none của bảnthửtrước. Không khẳng định đã xác nhận OS setting của user; đây là điều kiện source có thể làm bước resize tức thì. Giữ mép trái, delay100ms và retarget cũ.
