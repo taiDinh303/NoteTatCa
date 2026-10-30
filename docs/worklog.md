@@ -1,3 +1,9 @@
+## Undo thu gọn và bố cục PC gọn, mascot né vùng điều khiển — 2026-10-30
+
+- Theo yêu cầu mới: gỡ toàn bộ collapse UI/state, key cũ bị bỏ qua nên không còn ẩn notes. PC dùng padding layer8px/main16px/toolbar12px như mobile. Mascot chọn card có khoảng trống bảo thủ120px theo zoom, giữ perch khi an toàn; scroll/resize/layout đo qua RAF+ResizeObserver có cleanup, không ghi dữ liệu. Không có chỗ thì ẩn trên list; modal mascot giữ nguyên. Chủ dự án đã chọn áp dụng cách né.
+
+- Validation: React build/lint và Release strict PASS;7 regression mở note/reorder PASS,2 compact/perch PASS. Không thiết bị thật/production/fullsuite. Lượt test perch đầu lỗi port5173 khi chạy đồng thời, rerun tuần tự. Scope chỉ undo collapse,compact/perch,test/docs; không email/backend/localconfig.
+
 ## Thu gọn/mở rộng Pinned và note thường độc lập — 2026-10-30
 
 - Theo ảnh/lệnh chủ dự án: thêm chevron button32px mỗi headingPinned/Everythingelse(Allnotes khi không cópin), giữ title/count khi ẩncards. EN/VI/ZH/JA labels, aria-expanded/controls và keyboardfocus/Enter/Space qua nativebutton. Mỗi nhóm có booleanbrowserpreference riêng, nhớ qua reload, fallbackstate khi storage lỗi; không ghi dữ liệu note/chỉnh pin/trash. Nhómẩn unmountcard/mascot; SortableContext và strategy dùng visibleNotes để index không lệch khi nhóm trước bịẩn. Reorder vẫn dùng nhóm dữ liệuđầyđủ, giữ guard không kéo giữa nhóm. Trash giữ nguyên.

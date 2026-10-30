@@ -25,7 +25,7 @@ for (const width of [320, 393, 800, 801, 1440]) {
       expect(gaps.top).toBeGreaterThanOrEqual(18);
       expect(gaps.top).toBeLessThanOrEqual(22);
       expect(gaps.padding).toBe("16px");
-    } else expect(gaps.top).toBeGreaterThanOrEqual(60);
+    } else expect(gaps.top).toBeLessThanOrEqual(22);
     await page.screenshot({ path: info.outputPath("notes.png") });
     await page.locator(".note-card").first().getByRole("button", { name: /^Open / }).click();
     const viewer = page.getByRole("dialog", { name: "View note", exact: true });

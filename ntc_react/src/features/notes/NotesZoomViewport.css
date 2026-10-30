@@ -65,8 +65,8 @@ html:has([data-notes-zoom]) {
   display: flow-root;
   position: absolute;
   inset: 0 auto auto 0;
-  /* Include tall hats above the first row, inside the clipped scrollport. */
-  padding-top: 48px;
+  /* Companions choose a safe lower card instead of reserving a blank first row. */
+  padding-top: 8px;
   transform-origin: 0 0;
   translate: none;
 }
@@ -87,8 +87,8 @@ html:has([data-notes-zoom]) {
 .notes-zoom-layer .notes-section {
   width: 100%;
 }
-.note-group-content[hidden] { display: none; }
-.note-group-toggle { flex-shrink: 0; width: 32px; height: 32px; }
+.customer-shell:has([data-notes-zoom]) .workspace-main { padding-top: 16px; }
+.customer-shell:has([data-notes-zoom]) .workspace-toolbar { margin-bottom: 12px; }
 
 @container viewport (max-width: 800px) {
   /* Mobile companions are paused, so the first row needs no hat headroom. */
