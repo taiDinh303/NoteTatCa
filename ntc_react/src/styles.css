@@ -4541,6 +4541,12 @@ td {
 @container viewport (max-width: 480px) { .note-view-timestamp { font-size: 10px; } }
 .note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
+  /* Dim the mobile workspace without resampling the transformed note list
+     into a backdrop blur while the dialog opens or changes mode. */
+  .modal-overlay:has(~ .note-editor-modal) {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
   .modal.note-editor-modal:not(.fullscreen) {
     width: calc(100vw / var(--interface-scale) - 18px);
     max-width: none;
