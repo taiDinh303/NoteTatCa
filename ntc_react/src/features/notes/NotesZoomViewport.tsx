@@ -276,8 +276,10 @@ export function NotesZoomViewport({
       else if (settled) {
         window.clearTimeout(listSettleTimer);
         listSettleTimer = window.setTimeout(() => {
-          content.style.transition = matchMedia("(prefers-reduced-motion: reduce)").matches
-            ? "none" : "width 180ms cubic-bezier(0.2, 0, 0, 1)";
+          // Like the sidebar reveal, this explicit resize remains animated
+          // even when the global reduced-motion rule shortens transitions.
+          content.style.setProperty("transition", "width 180ms cubic-bezier(0.2, 0, 0, 1)", "important");
+          content.style.setProperty("transition-duration", "180ms", "important");
           fit(false);
         }, 100);
       }

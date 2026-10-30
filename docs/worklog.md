@@ -1,3 +1,8 @@
+## List width kéo ra/vào giống sidebar, không bị reduced-motion rút tức thì — 2026-10-30
+
+- Theo2ảnh và yêu cầu user: explicit width transition180ms dùng inlineimportant (kể cả transition-duration) như ngoại lệ sidebar, thay nhánh reduce→none của bảnthửtrước. Không khẳng định đã xác nhận OS setting của user; đây là điều kiện source có thể làm bước resize tức thì. Giữ mép trái, delay100ms và retarget cũ.
+- Actual Chromium2/2PASS35.2s ở reduce/no-preference: wheel xuống50% rồi lên150%, ghi offsetWidth từ trước gesture tới sau settle, >3giátrịtrung gian, delta lớn nhất<65% tổngthayđổi, finalfit<2px và computedduration180ms. Testđầu5wheelburst chưa đạt50%(62%) là harnesssai; đổi wheeltheoRAF tới target. Lượt capturechỉ sau target làm reduce thiếu frame(1–2); chuyển capture từ trước thao tác, không nới threshold. React build/fullESLint và Release strictPASS. Không fullsuite/OSuser/device thật/productionverification. Scope3files source/test/entryworklog; giữ email/backend/config/diffkhác; pushmain theoquyềnđãcó vàkiểmremoteSHA.
+
 ## List zoom: chuyển width mềm sau khi ngừng zoom — 2026-10-30
 
 - Theo lựa chọn chủ dự án sau video: list giữ scale liên tục; khi settled chờ100ms rồi chuyển width180ms easing; nếu zoom tiếp capture painted width một lần để retarget không bật về kích thước cũ. Không thêm animation scaleX làm bẹt chữ. Reduced-motion bỏ transition. ResizeObserver của List đo qua RAF tránh vòng lặp trong transition; timer/RAF/style cleanup khi unmount. Grid giữ nhánh fit cũ.
