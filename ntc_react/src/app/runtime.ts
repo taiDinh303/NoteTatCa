@@ -133,7 +133,7 @@ export const auth: AuthService = new AuthService(
   (session) => sessionChannel?.postMessage(session),
   async (owner) => {
     const data = await offlineStore.read(owner);
-    return data.complete &&
+    return (data.complete || data.notes.length > 0) &&
       data.identity?.userId === owner &&
       Array.isArray(data.identity.roles) &&
       data.identity.roles.includes("User") &&
@@ -285,7 +285,7 @@ preparation.subscribe(() => {
   if (preparation.getSnapshot().status === "ready") void offline.sync();
 });
 
-// Persist only customer identity metadata (no access token) and complete active notes/labels.
+// Persist customer identity metadata (no access token) and the downloaded notes/labels.
 let cachedSessionVisible = false;
 auth.subscribe(() => {
   const state = auth.getSnapshot();

@@ -142,6 +142,7 @@ export class WorkspacePreparation {
       parts: unknown[],
       load: (page: number, signal: AbortSignal) => Promise<Page<T>>,
       task: PreparationResource = resource,
+      allPages = true,
     ) => {
       return runTask(task, async () => {
         // Use the same per-page contract as useInfiniteQuery. A normal fetchQuery
@@ -181,7 +182,7 @@ export class WorkspacePreparation {
           enabled: false,
         });
         try {
-          while (data.pages.at(-1)?.hasNextPage) {
+          while (allPages && data.pages.at(-1)?.hasNextPage) {
             guard();
             const result = await observer.fetchNextPage({ throwOnError: true });
             data = result.data!;
@@ -241,6 +242,8 @@ export class WorkspacePreparation {
         const [active] = await Promise.all([
           paged("notes", [{}], (page, signal) =>
             this.ports.notes.list({}, page, signal),
+            "notes",
+            false,
           ),
           paged("labels", [], (page, signal) =>
             this.ports.labels.list(page, signal),

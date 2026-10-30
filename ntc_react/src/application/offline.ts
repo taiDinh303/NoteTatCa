@@ -60,6 +60,11 @@ export interface SyncSnapshot {
   error?: string;
   conflicts: PendingNote[];
 }
+export class DeviceSaveError extends Error {
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : "Could not save on this device. Keep your note open.", { cause });
+  }
+}
 export class OfflineNotes {
   private snapshot: SyncSnapshot = {
     pending: 0,
@@ -125,7 +130,7 @@ export class OfflineNotes {
     const owner = this.requireOwner();
     const data = await this.store.read(owner);
     this.guard(owner);
-    if (!data.complete || filter.trash) throw new ApiError(0);
+    if ((!data.complete && !data.notes.length) || filter.trash) throw new ApiError(0);
     return offlinePage(
       sortNotes(data.notes.filter((n) => matchesNote(n, filter))),
       page,
@@ -158,6 +163,32 @@ export class OfflineNotes {
       ];
       data.complete = true;
     });
+  }
+  async rememberPage(items: Note[]) {
+    const owner = this.requireOwner();
+    if (items.some((note) => note.userId !== owner)) throw new Error("Account changed");
+    await this.store.change(owner, (data) => {
+      const pending = new Set(data.pending.map((operation) => operation.id));
+      const incoming = new Set(items.map((note) => note.id));
+      data.notes = [
+        ...data.notes.filter((note) => !incoming.has(note.id) || pending.has(note.id)),
+        ...items.filter((note) => !pending.has(note.id) && !note.deletedTime),
+      ];
+      // A page is useful for local editing, but never certifies a complete list.
+    });
+  }
+  private async persistDraft<T>(owner: string, update: (data: OfflineData) => T) {
+    let invalidDraft = false;
+    try {
+      return await this.store.change(owner, (data) => {
+        try { return update(data); }
+        catch (error) { invalidDraft = true; throw error; }
+      });
+    } catch (error) {
+      this.guard(owner);
+      if (invalidDraft) throw error;
+      throw new DeviceSaveError(error);
+    }
   }
   async rememberOne(note: Note) {
     const owner = this.requireOwner();
@@ -193,9 +224,12 @@ export class OfflineNotes {
       const note = await this.remote.find(resolved);
       this.guard(owner);
       await this.rememberOne(note).catch(() => {});
-      return note;
+      // A read started before a local save must not replace the newer draft.
+      const visible = await this.overlay([note], false).catch(() => [note]);
+      this.guard(owner);
+      return visible[0] ?? note;
     } catch (error) {
-      if (local && unavailable(error)) return local;
+      if (local && unavailable(error)) { this.guard(owner); return local; }
       throw error;
     }
   }
@@ -208,7 +242,7 @@ export class OfflineNotes {
   ): Promise<Note> {
     validateDocument(draft.documentJson);
     const owner = this.requireOwner();
-    const result = await this.store.change(owner, (data) => {
+    const result = await this.persistDraft(owner, (data) => {
       const resolved = id ? (data.aliases[id] ?? id) : "local-" + key;
       const existing = data.notes.find((n) => n.id === resolved);
       if (id && !existing)

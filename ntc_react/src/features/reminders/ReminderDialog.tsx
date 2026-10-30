@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Bell, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
-import { cache, reminders, workspace } from "../../app/runtime";
+import { cache, notes, reminders, workspace } from "../../app/runtime";
 import type { Reminder, ReminderInput } from "../../domain/models";
 import { REPEAT_NAMES, WEEKDAYS } from "../../domain/models";
 import {
@@ -234,6 +234,27 @@ export function ReminderForm({
   );
 }
 export default function ReminderDialog({
+  noteId, title, zone, onClose,
+}: {
+  noteId: string; title: string; zone: string; onClose: () => void;
+}) {
+  useLanguage();
+  const resolved = useQuery({
+    queryKey: workspace.key("remote-note", noteId),
+    queryFn: () => notes.readyForRemote(noteId),
+    enabled: noteId.startsWith("local-"),
+    retry: false,
+    networkMode: "always",
+  });
+  if (noteId.startsWith("local-") && !resolved.data) return (
+    <Modal open onClose={onClose} title={tr("Reminders")}>
+      {resolved.isError ? <ErrorPanel error={resolved.error} retry={() => void resolved.refetch()} /> : <Spinner />}
+    </Modal>
+  );
+  return <ReadyReminderDialog noteId={resolved.data?.id ?? noteId} title={title} zone={zone} onClose={onClose} />;
+}
+
+function ReadyReminderDialog({
   noteId,
   title,
   zone,

@@ -4,6 +4,7 @@ import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
   Suspense,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -71,9 +72,10 @@ export default function NoteEditor(props: NoteEditorProps) {
 }
 function ZoomSession({ children }: { children: React.ReactNode }) {
   const percent = useRef(100);
+  const scroll = useRef({ left: 0, top: 0 });
   const [target, setTarget] = useState<HTMLDivElement | null>(null);
   const [handTarget, setHandTarget] = useState<HTMLDivElement | null>(null);
-  const zoom = useMemo(() => ({ percent, target, setTarget, handTarget, setHandTarget }), [target, handTarget]);
+  const zoom = useMemo(() => ({ percent, scroll, target, setTarget, handTarget, setHandTarget }), [target, handTarget]);
   return (
     <ContentZoomSession.Provider value={zoom}>
       <MascotAnimationSession>{children}</MascotAnimationSession>
@@ -96,6 +98,8 @@ function NoteEditorSession({
     queryFn: () => notes.find(resolvedId!),
     enabled: !!resolvedId,
     staleTime: 0,
+    initialData: () => resolvedId ? workspace.cachedNote(resolvedId)?.note : undefined,
+    initialDataUpdatedAt: () => resolvedId ? workspace.cachedNote(resolvedId)?.updatedAt : undefined,
   });
   if (resolvedId && !query.data)
     return (
@@ -280,7 +284,8 @@ function NoteViewer({
   useLanguage();
   const me = useMe();
   const auth = useAuth();
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyNote, setHistoryNote] = useState<Note>();
+  const [historyBusy, setHistoryBusy] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(
     initialAction === "reminder",
   );
@@ -305,8 +310,8 @@ function NoteViewer({
         onClose={() => setReminderOpen(false)}
       />
     );
-  if (historyOpen)
-    return <NoteHistory note={note} onClose={() => setHistoryOpen(false)} onRestored={onRestored} />;
+  if (historyNote)
+    return <NoteHistory note={historyNote} onClose={() => setHistoryNote(undefined)} onRestored={onRestored} />;
   return (
     <Modal
       open
@@ -350,7 +355,7 @@ function NoteViewer({
       <div className="editor-scroll">
         <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
           <ReadOnlyContent
-            key={note.version}
+            key={note.documentJson ?? note.content}
             documentJson={draftFrom(note).documentJson}
           />
         </Suspense>
@@ -394,7 +399,12 @@ function NoteViewer({
                   </dd>
                 </div>
               </dl>
-              {auth.status === "authenticated" ? <Button variant="secondary" onClick={() => setHistoryOpen(true)}><History size={15} />{tr("Version history")}</Button> : null}
+              {auth.status === "authenticated" ? <Button variant="secondary" busy={historyBusy} onClick={() => {
+                setHistoryBusy(true);
+                void notes.readyForRemote(note.id).then(setHistoryNote)
+                  .catch(error => toast.error(errorMessage(error)))
+                  .finally(() => setHistoryBusy(false));
+              }}><History size={15} />{tr("Version history")}</Button> : null}
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
@@ -472,6 +482,7 @@ function EditorSession({
   const syncState = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const me = useMe();
   const [draft, setDraft] = useState(() => draftFrom(initial));
+  const [initialDocument] = useState(() => draft.documentJson);
   const [coordinator] = useState(
     () =>
       new AutosaveCoordinator(
@@ -520,12 +531,19 @@ function EditorSession({
       fork.current?.dispose();
     };
   }, [coordinator]);
-  function update(patch: Partial<NoteDraft>) {
+  const update = useCallback((patch: Partial<NoteDraft>) => {
     const next = { ...draftRef.current, ...patch };
     draftRef.current = next;
     setDraft(next);
     coordinator.update(next);
-  }
+  }, [coordinator]);
+  const onDocumentChange = useCallback((documentJson: string) => update({ documentJson }), [update]);
+  const onEditorReady = useCallback((commands: EditorCommands) => {
+    editor.current = commands;
+    if (!document.activeElement?.matches(
+      "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, .note-icon-menu *, [role='menuitem'], [role='menuitemradio']",
+    )) commands.focus();
+  }, []);
   async function save() {
     setOtherError(undefined);
     try {
@@ -750,19 +768,10 @@ function EditorSession({
         <div className="editor-scroll">
           <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>
             <RichEditor
-              initial={draft.documentJson}
+              initial={initialDocument}
               onCharacterCount={setCharacterCount}
-              onChange={(documentJson) => update({ documentJson })}
-              onReady={(commands) => {
-                editor.current = commands;
-                // Lazy editor startup must not steal focus from an optional title or another input.
-                if (
-                  !document.activeElement?.matches(
-                    "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, .note-icon-menu *, [role='menuitem'], [role='menuitemradio']",
-                  )
-                )
-                  commands.focus();
-              }}
+              onChange={onDocumentChange}
+              onReady={onEditorReady}
             />
           </Suspense>
         </div>

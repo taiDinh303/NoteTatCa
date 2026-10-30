@@ -6,7 +6,7 @@ import type {
   Page,
 } from "../domain/models";
 import { matchesNote } from "../domain/models";
-import { OfflineNotes, offlinePage } from "../application/offline";
+import { DeviceSaveError, OfflineNotes, offlinePage } from "../application/offline";
 import { ApiClient, ApiError } from "./http";
 import { LabelsRepository, NotesRepository } from "./repositories";
 import type { OfflineStore } from "./offlineStore";
@@ -31,6 +31,7 @@ export class OfflineNotesRepository extends NotesRepository {
       return this.offline.cachedList(filter, page);
     try {
       const result = await super.list(filter, page, signal);
+      if (!filter.trash) await this.offline.rememberPage(result.items).catch(() => {});
       if (!Object.keys(filter).length) {
         if (page === 1) this.pages.clear();
         this.pages.set(page, result.items);
@@ -70,48 +71,31 @@ export class OfflineNotesRepository extends NotesRepository {
     return this.offline.find(id);
   }
   override async create(draft: NoteDraft, key: string): Promise<Note> {
-    if (this.online()) {
-      try {
-        const note = await super.create(draft, key);
-        await this.offline.rememberOne(note).catch(() => {});
-        return note;
-      } catch (error) {
-        if (!connectionFailure(error)) throw error;
-      }
+    try {
+      return await this.offline.save(undefined, draft, "local", key);
+    } catch (error) {
+      if (!(error instanceof DeviceSaveError) || !this.online()) throw error;
+      // Storage may be disabled/full. A server ACK is still a safe save.
+      return super.create(draft, key);
     }
-    return this.offline.save(undefined, draft, "local", key);
   }
   override async patch(
     id: string,
     draft: NoteDraft,
     version: string,
   ): Promise<Note> {
-    let attempted = false;
-    if (
-      this.online() &&
-      !(await this.offline.hasPending(id).catch(() => false))
-    ) {
-      try {
-        const target = await this.offline
-          .resolveWrite(id, version)
-          .catch(() => ({ id, version }));
-        const note = await super.patch(target.id, draft, target.version);
-        await this.offline.rememberOne(note).catch(() => {});
-        return note;
-      } catch (error) {
-        if (!connectionFailure(error)) throw error;
-        attempted = true;
-      }
+    try {
+      return await this.offline.save(id, draft, version);
+    } catch (error) {
+      if (!(error instanceof DeviceSaveError) || !this.online()) throw error;
+      // Do not bypass queued work whose storage cannot currently be read.
+      if (await this.offline.hasPending(id).catch(() => true)) throw error;
+      const target = await this.offline.resolveWrite(id, version);
+      return super.patch(target.id, draft, target.version);
     }
-    return this.offline.save(
-      id,
-      draft,
-      version,
-      crypto.randomUUID(),
-      attempted,
-    );
   }
   private async requireSynced(id: string) {
+    if (this.online() && await this.offline.hasPending(id)) await this.offline.sync();
     if (
       !this.online() ||
       (await this.offline.hasPending(id).catch(() => false))
@@ -119,23 +103,29 @@ export class OfflineNotesRepository extends NotesRepository {
       throw new Error(
         "Sync this note before changing its pin, labels, reminders, order or trash state.",
       );
+    return (await this.offline.resolveWrite(id, "")).id;
+  }
+  override async readyForRemote(id: string) {
+    return super.find(await this.requireSynced(id));
   }
   override async pin(note: Note) {
     await this.requireSynced(note.id);
-    const saved = await super.pin(note);
+    const target = await this.offline.resolveWrite(note.id, note.version);
+    const saved = await super.pin({ ...note, ...target });
     await this.offline.rememberOne(saved).catch(() => {});
     return saved;
   }
   override async setLabels(note: Note, ids: string[]) {
     await this.requireSynced(note.id);
-    const saved = await super.setLabels(note, ids);
+    const target = await this.offline.resolveWrite(note.id, note.version);
+    const saved = await super.setLabels({ ...note, ...target }, ids);
     await this.offline.rememberOne(saved).catch(() => {});
     return saved;
   }
   override async trash(id: string) {
-    await this.requireSynced(id);
-    const result = await super.trash(id);
-    await this.offline.forget(id).catch(() => {});
+    const resolved = await this.requireSynced(id);
+    const result = await super.trash(resolved);
+    await this.offline.forget(resolved).catch(() => {});
     return result;
   }
   override async restore(id: string) {
@@ -196,7 +186,7 @@ export class OfflineLabelsRepository extends LabelsRepository {
     } catch (error) {
       if (!owner || !connectionFailure(error)) throw error;
       const data = await this.store.read(owner);
-      if (owner !== this.owner() || !data.complete) throw error;
+      if (owner !== this.owner() || (!data.complete && !data.notes.length)) throw error;
       return offlinePage(data.labels, page);
     }
   }

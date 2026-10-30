@@ -31,7 +31,8 @@ import {
 import { dateTime, errorMessage } from "../../shared/utils";
 import { ReminderForm } from "./ReminderDialog";
 import { commitReminder, pendingReminder } from "./reminderCache";
-const NoteEditor = lazy(() => import("../editor/NoteEditor"));
+import { loadNoteEditor } from "../editor/loadNoteEditor";
+const NoteEditor = lazy(loadNoteEditor);
 export default function RemindersPage() {
   useLanguage();
   const state = useAuth();

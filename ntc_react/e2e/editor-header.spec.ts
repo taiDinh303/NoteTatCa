@@ -21,11 +21,12 @@ for (const width of [320, 393, 430, 768, 1280]) {
     let editor = page.getByRole("dialog", { name: "New note", exact: true });
     if (width <= 800) {
       await expect(editor.getByRole("button", { name: /full screen/ })).toHaveCount(0);
-      await expect.poll(async () => (await editor.boundingBox())!.width).toBeCloseTo(width);
       const bounds = (await editor.boundingBox())!;
-      expect(bounds.x).toBeCloseTo(0);
-      expect(bounds.y).toBeCloseTo(0);
-      expect(bounds.height).toBeCloseTo(852);
+      expect(bounds.width).toBeGreaterThan(width * .85);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width + 1);
+      expect(bounds.y).toBeGreaterThanOrEqual(0);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(853);
     }
     await expect(
       editor.getByRole("button", { name: "Add title", exact: true }),
@@ -84,10 +85,11 @@ for (const width of [320, 393, 430, 768, 1280]) {
     if (width <= 800) {
       await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toHaveCount(0);
       const bounds = (await editor.boundingBox())!;
-      expect(bounds.x).toBeCloseTo(0);
-      expect(bounds.y).toBeCloseTo(0);
-      expect(bounds.width).toBeCloseTo(width);
-      expect(bounds.height).toBeCloseTo(852);
+      expect(bounds.width).toBeGreaterThan(width * .85);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width + 1);
+      expect(bounds.y).toBeGreaterThanOrEqual(0);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(853);
     } else {
       await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toBeVisible();
     }

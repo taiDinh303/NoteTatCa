@@ -71,7 +71,8 @@ import {
   Spinner,
 } from "../../shared/ui";
 import { errorMessage } from "../../shared/utils";
-const NoteEditor = lazy(() => import("../editor/NoteEditor"));
+import { loadNoteEditor, warmNoteEditor } from "../editor/loadNoteEditor";
+const NoteEditor = lazy(loadNoteEditor);
 import type { NoteOpenAction } from "../editor/NoteEditor";
 function NoteCard({
   note,
@@ -143,6 +144,8 @@ function NoteCard({
       }}
       className={`note-card ${draggable ? "draggable" : ""} ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}
+      onPointerEnter={warmNoteEditor}
+      onFocus={warmNoteEditor}
       data-sort-animating={
         transition && !transition.startsWith("transform 0ms")
           ? "true"
@@ -152,6 +155,7 @@ function NoteCard({
         if (canStartDrag(event.target)) listeners?.onMouseDown?.(event);
       }}
       onTouchStart={(event) => {
+        warmNoteEditor();
         if (canStartDrag(event.target)) listeners?.onTouchStart?.(event);
       }}
     >
@@ -542,6 +546,9 @@ export default function NotesPage({
           <button
             className="quick-capture"
             aria-label={tr("Take a note")}
+            onPointerEnter={warmNoteEditor}
+            onFocus={warmNoteEditor}
+            onTouchStart={warmNoteEditor}
             onClick={() => setEditor({})}
           >
             <span className="quick-capture-icon">

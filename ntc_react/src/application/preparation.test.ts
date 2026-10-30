@@ -202,7 +202,7 @@ describe("workspace preparation", () => {
     expect(loader.getSnapshot().tasks).toEqual([]);
     cache.clear();
   });
-  it("loads every page once and derives label/pin lists without per-label requests", async () => {
+  it("opens with only the first note page and leaves later pages for explicit loading", async () => {
     const cache = new QueryClient();
     const source = ports();
     const loader = new WorkspacePreparation(cache, source, () => "a:member");
@@ -213,7 +213,7 @@ describe("workspace preparation", () => {
       completed: 7,
       total: 7,
     });
-    expect(source.notes.list).toHaveBeenCalledTimes(4);
+    expect(source.notes.list).toHaveBeenCalledTimes(2);
     expect(source.labels.list).toHaveBeenCalledOnce();
     const workspace = new WorkspaceService(
       new NotesRepository(new ApiClient("/api/v1")),
@@ -221,14 +221,13 @@ describe("workspace preparation", () => {
       () => "a",
     );
     expect(
-      workspace.cachedNotes({ tagId: "label-a" })?.pages[0].items,
-    ).toHaveLength(3);
+      workspace.cachedNotes({ tagId: "label-a" }),
+    ).toBeUndefined();
     expect(
-      workspace.cachedNotes({ pinned: true })?.pages[0].items,
-    ).toHaveLength(0);
-    expect(cache.getQueryData(["private", "a", "note", "3"])).toMatchObject({
-      id: "3",
-    });
+      workspace.cachedNotes({ pinned: true }),
+    ).toBeUndefined();
+    expect(cache.getQueryData(["private", "a", "note", "1"])).toMatchObject({ id: "1" });
+    expect(cache.getQueryData(["private", "a", "note", "3"])).toBeUndefined();
     expect(source.admin.stats).not.toHaveBeenCalled();
     cache.clear();
   });

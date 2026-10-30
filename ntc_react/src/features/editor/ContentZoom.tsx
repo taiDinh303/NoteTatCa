@@ -18,6 +18,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
   const change = useRef<(value: number) => void>(() => {});
   const session = useContext(ContentZoomSession);
   const savedPercent = session?.percent;
+  const savedScroll = session?.scroll;
   const hand = useRef(false);
   const [handEnabled, setHandEnabled] = useState(false);
   const [percent, setPercent] = useState(() =>
@@ -33,6 +34,9 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     let timer = 0;
     let width = view.clientWidth;
     let height = document.offsetHeight;
+    let restoreScroll = savedScroll ? { ...savedScroll.current } : undefined;
+    let restoreHeight = -1;
+    let stableRestoreFrames = 0;
     let anchor:
       { x: number; y: number; docX: number; docY: number } | undefined;
     let pinch: { ids: number[]; distance: number; base: number } | undefined;
@@ -57,9 +61,20 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       frame = 0;
       current = target;
       const scale = current / 100;
+      height = document.offsetHeight;
       document.style.transform = `scale(${scale})`;
       space.style.width = `${width * scale}px`;
       space.style.height = `${height * scale}px`;
+      if (restoreScroll && document.querySelector(".rich-editor")) {
+        stableRestoreFrames = restoreHeight === height ? stableRestoreFrames + 1 : 0;
+        restoreHeight = height;
+        if (height * scale >= restoreScroll.top + view.clientHeight || stableRestoreFrames >= 2) {
+          view.scrollLeft = restoreScroll.left;
+          view.scrollTop = restoreScroll.top;
+          restoreScroll = undefined;
+          rememberScroll();
+        } else schedule();
+      }
       if (anchor) {
         view.scrollLeft = anchor.docX * scale - anchor.x;
         view.scrollTop = anchor.docY * scale - anchor.y;
@@ -98,6 +113,10 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     observer.observe(view);
     observer.observe(document);
     schedule();
+    function rememberScroll() {
+      if (savedScroll && !restoreScroll) savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
+    }
+    view.addEventListener("scroll", rememberScroll, { passive: true });
     function wheel(event: WheelEvent) {
       if (
         !(event.ctrlKey || event.metaKey) ||
@@ -242,6 +261,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     return () => {
       change.current = () => {};
       observer.disconnect();
+      view.removeEventListener("scroll", rememberScroll);
       cancelAnimationFrame(frame);
       window.clearTimeout(timer);
       view.removeEventListener("wheel", wheel);
@@ -259,7 +279,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       view.removeEventListener("lostpointercapture", pointerEnd);
       view.removeEventListener("click", click, true);
     };
-  }, [savedPercent]);
+  }, [savedPercent, savedScroll]);
   function commit(input: HTMLInputElement) {
     const value = input.value.trim() ? Number(input.value) : NaN;
     if (Number.isFinite(value)) change.current(value);

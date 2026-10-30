@@ -26,6 +26,25 @@ async function write(page: Page, title: string) {
 test.beforeEach(async ({ request }) => {
   await request.post(fixture + "/__fixture/reset");
 });
+
+test("downloaded first-page notes remain editable after an offline reload with more pages on the server", async ({ page, request }) => {
+  expect((await request.post(fixture + "/__fixture/seed-notes?count=110")).ok()).toBeTruthy();
+  await login(page);
+  await expect(page.locator(".note-card")).toHaveCount(100);
+  await expect(page.getByRole("button", { name: "Load more notes", exact: true })).toBeVisible();
+  await page.addInitScript(() => Object.defineProperty(navigator, "onLine", { get: () => false, configurable: true }));
+  await page.route("**/health/live", route => route.abort());
+  await page.route("**/api/**", route => route.abort());
+  await page.reload();
+  await expect(page.locator(".note-card")).toHaveCount(100);
+  await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Edit", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+  await editor.getByLabel("Note title").fill("Offline first-page edit");
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Open Offline first-page edit", exact: true })).toBeVisible();
+});
 test("two offline tabs keep a stale editor draft instead of overwriting the newer local edit", async ({
   page,
   context,

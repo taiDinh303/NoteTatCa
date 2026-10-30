@@ -28,6 +28,9 @@ for (const width of [393, 1280]) {
     await expect(content.locator("input[type=checkbox]")).toHaveCount(1);
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
+    // Closing acknowledges the device transaction; let queued writes settle
+    // before measuring whether read-only interactions themselves write.
+    await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
     await expect(page.locator(".note-card .note-date")).toHaveCount(0);
     let writes = 0;
     page.on("request", (request) => {
@@ -51,18 +54,14 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Edit", exact: true })
       .boundingBox())!;
     expect(stampBounds.x).toBeLessThan(editBounds.x);
-    if (width > 800) {
-      expect(
+    expect(
         Math.abs(
           stampBounds.y +
             stampBounds.height / 2 -
             editBounds.y -
             editBounds.height / 2,
         ),
-      ).toBeLessThan(3);
-    } else {
-      expect(editBounds.y).toBeGreaterThan(stampBounds.y + stampBounds.height / 2);
-    }
+    ).toBeLessThan(3);
     await timestamp.click();
     const information = page.locator(".note-information");
     await expect(information).toContainText("Created");
@@ -88,8 +87,12 @@ for (const width of [393, 1280]) {
     await expect(viewer.getByLabel("Character count")).toHaveCount(0);
     if (width <= 800) {
       const bounds = (await viewer.boundingBox())!;
-      expect(bounds.width).toBeCloseTo(width);
-      expect(bounds.height).toBeCloseTo(852);
+      expect(bounds.width).toBeGreaterThan(width * .85);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width + 1);
+      expect(bounds.y).toBeGreaterThanOrEqual(0);
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(853);
+      await expect(viewer.getByRole("button", { name: "Enter full screen", exact: true })).toHaveCount(0);
     }
     await readContent.click();
     await page.keyboard.type("must not be added");

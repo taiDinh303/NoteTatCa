@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
@@ -89,11 +89,13 @@ export interface EditorCommands {
 }
 export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
   const language = useLanguage();
+  const [content] = useState(() => JSON.parse(documentJson));
   const editor = useEditor({
+    shouldRerenderOnTransaction: false,
     extensions: extensions.filter(
       (extension) => extension.name !== "placeholder",
     ),
-    content: JSON.parse(documentJson),
+    content,
     editable: false,
     editorProps: {
       attributes: {
@@ -120,7 +122,7 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
     </ContentZoom>
   );
 }
-export default function RichEditor({
+export default memo(function RichEditor({
   initial,
   onChange,
   onReady,
@@ -138,9 +140,11 @@ export default function RichEditor({
   const [error, setError] = useState<unknown>();
   const [source, setSource] = useState("");
   const [textColorOpen, setTextColorOpen] = useState(false);
+  const [content] = useState(() => JSON.parse(initial));
   const editor = useEditor({
+    shouldRerenderOnTransaction: false,
     extensions,
-    content: JSON.parse(initial),
+    content,
     editorProps: {
       attributes: {
         class: "rich-editor",
@@ -150,13 +154,14 @@ export default function RichEditor({
       },
     },
     onUpdate: ({ editor }) => {
-      onCharacterCount(editor.getText().length);
+      const characterCount = editor.getText().length;
+      onCharacterCount(characterCount);
       const json = JSON.stringify(
         canonicalDocument(editor.getJSON() as RichNode),
       );
       onChange(json);
       try {
-        if (editor.getText().length > 100000)
+        if (characterCount > 100000)
           throw new Error(
             tr("Note content can contain up to 100,000 characters."),
           );
@@ -170,7 +175,7 @@ export default function RichEditor({
       onCharacterCount(editor.getText().length);
       onReady({
         // Focus synchronously; a queued frame could run after the user opens the title input.
-        focus: () => editor.view.dom.focus({ preventScroll: true }),
+        focus: () => editor.view.focus(),
         exportMarkdown: () => setMarkdown("export"),
         importMarkdown: () => setMarkdown("import"),
         plainText: () => editor.getText(),
@@ -595,4 +600,4 @@ export default function RichEditor({
       ) : null}
     </>
   );
-}
+});

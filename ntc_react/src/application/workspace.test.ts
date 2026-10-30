@@ -81,6 +81,17 @@ it("pins and unpins at the destination head before a delayed save and rolls back
   cache.clear();
 });
 describe("private workspace cache", () => {
+  it("opens a note from a later cached page without using another owner's or trashed content", () => {
+    const cache = new QueryClient();
+    const service = new WorkspaceService(new NotesRepository(new ApiClient("/api/v1")), cache, () => "owner");
+    cache.setQueryData(service.key("notes", {}), { pages: [{ ...page, items: [] }, page], pageParams: [1, 2] });
+    expect(service.cachedNote(note.id)?.note).toEqual(note);
+    cache.setQueryData(service.key("notes", {}), { pages: [{ ...page, items: [{ ...note, userId: "other" }] }], pageParams: [1] });
+    expect(service.cachedNote(note.id)).toBeUndefined();
+    cache.setQueryData(service.key("notes", { trash: true }), { pages: [{ ...page, items: [{ ...note, deletedTime: "2026-10-30" }] }], pageParams: [1] });
+    expect(service.cachedNote(note.id)).toBeUndefined();
+    cache.clear();
+  });
   it("moves a note to Trash immediately and restores it if saving fails", async () => {
     const cache = new QueryClient();
     const repository = new NotesRepository(new ApiClient("/api/v1"));

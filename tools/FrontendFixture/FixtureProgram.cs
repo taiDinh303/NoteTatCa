@@ -45,6 +45,28 @@ public static class FixtureProgram
             }
             finally { databaseGate.Release(); }
         });
+        app.MapPost("/__fixture/seed-notes", async (int count) =>
+        {
+            if (count is < 1 or > 5000) return Results.BadRequest();
+            await databaseGate.WaitAsync();
+            try
+            {
+                using var scope = factory.Services.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                var start = await db.Notes.CountAsync(x => x.UserId == factory.A);
+                for (var i = 0; i < count; i++)
+                    db.Notes.Add(new Note
+                    {
+                        UserId = factory.A, Title = $"Synthetic scale note {start + i + 1}",
+                        Content = $"Measurement data {i}. " + new string('x', 400),
+                        SortOrder = start + i + 1,
+                        BackgroundColor = i % 5 == 0 ? "#fff4d4" : null
+                    });
+                await db.SaveChangesAsync();
+                return Results.Ok(new { count });
+            }
+            finally { databaseGate.Release(); }
+        });
         app.MapPost("/__fixture/dispatch", async () =>
         {
             await databaseGate.WaitAsync();

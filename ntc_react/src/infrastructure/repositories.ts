@@ -29,6 +29,9 @@ export class NotesRepository {
   find(id: string) {
     return this.api.request<Note>(`/notes/${id}`);
   }
+  readyForRemote(id: string) {
+    return this.find(id);
+  }
   async findTrashed(id: string, signal?: AbortSignal): Promise<Note> {
     let pageNumber = 1;
     while (true) {

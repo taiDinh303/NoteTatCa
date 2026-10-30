@@ -11,9 +11,16 @@ export interface SaveSnapshot {
   note?: Note;
   error?: Error;
 }
+const copyDraft = (draft: NoteDraft): NoteDraft => ({ ...draft, tagIds: [...draft.tagIds] });
+const sameDraft = (a: NoteDraft, b: NoteDraft) =>
+  a.title === b.title && a.documentJson === b.documentJson &&
+  a.iconEmoji === b.iconEmoji && a.backgroundColor === b.backgroundColor &&
+  a.isPinned === b.isPinned && a.tagIds.length === b.tagIds.length &&
+  a.tagIds.every((id, index) => id === b.tagIds[index]);
 export class AutosaveCoordinator {
   private draft: NoteDraft;
-  private confirmed: string;
+  private confirmed: NoteDraft;
+  private forceCreate = false;
   private note?: Note;
   private pendingCreate?: { draft: NoteDraft; key: string };
   private flight?: Promise<Note | undefined>;
@@ -28,8 +35,8 @@ export class AutosaveCoordinator {
     private readonly committed: (note: Note) => void,
     private readonly delay = 750,
   ) {
-    this.draft = structuredClone(initial);
-    this.confirmed = JSON.stringify(initial);
+    this.draft = copyDraft(initial);
+    this.confirmed = copyDraft(initial);
     this.note = note;
     this.snapshot = { status: "saved", dirty: false, note };
   }
@@ -41,14 +48,14 @@ export class AutosaveCoordinator {
     };
   };
   private dirty() {
-    return JSON.stringify(this.draft) !== this.confirmed;
+    return this.forceCreate || !sameDraft(this.draft, this.confirmed);
   }
   private emit(status: SaveSnapshot["status"], error?: Error) {
     this.snapshot = { status, dirty: this.dirty(), note: this.note, error };
     this.listeners.forEach((f) => f());
   }
   update(draft: NoteDraft) {
-    this.draft = structuredClone(draft);
+    this.draft = copyDraft(draft);
     clearTimeout(this.timer);
     if (this.snapshot.status === "conflict") {
       this.emit("conflict", this.snapshot.error);
@@ -64,7 +71,7 @@ export class AutosaveCoordinator {
     clearTimeout(this.timer);
     if (this.flight) return this.flight;
     if (this.snapshot.status === "conflict") throw this.snapshot.error;
-    if (createEmpty && !this.note) this.confirmed = "not-created";
+    if (createEmpty && !this.note) this.forceCreate = true;
     if (!this.dirty()) return this.note;
     this.flight = this.drain().finally(() => {
       this.flight = undefined;
@@ -78,16 +85,17 @@ export class AutosaveCoordinator {
         validateDocument(this.draft.documentJson);
         if (!this.note && !this.pendingCreate)
           this.pendingCreate = {
-            draft: structuredClone(this.draft),
+            draft: copyDraft(this.draft),
             key: crypto.randomUUID(),
           };
-        const target = this.pendingCreate?.draft ?? structuredClone(this.draft);
+        const target = this.pendingCreate?.draft ?? copyDraft(this.draft);
         const note = this.note
           ? await this.writer.patch(this.note.id, target, this.note.version)
           : await this.writer.create(target, this.pendingCreate!.key);
         this.note = note;
         this.pendingCreate = undefined;
-        this.confirmed = JSON.stringify(target);
+        this.confirmed = target;
+        this.forceCreate = false;
         this.committed(note);
       }
       this.emit("saved");

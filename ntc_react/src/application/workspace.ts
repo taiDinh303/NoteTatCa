@@ -40,6 +40,18 @@ export class WorkspaceService {
   key(resource: string, ...parts: unknown[]) {
     return ["private", this.identity() ?? "none", resource, ...parts];
   }
+  cachedNote(id: string) {
+    const owner = this.identity();
+    if (!owner) return;
+    for (const [key, data] of this.cache.getQueriesData<InfiniteData<Page<Note>>>({
+      queryKey: this.key("notes"),
+    })) {
+      const note = data?.pages.flatMap((page) => page.items).find(
+        (note) => note.id === id && note.userId === owner && !note.deletedTime,
+      );
+      if (note) return { note, updatedAt: this.cache.getQueryState(key)?.dataUpdatedAt };
+    }
+  }
   cachedNotes(
     filter: NoteFilter,
   ): InfiniteData<Page<Note>, number> | undefined {

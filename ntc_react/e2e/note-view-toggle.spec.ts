@@ -54,7 +54,7 @@ for (const width of [393, 1280]) {
   });
 }
 
-test("View waits for an in-flight save and keeps controls disabled", async ({ page }) => {
+test("View opens from a committed device save while server acknowledgement is in flight", async ({ page }) => {
   let release!: () => void;
   const gate = new Promise<void>((resolve) => { release = resolve; });
   let held = false;
@@ -68,11 +68,14 @@ test("View waits for an in-flight save and keeps controls disabled", async ({ pa
   const editor = await openEditor(page);
   await editor.getByRole("textbox", { name: "Note content" }).fill("Wait for server acknowledgement");
   await editor.getByRole("button", { name: "View", exact: true }).click();
-  await expect(editor.getByRole("button", { name: "View", exact: true })).toHaveAttribute("aria-busy", "true");
-  await expect(editor.getByRole("button", { name: "Close", exact: true })).toBeDisabled();
-  await expect(page.getByRole("dialog", { name: "View note", exact: true })).toHaveCount(0);
-  release();
   const viewer = page.getByRole("dialog", { name: "View note", exact: true });
+  await expect(viewer.getByRole("region", { name: "Note content" })).toContainText("Wait for server acknowledgement");
+  await expect(editor).toHaveCount(0);
+  release();
+  await page.unrouteAll({ behavior: "wait" });
+  await viewer.getByRole("button", { name: "Close", exact: true }).click();
+  await page.reload();
+  await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
   await expect(viewer.getByRole("region", { name: "Note content" })).toContainText("Wait for server acknowledgement");
 });
 
@@ -110,4 +113,35 @@ test("a new note can move between View and Edit without losing its draft", async
   editor = page.getByRole("dialog", { name: "Edit note", exact: true });
   await expect(editor.getByLabel("Note title")).toHaveValue("New note preview");
   await expect(editor.getByRole("textbox", { name: "Note content" })).toContainText("New note can return to View");
+});
+
+test("a locally created note opens View immediately and resolves its server ID before reminders", async ({ page }) => {
+  await openEditor(page);
+  await page.getByRole("dialog", { name: "Edit note", exact: true }).getByRole("button", { name: "Close", exact: true }).click();
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  let sent = false;
+  await page.route("**/api/v1/notes", async route => {
+    if (route.request().method() === "POST") { sent = true; await gate; }
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "Take a note", exact: true }).click();
+  const editor = page.getByRole("dialog", { name: "New note", exact: true });
+  await editor.getByLabel("Note title").fill("Local new note");
+  await editor.getByRole("textbox", { name: "Note content" }).fill("Durable before server ACK");
+  await editor.getByRole("button", { name: "View", exact: true }).click();
+  const viewer = page.getByRole("dialog", { name: "View note", exact: true });
+  await expect(viewer.getByRole("region", { name: "Note content" })).toContainText("Durable before server ACK");
+  await expect.poll(() => sent).toBe(true);
+  await viewer.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("dialog", { name: "Edit note", exact: true }).getByRole("button", { name: "Note reminders", exact: true }).click();
+  release();
+  const reminders = page.getByRole("dialog", { name: "Reminders", exact: true });
+  await expect(reminders.getByRole("button", { name: "Add reminder", exact: true })).toBeVisible();
+  await reminders.getByRole("button", { name: "Add reminder", exact: true }).click();
+  const saving = page.waitForRequest(request => request.url().includes("/api/v1/notes/") && request.url().endsWith("/reminders") && request.method() === "POST");
+  await reminders.getByRole("button", { name: "Set reminder", exact: true }).click();
+  expect((await saving).url()).not.toContain("local-");
+  await expect(reminders.getByText(/Does not repeat · Active/)).toBeVisible();
+  await page.unrouteAll({ behavior: "wait" });
 });

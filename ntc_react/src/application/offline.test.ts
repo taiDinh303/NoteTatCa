@@ -3,6 +3,8 @@ import { OfflineNotes } from "./offline";
 import { emptyOfflineData } from "../infrastructure/offlineStore";
 import type { OfflineData, OfflineStore } from "../infrastructure/offlineStore";
 import { ApiError } from "../infrastructure/http";
+import { ApiClient } from "../infrastructure/http";
+import { OfflineNotesRepository } from "../infrastructure/offlineRepositories";
 import { draftFrom, plainDocument } from "../domain/models";
 import type { Note, NoteDraft } from "../domain/models";
 const note = (id = "n", content = "old", version = "v1"): Note => ({
@@ -84,6 +86,72 @@ function setup() {
   };
 }
 describe("offline notes", () => {
+  it("commits an online edit locally before its server acknowledgement", async () => {
+    const f = setup();
+    await f.offline.rememberPage([note()]);
+    expect((await f.store.read("a")).complete).toBe(false);
+    expect((await f.offline.cachedList({}, 1)).items).toHaveLength(1);
+    let acknowledge!: (note: Note) => void;
+    f.remote.patch.mockImplementationOnce(() => new Promise(resolve => { acknowledge = resolve; }));
+    f.connect();
+    const repository = new OfflineNotesRepository(new ApiClient("/api/v1"), f.offline, () => true);
+    const local = await repository.patch("n", { ...draftFrom(note()), title: "Local first" }, "v1");
+    expect(local.version).toMatch(/^local:/);
+    expect((await f.store.read("a")).notes[0].title).toBe("Local first");
+    await vi.waitFor(() => expect(f.remote.patch).toHaveBeenCalled());
+    expect(f.offline.getSnapshot().pending).toBe(1);
+    acknowledge({ ...local, version: "v2" });
+    await f.offline.sync();
+    expect(f.offline.getSnapshot().pending).toBe(0);
+    expect((await f.offline.resolveWrite("n", local.version)).version).toBe("v2");
+  });
+  it("keeps a newly saved note recoverable before create returns its server ID", async () => {
+    const f = setup();
+    let acknowledge!: (note: Note) => void;
+    f.remote.create.mockImplementationOnce(() => new Promise(resolve => { acknowledge = resolve; }));
+    f.connect();
+    const repository = new OfflineNotesRepository(new ApiClient("/api/v1"), f.offline, () => true);
+    const local = await repository.create(draftFrom(), "new-key");
+    expect(local.id).toBe("local-new-key");
+    expect((await f.store.read("a")).pending[0].key).toBe("new-key");
+    await vi.waitFor(() => expect(f.remote.create).toHaveBeenCalled());
+    acknowledge({ ...local, id: "server", version: "v2" });
+    await f.offline.sync();
+    expect((await f.offline.resolveWrite(local.id, local.version)).id).toBe("server");
+  });
+  it("does not let an older detail GET overwrite a draft committed while it was in flight", async () => {
+    const f = setup();
+    await f.offline.rememberPage([note()]);
+    let returnGet!: (note: Note) => void;
+    let acknowledge!: (note: Note) => void;
+    f.remote.find.mockImplementationOnce(() => new Promise(resolve => { returnGet = resolve; }));
+    f.remote.patch.mockImplementationOnce(() => new Promise(resolve => { acknowledge = resolve; }));
+    f.connect();
+    const reading = f.offline.find("n");
+    await vi.waitFor(() => expect(f.remote.find).toHaveBeenCalled());
+    const local = await f.offline.save("n", { ...draftFrom(note()), title: "New draft" }, "v1");
+    returnGet(note());
+    expect((await reading).title).toBe("New draft");
+    await vi.waitFor(() => expect(f.remote.patch).toHaveBeenCalled());
+    acknowledge({ ...local, version: "v2" });
+    await f.offline.sync();
+  });
+  it("never falls back to a remote write on a stale local version", async () => {
+    const f = setup();
+    await f.offline.rememberPage([note()]);
+    await f.offline.save("n", { ...draftFrom(note()), title: "Other tab" }, "v1");
+    const transport = vi.fn();
+    const repository = new OfflineNotesRepository(new ApiClient("/api/v1", transport), f.offline, () => true);
+    await expect(repository.patch("n", draftFrom(note()), "v1")).rejects.toMatchObject({ status: 409 });
+    expect(transport).not.toHaveBeenCalled();
+  });
+  it("discards detail content when the account changes during its device-cache write", async () => {
+    const f = setup();
+    await f.offline.rememberPage([note()]);
+    f.connect();
+    vi.spyOn(f.offline, "rememberOne").mockImplementationOnce(async () => { f.owner("b"); });
+    await expect(f.offline.find("n")).rejects.toThrow("Account changed");
+  });
   it("keeps edits through a new coordinator, filters local content and syncs the expected version", async () => {
     const f = setup();
     await f.offline.rememberNotes([note()]);
