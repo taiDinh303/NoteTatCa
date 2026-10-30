@@ -26,6 +26,7 @@ export function NotesZoomViewport({
     content.style.removeProperty("translate");
     let initialized = false;
     let fitTimer = 0;
+    let listSettleTimer = 0;
     let availableWidth = 0;
     let rightInset = 0;
     let cardWidth = 320;
@@ -250,6 +251,15 @@ export function NotesZoomViewport({
       if (!reflowAnimations.size) releaseGrids();
     }
     function paint(next: number, settled = false) {
+      if (mode === "list" && next !== scale) {
+        window.clearTimeout(listSettleTimer);
+        // Capture the painted width before interrupting a previous settle.
+        if (content.style.transition && content.style.transition !== "none") {
+          width = content.getBoundingClientRect().width / scale;
+          content.style.transition = "none";
+          content.style.width = `${width}px`;
+        }
+      }
       if (next !== scale) window.clearTimeout(fitTimer);
       scale = next;
       content.style.transform = `scale(${scale})`;
@@ -261,13 +271,16 @@ export function NotesZoomViewport({
       view.scrollLeft = 0;
       // Reflow as soon as a column boundary is crossed, rather than waiting
       // for the zoom gesture and easing tail to stop in two separate phases.
-      if (
-        mode !== "list" ||
-        settled ||
-        content.style.getPropertyValue("--notes-columns") !==
-          String(columnsFor(scale))
-      )
-        fit(initialized);
+      if (mode !== "list") fit(initialized);
+      else if (!initialized) fit(false);
+      else if (settled) {
+        window.clearTimeout(listSettleTimer);
+        listSettleTimer = window.setTimeout(() => {
+          content.style.transition = matchMedia("(prefers-reduced-motion: reduce)").matches
+            ? "none" : "width 180ms cubic-bezier(0.2, 0, 0, 1)";
+          fit(false);
+        }, 100);
+      }
       updateScrollbar();
     }
     function measure() {
@@ -343,7 +356,14 @@ export function NotesZoomViewport({
       measure();
     }
     measure();
-    const observer = new ResizeObserver(measure);
+    let resizeFrame = 0;
+    const observer = new ResizeObserver(() => {
+      if (mode !== "list") measure();
+      else if (!resizeFrame) resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = 0;
+        measure();
+      });
+    });
     observer.observe(view);
     observer.observe(content);
     observer.observe(rail);
@@ -363,9 +383,12 @@ export function NotesZoomViewport({
     view.addEventListener("keydown", cancelReflow, true);
     return () => {
       observer.disconnect();
+      cancelAnimationFrame(resizeFrame);
       sidebarObserver.disconnect();
       main?.removeEventListener("transitionend", sidebarFinished);
       window.clearTimeout(fitTimer);
+      window.clearTimeout(listSettleTimer);
+      content.style.removeProperty("transition");
       cancelReflow();
       unsubscribe();
       view.removeEventListener("scroll", updateScrollbar);

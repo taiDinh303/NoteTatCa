@@ -1,3 +1,10 @@
+## List zoom: chuyển width mềm sau khi ngừng zoom — 2026-10-30
+
+- Theo lựa chọn chủ dự án sau video: list giữ scale liên tục; khi settled chờ100ms rồi chuyển width180ms easing; nếu zoom tiếp capture painted width một lần để retarget không bật về kích thước cũ. Không thêm animation scaleX làm bẹt chữ. Reduced-motion bỏ transition. ResizeObserver của List đo qua RAF tránh vòng lặp trong transition; timer/RAF/style cleanup khi unmount. Grid giữ nhánh fit cũ.
+- Focused Chromium kiểm nhiều giá trị offsetWidth trung gian, zoom110%, final width khớp viewport và transition PASS. Test đầu kỳ vọng150% từ1wheel là sai harness vì delta clamp chỉ10%, đã sửa110%. React build/lint, Release strict PASS. Broad zoom có lỗi sidebar/timing chưa xác định baseline; không claim fullsuitePASS. Không ownerDB/email thật/migration/manualdeploy/physicaldevice.
+
+- Actual broad:20case hoàn tất15PASS/5FAIL, dừng4case width lớn còn lại sau khi đã có lỗi và đủ viewportcoverage; không claim24PASS. Đối chiếu tạm NotesZoomViewport bảnHEAD, restore byte-exact sau đó:5/5sidebarcases tái hiện FAIL cùngassertions. Focusedfinal1PASS có >3widthsamples;2listzoomcontinuous393/1440PASS. Scopepublication3files(source,test,riêngentryworklog); giữ mọi email/backend/config/dirtykhác. Không fullsuite/production verification; pushmain và kiểmremote SHA.
+
 ## Undo thu gọn và bố cục PC gọn, mascot né vùng điều khiển — 2026-10-30
 
 - Theo yêu cầu mới: gỡ toàn bộ collapse UI/state, key cũ bị bỏ qua nên không còn ẩn notes. PC dùng padding layer8px/main16px/toolbar12px như mobile. Mascot chọn card có khoảng trống bảo thủ120px theo zoom, giữ perch khi an toàn; scroll/resize/layout đo qua RAF+ResizeObserver có cleanup, không ghi dữ liệu. Không có chỗ thì ẩn trên list; modal mascot giữ nguyên. Chủ dự án đã chọn áp dụng cách né.
