@@ -528,7 +528,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
   });
 }
 
-for (const width of [393, 1920]) {
+for (const width of [1920]) {
   test(`notes have a single vertical scroll area ${width}`, async ({
     page,
   }) => {
@@ -656,7 +656,7 @@ for (const width of [393, 1920]) {
   });
 }
 
-for (const width of [393, 1440]) {
+for (const width of [1440]) {
   test(`list zoom is continuous and leaves chrome fixed ${width}`, async ({
     page,
   }) => {
@@ -864,9 +864,6 @@ for (const width of [393, 1440]) {
 }
 
 for (const { width, theme } of [
-  { width: 320, theme: "light" },
-  { width: 393, theme: "light" },
-  { width: 768, theme: "light" },
   { width: 1024, theme: "dark" },
   { width: 1280, theme: "light" },
   { width: 1366, theme: "dark" },

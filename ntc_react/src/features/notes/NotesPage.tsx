@@ -1,3 +1,4 @@
+import { useMobileLayout } from "../../shared/useMobileLayout";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   lazy,
@@ -311,15 +312,17 @@ export default function NotesPage({
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const q = useDebounced(params.get("q") ?? "");
+  const mobileLayout = useMobileLayout();
   const [pinFilter, setPinFilter] = useState("all");
+  const effectivePinFilter = mobileLayout ? "all" : pinFilter;
   const filter: NoteFilter = {
     ...(q ? { q } : {}),
     ...(tagId ? { tagId } : {}),
     ...(trash ? { trash: true } : {}),
     ...(reminderView ? { hasReminder: true } : {}),
-    ...(pinFilter === "pinned"
+    ...(effectivePinFilter === "pinned"
       ? { pinned: true }
-      : pinFilter === "unpinned"
+      : effectivePinFilter === "unpinned"
         ? { pinned: false }
         : {}),
   };
@@ -331,13 +334,14 @@ export default function NotesPage({
   } | null>(null);
   const [lastOpenedNoteId, setLastOpenedNoteId] = useState<string | null>(null);
   const selected = params.get("note");
-  const [view, setView] = useState(() => {
+  const [savedView, setView] = useState(() => {
     try {
       return localStorage.getItem("ntc.view.v1") === "list" ? "list" : "grid";
     } catch {
       return "grid";
     }
   });
+  const view = mobileLayout ? "grid" : savedView;
   const [confirm, setConfirm] = useState<{
     note: Note;
     action: "delete";
@@ -556,7 +560,7 @@ export default function NotesPage({
             <span>{tr("New")}</span>
           </button>
         ) : null}
-        <div className="row-actions">
+        {!mobileLayout ? <div className="row-actions">
           {!trash ? (
             <Select
               label={tr("Filter pinned notes")}
@@ -599,7 +603,7 @@ export default function NotesPage({
               );
             })}
           </div>
-        </div>
+        </div> : null}
       </div>
       {query.isPending ? (
         <SkeletonCards />

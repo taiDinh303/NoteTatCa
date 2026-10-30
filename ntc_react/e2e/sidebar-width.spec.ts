@@ -20,7 +20,7 @@ for (const width of [1024, 1366, 1440, 1920]) {
     const baseline = await geometry();
     for (const [label, path] of [
       ["Reminders", "/reminders"],
-      ["Inbox", "/notifications"],
+      ["Notifications", "/notifications"],
       ["Trash", "/trash"],
       ["All notes", "/notes"],
     ]) {

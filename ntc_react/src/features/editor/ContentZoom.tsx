@@ -1,3 +1,4 @@
+import { useMobileLayout } from "../../shared/useMobileLayout";
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -11,6 +12,16 @@ const clamp = (value: number) => Math.min(300, Math.max(50, value));
 
 // Scale a fixed-width document, so gestures never reflow paragraphs or edit marks.
 export default function ContentZoom({ children }: { children: ReactNode }) {
+  const mobile = useMobileLayout();
+  return <DesktopContentZoom mobile={mobile}>{children}</DesktopContentZoom>;
+}
+function DesktopContentZoom({
+  children,
+  mobile,
+}: {
+  children: ReactNode;
+  mobile: boolean;
+}) {
   useLanguage();
   const viewport = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -28,7 +39,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     const view = viewport.current!;
     const space = stage.current!;
     const document = layer.current!;
-    let current = savedPercent?.current ?? 100;
+    let current = mobile ? 100 : (savedPercent?.current ?? 100);
     let target = current;
     let frame = 0;
     let timer = 0;
@@ -66,9 +77,13 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       space.style.width = `${width * scale}px`;
       space.style.height = `${height * scale}px`;
       if (restoreScroll && document.querySelector(".rich-editor")) {
-        stableRestoreFrames = restoreHeight === height ? stableRestoreFrames + 1 : 0;
+        stableRestoreFrames =
+          restoreHeight === height ? stableRestoreFrames + 1 : 0;
         restoreHeight = height;
-        if (height * scale >= restoreScroll.top + view.clientHeight || stableRestoreFrames >= 2) {
+        if (
+          height * scale >= restoreScroll.top + view.clientHeight ||
+          stableRestoreFrames >= 2
+        ) {
           view.scrollLeft = restoreScroll.left;
           view.scrollTop = restoreScroll.top;
           restoreScroll = undefined;
@@ -85,7 +100,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       if (!frame) frame = requestAnimationFrame(paint);
     }
     function update(value: number) {
-      if (!Number.isFinite(value)) return;
+      if (mobile || !Number.isFinite(value)) return;
       target = clamp(value);
       if (savedPercent) savedPercent.current = target;
       document.style.willChange = "transform";
@@ -114,10 +129,12 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     observer.observe(document);
     schedule();
     function rememberScroll() {
-      if (savedScroll && !restoreScroll) savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
+      if (savedScroll && !restoreScroll)
+        savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
     }
     view.addEventListener("scroll", rememberScroll, { passive: true });
     function wheel(event: WheelEvent) {
+      if (mobile) return;
       if (
         !(event.ctrlKey || event.metaKey) ||
         !event.deltaY ||
@@ -138,6 +155,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
     const distance = (a: Touch, b: Touch) =>
       Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
     function start(event: TouchEvent) {
+      if (mobile) return;
       pinch = undefined;
       if (event.touches.length !== 2 || !event.cancelable) return;
       event.preventDefault();
@@ -168,6 +186,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       pinch = undefined;
     }
     function gestureStart(event: Event) {
+      if (mobile) return;
       if (!event.cancelable) return;
       event.preventDefault();
       safariBase = target;
@@ -279,7 +298,7 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
       view.removeEventListener("lostpointercapture", pointerEnd);
       view.removeEventListener("click", click, true);
     };
-  }, [savedPercent, savedScroll]);
+  }, [savedPercent, savedScroll, mobile]);
   function commit(input: HTMLInputElement) {
     const value = input.value.trim() ? Number(input.value) : NaN;
     if (Number.isFinite(value)) change.current(value);
@@ -350,8 +369,10 @@ export default function ContentZoom({ children }: { children: ReactNode }) {
           </div>
         </div>
       </div>
-      {session?.target ? createPortal(controls, session.target) : null}
-      {session?.handTarget
+      {!mobile && session?.target
+        ? createPortal(controls, session.target)
+        : null}
+      {!mobile && session?.handTarget
         ? createPortal(
             <IconButton
               icon={Hand}

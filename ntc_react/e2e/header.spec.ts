@@ -66,7 +66,7 @@ for (const width of [1440, 1024, 393, 320]) {
       await header.getByRole('link', { name: 'Back', exact: true }).click();
       await expect(page).toHaveURL(/\/notes$/);
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
-      await expect(page.getByRole('spinbutton', { name: 'Zoom percentage', exact: true })).toHaveValue('100');
+      await expect(page.getByRole('spinbutton', { name: 'Zoom percentage', exact: true })).toHaveCount(0);
       await page.keyboard.press('Escape');
       await header.getByRole('button', { name: 'Account menu', exact: true }).click();
       await page.getByRole('menuitem', { name: 'Account settings', exact: true }).click();

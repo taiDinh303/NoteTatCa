@@ -21,7 +21,7 @@ async function setZoom(page: import("@playwright/test").Page, percent: number) {
   await input.fill(String(percent));
   await input.press("Enter");
 }
-for (const width of [320, 393, 1280]) {
+for (const width of [801, 1024, 1280]) {
   test(`content zoom keeps note chrome and saved text unchanged ${width}`, async ({
     page,
   }) => {
@@ -418,7 +418,7 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
 });
 
 for (const [width, theme] of [
-  [393, "light"],
+  [1024, "light"],
   [1440, "light"],
   [1440, "dark"],
 ] as const) {
@@ -532,8 +532,8 @@ for (const [width, theme] of [
 }
 
 for (const [width, theme] of [
-  [320, "light"],
-  [393, "light"],
+  [801, "light"],
+  [1024, "light"],
   [904, "light"],
   [1440, "light"],
   [1440, "dark"],

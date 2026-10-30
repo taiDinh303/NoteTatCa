@@ -83,7 +83,7 @@ for (const width of [393, 1280]) {
     ).toHaveCount(0);
     await expect(
       viewer.getByRole("button", { name: "Content zoom", exact: true }),
-    ).toBeVisible();
+    ).toHaveCount(width <= 800 ? 0 : 1);
     await expect(viewer.getByLabel("Character count")).toHaveCount(0);
     if (width <= 800) {
       const bounds = (await viewer.boundingBox())!;

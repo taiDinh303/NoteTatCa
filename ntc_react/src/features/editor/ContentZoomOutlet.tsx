@@ -1,3 +1,4 @@
+import { useMobileLayout } from "../../shared/useMobileLayout";
 import { useCallback, useContext, useId, useState } from "react";
 import { ZoomIn } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
@@ -14,6 +15,7 @@ export default function ContentZoomOutlet({
   color?: string;
 }) {
   useLanguage();
+  const mobile = useMobileLayout();
   const session = useContext(ContentZoomSession);
   const setTarget = session?.setTarget;
   const setHandTarget = session?.setHandTarget;
@@ -31,7 +33,7 @@ export default function ContentZoomOutlet({
   const attachRoot = useCallback((node: HTMLDivElement | null) => {
     setBoundary(node?.closest<HTMLElement>(".note-editor-modal") ?? null);
   }, []);
-  if (!session) return null;
+  if (!session || mobile) return null;
   if (popup)
     return (
       <Popover.Root open={expanded} onOpenChange={setExpanded}>

@@ -291,7 +291,7 @@ test("preloads all note pages and switches cached workspace collections without 
       }),
     ).toBeVisible();
     await page
-      .getByRole("link", { name: "Inbox", exact: true })
+      .getByRole("link", { name: "Notifications", exact: true })
       .first()
       .click();
     await page.getByRole("button", { name: "Unread", exact: true }).click();
@@ -337,6 +337,9 @@ test("keeps the saved session when offline during restore and reconnects on requ
     });
   });
   await page.reload();
+  await expect(page.getByRole("button", { name: "Account menu", exact: true })).toBeVisible();
+  await openAccountMenu(page);
+  await page.getByRole("menuitem", { name: "Review sync", exact: true }).click();
   await expect(
     page.getByText("Offline notes on this device", { exact: true }),
   ).toBeVisible();
@@ -352,6 +355,7 @@ test("keeps the saved session when offline during restore and reconnects on requ
   await page
     .getByRole("button", { name: "Sync now", exact: true })
     .click();
+  await page.getByRole("dialog", { name: "Note synchronization", exact: true }).getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Notes", exact: true }),
   ).toBeVisible();
@@ -416,7 +420,7 @@ test("renders responsive workspace without console errors or navigation reloads"
       exact: true,
     }),
   ).toHaveCount(0);
-  await page.getByRole("link", { name: "Inbox", exact: true }).first().click();
+  await page.getByRole("link", { name: "Notifications", exact: true }).first().click();
   await expect(
     page.getByRole("heading", { name: "Your inbox", exact: true }),
   ).toHaveClass("sr-only");
@@ -1558,7 +1562,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
   expect(
     (await request.post(fixture + "/__fixture/dispatch")).ok(),
   ).toBeTruthy();
-  await page.getByRole("link", { name: "Inbox", exact: true }).click();
+  await page.getByRole("link", { name: "Notifications", exact: true }).click();
   await expect(
     page.getByText("A note is waiting for you", { exact: true }),
   ).toBeVisible();
@@ -2119,7 +2123,8 @@ test("keeps a durable draft after a network failure and syncs without duplicates
   await editor.getByRole("button", { name: "Close", exact: true }).click();
   await expect(page.getByRole("dialog", { name: "Keep your changes?", exact: true })).toHaveCount(0);
   await page.unroute("**/api/v1/notes");
-  await page.getByRole("button", { name: "Sync now", exact: true }).click();
+  await openAccountMenu(page);
+  await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
   await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   await expect(
     page.getByRole("button", {

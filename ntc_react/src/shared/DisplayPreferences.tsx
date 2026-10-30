@@ -1,3 +1,4 @@
+import { useMobileLayout } from "./useMobileLayout";
 import { t as tr, useLanguage } from "./i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -9,6 +10,7 @@ const clamp = (value: number) => Math.min(150, Math.max(50, value));
 
 export function DisplayPreferences({ children }: { children: ReactNode }) {
   useLanguage();
+  const mobile = useMobileLayout();
   const [percent, setPercent] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -27,12 +29,12 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
   const subscribe = useCallback(
     (paint: (scale: number, settled: boolean) => void) => {
       listeners.current.add(paint);
-      paint(current.current / 100, true);
+      paint(mobile ? 1 : current.current / 100, true);
       return () => {
         listeners.current.delete(paint);
       };
     },
-    [],
+    [mobile],
   );
   const indicator = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -42,10 +44,11 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
     [],
   );
   const zoomContext = useMemo(
-    () => ({ percent, change: changePercent, subscribe }),
-    [percent, changePercent, subscribe],
+    () => ({ percent: mobile ? 100 : percent, change: changePercent, subscribe }),
+    [mobile, percent, changePercent, subscribe],
   );
   useEffect(() => {
+    if (mobile) return;
     let frame = 0;
     let hideTimer = 0;
     let lastTime = 0;
@@ -215,11 +218,11 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       window.removeEventListener("gesturechange", gestureChange, true);
       window.removeEventListener("gestureend", gestureEnd, true);
     };
-  }, []);
+  }, [mobile]);
   return (
     <DisplayZoomContext.Provider value={zoomContext}>
       {children}
-      {visible
+      {visible && !mobile
         ? createPortal(
             <div
               ref={indicator}

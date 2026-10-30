@@ -6,11 +6,10 @@ import {
   onlineWorkspace,
   cache,
   workspace,
-  connection,
 } from "./runtime";
 import { Button, ConfirmDialog, ErrorBanner, Modal } from "../shared/ui";
-import { t as tr, useLanguage } from "../shared/i18n";
 import { useAuth } from "../shared/hooks";
+import { t as tr, useLanguage } from "../shared/i18n";
 
 async function downloadBackup() {
   const data = await offline.exportPending();
@@ -129,15 +128,10 @@ export function LogoutWarning() {
     </Modal>
   );
 }
-export function OfflineControls() {
+export function OfflineControls({ onClose }: { onClose: () => void }) {
   useLanguage();
   const state = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const session = useAuth();
-  const network = useSyncExternalStore(
-    connection.subscribe,
-    connection.getSnapshot,
-  );
-  const [details, setDetails] = useState(false);
   const [discard, setDiscard] = useState<string>();
   const [error, setError] = useState<unknown>();
   const [busy, setBusy] = useState(false);
@@ -156,111 +150,68 @@ export function OfflineControls() {
       setBusy(false);
     }
   }
-  const quiet =
-    !busy &&
-    !state.pending &&
-    session.status !== "offline" &&
-    !network.warming &&
-    !network.problem &&
-    !state.error &&
-    !error;
   return (
     <>
-      {quiet ? (
-        <span className="sr-only" role="status">
-          {tr("Notes synced")}
-        </span>
-      ) : (
-        <div
-          className="offline-toolbar"
-          role="region"
-          aria-label={tr("Note synchronization")}
-        >
-          <span role="status">
+      <Modal open title={tr("Note synchronization")} onClose={onClose}>
+        <div className="modal-body">
+          <p role="status">
             {state.syncing
               ? tr("Syncing notes…")
               : state.pending
                 ? tr("{0} pending changes", state.pending)
                 : session.status === "offline"
                   ? tr("Offline notes on this device")
-                  : network.warming
-                    ? tr("Connecting to NoteTatCa…")
-                    : network.problem === "offline"
-                      ? tr("Working offline")
-                      : network.problem
-                        ? tr("Connection interrupted")
-                        : tr("Notes synced")}
-          </span>
-          <Button
-            variant="ghost"
-            busy={state.syncing || busy}
-            onClick={() => void sync()}
-          >
+                  : tr("Notes synced")}
+          </p>
+          <ErrorBanner
+            error={error ?? (state.error ? new Error(state.error) : undefined)}
+          />
+          <p>
+            {tr(
+              "Changes saved on this device are kept until they sync. Conflicts never overwrite the online note automatically.",
+            )}
+          </p>
+          {state.conflicts.map((item) => (
+            <section className="offline-conflict" key={item.key}>
+              <strong>{item.draft.title || tr("Untitled")}</strong>
+              <p>{item.blocked ? tr(item.blocked) : null}</p>
+              <Button
+                disabled={busy}
+                onClick={() => {
+                  setBusy(true);
+                  void offline
+                    .resolve(item.id, true)
+                    .catch(setError)
+                    .finally(() => setBusy(false));
+                }}
+              >
+                {tr("Save as a new copy")}
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={busy}
+                onClick={() => setDiscard(item.id)}
+              >
+                {tr("Use online version")}
+              </Button>
+            </section>
+          ))}
+        </div>
+        <div className="modal-footer">
+          <Button busy={state.syncing || busy} onClick={() => void sync()}>
             {tr("Sync now")}
           </Button>
-          {state.conflicts.length || state.error || error ? (
-            <Button variant="ghost" onClick={() => setDetails(true)}>
-              {tr("Review sync")}
-            </Button>
-          ) : null}
+          <Button
+            variant="secondary"
+            onClick={() => {
+              void downloadBackup().catch(setError);
+            }}
+          >
+            {tr("Download backup")}
+          </Button>
+          <Button onClick={onClose}>{tr("Close")}</Button>
         </div>
-      )}
-      {details ? (
-        <Modal
-          open
-          title={tr("Note synchronization")}
-          onClose={() => setDetails(false)}
-        >
-          <div className="modal-body">
-            <ErrorBanner
-              error={
-                error ?? (state.error ? new Error(state.error) : undefined)
-              }
-            />
-            <p>
-              {tr(
-                "Changes saved on this device are kept until they sync. Conflicts never overwrite the online note automatically.",
-              )}
-            </p>
-            {state.conflicts.map((item) => (
-              <section className="offline-conflict" key={item.key}>
-                <strong>{item.draft.title || tr("Untitled")}</strong>
-                <p>{item.blocked ? tr(item.blocked) : null}</p>
-                <Button
-                  disabled={busy}
-                  onClick={() => {
-                    setBusy(true);
-                    void offline
-                      .resolve(item.id, true)
-                      .catch(setError)
-                      .finally(() => setBusy(false));
-                  }}
-                >
-                  {tr("Save as a new copy")}
-                </Button>
-                <Button
-                  variant="secondary"
-                  disabled={busy}
-                  onClick={() => setDiscard(item.id)}
-                >
-                  {tr("Use online version")}
-                </Button>
-              </section>
-            ))}
-          </div>
-          <div className="modal-footer">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                void downloadBackup().catch(setError);
-              }}
-            >
-              {tr("Download backup")}
-            </Button>
-            <Button onClick={() => setDetails(false)}>{tr("Close")}</Button>
-          </div>
-        </Modal>
-      ) : null}
+      </Modal>
       {discard ? (
         <ConfirmDialog
           title={tr("Use online version")}

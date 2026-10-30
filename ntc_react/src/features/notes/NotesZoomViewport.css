@@ -96,3 +96,6 @@ html:has([data-notes-zoom]) {
   .customer-shell:has([data-notes-zoom]) .workspace-main { padding-top: 16px; }
   .customer-shell:has([data-notes-zoom]) .workspace-toolbar { margin-bottom: 12px; }
 }
+
+.notes-mobile-layer { position: relative; width: 100%; }
+.notes-mobile-layer .note-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }

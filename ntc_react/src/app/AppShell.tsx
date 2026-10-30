@@ -4,7 +4,6 @@ import { warmSettings } from "../features/settings/warmSettings";
 import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
 import "./SidebarLayout.css";
-import type { ReactNode } from "react";
 import {
   lazy,
   memo,
@@ -44,7 +43,6 @@ import { inbox, workspace } from "./runtime";
 import { useAuth, useLabels, useNotes } from "../shared/hooks";
 import { IconButton, Logo, Modal, Spinner } from "../shared/ui";
 import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
-import { OfflineControls } from "./OfflineControls";
 import { GuestBanner } from "./GuestControls";
 import { useTheme } from "../shared/useTheme";
 import { desktopNoteWidth, DESKTOP_NOTE_GAP } from "../shared/workspaceGrid";
@@ -52,12 +50,10 @@ const LabelsManager = lazy(() => import("../features/labels/LabelsManager"));
 const Sidebar = memo(function Sidebar({
   onLabels,
   onNavigate,
-  accountControls,
   mobile = false,
 }: {
   onLabels: () => void;
   onNavigate: () => void;
-  accountControls?: ReactNode;
   mobile?: boolean;
 }) {
   useLanguage();
@@ -72,6 +68,8 @@ const Sidebar = memo(function Sidebar({
     queryFn: () => inbox.count(),
     enabled: sidebarAuth.status === "authenticated",
     staleTime: 30_000,
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
   });
   const notesCount = notesQuery.data?.pages[0]?.totalItems;
   const trashCount = trashQuery.data?.pages[0]?.totalItems;
@@ -96,11 +94,6 @@ const Sidebar = memo(function Sidebar({
               <CalendarDays size={19} />
               {tr("Reminders")}
               {typeof remindersCount === "number" ? <span className="nav-count" aria-hidden="true">{remindersCount}</span> : null}
-            </NavLink>
-            <NavLink to="/notifications" onClick={onNavigate}>
-              <Bell size={19} />
-              {tr("Inbox")}
-              {typeof unreadQuery.data === "number" ? <span className="nav-count" aria-hidden="true">{unreadQuery.data}</span> : null}
             </NavLink>
           </>
         ) : null}
@@ -144,7 +137,6 @@ const Sidebar = memo(function Sidebar({
       <div className="sidebar-bottom">
         {!guestMode ? (
           <>
-            {accountControls}
             <NavLink
               className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
               to={mobile ? "/settings" : "/settings/account"}
@@ -155,6 +147,11 @@ const Sidebar = memo(function Sidebar({
             >
               <Settings size={18} />
               {tr("Settings")}
+            </NavLink>
+            <NavLink to="/notifications" className="settings-link" onClick={onNavigate}>
+              <Bell size={18} />
+              {tr("Notifications")}
+              {typeof unreadQuery.data === "number" ? <span className="nav-count" aria-hidden="true">{unreadQuery.data}</span> : null}
             </NavLink>
             <NavLink
               className={`settings-link ${pathname === "/help" ? "active" : ""}`}
@@ -257,13 +254,6 @@ export default function AppShell() {
       /* Layout preference storage is optional. */
     }
   }, [sidebarHidden]);
-  const unread = useQuery({
-    queryKey: workspace.key("unread"),
-    queryFn: () => inbox.count(),
-    enabled: state.status === "authenticated",
-    refetchInterval: 60_000,
-    refetchIntervalInBackground: false,
-  });
   useEffect(() => {
     function key(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") {
@@ -415,7 +405,6 @@ export default function AppShell() {
       <div className="main-column">
         <main className="workspace-main" id="workspace-main">
           <GuestBanner />
-          {state.status !== "guest" ? <OfflineControls /> : null}
           <RouteContent><Outlet /></RouteContent>
         </main>
       </div>
@@ -431,24 +420,6 @@ export default function AppShell() {
           mobile
           onLabels={() => setManageLabels(true)}
           onNavigate={() => setMobile(false)}
-          accountControls={
-            <NavLink
-              to="/notifications"
-              className="settings-link drawer-inbox"
-              aria-label={tr("Open inbox")}
-              onClick={() => {
-                setMobile(false);
-              }}
-            >
-              <Bell size={18} />
-              {tr("Notifications")}
-              {(unread.data ?? 0) > 0 ? (
-                <span className="drawer-unread">
-                  {unread.data! > 9 ? "9+" : unread.data}
-                </span>
-              ) : null}
-            </NavLink>
-          }
         />
       </Modal>
       {manageLabels ? (

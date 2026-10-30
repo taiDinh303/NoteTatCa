@@ -133,8 +133,8 @@ for (const width of [320, 393])
     ).toBeVisible();
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "Sync now", exact: true }),
-    ).toBeVisible();
+      page.locator(".offline-toolbar"),
+    ).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -246,7 +246,8 @@ test("external edits create a reviewable conflict and an offline copy never over
     ).ok(),
   ).toBeTruthy();
   await context.setOffline(false);
-  await page.getByRole("button", { name: "Review sync", exact: true }).click();
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Review sync", exact: true }).click();
   const review = page.getByRole("dialog", {
     name: "Note synchronization",
     exact: true,

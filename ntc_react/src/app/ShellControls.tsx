@@ -1,3 +1,6 @@
+import { useMobileLayout } from "../shared/useMobileLayout";
+import { useState } from "react";
+import { OfflineControls } from "./OfflineControls";
 import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +33,12 @@ export function ShellAccountMenu({
 }: { onNavigate?: () => void } = {}) {
   useLanguage();
   const state = useAuth();
+  const mobile = useMobileLayout();
+  const [reviewSync, setReviewSync] = useState(false);
+  const syncState = useSyncExternalStore(
+    offline.subscribe,
+    offline.getSnapshot,
+  );
   const guestData = useSyncExternalStore(guest.subscribe, guest.getSnapshot);
   const guestMode = state.status === "guest";
   const me = useMe();
@@ -47,83 +56,105 @@ export function ShellAccountMenu({
     state.session?.userName ||
     tr("Your account");
   return (
-    <ActionMenu
-      label={tr("Account menu")}
-      extra={<ZoomDropdown />}
-      items={[
-        ...(guestMode
-          ? [
-              {
-                label: tr("Sign in"),
-                icon: LogIn,
-                action: () => {
-                  guest.requestImport();
-                  navigateTo("/login");
+    <>
+      {!guestMode && !isAdministrator(state.session) ? (
+        <span className="sr-only" role="status">
+          {tr(
+            syncState.syncing
+              ? "Syncing notes…"
+              : syncState.pending
+                ? "{0} pending changes"
+                : "Notes synced",
+            syncState.pending,
+          )}
+        </span>
+      ) : null}
+      <ActionMenu
+        label={tr("Account menu")}
+        extra={mobile ? undefined : <ZoomDropdown />}
+        items={[
+          ...(guestMode
+            ? [
+                {
+                  label: tr("Sign in"),
+                  icon: LogIn,
+                  action: () => {
+                    guest.requestImport();
+                    navigateTo("/login");
+                  },
                 },
-              },
-            ]
-          : []),
-        ...(!guestMode && !isAdministrator(state.session)
-          ? [
-              {
-                label: tr("Sync now"),
-                icon: RefreshCw,
-                action: () => {
-                  void (async () => {
-                    if (!navigator.onLine)
-                      throw new Error(tr("Working offline"));
-                    if (!onlineWorkspace()) await auth.refresh();
-                    await offline.sync();
-                    await cache.invalidateQueries({
-                      queryKey: workspace.key("notes"),
-                    });
-                  })().catch((error) => toast.error(errorMessage(error)));
+              ]
+            : []),
+          ...(!guestMode && !isAdministrator(state.session)
+            ? [
+                {
+                  label: tr("Review sync"),
+                  icon: RefreshCw,
+                  action: () => setReviewSync(true),
                 },
-              },
-            ]
-          : []),
-        ...(!guestMode && !isAdministrator(state.session) && guestData.exists
-          ? [
-              {
-                label: tr("Copy guest notes"),
-                icon: Copy,
-                action: () => guest.requestImport(),
-              },
-            ]
-          : []),
-        ...(!guestMode
-          ? [
-              {
-                label: tr("Account settings"),
-                icon: Settings,
-                action: () => navigateTo(base + "/profile"),
-              },
-            ]
-          : []),
-        {
-          label: tr(guestMode ? "Leave guest mode" : "Sign out"),
-          icon: LogOut,
-          separator: true,
-          action: () => navigateTo("/logout"),
-        },
-      ]}
-    >
-      <button
-        ref={trigger}
-        type="button"
-        className="avatar-menu"
-        aria-label={tr("Account menu")}
+                {
+                  label: tr("Sync now"),
+                  icon: RefreshCw,
+                  action: () => {
+                    void (async () => {
+                      if (!navigator.onLine)
+                        throw new Error(tr("Working offline"));
+                      if (!onlineWorkspace()) await auth.refresh();
+                      await offline.sync();
+                      await cache.invalidateQueries({
+                        queryKey: workspace.key("notes"),
+                      });
+                    })().catch((error) => toast.error(errorMessage(error)));
+                  },
+                },
+              ]
+            : []),
+          ...(!guestMode && !isAdministrator(state.session) && guestData.exists
+            ? [
+                {
+                  label: tr("Copy guest notes"),
+                  icon: Copy,
+                  action: () => guest.requestImport(),
+                },
+              ]
+            : []),
+          ...(!guestMode
+            ? [
+                {
+                  label: tr("Account settings"),
+                  icon: Settings,
+                  action: () => navigateTo(base + "/profile"),
+                },
+              ]
+            : []),
+          {
+            label: tr(guestMode ? "Leave guest mode" : "Sign out"),
+            icon: LogOut,
+            separator: true,
+            action: () => navigateTo("/logout"),
+          },
+        ]}
       >
-        <Avatar
-          name={name}
-          picture={
-            me.data ? me.data.profile?.picture : state.session?.picture
-          }
-        />
-        <span className="account-name">{name.split(" ")[0]}</span>
-        <ChevronDown size={12} />
-      </button>
-    </ActionMenu>
+        <button
+          ref={trigger}
+          type="button"
+          className="avatar-menu"
+          aria-label={tr("Account menu")}
+        >
+          <Avatar
+            name={name}
+            picture={
+              me.data ? me.data.profile?.picture : state.session?.picture
+            }
+          />
+          <span className="account-name">{name.split(" ")[0]}</span>
+          <ChevronDown size={12} />
+        </button>
+      </ActionMenu>
+      {reviewSync ? (
+        <OfflineControls onClose={() => setReviewSync(false)} />
+      ) : null}
+    </>
   );
 }
 
