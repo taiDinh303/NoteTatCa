@@ -1,7 +1,6 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { lazy, Suspense, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 import {
   Bell,
   CalendarDays,
@@ -83,9 +82,6 @@ export default function RemindersPage() {
   return (
     <>
       <h1 className="sr-only">{tr("Reminders")}</h1>
-      <div className="workspace-toolbar reminder-toolbar">
-        <Link className="button secondary" to="/notes">{tr("Go to notes")}</Link>
-      </div>
       <div className="reminders-scroll" role="region" aria-label={tr("Reminders")} tabIndex={0}>
       <div className="feature-banner">
         <div className="feature-icon">

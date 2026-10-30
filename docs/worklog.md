@@ -1,3 +1,9 @@
+## Bỏ Go to notes khỏi Reminders — 2026-10-30
+
+- Theoảnh/lệnh chủ dự án: gỡ link Go to notes và toàn bộ toolbar chỉ chứa link đó trên Reminders cả PC/mobile; bỏ import Link và2ruleCSS reminder-toolbar không còn dùng. Banner hướng dẫn và vùngcuộn/card/lịch/notification giữ nguyên.
+- Actual validation: Chromium4/4PASS:3case393/1440/1920 kiểm Reminders không link/toolbar và banner visible; toolbar Notes/Notifications/Trash cùng top, không rootgutter lệch và Inboxcuộn300;1regression tạo reminder→dispatchsynthetic→readnotification PASS. Cập nhật bàialignment theo bố cục hiện hành: không còn toolbarReminders, so top của các toolbar còn lại thay vì viewtoggle đã ẩn mobile ở lượt trước. React TypeScript/Vite productionbuild/fullESLint PASS; .NETRelease -warnaserror -m:1 PASS0warnings/errors; scoped diffcheckPASS. Không fullsuite/visualQA/device thật/productionverification/ownerDB/email thật/migrate/manualdeploy; tests dùng SQLite/capturedmail fixture riêng.
+- Publication scope4files: RemindersPage.tsx, styles.css, workspace-toolbar-alignment.spec.ts và riêng entryworklog này. Fetch HEAD=origin/main=296a471 divergence0/0; pushmain theo quyềnReact đã có và kiểmremoteSHA saupush. Giữ mọi backend/archive/privacy/messages/mascot/assets/config và entryworklog có sẵn ngoài scope.
+
 ## Khôi phục bộ lọc ghim trên điện thoại — 2026-10-30
 
 - Theo2ảnh/yêu cầu bổ sung mới nhất: khôi phục Select All notes/Pinned only/Unpinned only ở bên phải New trên mobile; filter dùng pinFilter thật như PC, không ép all khi viewport≤800. Yêu cầu này thay thế phần ẩn bộ lọc pin trong entry Mobile trước đó. Giữ Grid/List và zoom ẩn trên điện thoại, danh sách một cột100%/fullwidth; Trash vẫn không có bộ lọc pin như trước.
