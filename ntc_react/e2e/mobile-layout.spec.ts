@@ -19,9 +19,20 @@ for (const width of [320, 393, 800])
       .fill("Synthetic-password-123!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(page.locator(".note-card").first()).toBeVisible();
-    await expect(
-      page.getByLabel("Filter pinned notes", { exact: true }),
-    ).toHaveCount(0);
+    const pinFilter = page.getByRole("button", { name: "Filter pinned notes", exact: true });
+    await expect(pinFilter).toBeVisible();
+    const total = await page.locator(".note-card").count();
+    await pinFilter.click();
+    await page.getByRole("option", { name: "Pinned only", exact: true }).click();
+    await expect(page.locator(".note-card")).toHaveCount(2);
+    await expect(page.locator(".notes-section")).toHaveCount(1);
+    await pinFilter.click();
+    await page.getByRole("option", { name: "Unpinned only", exact: true }).click();
+    await expect(page.locator(".note-card")).toHaveCount(total - 2);
+    await expect(page.locator(".notes-section")).toHaveCount(1);
+    await pinFilter.click();
+    await page.getByRole("option", { name: "All notes", exact: true }).click();
+    await expect(page.locator(".note-card")).toHaveCount(total);
     await expect(
       page.getByRole("group", { name: "Notes view", exact: true }),
     ).toHaveCount(0);

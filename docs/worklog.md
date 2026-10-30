@@ -1,3 +1,9 @@
+## Khôi phục bộ lọc ghim trên điện thoại — 2026-10-30
+
+- Theo2ảnh/yêu cầu bổ sung mới nhất: khôi phục Select All notes/Pinned only/Unpinned only ở bên phải New trên mobile; filter dùng pinFilter thật như PC, không ép all khi viewport≤800. Yêu cầu này thay thế phần ẩn bộ lọc pin trong entry Mobile trước đó. Giữ Grid/List và zoom ẩn trên điện thoại, danh sách một cột100%/fullwidth; Trash vẫn không có bộ lọc pin như trước.
+- Actual validation: Chromium mobile-layout3/3PASS320/393/800: chọn pinned hiện2notes/1group, unpinned hiện4notes/1group, Allnotes trở lại6notes; tiếp tục kiểm fullwidth/nooverflow/100%, syntheticwheel/touch không zoom, không Grid/List/contentzoom, review sync, resize1440 khôi phục50%/List và reload. Đã xem ảnh393 tại artifacts/mobile-pin-filter. React TypeScript/Vite productionbuild/fullESLint PASS; .NETRelease -warnaserror -m:1 PASS0warnings/errors; scoped diffcheckPASS. Synthetic SQLite/capturedmail fixture riêng; không ownerDB/email thật/fullsuite/device thật/migrate/manualdeploy/productionverification.
+- Publication scope3files: NotesPage.tsx, mobile-layout.spec.ts và riêng entryworklog này. Fetch HEAD=origin/main=63f6409 divergence0/0; pushmain theo quyềnReact đã có và kiểmremoteSHA saupush. Giữ backend/archive/privacy/messages/mascot/assets/config và worklog có sẵn ngoài commit.
+
 ## Badge Notifications đồng nhất sidebar — 2026-10-30
 
 - Theoảnh/yêu cầu chủ dự án: mở rộng CSS nav-count dùng chung cho settings-link, nên sốNotifications có margin-left:auto, nền bo10px, min-width20px, padding1px7px, font11px/600/tabular-nums giống All notes/Reminders/Trash; active badge dùng màu text chung. Áp dụng sidebar PC và drawer mobile; giữ unread query/count, thứ tự menu và route.

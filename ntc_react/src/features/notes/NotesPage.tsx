@@ -314,15 +314,14 @@ export default function NotesPage({
   const q = useDebounced(params.get("q") ?? "");
   const mobileLayout = useMobileLayout();
   const [pinFilter, setPinFilter] = useState("all");
-  const effectivePinFilter = mobileLayout ? "all" : pinFilter;
   const filter: NoteFilter = {
     ...(q ? { q } : {}),
     ...(tagId ? { tagId } : {}),
     ...(trash ? { trash: true } : {}),
     ...(reminderView ? { hasReminder: true } : {}),
-    ...(effectivePinFilter === "pinned"
+    ...(pinFilter === "pinned"
       ? { pinned: true }
-      : effectivePinFilter === "unpinned"
+      : pinFilter === "unpinned"
         ? { pinned: false }
         : {}),
   };
@@ -560,7 +559,7 @@ export default function NotesPage({
             <span>{tr("New")}</span>
           </button>
         ) : null}
-        {!mobileLayout ? <div className="row-actions">
+        <div className="row-actions">
           {!trash ? (
             <Select
               label={tr("Filter pinned notes")}
@@ -572,7 +571,7 @@ export default function NotesPage({
               <option value="unpinned">{tr("Unpinned only")}</option>
             </Select>
           ) : null}
-          <div
+          {!mobileLayout ? <div
             className="view-toggle"
             role="group"
             aria-label={tr("Notes view")}
@@ -602,8 +601,8 @@ export default function NotesPage({
                 />
               );
             })}
-          </div>
-        </div> : null}
+          </div> : null}
+        </div>
       </div>
       {query.isPending ? (
         <SkeletonCards />
