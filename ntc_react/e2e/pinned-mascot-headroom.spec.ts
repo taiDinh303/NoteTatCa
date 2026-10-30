@@ -3,7 +3,7 @@ import metadata from "../src/features/mascot/mascotAnchors.generated.json" with 
 
 for (const [width, zoom, mode] of [
   [1440, 50, "grid"], [1440, 100, "grid"], [1440, 150, "grid"],
-  [1440, 100, "list"], [393, 100, "grid"],
+  [1440, 100, "list"],
 ] as const) {
   test(`the entire Chef hat fits above the first pinned row ${width}/${zoom}/${mode}`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: 900 });

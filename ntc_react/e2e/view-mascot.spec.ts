@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-for (const width of [393, 1440]) {
+for (const width of [801, 1440]) {
   test(`View mascot has headroom and Edit keeps the same frame ${width}`, async ({
     page,
   }) => {

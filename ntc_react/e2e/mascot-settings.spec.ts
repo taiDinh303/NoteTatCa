@@ -110,9 +110,7 @@ test("appearance remembers presets and provides no second custom-upload slot", a
     fullPage: true,
   });
   await page.setViewportSize({ width: 393, height: 852 });
-  await expect(
-    page.getByRole("radio", { name: "Fox", exact: true }),
-  ).toBeChecked();
+  await expect(page.locator(".mascot-settings")).toHaveCount(0);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -123,6 +121,7 @@ test("appearance remembers presets and provides no second custom-upload slot", a
     fullPage: true,
   });
   await page.setViewportSize({ width: 1440, height: 1000 });
+  await expect(page.getByRole("radio", { name: "Fox", exact: true })).toBeChecked();
   const dark = page.getByRole("switch", { name: "Dark mode", exact: true });
   await dark.click();
   await expect(dark).toBeChecked();

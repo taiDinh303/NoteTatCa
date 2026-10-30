@@ -11,6 +11,7 @@ import { useDisplayZoom } from "../../shared/displayZoom";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import "./preferences.css";
 import { MascotSettings } from "../mascot/MascotSettings";
+import { useDesktopMascots } from "../mascot/desktopMascots";
 
 export default function PreferencesPage({
   section,
@@ -21,6 +22,7 @@ export default function PreferencesPage({
 }) {
   const { theme, toggleTheme } = useTheme();
   const language = useLanguage();
+  const desktopMascots = useDesktopMascots();
   const title = tr(
     { language: "Language", privacy: "Privacy", appearance: "Appearance" }[
       section
@@ -65,7 +67,7 @@ export default function PreferencesPage({
             </button>
           </div>
           <AppearanceZoomRow />
-          {!administration ? <MascotSettings /> : null}
+          {!administration && desktopMascots ? <MascotSettings /> : null}
         </div>
       ) : null}
     </section>

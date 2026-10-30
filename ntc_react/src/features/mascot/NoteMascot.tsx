@@ -5,6 +5,7 @@ import { mascotPresetSources, useMascotPreference } from "./mascotPreference";
 import { useAccountMascot } from "./generatedMascot";
 import { useAuth } from "../../shared/hooks";
 import { useMascotFloor } from "./mascotFloor";
+import { useDesktopMascots } from "./desktopMascots";
 
 /*
  * NoteMascot — the selected companion sitting on top of a note card.
@@ -17,6 +18,11 @@ import { useMascotFloor } from "./mascotFloor";
  * No chat logic — decorative only.
  */
 export function NoteMascot({ size = 88 }: { size?: number }) {
+  const available = useDesktopMascots();
+  return available ? <DesktopNoteMascot size={size} /> : null;
+}
+
+function DesktopNoteMascot({ size }: { size: number }) {
   useLanguage();
   const { enabled, character, customImage } = useMascotPreference();
   const actor = useAuth();

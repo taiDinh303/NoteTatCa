@@ -2,7 +2,7 @@ import { mascotDirectionFrame } from "../src/features/mascot/mascotGeometry";
 import { expect, test } from "@playwright/test";
 import { mascotCharacters } from "../src/features/mascot/mascotPreference";
 
-test("every preset keeps its full opaque body above the card on desktop and mobile", async ({
+test("every preset keeps its full opaque body above the card on desktop", async ({
   page,
 }) => {
   test.setTimeout(240_000);
@@ -12,7 +12,7 @@ test("every preset keeps its full opaque body above the card on desktop and mobi
     .getByRole("link", { name: "Try guest mode", exact: true })
     .click();
   const mascot = page.locator(".note-mascot");
-  for (const width of [1440, 393]) {
+  for (const width of [1440, 801]) {
     await page.setViewportSize({ width, height: 900 });
     for (const character of mascotCharacters) {
       await page.evaluate((name) => {
