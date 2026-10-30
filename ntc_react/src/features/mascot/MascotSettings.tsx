@@ -1,7 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   mascotGroups,
-  mascotPresetSources,
+  type mascotPresetSources,
   setMascotPreference,
   useMascotPreference,
 } from "./mascotPreference";
@@ -11,6 +11,8 @@ import { useAccountMascot } from "./generatedMascot";
 import { MascotPage } from "./MascotPage";
 import { useMascotFloor } from "./mascotFloor";
 import { mascotArtScale } from "./mascotGeometry";
+import { mascotPreviewSources, useMascotPreview } from "./mascotPreviews";
+import { LoaderCircle } from "lucide-react";
 import "./MascotSettings.css";
 
 function MascotChoicePreview({
@@ -18,7 +20,8 @@ function MascotChoicePreview({
 }: {
   name: Parameters<typeof mascotPresetSources>[0];
 }) {
-  const sources = mascotPresetSources(name);
+  const sources = mascotPreviewSources(name);
+  const preview = useMascotPreview(sources.directions, sources.reactions);
   const floors = useMascotFloor(sources.directions, sources.reactions, true);
   // The larger transparent canvas must not turn into empty gallery layout space.
   // The exported v6 frames need <6px above this preview; retain the v5 allowance.
@@ -31,17 +34,27 @@ function MascotChoicePreview({
         height: 72 + headroom,
         paddingTop: headroom,
         boxSizing: "border-box",
-        visibility: floors ? "visible" : "hidden",
       }}
+      className="mascot-choice-preview"
+      data-preview-state={preview.state}
     >
-      <MascotPage
+      {preview.state === "ready" ? <MascotPage
         {...sources}
         size={72}
         label={characterLabel(name)}
         className="mascot-choice-page"
         disableSquash
         floors={floors}
-      />
+      /> : preview.state === "error" ? (
+        <button type="button" className="mascot-preview-retry" aria-label={tr("Retry {0}", characterLabel(name))} onClick={event => { event.preventDefault(); event.stopPropagation(); preview.retry(); }}>
+          {tr("Retry")}
+        </button>
+      ) : (
+        <span className="mascot-preview-loading" role="status" aria-label={tr("Loading {0}…", characterLabel(name))}>
+          <LoaderCircle size={20} className="spin" />
+          <span>{tr("Loading…")}</span>
+        </span>
+      )}
     </span>
   );
 }

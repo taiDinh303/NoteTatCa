@@ -1,5 +1,10 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Loading settings…": ["Đang tải cài đặt…", "正在加载设置…", "設定を読み込み中…"],
+  "Loading profile…": ["Đang tải hồ sơ…", "正在加载个人资料…", "プロフィールを読み込み中…"],
+  "Loading connected accounts…": ["Đang tải tài khoản liên kết…", "正在加载关联账户…", "連携アカウントを読み込み中…"],
+  "Loading active sessions…": ["Đang tải phiên đăng nhập…", "正在加载登录会话…", "セッションを読み込み中…"],
+  "Retry {0}": ["Tải lại {0}", "重试{0}", "{0}を再試行"],
   "NoteTatCa companions": ["Bạn đồng hành NoteTatCa", "NoteTatCa 小伙伴", "NoteTatCaの仲間"],
   "mascot.notebook": ["Robot sổ tay", "笔记本机器人", "ノートロボット"],
   "mascot.paper": ["Bạn giấy", "纸张伙伴", "紙の仲間"],

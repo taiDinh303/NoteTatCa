@@ -57,7 +57,7 @@ export default function SettingsPage({
       {section === "sessions" ? (
         <Sessions />
       ) : me.isPending ? (
-        <Spinner />
+        <Spinner label={tr("Loading profile…")} />
       ) : me.isError ? (
         <ErrorPanel error={me.error} retry={() => void me.refetch()} />
       ) : section === "profile" ? (
@@ -553,7 +553,7 @@ function AccountSettings({ me }: { me: Me }) {
         </div>
         <div className="form-grid account-forms">
           {linked.isPending ? (
-            <Spinner />
+            <Spinner label={tr("Loading connected accounts…")} />
           ) : linked.isError ? (
             <ErrorPanel
               error={linked.error}
@@ -641,7 +641,7 @@ function Sessions() {
         </div>
       </div>
       {query.isPending ? (
-        <Spinner />
+        <Spinner label={tr("Loading active sessions…")} />
       ) : query.isError ? (
         <ErrorPanel error={query.error} retry={() => void query.refetch()} />
       ) : !items.length ? (

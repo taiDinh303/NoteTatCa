@@ -1,4 +1,6 @@
 import { SidebarLabels } from "../features/labels/SidebarLabels";
+import { RouteContent } from "./RouteContent";
+import { warmSettings } from "../features/settings/warmSettings";
 import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
 import "./SidebarLayout.css";
@@ -135,6 +137,8 @@ const Sidebar = memo(function Sidebar({
             <NavLink
               className={`settings-link ${pathname.startsWith("/settings") ? "active" : ""}`}
               to={mobile ? "/settings" : "/settings/account"}
+              onPointerEnter={warmSettings}
+              onFocus={warmSettings}
               end
               onClick={onNavigate}
             >
@@ -162,6 +166,11 @@ const Sidebar = memo(function Sidebar({
 export default function AppShell() {
   useLanguage();
   const state = useAuth();
+  useEffect(() => {
+    if (state.status !== "authenticated") return;
+    const timer = window.setTimeout(warmSettings, 500);
+    return () => window.clearTimeout(timer);
+  }, [state.status, state.session?.userId]);
   const navigate = useNavigate();
   const location = useLocation();
   const settingsTitles: Record<string, string> = {
@@ -395,7 +404,7 @@ export default function AppShell() {
         <main className="workspace-main" id="workspace-main">
           <GuestBanner />
           {state.status !== "guest" ? <OfflineControls /> : null}
-          <Outlet />
+          <RouteContent><Outlet /></RouteContent>
         </main>
       </div>
       <Modal

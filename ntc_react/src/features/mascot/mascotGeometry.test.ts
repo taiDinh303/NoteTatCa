@@ -9,6 +9,7 @@ test("retired mascots are absent from the selectable catalog", () => {
 });
 
 test("corrects reversed horizontal gaze without flipping the artwork", () => {
+  expect(Array.from({ length: 9 }, (_, i) => mascotDirectionFrame("/mascots/ntc-v6/previews/bunny-directions.webp?rev=x", i))).toEqual([0, 1, 2, 5, 4, 3, 6, 7, 8]);
   expect(
     Array.from({ length: 9 }, (_, i) =>
       mascotDirectionFrame("/mascots/ntc-v6/bunny-directions.webp?rev=x", i),

@@ -1,5 +1,6 @@
 import { mascotBodyAnchor } from "./mascotBodyFloor";
 import { useEffect, useState } from "react";
+import { presetAtlasAnchors } from "./presetAnchors";
 
 const centers = new Map<string, number[]>();
 const floors = new Map<string, Promise<number[]>>();
@@ -7,6 +8,12 @@ const resolvedFloors = new Map<string, number[]>();
 
 // Atlas padding differs by character. Measure once, never during pointer motion.
 function floor(source: string): Promise<number[]> {
+  const preset = presetAtlasAnchors(source);
+  if (preset) {
+    centers.set(source, preset.centers);
+    resolvedFloors.set(source, preset.floors);
+    return Promise.resolve(preset.floors);
+  }
   const cached = floors.get(source);
   if (cached) return cached;
   const result = new Promise<number[]>((resolve, reject) => {
@@ -100,12 +107,12 @@ export function useMascotFloor(
   }, [directions, reactions, key, enabled]);
 
   if (measured?.key === key) return measured.value;
-  const cachedDirections = resolvedFloors.get(directions);
-  const cachedReactions = resolvedFloors.get(reactions);
+  const cachedDirections = resolvedFloors.get(directions) ?? presetAtlasAnchors(directions)?.floors;
+  const cachedReactions = resolvedFloors.get(reactions) ?? presetAtlasAnchors(reactions)?.floors;
   return cachedDirections && cachedReactions
     ? {
-        directionsX: centers.get(directions),
-        reactionsX: centers.get(reactions),
+        directionsX: centers.get(directions) ?? presetAtlasAnchors(directions)?.centers,
+        reactionsX: centers.get(reactions) ?? presetAtlasAnchors(reactions)?.centers,
         directions: cachedDirections,
         reactions: cachedReactions,
         max: Math.max(...cachedDirections, ...cachedReactions),

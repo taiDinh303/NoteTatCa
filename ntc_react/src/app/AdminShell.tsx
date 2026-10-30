@@ -1,6 +1,8 @@
 import { t as tr, useLanguage } from "../shared/i18n";
 import "./SidebarMotion.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { RouteContent } from "./RouteContent";
+import { warmSettings } from "../features/settings/warmSettings";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
@@ -91,6 +93,10 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
 }
 
 export default function AdminShell() {
+  useEffect(() => {
+    const timer = window.setTimeout(warmSettings, 500);
+    return () => window.clearTimeout(timer);
+  }, []);
   useLanguage();
   const location = useLocation();
   const preferenceTitles: Record<string, string> = {
@@ -162,7 +168,7 @@ export default function AdminShell() {
           </div>
         </header>
         <main className="workspace-main" id="admin-main">
-          <Outlet />
+          <RouteContent><Outlet /></RouteContent>
         </main>
       </div>
       <Modal
