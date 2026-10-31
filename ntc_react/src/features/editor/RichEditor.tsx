@@ -1,4 +1,7 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
+import NoteTemplates from "./NoteTemplates";
+import NoteOutline from "./NoteOutline";
+import "./NoteTools.css";
 import { memo, useEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
@@ -118,6 +121,7 @@ export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
   }, [editor, language]);
   return (
     <ContentZoom>
+      <NoteOutline editor={editor} />
       <EditorContent editor={editor} />
     </ContentZoom>
   );
@@ -248,6 +252,7 @@ export default memo(function RichEditor({
     <>
       <div className="editor-toolbar" aria-label={tr("Text formatting")}>
         <ContentZoomOutlet />
+        <NoteTemplates editor={editor} />
         <span className="toolbar-divider" />
         <IconButton
           icon={Bold}
@@ -467,8 +472,8 @@ export default memo(function RichEditor({
           onClick={() => editor.chain().focus().redo().run()}
         />
       </div>
-      <ErrorBanner error={error} />
-      <ContentZoom>
+      <ErrorBanner error={error} />      <ContentZoom>
+        <NoteOutline editor={editor} />
         <EditorContent className="editor-content" editor={editor} />
       </ContentZoom>
       {link ? (

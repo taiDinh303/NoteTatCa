@@ -1,0 +1,20 @@
+.note-outline,
+.note-templates {
+  flex: 0 0 auto;
+  max-height: 25vh;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+.note-outline summary,
+.note-templates summary {
+  cursor: pointer;
+}
+.note-templates select {
+  max-width: 100%;
+}
+.note-outline button {
+  white-space: normal;
+  text-align: start;
+}
