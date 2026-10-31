@@ -15,6 +15,8 @@ Mỗi giai đoạn có thể phát hành riêng. Ưu tiên hoàn thiện khả n
 | Giai đoạn / task | Phạm vi | Điều kiện hoàn thành |
 | --- | --- | --- |
 | 0 — TASK-022 | Củng cố offline/sync hiện có, version history và export/import có phiên bản | Khôi phục bản trước mà không mất bản hiện tại; export có thể nhập lại; lỗi quota/mất mạng/đổi tài khoản không mất draft; phân biệt cache với backup |
+
+**Tiến độ 2026-10-27:** lịch sử phiên bản nội dung và archive JSON schema1 đã triển khai local, có diễn tập import qua hai SQLite fixture độc lập; xem [worklog](worklog.md). Lịch sử của pin/label/reminder, media manifest khi có media, import hơn giới hạn hiện tại và phép thử migration trên provider thật vẫn là phần mở rộng/kiểm chứng còn lại. Đo1.000note dẫn tới chỉ tải trang đầu khi mở app; chưa triển khai delta sync hoặc virtualization vì số đo hiện tại chưa chứng minh cần, xem [báo cáo đo tải](PERFORMANCE-NOTES-2026-10-27.md).
 | 1 — TASK-023 | Ảnh và tệp đính kèm trước | Upload có tiến độ/hủy/thử lại, resize ảnh/alt text/caption, giới hạn loại và dung lượng; kiểm quyền tải/xóa; thay tên file không vượt kiểm loại; dọn upload mồ côi an toàn |
 | 2 — TASK-024 | Bảng trong note | Thêm/xóa hàng cột, header, resize và cuộn ngang trong bảng trên mobile; copy/paste, undo/redo, view/edit/offline/export không mất dữ liệu. Bản đầu là bảng đơn giản, chưa phải bảng tính có công thức |
 | 3 — TASK-025 | Audio và video | Đính kèm/phát/tua với trạng thái xử lý/lỗi; tải theo yêu cầu, không preload toàn bộ media. Ghi âm cần xin quyền mic khi bấm, có preview trước lưu. Upload file và nhúng link là hai luồng riêng; chưa hứa chuyển mã/ghi hình trực tiếp |

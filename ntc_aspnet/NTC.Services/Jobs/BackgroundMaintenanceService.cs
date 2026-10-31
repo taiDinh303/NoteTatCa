@@ -7,10 +7,11 @@ using NTC.Contract.Repositories.Entities.Tasks;
 using NTC.Contract.Repositories.IUOW;
 using NTC.Contract.Services.Interface;
 using NTC.Services.Notes;
+using NTC.Services.Infrastructure;
 namespace NTC.Services.Jobs;
 
 public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimeProvider clock, IEmailSender email,
-    IConfiguration config, ILogger<BackgroundMaintenanceService> logger) : IBackgroundMaintenanceService
+    IConfiguration config, ILogger<BackgroundMaintenanceService> logger, EmailTemplateRenderer templates) : IBackgroundMaintenanceService
 {
     public async Task<int> DispatchRemindersAsync(CancellationToken cancellationToken = default)
     {
@@ -59,6 +60,7 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
         foreach (var id in ids)
         {
             cancellationToken.ThrowIfCancellationRequested(); var leaseId = Guid.NewGuid(); ReminderDelivery? item = null; string? recipient = null;
+            string? noteTitle = null, noteContent = null;
             await unitOfWork.BeginTransactionAsync();
             try
             {
@@ -73,6 +75,7 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
                 if (item.Attempts >= 5)
                 { item.Abandoned = true; item.AbandonedAt = now; item.LastErrorCode = "RETRY_LIMIT_REACHED"; item.LeaseId = null; item.LeaseUntil = null; await unitOfWork.SaveAsync(); await unitOfWork.CommitTransactionAsync(); continue; }
                 item.LeaseId = leaseId; item.LeaseUntil = now.AddMinutes(2); item.Attempts++; item.LastAttemptAt = now; recipient = note.User.Email;
+                noteTitle = note.Title; noteContent = note.Content;
                 await unitOfWork.SaveAsync(); await unitOfWork.CommitTransactionAsync();
             }
             catch (DbUpdateConcurrencyException) { await unitOfWork.RollBackAsync(); continue; }
@@ -80,8 +83,8 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
             try
             {
                 var clientUrl = config["AppSettings:ClientUrl"]?.TrimEnd('/') ?? "";
-                var link = System.Net.WebUtility.HtmlEncode($"{clientUrl}/notes/{item!.NoteId}");
-                await email.SendEmailAsync(recipient!, "NoteTatCa reminder", $"<p>You have a note reminder.</p><p><a href=\"{link}\">Open NoteTatCa</a></p>");
+                var link = $"{clientUrl}/notes/{item!.NoteId}";
+                await email.SendEmailAsync(recipient!, $"Nhắc lịch: {templates.ReminderTitle(noteTitle)}", templates.RenderReminder(noteTitle, noteContent, link));
                 item.SentAt = clock.GetUtcNow(); item.LastErrorCode = null; sent++;
             }
             catch (Exception ex) when (!cancellationToken.IsCancellationRequested)

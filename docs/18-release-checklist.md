@@ -1,3 +1,7 @@
+## Trạng thái 2026-10-31
+
+Checklist 2026-10-17 bên dưới là mốc lịch sử, không phải mô tả đầy đủ cloud hiện tại. Google/Brevo có evidence live trong worklog; không tự triển khai lại. Archive/history có code local và kiểm thử, schema mới chưa apply production. Chỉ xét phát hành sau provider migration trên DB riêng, đối soát round-trip và hồi quy offline/mobile. Kết quả lượt này xem worklog.
+
 # 18 — Phát hành và nghiệm thu
 
 > 2026-10-17 | Backend source gate đã qua; production gate chưa xét.

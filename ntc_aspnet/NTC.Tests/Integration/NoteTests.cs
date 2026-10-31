@@ -40,6 +40,43 @@ public sealed class NoteTests
         Assert.Equal("Winner",(await ApiFactory.Data(await c.GetAsync($"/api/v1/notes/{id}"))).GetProperty("content").GetString());
     }
     [Fact]
+    public async Task Revision_restore_preserves_the_current_content_and_rejects_other_owners()
+    {
+        using var f = new ApiFactory(); await f.InitializeAsync();
+        var (a, _) = await f.LoginAsync(); var (b, _) = await f.LoginAsync("b@example.test");
+        using var owner = a; using var other = b;
+        var created = await ApiFactory.Note(a, "First");
+        var id = created.GetProperty("id").GetGuid();
+        var firstVersion = created.GetProperty("version").GetGuid();
+        var edited = await ApiFactory.Data(await a.PatchAsJsonAsync($"/api/v1/notes/{id}",
+            new { title = "Second", content = "Second", version = firstVersion }));
+        var secondVersion = edited.GetProperty("version").GetGuid();
+        var revisions = await ApiFactory.Data(await a.GetAsync($"/api/v1/notes/{id}/revisions"));
+        var original = Assert.Single(revisions.GetProperty("items").EnumerateArray());
+        Assert.Equal(firstVersion, original.GetProperty("sourceVersion").GetGuid());
+        Assert.Equal("First", original.GetProperty("content").GetString());
+        Assert.Equal(HttpStatusCode.NotFound, (await b.GetAsync($"/api/v1/notes/{id}/revisions")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await b.PostAsJsonAsync(
+            $"/api/v1/notes/{id}/revisions/{original.GetProperty("id").GetGuid()}/restore",
+            new { version = secondVersion })).StatusCode);
+        var restored = await ApiFactory.Data(await a.PostAsJsonAsync(
+            $"/api/v1/notes/{id}/revisions/{original.GetProperty("id").GetGuid()}/restore",
+            new { version = secondVersion }));
+        Assert.Equal("First", restored.GetProperty("content").GetString());
+        Assert.NotEqual(secondVersion, restored.GetProperty("version").GetGuid());
+        Assert.Equal(HttpStatusCode.Conflict, (await a.PostAsJsonAsync(
+            $"/api/v1/notes/{id}/revisions/{original.GetProperty("id").GetGuid()}/restore",
+            new { version = secondVersion })).StatusCode);
+        var after = await ApiFactory.Data(await a.GetAsync($"/api/v1/notes/{id}/revisions"));
+        Assert.Contains(after.GetProperty("items").EnumerateArray(), item =>
+            item.GetProperty("content").GetString() == "Second");
+        await ApiFactory.Data(await a.PostAsync($"/api/v1/notes/{id}/trash", null));
+        await ApiFactory.Data(await a.DeleteAsync($"/api/v1/notes/{id}"));
+        using var scope = f.Services.CreateScope();
+        Assert.False(await scope.ServiceProvider.GetRequiredService<DatabaseContext>()
+            .NoteRevisions.AnyAsync(x => x.NoteId == id));
+    }
+    [Fact]
     public async Task Rich_content_round_trips_and_legacy_cannot_silently_flatten_it()
     {
         using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;

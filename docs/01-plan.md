@@ -1,3 +1,7 @@
+## Cập nhật thực thi 2026-10-31
+
+Trạng thái mới thay các TODO lịch sử bên dưới: TASK-018/022 đã có source JSON archive/import và revision/restore, chưa coi là production-ready khi migration/provider restore chưa được kiểm trên DB biệt lập. Offline create/edit và bảo vệ logout đã có; kiểm hồi quy hiện hành ghi trong worklog. TASK-031/034 đang bổ sung mẫu cấu trúc chèn cuối note và mục lục View/Edit; không thêm media/cộng tác. TASK-019 tiếp tục để sau. TASK-020 có runbook diễn tập và log maintenance; retention/RPO/RTO thực tế cần operator chốt.
+
 # 01 — Kế hoạch NoteTatCa
 
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES

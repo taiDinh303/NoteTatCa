@@ -20,7 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>(); services.AddScoped<IUserService, UserService>();
         services.AddScoped<IUserInfoService, UserInfoService>(); services.AddScoped<IUserLoginService, UserLoginService>();
         services.AddScoped<IRoleService, RoleService>(); services.AddScoped<IUserRoleService, UserRoleService>();
-        services.AddScoped<INoteService, NoteService>(); services.AddScoped<ITagService, TagService>();
+        services.AddScoped<INoteService, NoteService>(); services.AddScoped<IWorkspaceArchiveService, WorkspaceArchiveService>(); services.AddScoped<ITagService, TagService>();
         services.AddScoped<INoteTagService, NoteTagService>(); services.AddScoped<IReminderService, ReminderService>();
         services.AddScoped<IAdminService, AdminService>(); services.AddScoped<IInboxService, InboxService>();
         services.AddScoped<ISessionService, SessionService>();

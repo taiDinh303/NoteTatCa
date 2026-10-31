@@ -19,6 +19,12 @@ Giữ solution .NET 8/Identity, routes legacy và payload đang dùng ở Razor 
 
 ## Thiết kế triển khai
 
+### Lịch sử và archive workspace — 2026-10-27
+
+`NoteRevision` giữ snapshot nội dung trước PATCH thành công và trước restore, gắn composite FK `(NoteId,UserId)` vào note cùng owner. Endpoint GET `/api/v1/notes/{id}/revisions` phân trang; POST `/{revisionId}/restore` yêu cầu version hiện tại, trả409 khi cũ và404 khi không thuộc owner. Hard delete note xóa revision theo FK; không có lịch sử cho pin/label/reminder. Migration mới additive trên cả SQL Server và PostgreSQL, chưa apply lên database của chủ dự án.
+
+GET `/api/v1/workspace/archive` xuất JSON schema1 gồm note/Trash, label/link, reminder và revision. POST `/api/v1/workspace/archive/import` kiểm schema và dữ liệu trước transaction, tạo bản sao ID mới dưới account đăng nhập; không nhận quyền owner từ JSON. Thời điểm tạo/sửa note được giữ; Trash bắt đầu lại30ngày; reminder được nhập inactive để tránh email ngoài ý muốn. Limit request50MB,10.000note/5.000label. Đây là sao lưu nội dung workspace, không chứa auth, notification đã gửi hoặc media chưa hỗ trợ. Kiểm round-trip trên hai SQLite fixture tách biệt; cần thử migration trên instance SQL Server/PostgreSQL riêng trước rollout.
+
 Thay đổi 2026-10-19/DEC-017: Admin là nhóm quản trị riêng. Policy `CustomerWorkspace` yêu cầu xác thực và không có Admin, gắn trên Notes/Tags/Reminders/Notifications v1 và Note/Tag/NoteTag/Reminder legacy. Admin+User cũ cũng bị403 trước model binding; private ownership non-admin vẫn404. AuthConfiguration kiểm role DB hiện tại nên JWT role cũ không vượt policy. Profile/account/sessions self và các API quản trị không bị policy workspace. Không migration hoặc sửa role/note live. Seed demo mới tạo admin chỉ role Admin và không note mẫu; rerun không tự loại role hoặc xóa note cũ của admin.
 
 - Auth: Identity + JWT access ngắn hạn; refresh token opaque, chỉ lưu hash trong DB, rotation và phát hiện reuse; logout/revoke/đổi mật khẩu/khóa user làm phiên mất hiệu lực. Bearer API không tự phụ thuộc cross-site cookie. React đã có ở ntc_react; storage/token/tests xem FRONTEND-IMPLEMENTATION, không mặc định localStorage an toàn.

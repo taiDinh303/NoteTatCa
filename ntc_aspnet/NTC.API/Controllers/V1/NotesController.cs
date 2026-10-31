@@ -22,6 +22,17 @@ public sealed class NotesController(INoteService notes, INoteTagService labels) 
         Success(await notes.QueryAsync(pageNumber, pageSize, q, tagId, trash, pinned, hasReminder));
     [HttpGet("{id:guid}")] [ProducesResponseType(typeof(BaseResponse<NoteResponseModelView>), 200)]
     public async Task<IActionResult> Get(Guid id) => Success(await notes.GetByIdAsync(id));
+    [HttpGet("{id:guid}/revisions")]
+    [ProducesResponseType(typeof(BaseResponse<BasePaginatedList<NoteRevisionModel>>), 200)]
+    public async Task<IActionResult> Revisions(Guid id, int pageNumber = 1, int pageSize = 20) =>
+        Success(await notes.QueryRevisionsAsync(id, pageNumber, pageSize));
+    [HttpPost("{id:guid}/revisions/{revisionId:guid}/restore")]
+    [ProducesResponseType(typeof(BaseResponse<NoteResponseModelView>), 200)]
+    public async Task<IActionResult> RestoreRevision(Guid id, Guid revisionId, RestoreNoteRevisionRequest request)
+    {
+        await notes.RestoreRevisionAsync(id, revisionId, request.Version);
+        return Success(await notes.GetByIdAsync(id));
+    }
     [HttpPost] [ProducesResponseType(typeof(BaseResponse<NoteResponseModelView>), 201)]
     public async Task<IActionResult> Create(SaveNoteRequest request, [FromHeader(Name = "Idempotency-Key")] string? key = null)
     {

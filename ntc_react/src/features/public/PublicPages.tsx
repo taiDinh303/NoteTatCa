@@ -303,7 +303,7 @@ export function Privacy() {
       <h2>{tr("Reminders and email")}</h2>
       <p>
         {tr(
-          "Reminder emails contain a link to the app rather than your note content. Delivery depends on the server’s configured reminder service and email provider.",
+          "Reminder emails include the note title, a short content preview and a link to open the note. Delivery depends on the server’s configured reminder service and email provider.",
         )}
       </p>
       <h2>{tr("Deleted notes")}</h2>

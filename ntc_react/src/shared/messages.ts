@@ -1,5 +1,6 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Sync pending edits before downloading a workspace backup.": ["Đồng bộ thay đổi đang chờ trước khi tải bản sao lưu workspace.", "下载工作区备份前请先同步待处理的更改。", "ワークスペースのバックアップ前に保留中の変更を同期してください。"],
   "Table of contents": ["Mục lục","目录","目次"],
   "Note templates": ["Mẫu ghi chú","笔记模板","ノートテンプレート"],
   "Choose a template": ["Chọn mẫu","选择模板","テンプレートを選択"],
@@ -1731,11 +1732,11 @@ export const messages: Record<string, readonly [string, string, string]> = {
     "提醒与邮件",
     "リマインダーとメール",
   ],
-  "Reminder emails contain a link to the app rather than your note content. Delivery depends on the server’s configured reminder service and email provider.":
+  "Reminder emails include the note title, a short content preview and a link to open the note. Delivery depends on the server’s configured reminder service and email provider.":
     [
-      "Email nhắc nhở chứa liên kết tới ứng dụng thay vì nội dung ghi chú. Việc gửi phụ thuộc vào dịch vụ nhắc nhở và nhà cung cấp email của máy chủ.",
-      "提醒邮件包含应用链接，而非笔记内容。发送取决于服务器的提醒服务和邮件提供商。",
-      "リマインダーメールにはノートの内容ではなくアプリへのリンクが含まれます。配信はサーバーのリマインダーサービスとメール事業者に依存します。",
+      "Email nhắc nhở có tiêu đề, đoạn nội dung ngắn và liên kết mở ghi chú. Việc gửi phụ thuộc vào dịch vụ nhắc nhở và nhà cung cấp email của máy chủ.",
+      "提醒邮件包含笔记标题、简短内容预览及打开笔记的链接。发送取决于服务器的提醒服务和邮件提供商。",
+      "リマインダーメールにはノートのタイトル、短い内容プレビュー、ノートへのリンクが含まれます。配信はサーバーのリマインダーサービスとメール事業者に依存します。",
     ],
   "Notes in trash can be restored during a 30-day retention period, unless you choose to delete them permanently sooner. Backups follow the operator’s separate retention arrangements.":
     [
@@ -2116,11 +2117,11 @@ export const messages: Record<string, readonly [string, string, string]> = {
       "退出登录会清除内存中的笔记缓存。可通过登录会话退出不再使用的会话。",
       "ログアウトでメモリー内のノートキャッシュが消去されます。不要なセッションは「ログイン中のセッション」からログアウトできます。",
     ],
-  "Reminder emails contain a link to the app rather than your note content. You can choose whether to send an email when setting a reminder.":
+  "Reminder emails include the note title, a short content preview and a link to open the note. You can choose whether to send an email when setting a reminder.":
     [
-      "Email nhắc nhở chứa liên kết tới ứng dụng thay vì nội dung ghi chú. Bạn có thể chọn gửi email khi đặt nhắc nhở.",
-      "提醒邮件包含应用链接，而非笔记内容。设置提醒时可选择是否发送邮件。",
-      "リマインダーメールにはノート内容ではなくアプリへのリンクが含まれます。設定時にメールを送るか選べます。",
+      "Email nhắc nhở có tiêu đề, đoạn nội dung ngắn và liên kết mở ghi chú. Bạn có thể chọn gửi email khi đặt nhắc nhở.",
+      "提醒邮件包含笔记标题、简短内容预览及打开笔记的链接。设置提醒时可选择是否发送邮件。",
+      "リマインダーメールにはノートのタイトル、短い内容プレビュー、ノートへのリンクが含まれます。設定時にメールを送るか選べます。",
     ],
   "You can restore notes from Trash for up to 30 days. Permanent deletion cannot be undone in the app.":
     [
