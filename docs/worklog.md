@@ -1,3 +1,18 @@
+## Archive bảo vệ pending và publication mới nhất — 2026-10-31
+
+- Archive/history browser final2/2PASS, gồm chặn export lúc còn pending→Sync now→JSON chứa nội dung mới. Main3d92e85705f3dc06474e97255122220eab89809a đã push và ls-remote khớp; scope7files(2workflow,NoteEditor/styles,2E2E,worklog), không schema/config. GitHub4shards cuối đang chạy; backendmain/nhánhdữliệu đã cóSUCCESS ở các run ghi trên. Build/lint publicationPASS. Note-view/toggle kiểm2vòng,8ca khác nhau; ghi số execution sau khi hoàn tất.
+
+## CI chỉ chạy bản mới nhất trên mỗi nhánh — 2026-10-31
+
+- Thêm concurrency group theo workflow/ref và cancel-in-progress cho backend/frontend để các push sửa liên tiếp không tiếp tục chạy bản cũ tốn runner. Nhánh dữ liệu vẫn có nhóm riêng; không bỏ job/test hoặc tăng ngưỡng nghiệm thu. Follow-up gồm7files(5source/test/docs đã mô tả ngay dưới và2workflow), giữ raw failure history cũ; chỉ xác nhận latestgreen khi workflow hoàn tất.
+
+## Giữ slot icon và chờ ACK trước reload trong test — 2026-10-31
+
+- Kiểm mở rộng cho thấy cách đưa add-icon ra sau title giữ View/Edit nhưng làm title dịch khi chọn icon. Thay bằng spacer aria-hidden đúng28px trong View khi không có emoji, giữ add-icon bên trái và khoảng12px. Final7/7ChromiumPASS:5geometry801/904/1024/1440light/dark và2iconless header empty/plain, title/icon/pin/fullscreen ổn định cả khi thêm emoji.
+- Phân tích artifact13031772641 từ CI bằng network/snapshot trace: ca note-view1280 gọi reload khi modal vẫn data-save-state=saving, chưa có POSTnotes; click Close chỉ khởi động async save, không phải ACK. Sửa test chờ editor hidden (close chỉ hoàn tất sau save) trước reload; áp dụng tương tự ca pin. Giữ các assertion readonly/no-write/reload persistence, không thêm retry hoặc skip. Kiểm lặp2vòng note-view để xác minh sửa harness; kết quả ghi sau lượt chạy.
+- Workspace archive pending protection browser2/2PASS: không GETarchive khi có thay đổi local pending, Sync now xong tải JSON có đúng nội dung mới; cùng history restore/import copies. GitHub integration không được quyền tạo draftPR(403); nhánh codex/notes-data-reliability đã push và SHA xác minh, có thể review bằng compare link, không claim đã mởPR.
+- Publication follow-up5files NoteEditor/styles/note-view/workspace/worklog; giữ archive migration ngoài main. Remote main trước commit6857a0a; kiểm build/lint và SHA sau push, chờ CI cuối.
+
 ## Xác minh publication cuối và nhánh dữ liệu — 2026-10-31
 
 - Đã push main6857a0a615eac34f6810d3c2aacb6660508ce746 và ls-remote khớp. Scope18files:15React source/tests cùng3docs, không đổi schema/config local. Checkout publication React build/lint138unit/config4PASS sau copy. Final rich/labels/trash, deferred title và conflict copy3/3PASS; refetch sau copy làm bản server hiện lại không cần reload. Main CI mới sẽ kiểm đầy đủ4shards.

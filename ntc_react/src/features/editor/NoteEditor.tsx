@@ -331,7 +331,7 @@ function NoteViewer({
         <div className="editor-identity note-view-identity">
           {note.iconEmoji ? (
             <span className="note-heading-icon" aria-hidden="true">{note.iconEmoji}</span>
-          ) : null}
+          ) : <span className="note-heading-icon-space" aria-hidden="true" />}
           {note.title ? <h2 className="note-heading-title">{note.title}</h2> : null}
         </div>
         <div className="row-actions">
