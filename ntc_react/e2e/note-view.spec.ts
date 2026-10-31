@@ -27,6 +27,7 @@ for (const width of [393, 1280]) {
       .click();
     await expect(content.locator("input[type=checkbox]")).toHaveCount(1);
     await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(editor).toBeHidden();
     await page.reload();
     // Closing acknowledges the device transaction; let queued writes settle
     // before measuring whether read-only interactions themselves write.
@@ -133,6 +134,7 @@ for (const width of [393, 1280]) {
       .getByRole("textbox", { name: "Note content" })
       .fill("Edited explicitly");
     await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(editor).toBeHidden();
     await page.reload();
     const card = page.getByRole("article").filter({
       has: page.getByRole("button", {

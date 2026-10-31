@@ -1095,6 +1095,7 @@ for (const theme of ["light", "dark"]) {
       animations: "disabled",
     });
     await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(editor).toBeHidden();
     await page.reload();
     await expect(
       page.getByRole("button", { name: `Unpin ${title}`, exact: true }),
@@ -2028,6 +2029,7 @@ for (const mobile of [false, true]) {
       editor.getByText("All changes saved", { exact: true }),
     ).toBeVisible();
     await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(editor).toBeHidden();
     await page.reload();
     await page.getByText("Centered private text", { exact: true }).click();
     await page

@@ -1,3 +1,14 @@
+## CI chỉ chạy bản mới nhất trên mỗi nhánh — 2026-10-31
+
+- Thêm concurrency group theo workflow/ref và cancel-in-progress cho backend/frontend để các push sửa liên tiếp không tiếp tục chạy bản cũ tốn runner. Nhánh dữ liệu vẫn có nhóm riêng; không bỏ job/test hoặc tăng ngưỡng nghiệm thu. Follow-up gồm7files(5source/test/docs đã mô tả ngay dưới và2workflow), giữ raw failure history cũ; chỉ xác nhận latestgreen khi workflow hoàn tất.
+
+## Giữ slot icon và chờ ACK trước reload trong test — 2026-10-31
+
+- Kiểm mở rộng cho thấy cách đưa add-icon ra sau title giữ View/Edit nhưng làm title dịch khi chọn icon. Thay bằng spacer aria-hidden đúng28px trong View khi không có emoji, giữ add-icon bên trái và khoảng12px. Final7/7ChromiumPASS:5geometry801/904/1024/1440light/dark và2iconless header empty/plain, title/icon/pin/fullscreen ổn định cả khi thêm emoji.
+- Phân tích artifact13031772641 từ CI bằng network/snapshot trace: ca note-view1280 gọi reload khi modal vẫn data-save-state=saving, chưa có POSTnotes; click Close chỉ khởi động async save, không phải ACK. Sửa test chờ editor hidden (close chỉ hoàn tất sau save) trước reload; áp dụng tương tự ca pin. Giữ các assertion readonly/no-write/reload persistence, không thêm retry hoặc skip. Kiểm lặp2vòng note-view để xác minh sửa harness; kết quả ghi sau lượt chạy.
+- Workspace archive pending protection browser2/2PASS: không GETarchive khi có thay đổi local pending, Sync now xong tải JSON có đúng nội dung mới; cùng history restore/import copies. GitHub integration không được quyền tạo draftPR(403); nhánh codex/notes-data-reliability đã push và SHA xác minh, có thể review bằng compare link, không claim đã mởPR.
+- Publication follow-up5files NoteEditor/styles/note-view/workspace/worklog; giữ archive migration ngoài main. Remote main trước commit6857a0a; kiểm build/lint và SHA sau push, chờ CI cuối.
+
 ## Khép các lỗi hồi quy từ CI đầy đủ — 2026-10-31
 
 - Đọc đủ 4 shard của run 41173105211: 36 lỗi sau khi unit/contract đã qua; xử lý theo hành vi đã chốt, không thêm skip, không bỏ assertion để che lỗi. Geometry 5 ca đã sửa ở 20880dd. Các test cũ đổi Open inbox→Notifications, Sync now trong account menu, label button aria-pressed, filter chưa đủ trang phải hỏi server, startup editor atomic, conflict dùng Review sync/copy, sidebar trượt ra ngoài viewport thay clip-path100%, mobile normal flow thay scrollbar desktop. Bộ 5 test zoom toàn chrome được thay bằng hợp đồng hiện hành: zoom danh sách, chrome cố định, numeric/clamp/steps, Ctrl-wheel, mobile không app zoom và admin không gọi dữ liệu cá nhân. Matrix zoom rộng vẫn giữ ở notes-zoom/mobile-layout/content-zoom.
