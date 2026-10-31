@@ -75,7 +75,7 @@ for (const width of [320, 393, 1440]) {
     expect(await sidebar.evaluate((element) => element.scrollTop)).toBe(0);
     if (width < 800) {
       const notifications = sidebar.getByRole("link", {
-        name: "Open inbox",
+        name: "Notifications",
         exact: true,
       });
       const settings = sidebar.getByRole("link", {

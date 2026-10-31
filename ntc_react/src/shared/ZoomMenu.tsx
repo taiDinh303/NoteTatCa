@@ -59,7 +59,10 @@ export function ZoomDropdown() {
             setFocused(true);
             setDraft(String(percent));
           }}
-          onChange={(event) => setDraft(event.target.value)}
+          onChange={(event) => {
+            setFocused(true);
+            setDraft(event.target.value);
+          }}
           onBlur={commit}
           onKeyDown={(event) => {
             event.stopPropagation();

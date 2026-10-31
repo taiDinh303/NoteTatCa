@@ -165,8 +165,10 @@ test("bunny uses the aligned atlas without a neck cut and leaves card actions cl
     .getByRole("dialog", { name: "View note" })
     .getByRole("button", { name: "Close", exact: true })
     .click();
-  const mascotBox = await target.locator(".note-mascot").boundingBox();
-  const cardBox = await target.boundingBox();
+  const perched = cards.filter({ has: page.locator(".note-mascot") });
+  await expect(perched).toHaveCount(1);
+  const mascotBox = await perched.locator(".note-mascot").boundingBox();
+  const cardBox = await perched.boundingBox();
   expect(
     cardBox!.x + cardBox!.width - mascotBox!.x - mascotBox!.width,
   ).toBeGreaterThan(45);

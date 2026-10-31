@@ -268,7 +268,7 @@ test("language change preserves the open editor draft", async ({
   await content.evaluate((element) =>
     element.setAttribute("data-editor-instance", "original"),
   );
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByText("Saved on this device; waiting to sync", { exact: true })).toBeVisible();
   const otherTab = await context.newPage();
   await otherTab.goto("/settings/language");
   await otherTab

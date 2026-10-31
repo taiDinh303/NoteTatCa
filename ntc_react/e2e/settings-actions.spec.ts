@@ -66,7 +66,7 @@ for (const width of [320, 393, 1440]) {
       }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
-    const provider = await page.locator(".connected-provider-label").boundingBox();
+    const provider = await page.locator(".connected-provider-label").locator("..").boundingBox();
     const disconnect = page.getByRole("button", { name: "Disconnect", exact: true });
     const actionBounds = (await disconnect.boundingBox())!;
     const badge = (await page.locator(".provider-badge").boundingBox())!;

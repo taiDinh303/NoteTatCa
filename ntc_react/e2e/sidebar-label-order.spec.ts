@@ -79,7 +79,10 @@ for (const touch of [false, true]) {
       });
       await handle.focus();
       await page.keyboard.press("Space");
+      await expect(nav.locator(".sorting")).toHaveCount(1);
+      await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
       await page.keyboard.press("ArrowDown");
+      await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => resolve())));
       await page.keyboard.press("Space");
       await expect(links).toHaveText([names[0], names[2], names[1]]);
       await page.reload();

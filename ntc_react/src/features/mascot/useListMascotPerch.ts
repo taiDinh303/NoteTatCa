@@ -1,12 +1,17 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { useMascotPreference } from "./mascotPreference";
+import { useDesktopMascots } from "./desktopMascots";
 
 // Keep the companion inside the clipped notes viewport, below all controls.
 // Check its current perch first; only search for another card when necessary.
 export function useListMascotPerch(preferred: string | null, layout: string, mode: string) {
+  const { enabled } = useMascotPreference();
+  const desktop = useDesktopMascots();
   const [perch, setPerch] = useState<string | null>(null);
   const current = useRef<string | null>(null);
   const previousPreferred = useRef<string | null>(null);
   useLayoutEffect(() => {
+    if (!enabled || !desktop || !preferred) return;
     const viewport = document.querySelector<HTMLElement>("[data-notes-zoom]");
     const layer = viewport?.querySelector<HTMLElement>(".notes-zoom-layer");
     if (!viewport || !layer) return;
@@ -55,6 +60,6 @@ export function useListMascotPerch(preferred: string | null, layout: string, mod
       viewport.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, [preferred, layout, mode]);
-  return perch;
+  }, [preferred, layout, mode, enabled, desktop]);
+  return enabled && desktop ? perch : null;
 }
