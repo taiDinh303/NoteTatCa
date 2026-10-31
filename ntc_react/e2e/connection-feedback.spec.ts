@@ -39,8 +39,10 @@ for (const width of [393, 1440]) {
       await expect(
         page.getByRole("button", { name: "Take a note", exact: true }),
       ).toBeVisible();
+      await page.getByRole("button", { name: "Account menu", exact: true }).click();
+      await page.getByRole("menuitem", { name: "Review sync", exact: true }).click();
       await expect(
-        page.getByRole("region", { name: "Note synchronization" }),
+        page.getByRole("dialog", { name: "Note synchronization" }),
       ).toBeVisible();
       await expect(
         page.getByText("Offline notes on this device", { exact: true }),
@@ -53,6 +55,7 @@ for (const width of [393, 1440]) {
         path: `../artifacts/frontend/connection-single-${width}.png`,
         animations: "disabled",
       });
+      await page.getByRole("dialog", { name: "Note synchronization" }).getByRole("button", { name: "Close", exact: true }).click();
     } finally {
       release();
     }
@@ -68,12 +71,14 @@ for (const width of [393, 1440]) {
       });
       window.dispatchEvent(new Event("offline"));
     });
-    const notice = page.getByRole("region", {
+    await page.getByRole("button", { name: "Account menu", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Review sync", exact: true }).click();
+    const notice = page.getByRole("dialog", {
       name: "Note synchronization",
     });
     await expect(notice).toBeVisible();
     await expect(
-      notice.getByText("Working offline", { exact: true }),
+      notice.getByRole("button", { name: "Download backup", exact: true }),
     ).toBeVisible();
     await expect(page.locator(".startup-screen")).toHaveCount(0);
     await page.evaluate(() => {
@@ -83,9 +88,8 @@ for (const width of [393, 1440]) {
       });
     });
     await notice.getByRole("button", { name: "Sync now", exact: true }).click();
-    await expect(
-      page.getByText("Notes synced", { exact: true }),
-    ).toBeAttached();
+    await expect(notice.getByText("Notes synced", { exact: true })).toBeVisible();
+    await notice.getByRole("button", { name: "Close", exact: true }).click();
     await expect(
       page.getByRole("button", { name: "Take a note", exact: true }),
     ).toBeVisible();

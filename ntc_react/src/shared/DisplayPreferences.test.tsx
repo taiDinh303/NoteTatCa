@@ -1,14 +1,23 @@
 // @vitest-environment jsdom
 import { act, cleanup, render, screen } from "@testing-library/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { DisplayPreferences } from "./DisplayPreferences";
 import { useDisplayZoom } from "./displayZoom";
 import { useEffect } from "react";
+
+beforeEach(() => {
+  vi.stubGlobal("matchMedia", vi.fn((query: string) => ({
+    matches: false, media: query, onchange: null,
+    addEventListener: vi.fn(), removeEventListener: vi.fn(),
+    addListener: vi.fn(), removeListener: vi.fn(), dispatchEvent: vi.fn(),
+  })));
+});
 
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
   localStorage.clear();
   document.documentElement.style.removeProperty("--interface-scale");
 });

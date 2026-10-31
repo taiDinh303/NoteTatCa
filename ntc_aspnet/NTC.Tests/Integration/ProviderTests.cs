@@ -16,7 +16,16 @@ public sealed class ProviderTests
         using var sql=new SqlServerDesignFactory().CreateDbContext([]);using var pg=new PostgreSqlDesignFactory().CreateDbContext([]);
         var sqlScript=sql.Database.GenerateCreateScript();var pgScript=pg.Database.GenerateCreateScript();
         Assert.Contains("[Notes]",sqlScript);Assert.Contains("uuid",pgScript);Assert.Contains("ntc",pgScript);
-        Assert.Equal(4,sql.Database.GetMigrations().Count());Assert.Equal(3,pg.Database.GetMigrations().Count());
+        Assert.Equal(new[] {
+            "20260731153548_InitialCreate", "20261017044024_CompleteNoteBackend",
+            "20261017122802_EnforceEntityIntegrity", "20261017160312_SupportAccountReactivation",
+            "20261027152708_AddMascotGenerations"
+        }, sql.Database.GetMigrations());
+        Assert.Equal(new[] {
+            "20261017044034_InitialPostgreSql", "20261017122809_EnforceEntityIntegrity",
+            "20261017160333_SupportAccountReactivation",
+            "20261027152721_AddMascotGenerations"
+        }, pg.Database.GetMigrations());
         Assert.DoesNotContain("uniqueidentifier",pgScript,StringComparison.OrdinalIgnoreCase);
         Assert.False(sql.Database.HasPendingModelChanges());Assert.False(pg.Database.HasPendingModelChanges());
     }

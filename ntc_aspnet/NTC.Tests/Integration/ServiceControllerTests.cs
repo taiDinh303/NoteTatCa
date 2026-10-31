@@ -324,7 +324,8 @@ public sealed class ServiceControllerTests
         {
             var responses = operation.Value.GetProperty("responses");
             var success = Assert.Single(responses.EnumerateObject(), x => x.Name.StartsWith('2'));
-            Assert.True(success.Value.GetProperty("content").EnumerateObject().All(x => x.Value.TryGetProperty("schema", out _)), path.Name);
+            Assert.True(success.Value.TryGetProperty("content", out var content), path.Name + " " + operation.Name + " missing success schema");
+            Assert.True(content.EnumerateObject().All(x => x.Value.TryGetProperty("schema", out _)), path.Name);
             foreach (var error in new[] { "400", "401", "404", "409", "429", "500" }) Assert.True(responses.TryGetProperty(error, out _), path.Name + ":" + error);
             Assert.True(operation.Value.TryGetProperty("x-ntc-access", out _), path.Name);
         }

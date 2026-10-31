@@ -1,3 +1,10 @@
+## Sửa CI backend/frontend — 2026-10-31
+
+- Theo ảnh/yêu cầu chủ dự án: xác minh logs runs41072000340/41072000692. Frontend4test fail thiếu jsdom matchMedia: bổ sung mock desktop và cleanup,138unit/config4PASS local. Backend migration history count lỗi sau thêm mascot: kiểm chính xác lịch sử5SQLServer/4PostgreSQL trên commit scope, giữ model pending check; khai báo schema typed cho6mascot endpoints, assertion OpenAPI có path khi thiếu schema. Không bỏ assertion hoặc bỏ test. Mobile card-label test không bấm Grid/List đã gỡ theo yêu cầu30/10; connection test mở Review sync từ accountmenu theo UI hiện hành.
+- Chia248E2E thành4shards/runner riêng, fail-fast false, artifact tên riêng; giữ đủ suite và20phút mỗi shard. Healthcheck PostgreSQL dùng user/database fixture đúng để hết role-root noise. Không đổi app runtime/auth/notes/config local/schema/hosting.
+- Validation source workingtree gồm archive đang làm riêng: Release strictPASS,166backendPASS/1PGskip sau loại5LocalDB tests vì máy chưa cài; CI Ubuntu giữ skip LocalDB như trước, chạy PostgreSQLservice. Clean publication không chứa archive/history/reminder/template hoặc mascot assets; kiểm CI sau push là evidence cuối, chưa claim green trước khi chạy. Cấu hình synthetic export và ProductionpublishchecksPASS; không dùng ownerDB/email thật/migration/manualdeploy.
+- Publication scope9files (2workflow,4testfiles,mascotcontroller,connectionE2E/cardlabelsE2E và worklog theo danh sách git). Fetch HEAD=origin/main9b6f472, divergence0/0; xuất bản main theo yêu cầu sửaCI, kiểm remoteSHA và theo dõi workflow.
+
 ## Bỏ Go to notes khỏi Reminders — 2026-10-30
 
 - Theoảnh/lệnh chủ dự án: gỡ link Go to notes và toàn bộ toolbar chỉ chứa link đó trên Reminders cả PC/mobile; bỏ import Link và2ruleCSS reminder-toolbar không còn dùng. Banner hướng dẫn và vùngcuộn/card/lịch/notification giữ nguyên.

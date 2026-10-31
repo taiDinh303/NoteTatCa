@@ -29,8 +29,8 @@ for (const width of [320, 393, 1440]) {
     const card = page.getByRole("article").filter({ has: page.getByRole("button", { name: "Open Many labels", exact: true }) });
     await expect(card).toBeVisible();
     let gridCount = 0;
-    for (const view of ["grid", "list", "grid"]) {
-      await page.getByRole("button", { name: `${view} view`, exact: true }).click();
+    for (const view of (width <= 800 ? ["grid"] : ["grid", "list", "grid"])) {
+      if (width > 800) await page.getByRole("button", { name: `${view} view`, exact: true }).click();
       await page.evaluate(() => document.fonts.ready);
       const labels = card.locator(".card-labels");
       await expect.poll(async () => labels.locator(":scope > .label-chip").count()).toBeGreaterThan(0);
