@@ -30,6 +30,6 @@ test('signed in user can visit Home and return to workspace', async ({ page }) =
   await expect(page).toHaveURL(/\/Home/);
   await expect(page.getByRole('heading', { name: 'Clear your mind. Keep your ideas.' })).toBeVisible();
   await page.reload();
-  await page.getByRole('link', { name: 'Open workspace', exact: true }).click();
+  await page.getByRole('banner').getByRole('link', { name: 'Open workspace', exact: true }).click();
   await expect(page).toHaveURL(/\/notes/);
 });

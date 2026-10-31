@@ -181,6 +181,7 @@ export function OfflineControls({ onClose }: { onClose: () => void }) {
                   setBusy(true);
                   void offline
                     .resolve(item.id, true)
+                    .then(() => cache.invalidateQueries({ queryKey: workspace.key("notes") }))
                     .catch(setError)
                     .finally(() => setBusy(false));
                 }}

@@ -16,3 +16,7 @@
 `WorkspacePreparation` trước đây tải tất cả 1.000 note theo các trang 100 và chặn mở màn hình. Đây là nguyên nhân rõ ràng của request/bytes và thời gian sẵn sàng cao. Đã đổi để chỉ trang đầu chặn mở màn hình; nút **Load more notes** vẫn dùng phân trang API khi người dùng cần xem thêm. Cơ chế cache không suy diễn một bộ lọc từ trang đầu chưa đầy đủ; lọc/search vẫn hỏi server. Không triển khai delta sync hoặc virtualization vì phép cuộn trang đầu chưa có khung trên 32ms trong phép đo này.
 
 Đây là số đo tổng hợp trên Chromium local, không đại diện cho máy vật lý, mạng chậm, trình duyệt khác, thao tác kéo chuột thật, hoặc 1.000 card cùng xuất hiện sau khi người dùng tải mọi trang. Nếu phát sinh giật ở các điều kiện đó, cần đo riêng trước khi chọn virtualization hoặc delta sync. Không có đo bộ nhớ đáng tin cậy trong lượt này.
+
+## Rerun 2026-10-31
+
+Đo riêng sau build: desktop ready2078ms,15requests,100429B; mobile1892ms,13requests,196855B. p95frame16.8ms,1/0frames>32ms. Cùng fixture1.000note và giới hạn phương pháp như trên; request/body thay đổi theo background timing. Không suy ra phần trăm cải thiện/giảm tốc từ một lượt hoặc cam kết thiết bị thật.

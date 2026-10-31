@@ -263,7 +263,14 @@
   white-space: nowrap;
 }
 .settings-account .connected-provider-label {
+  display: flex;
+  align-items: center;
+  grid-column: 1;
+  grid-row: 1;
   font: inherit;
+}
+.settings-account .account-data-row:has(> .connected-provider-label) > .button {
+  grid-row: 1;
 }
 .settings-account .connected-provider-label .provider-badge {
   display: inline-flex;

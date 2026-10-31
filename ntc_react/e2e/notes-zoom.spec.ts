@@ -55,6 +55,8 @@ for (const mode of ["grid", "list"]) {
   }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.addInitScript((mode) => {
+      // Isolate reflow layout reads; mascot safety measurement has separate coverage.
+      localStorage.setItem("ntc.mascot.v1", "off:bunny");
       localStorage.setItem("ntc.view.v1", mode);
       localStorage.setItem("ntc.interface.zoom.v1", "150");
     }, mode);
@@ -169,7 +171,7 @@ for (const zoom of [75, 100, 125]) {
   }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await page.addInitScript(
-      (zoom) => localStorage.setItem("ntc.interface.zoom.v1", String(zoom)),
+      (zoom) => { localStorage.setItem("ntc.interface.zoom.v1", String(zoom)); localStorage.setItem("ntc.mascot.v1", "off:bunny"); },
       zoom,
     );
     await page.goto("/Home");
@@ -643,7 +645,7 @@ for (const width of [1920]) {
     await page.screenshot({
       path: `test-results/notes-single-scroll-${width}.png`,
     });
-    const resizedWidth = width === 1920 ? 760 : 430;
+    const resizedWidth = width === 1920 ? 1024 : 1280; // Desktop scrollbar contract; mobile has its own normal-flow coverage.
     await page.setViewportSize({ width: resizedWidth, height: 760 });
     await expect
       .poll(() => list.evaluate((el) => el.getBoundingClientRect().right))

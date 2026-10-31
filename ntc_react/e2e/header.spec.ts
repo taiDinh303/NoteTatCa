@@ -76,7 +76,7 @@ for (const width of [1440, 1024, 393, 320]) {
       await header.getByRole('link', { name: 'Back', exact: true }).click();
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
       await expect(drawer.getByRole('button', { name: 'Account menu', exact: true })).toHaveCount(0);
-      await drawer.getByRole('link', { name: 'Open inbox', exact: true }).click();
+      await drawer.getByRole('link', { name: 'Notifications', exact: true }).click();
       await expect(page).toHaveURL(/\/notifications$/);
       await expect(drawer).toBeHidden();
       await page.getByRole('button', { name: 'Open navigation', exact: true }).click();

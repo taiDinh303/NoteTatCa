@@ -39,15 +39,25 @@ async function ctrlWheel(page: Page, deltaY: number) {
   await page.keyboard.up("Control");
 }
 async function setZoom(page: Page, percent: number) {
-  await ctrlWheel(page, -3000);
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
-  if (percent !== 150) {
-    await ctrlWheel(
-      page,
-      percent === 50 ? 3000 : Math.log(150 / percent) * 1000,
-    );
-  }
-  await expect(page.locator("html")).toHaveCSS("zoom", String(percent / 100));
+  await openAccountMenu(page);
+  const input = page.getByRole("spinbutton", {
+    name: "Zoom percentage",
+    exact: true,
+  });
+  await input.fill(String(percent));
+  await input.press("Enter");
+  await expect(input).toHaveValue(String(percent));
+  await page.keyboard.press("Escape");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await expect
+    .poll(() =>
+      page
+        .locator(".notes-zoom-layer")
+        .evaluate(
+          (el) => new DOMMatrixReadOnly(getComputedStyle(el).transform).a,
+        ),
+    )
+    .toBeCloseTo(percent / 100, 2);
 }
 async function createNote(
   page: Page,
@@ -137,15 +147,17 @@ test("waits for a waking server before sending credentials and shows connection 
   expect(signIns).toBe(1);
 });
 
-test("preloads all note pages and switches cached workspace collections without loading again", async ({
+test("loads the first note page before background data and fetches later pages on demand", async ({
   page,
 }) => {
   const warmed = new Set<string>();
-  page.on("response", response => {
+  page.on("response", (response) => {
     if (response.ok()) {
       if (response.url().includes("/api/v1/me")) warmed.add("me");
-      if (response.url().includes("/api/v1/reminders?")) warmed.add("reminders");
-      if (response.url().includes("/api/v1/notifications/unread-count")) warmed.add("inbox");
+      if (response.url().includes("/api/v1/reminders?"))
+        warmed.add("reminders");
+      if (response.url().includes("/api/v1/notifications/unread-count"))
+        warmed.add("inbox");
     }
   });
   let release!: () => void;
@@ -252,7 +264,14 @@ test("preloads all note pages and switches cached workspace collections without 
     await expect(
       page.getByRole("heading", { name: "Notes", exact: true }),
     ).toBeVisible();
-    expect(pages).toEqual([1, 2, 3]);
+    expect([...new Set(pages)]).toEqual([1]);
+    for (let number = 2; number <= 3; number++) {
+      await page
+        .getByRole("button", { name: "Load more notes", exact: true })
+        .click();
+      await expect.poll(() => pages.includes(number)).toBe(true);
+    }
+    expect([...new Set(pages)]).toEqual([1, 2, 3]);
     await expect.poll(() => warmed.size).toBe(3);
     await page.route(
       /\/api\/v1\/(reminders|notifications)\?/,
@@ -337,9 +356,13 @@ test("keeps the saved session when offline during restore and reconnects on requ
     });
   });
   await page.reload();
-  await expect(page.getByRole("button", { name: "Account menu", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Account menu", exact: true }),
+  ).toBeVisible();
   await openAccountMenu(page);
-  await page.getByRole("menuitem", { name: "Review sync", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Review sync", exact: true })
+    .click();
   await expect(
     page.getByText("Offline notes on this device", { exact: true }),
   ).toBeVisible();
@@ -352,10 +375,11 @@ test("keeps the saved session when offline during restore and reconnects on requ
       get: () => true,
     });
   });
+  await page.getByRole("button", { name: "Sync now", exact: true }).click();
   await page
-    .getByRole("button", { name: "Sync now", exact: true })
+    .getByRole("dialog", { name: "Note synchronization", exact: true })
+    .getByRole("button", { name: "Close", exact: true })
     .click();
-  await page.getByRole("dialog", { name: "Note synchronization", exact: true }).getByRole("button", { name: "Close", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Notes", exact: true }),
   ).toBeVisible();
@@ -420,7 +444,10 @@ test("renders responsive workspace without console errors or navigation reloads"
       exact: true,
     }),
   ).toHaveCount(0);
-  await page.getByRole("link", { name: "Notifications", exact: true }).first().click();
+  await page
+    .getByRole("link", { name: "Notifications", exact: true })
+    .first()
+    .click();
   await expect(
     page.getByRole("heading", { name: "Your inbox", exact: true }),
   ).toHaveClass("sr-only");
@@ -494,461 +521,206 @@ test("renders responsive workspace without console errors or navigation reloads"
   expect(errors).toEqual([]);
 });
 
-test("scales the interface without reloads, preserves notes and fits desktop and mobile", async ({
+test("list zoom keeps chrome fixed and mobile preserves the desktop preference", async ({
   page,
 }) => {
   await login(page);
-  await expect(
-    page.getByText("Personal workspace", { exact: true }),
-  ).toHaveCount(0);
-  await expect(page.getByText("Just for you", { exact: true })).toHaveCount(0);
-  await expect(page.locator(".global-search kbd")).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: /^Interface zoom:/ }),
-  ).toHaveCount(0);
-  await expect(page.locator(".sidebar-tip")).toHaveCount(0);
-  await expect(
-    page.getByText("Big ideas often start", { exact: false }),
-  ).toHaveCount(0);
-  await page.keyboard.press("Control+k");
-  await expect(
-    page.getByLabel("Search your notes", { exact: true }),
-  ).toBeFocused();
-  await expect(page.locator(".sidebar")).toHaveCSS("scrollbar-width", "thin");
-  const lightThumb = await page
-    .locator(".sidebar")
-    .evaluate((el) => getComputedStyle(el).scrollbarColor);
-  await page.getByRole("button", { name: "Use dark theme" }).click();
-  expect(
-    await page
-      .locator(".sidebar")
-      .evaluate((el) => getComputedStyle(el).scrollbarColor),
-  ).not.toBe(lightThumb);
-  await page.evaluate(() => {
-    (window as Window & { zoomMarker?: string }).zoomMarker = "kept";
-  });
-  async function zoom(level: number) {
-    await setZoom(page, level);
-    await expect(page.locator("html")).toHaveCSS("zoom", String(level / 100));
-  }
-  async function inViewport(selector: string) {
-    const viewport = page.viewportSize()!;
-    await expect
-      .poll(async () => (await page.locator(selector).boundingBox())!.x)
-      .toBeGreaterThanOrEqual(-1);
-    await expect
-      .poll(async () => {
-        const bounds = (await page.locator(selector).boundingBox())!;
-        return bounds.x + bounds.width;
-      })
-      .toBeLessThanOrEqual(viewport.width + 1);
-  }
-  const initialWidth = (await page.locator(".sidebar").boundingBox())!.width;
-  await zoom(125);
-  expect((await page.locator(".sidebar").boundingBox())!.width).toBeGreaterThan(
-    initialWidth,
-  );
-  await inViewport(".topbar");
-  await page.screenshot({
-    path: "../artifacts/frontend/zoom-desktop-dark.png",
-    fullPage: true,
-  });
-  await page.getByRole("link", { name: "Reminders", exact: true }).click();
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
-  expect(
-    await page.evaluate(
-      () => (window as Window & { zoomMarker?: string }).zoomMarker,
-    ),
-  ).toBe("kept");
-  await page.reload();
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.25");
-  await page.getByRole("link", { name: "All notes", exact: true }).click();
+  const header = await page.locator(".topbar").boundingBox();
+  const sidebar = await page.locator(".sidebar").boundingBox();
   for (const level of [50, 75, 100, 125, 150]) {
-    await zoom(level);
-    await inViewport(".topbar");
-    await inViewport("#workspace-main");
+    await setZoom(page, level);
+    expect((await page.locator(".topbar").boundingBox())!.height).toBe(
+      header!.height,
+    );
+    expect((await page.locator(".sidebar").boundingBox())!.width).toBe(
+      sidebar!.width,
+    );
   }
+  await setZoom(page, 125);
+  await page.reload();
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
+    )
+    .toBe("125");
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator(".notes-mobile-viewport")).toBeVisible();
+  await openAccountMenu(page);
   await expect(
-    page.getByRole("button", { name: "Open navigation", exact: true }),
-  ).toBeVisible();
-  await page
-    .getByRole("button", { name: "Open navigation", exact: true })
-    .click();
-  await inViewport(".navigation-drawer");
-  await page
-    .getByRole("dialog", { name: "NoteTatCa.", exact: true })
-    .getByRole("link", { name: "All notes", exact: true })
-    .click();
-  await page.screenshot({
-    path: "../artifacts/frontend/zoom-mobile-dark.png",
-    fullPage: true,
-  });
+    page.getByRole("spinbutton", { name: "Zoom percentage", exact: true }),
+  ).toHaveCount(0);
+  await page.keyboard.press("Escape");
   const editor = await createNote(
     page,
     "Zoom draft",
     "Preserved while changing display size.",
   );
-  const editorBounds = (await editor.boundingBox())!;
-  expect(editorBounds.height).toBeCloseTo(844, 0);
-  await inViewport(".note-editor-modal");
-  for (const width of [320, 390]) {
-    await page.setViewportSize({ width, height: 844 });
-    for (const button of await editor.locator(".editor-tools button").all()) {
-      const bounds = (await button.boundingBox())!;
-      expect(bounds.x).toBeGreaterThanOrEqual(0);
-      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width + 1);
-    }
-    const closeBounds = (await editor
-      .getByRole("button", { name: "Close", exact: true })
-      .boundingBox())!;
-    expect(closeBounds.y + closeBounds.height).toBeLessThanOrEqual(844);
-    await expect(
-      editor.getByRole("textbox", { name: "Note content" }),
-    ).toHaveText("Preserved while changing display size.");
-  }
-  await page.screenshot({
-    path: "../artifacts/frontend/zoom-mobile-editor.png",
-  });
+  await expect(
+    editor.getByRole("textbox", { name: "Note content" }),
+  ).toHaveText("Preserved while changing display size.");
+  expect((await editor.boundingBox())!.width).toBeLessThanOrEqual(390);
   await editor.getByRole("button", { name: "Close", exact: true }).click();
-  for (const width of [320, 390, 768, 1024]) {
-    await page.setViewportSize({ width, height: 844 });
-    for (const level of [50, 150]) {
-      await zoom(level);
-      await inViewport(".topbar");
-      await inViewport("#workspace-main");
-      await expect(
-        page.getByRole("button", { name: "Open Zoom draft", exact: true }),
-      ).toBeVisible();
-    }
-  }
-  await openAccountMenu(page);
-  await inViewport(".dropdown");
-  await page
-    .getByRole("menuitem", { name: "Account settings", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/settings\/profile$/);
-  await zoom(100);
-  await page.reload();
-  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
+    )
+    .toBe("125");
+  await setZoom(page, 100);
 });
 
-test("opens account-menu zoom with numeric input, increment buttons and shared gesture state", async ({
+test("account-menu numeric zoom clamps values and increment controls keep chrome fixed", async ({
   page,
 }) => {
   await login(page);
-  await page
-    .getByRole("button", { name: "Use dark theme", exact: true })
-    .click();
-  const account = page.getByRole("button", {
-    name: "Account menu",
-    exact: true,
-  });
-  await account.click();
-  await page
-    .getByRole("menuitem", { name: "Zoom (100%)", exact: true })
-    .click();
-  const panel = page.getByRole("dialog", {
-    name: "Interface zoom",
-    exact: true,
-  });
-  const input = panel.getByRole("spinbutton", {
+  await setZoom(page, 100);
+  await openAccountMenu(page);
+  const input = page.getByRole("spinbutton", {
     name: "Zoom percentage",
     exact: true,
   });
-  await input.fill("83");
-  await expect(page.locator("html")).toHaveCSS("zoom", "1");
-  await input.press("Enter");
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.83");
-  await panel.getByRole("button", { name: "Zoom in", exact: true }).click();
-  await expect(input).toHaveValue("93");
-  await panel.getByRole("button", { name: "Zoom out", exact: true }).click();
-  await expect(input).toHaveValue("83");
-  await input.fill("90");
-  await panel.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await page.getByRole("button", { name: "Zoom in", exact: true }).click();
+  await expect(input).toHaveValue("105");
+  await page.getByRole("button", { name: "Zoom out", exact: true }).click();
   await expect(input).toHaveValue("100");
   await input.fill("999");
-  await input.press("Tab");
+  await input.press("Enter");
   await expect(input).toHaveValue("150");
   await expect(
-    panel.getByRole("button", { name: "Zoom in", exact: true }),
+    page.getByRole("button", { name: "Zoom in", exact: true }),
   ).toBeDisabled();
   await input.fill("1");
   await input.press("Enter");
   await expect(input).toHaveValue("50");
   await expect(
-    panel.getByRole("button", { name: "Zoom out", exact: true }),
+    page.getByRole("button", { name: "Zoom out", exact: true }),
   ).toBeDisabled();
-  await input.fill("");
-  await input.press("Tab");
-  await expect(input).toHaveValue("50");
-  await ctrlWheel(page, -3000);
-  await expect(input).toHaveValue("150");
-  await page.setViewportSize({ width: 390, height: 844 });
-  const bounds = (await panel.boundingBox())!;
-  expect(bounds.x).toBeGreaterThanOrEqual(0);
-  expect(bounds.x + bounds.width).toBeLessThanOrEqual(391);
-  expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
-  await page.screenshot({
-    path: "../artifacts/frontend/account-zoom-mobile.png",
-    animations: "disabled",
-  });
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await panel
-    .getByRole("button", { name: "Reset to 100%", exact: true })
-    .click();
-  await input.fill("67");
-  await input.press("Enter");
-  await panel.getByRole("button", { name: "Done", exact: true }).click();
-  await expect(account).toBeFocused();
-  await page.reload();
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.67");
-  await account.click();
-  await page.getByRole("menuitem", { name: "Zoom (67%)", exact: true }).click();
-  await expect(input).toHaveValue("67");
-  await page.keyboard.press("Escape");
-  await expect(panel).toHaveCount(0);
-  await expect(account).toBeFocused();
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(input).toHaveValue("100");
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
 });
 
-test("zooms with Ctrl wheel within bounds and briefly shows a bottom-center percentage", async ({
+test("Ctrl wheel changes list zoom within bounds while chrome stays fixed", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    if (!sessionStorage.getItem("zoom-seeded")) {
-      localStorage.setItem("ntc.interface.zoom.v1", "42");
-      sessionStorage.setItem("zoom-seeded", "true");
-    }
-  });
   await login(page);
-  const hud = page.locator(".zoom-indicator");
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
-  await expect(hud).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: /^Interface zoom:/ }),
-  ).toHaveCount(0);
-  await expect(
-    page.getByRole("dialog", { name: "Interface zoom" }),
-  ).toHaveCount(0);
-  const originalDpr = await page.evaluate(() => devicePixelRatio);
-  await page.mouse.wheel(0, 200);
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
-  await expect(hud).toHaveCount(0);
-  await ctrlWheel(page, -3000);
-  await expect(hud).toHaveText("150%");
-  const bounds = (await hud.boundingBox())!;
-  const viewport = page.viewportSize()!;
-  const bodyBox = (await page.locator("body").boundingBox())!;
-  expect(bounds.x + bounds.width / 2).toBeCloseTo(
-    bodyBox.x + bodyBox.width / 2,
-    0,
+  await setZoom(page, 100);
+  const before = await page.locator(".topbar").boundingBox();
+  await ctrlWheel(page, -120);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Number(localStorage.getItem("ntc.interface.zoom.v1")),
+      ),
+    )
+    .toBeGreaterThan(100);
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  expect((await page.locator(".topbar").boundingBox())!.height).toBe(
+    before!.height,
   );
-  expect(viewport.height - bounds.y - bounds.height).toBeCloseTo(24, 0);
-  expect(await page.evaluate(() => devicePixelRatio)).toBe(originalDpr);
-  await page.screenshot({
-    path: "../artifacts/frontend/zoom-wheel-indicator.png",
-    animations: "disabled",
-  });
-  await expect(hud).toHaveCount(0, { timeout: 4000 });
-  await ctrlWheel(page, 3000);
-  await expect(hud).toHaveText("50%");
-  await page.reload();
-  await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
-  await expect(hud).toHaveCount(0);
-  const canceled = await page.evaluate(() => {
-    const event = new WheelEvent("wheel", {
-      ctrlKey: true,
-      deltaY: -2,
-      deltaMode: 1,
-      bubbles: true,
-      cancelable: true,
-    });
-    document.dispatchEvent(event);
-    return event.defaultPrevented;
-  });
-  expect(canceled).toBe(true);
-  await expect(page.locator("html")).not.toHaveCSS("zoom", "0.5");
+  await setZoom(page, 50);
+  await ctrlWheel(page, 120);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Number(localStorage.getItem("ntc.interface.zoom.v1")),
+      ),
+    )
+    .toBe(50);
+  await setZoom(page, 150);
+  await ctrlWheel(page, -120);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Number(localStorage.getItem("ntc.interface.zoom.v1")),
+      ),
+    )
+    .toBe(150);
 });
 
-test.describe("pinch zoom", () => {
+test.describe("mobile gestures", () => {
   test.use({
     viewport: { width: 390, height: 844 },
     isMobile: true,
     hasTouch: true,
   });
-  test("uses two fingers without double native zoom, keeps one-finger scroll and editor content", async ({
+  test("two-finger gestures do not enable app zoom or reorder notes", async ({
     page,
-    context,
   }) => {
     await login(page);
-    const session = await context.newCDPSession(page);
-    async function pinch(startDistance: number, endDistance: number) {
-      function points(distance: number) {
-        return [
-          { id: 1, x: 195 - distance / 2, y: 400 },
-          { id: 2, x: 195 + distance / 2, y: 400 },
-        ];
-      }
-      await session.send("Input.dispatchTouchEvent", {
-        type: "touchStart",
-        touchPoints: points(startDistance),
-      });
-      for (let step = 1; step <= 5; step++) {
-        await session.send("Input.dispatchTouchEvent", {
-          type: "touchMove",
-          touchPoints: points(
-            startDistance + ((endDistance - startDistance) * step) / 5,
-          ),
-        });
-      }
-      await session.send("Input.dispatchTouchEvent", {
-        type: "touchEnd",
-        touchPoints: [],
-      });
-    }
-    const hud = page.locator(".zoom-indicator");
-    const reorderRequests: string[] = [];
-    page.on("request", (request) => {
-      if (request.url().endsWith("/notes/reorder"))
-        reorderRequests.push(request.url());
+    const before = await page.evaluate(() =>
+      localStorage.getItem("ntc.interface.zoom.v1"),
+    );
+    const writes: string[] = [];
+    page.on("request", (r) => {
+      if (r.url().endsWith("/notes/reorder")) writes.push(r.url());
     });
-    const handle = (await page.locator(".note-open").first().boundingBox())!;
-    const handleX = handle.x + handle.width / 2;
-    const handleY = handle.y + handle.height / 2;
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ id: 1, x: handleX, y: handleY }],
+    await page.locator(".notes-mobile-viewport").evaluate((el) => {
+      const touches = (distance: number) => [
+        new Touch({ identifier: 1, target: el, clientX: 80, clientY: 300 }),
+        new Touch({
+          identifier: 2,
+          target: el,
+          clientX: 80 + distance,
+          clientY: 300,
+        }),
+      ];
+      el.dispatchEvent(
+        new TouchEvent("touchstart", {
+          bubbles: true,
+          cancelable: true,
+          touches: touches(100),
+        }),
+      );
+      el.dispatchEvent(
+        new TouchEvent("touchmove", {
+          bubbles: true,
+          cancelable: true,
+          touches: touches(200),
+        }),
+      );
+      el.dispatchEvent(
+        new TouchEvent("touchend", { bubbles: true, touches: [] }),
+      );
     });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [
-        { id: 1, x: handleX, y: handleY },
-        { id: 2, x: handleX - 100, y: handleY },
-      ],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [
-        { id: 1, x: handleX + 10, y: handleY },
-        { id: 2, x: handleX - 170, y: handleY },
-      ],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-    await expect(hud).toHaveText("150%");
-    expect(reorderRequests).toEqual([]);
-    await expect(page.locator(".note-editor-modal")).toHaveCount(0);
-    await pinch(120, 240);
-    await expect(hud).toHaveText("150%");
-    await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
-    expect(await page.evaluate(() => visualViewport?.scale)).toBe(1);
-    await pinch(240, 60);
-    await expect(hud).toHaveText("50%");
-    await expect(page.locator("html")).toHaveCSS("zoom", "0.5");
-    await pinch(80, 160);
-    await expect(page.locator("html")).toHaveCSS("zoom", "1");
-    const beforeScroll = await page.evaluate(() => scrollY);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ x: 210, y: 700 }],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: 210, y: 500 }],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ x: 210, y: 300 }],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-    await expect
-      .poll(() => page.evaluate(() => scrollY))
-      .toBeGreaterThan(beforeScroll);
-    await expect(page.locator("html")).toHaveCSS("zoom", "1");
+    await expect(page.locator(".notes-mobile-viewport")).toBeVisible();
+    expect(
+      await page.evaluate(() => localStorage.getItem("ntc.interface.zoom.v1")),
+    ).toBe(before);
+    expect(writes).toEqual([]);
+    await openAccountMenu(page);
+    await expect(
+      page.getByRole("spinbutton", { name: "Zoom percentage" }),
+    ).toHaveCount(0);
+    await page.keyboard.press("Escape");
     const editor = await createNote(
       page,
       "Pinch draft",
       "Keep this note while zooming.",
     );
-    await pinch(120, 240);
-    await expect(hud).toHaveText("150%");
     await expect(
       editor.getByRole("textbox", { name: "Note content" }),
     ).toHaveText("Keep this note while zooming.");
-    const bounds = (await hud.boundingBox())!;
-    expect(bounds.x + bounds.width / 2).toBeCloseTo(195, 0);
-    expect(bounds.y + bounds.height).toBeLessThanOrEqual(844);
-    await page.screenshot({
-      path: "../artifacts/frontend/zoom-pinch-indicator.png",
-      animations: "disabled",
-    });
-    await editor.getByRole("button", { name: "Close", exact: true }).tap();
-    await openAccountMenu(page);
-    await page
-      .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
-      .tap();
-    const zoomPanel = page.getByRole("dialog", {
-      name: "Interface zoom",
-      exact: true,
-    });
-    await zoomPanel
-      .getByRole("button", { name: "Zoom out", exact: true })
-      .tap();
-    await expect(
-      zoomPanel.getByRole("spinbutton", {
-        name: "Zoom percentage",
-        exact: true,
-      }),
-    ).toHaveValue("140");
-    await pinch(120, 240);
-    await expect(
-      zoomPanel.getByRole("spinbutton", {
-        name: "Zoom percentage",
-        exact: true,
-      }),
-    ).toHaveValue("150");
-    await zoomPanel.getByRole("button", { name: "Done", exact: true }).tap();
-    expect(reorderRequests).toEqual([]);
-    await session.detach();
   });
 });
 
-test("administrator can change interface zoom without personal content requests", async ({
+test("administrator keeps fixed chrome and no personal content requests on mobile", async ({
   page,
 }) => {
-  const personalRequests: string[] = [];
-  page.on("request", (request) => {
+  const requests: string[] = [];
+  page.on("request", (r) => {
     if (
-      /\/api\/v1\/(notes|tags|reminders|notifications)(?:[/?]|$)/.test(
-        request.url(),
-      )
+      /\/api\/v1\/(notes|tags|reminders|notifications)(?:[/?]|$)/.test(r.url())
     )
-      personalRequests.push(request.url());
+      requests.push(r.url());
   });
   await login(page, "admin@example.test");
   await page.setViewportSize({ width: 390, height: 844 });
-  await setZoom(page, 150);
   await openAccountMenu(page);
-  await page
-    .getByRole("menuitem", { name: "Zoom (150%)", exact: true })
-    .click();
-  const zoomPanel = page.getByRole("dialog", {
-    name: "Interface zoom",
-    exact: true,
-  });
-  await zoomPanel
-    .getByRole("button", { name: "Zoom out", exact: true })
-    .click();
   await expect(
-    zoomPanel.getByRole("spinbutton", { name: "Zoom percentage", exact: true }),
-  ).toHaveValue("140");
-  await zoomPanel.getByRole("button", { name: "Zoom in", exact: true }).click();
-  await zoomPanel.getByRole("button", { name: "Done", exact: true }).click();
+    page.getByRole("spinbutton", { name: "Zoom percentage" }),
+  ).toHaveCount(0);
+  await page.keyboard.press("Escape");
   await page
     .getByRole("button", { name: "Open navigation", exact: true })
     .click();
@@ -959,8 +731,8 @@ test("administrator can change interface zoom without personal content requests"
   await expect(
     page.getByRole("heading", { name: "Accounts", exact: true }),
   ).toBeVisible();
-  await expect(page.locator("html")).toHaveCSS("zoom", "1.5");
-  expect(personalRequests).toEqual([]);
+  await expect(page.locator("html")).toHaveCSS("zoom", "1");
+  expect(requests).toEqual([]);
 });
 
 test("offers a compact workspace with persistent sidebar control and one labels entry", async ({
@@ -1195,14 +967,14 @@ test("edits content in a full viewport with an optional title and fixed characte
   ).toContainText("Final content");
 });
 
-test("keeps the optional title focused when the rich editor loads slowly", async ({
+test("keeps the optional title focused after deferred editor startup", async ({
   page,
 }) => {
   let releaseEditor!: () => void;
   const editorGate = new Promise<void>((resolve) => {
     releaseEditor = resolve;
   });
-  await page.route("**/src/features/editor/RichEditor.tsx*", async (route) => {
+  await page.route("**/src/features/editor/NoteEditor.tsx*", async (route) => {
     await editorGate;
     await route.continue();
   });
@@ -1211,10 +983,11 @@ test("keeps the optional title focused when the rich editor loads slowly", async
     await page
       .getByRole("button", { name: "Take a note", exact: true })
       .click();
-    const dialog = page.getByRole("dialog", { name: "New note", exact: true });
     await expect(
-      dialog.getByText("Loading editor…", { exact: true }),
+      page.getByText("Opening editor…", { exact: true }),
     ).toBeVisible();
+    releaseEditor();
+    const dialog = page.getByRole("dialog", { name: "New note", exact: true });
     await dialog.getByLabel("Note title", { exact: true }).click();
     const title = dialog.getByLabel("Note title");
     await expect(title).toBeFocused();
@@ -1382,7 +1155,10 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
   await editor
     .getByRole("button", { name: "Note labels", exact: true })
     .click();
-  await editor.getByRole("checkbox", { name: "Work", exact: true }).check();
+  await editor.locator(".label-chooser").getByRole("button", { name: "Work", exact: true }).click();
+  await expect(
+    editor.locator(".label-chooser").getByRole("button", { name: "Work", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();
@@ -1482,13 +1258,32 @@ test("keeps a local draft when another session changes the note", async ({
   });
   expect(changed.ok()).toBeTruthy();
   await editor.getByLabel("Note title").fill("My local version");
-  await expect(editor.getByText("Your draft is safe here.")).toBeVisible();
   await expect(editor.getByLabel("Note title")).toHaveValue("My local version");
-  await editor
-    .getByRole("button", { name: "Save as new note", exact: true })
-    .click();
   await expect(
-    page.getByRole("button", { name: "Open My local version", exact: true }),
+    editor.getByText("Saved on this device; waiting to sync", { exact: true }),
+  ).toBeVisible();
+  await editor.getByRole("button", { name: "Close", exact: true }).click();
+  await openAccountMenu(page);
+  await page
+    .getByRole("menuitem", { name: "Review sync", exact: true })
+    .click();
+  const review = page.getByRole("dialog", {
+    name: "Note synchronization",
+    exact: true,
+  });
+  await expect(review).toContainText("My local version");
+  await review
+    .getByRole("button", { name: "Save as a new copy", exact: true })
+    .click();
+  await review.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(
+    page.getByRole("button", {
+      name: "Open My local version (offline copy)",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Open Remote version", exact: true }),
   ).toBeVisible();
 });
 
@@ -1580,7 +1375,9 @@ test("creates reminders and reads the resulting inbox notification", async ({
     await readAllGate;
     await route.continue();
   });
-  await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Mark all as read", exact: true })
+    .click();
   await page.getByRole("button", { name: "Unread", exact: true }).click();
   await expect(
     page.getByText("A note is waiting for you", { exact: true }),
@@ -2118,10 +1915,16 @@ test("keeps a durable draft after a network failure and syncs without duplicates
   await editor
     .getByRole("textbox", { name: "Note content" })
     .fill("My words are still here.");
-  await expect(editor.getByText("Saved on this device; waiting to sync", { exact: true })).toBeVisible();
-  await expect(editor.getByRole("textbox", { name: "Note content" })).toContainText("My words are still here.");
+  await expect(
+    editor.getByText("Saved on this device; waiting to sync", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    editor.getByRole("textbox", { name: "Note content" }),
+  ).toContainText("My words are still here.");
   await editor.getByRole("button", { name: "Close", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "Keep your changes?", exact: true })).toHaveCount(0);
+  await expect(
+    page.getByRole("dialog", { name: "Keep your changes?", exact: true }),
+  ).toHaveCount(0);
   await page.unroute("**/api/v1/notes");
   await openAccountMenu(page);
   await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();

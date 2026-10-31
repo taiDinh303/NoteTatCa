@@ -36,8 +36,9 @@ test("desktop sidebar remains clipped after repeated closes", async ({
     await expect(sidebar).toHaveAttribute("inert", "");
     await expect(sidebar).toHaveAttribute("aria-hidden", "true");
     await expect(sidebar).toHaveCSS("visibility", "visible");
-    await expect(sidebar).toHaveCSS("clip-path", "inset(0px 100% 0px 0px)");
-    await expect(sidebar).toHaveCSS("transition-property", "clip-path");
+    await expect.poll(() => sidebar.evaluate(el => el.getBoundingClientRect().right)).toBeLessThanOrEqual(1);
+    await expect(sidebar).toHaveCSS("pointer-events", "none");
+    await expect(sidebar).toHaveCSS("clip-path", "inset(0px)");
     await page
       .getByRole("button", { name: "Show sidebar", exact: true })
       .click();

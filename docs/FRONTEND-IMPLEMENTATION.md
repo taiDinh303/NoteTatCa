@@ -1,3 +1,9 @@
+## Hiện trạng ngày 2026-10-31
+
+Mẫu ghi chú học tập/nhật ký/kế hoạch/họp mở từ toolbar editor, xem trước và chèn cuối; không thay nội dung hiện có. Mục lục H1–H3 hoạt động View/Edit, có bật/tắt và focus. Dùng chung autosave, offline, guest và 4 ngôn ngữ. Notes desktop zoom50–150% độc lập chrome; mobile một cột100%, không Grid/List hoặc app zoom. Sync now/Review sync nằm trong account menu.
+
+Archive JSON và version history có source trên nhánh codex/notes-data-reliability, backend CI PostgreSQL/Docker đã qua; chưa merge schema/migrate production trong đợt này. Các đoạn triển khai archive phía dưới mô tả source, không chứng minh tính năng đã bật trên web đang dùng. Backup vận hành/retention/keyring/alert môi trường vẫn cần kiểm riêng. Evidence mới nhất ở worklog.
+
 # React NoteTatCa — triển khai 2026-10-18
 
 ## Danh sách50 mascot và hướng nhìn Appearance — 2026-10-30

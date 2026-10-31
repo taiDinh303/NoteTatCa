@@ -46,7 +46,8 @@ for (const width of [393, 1280]) {
     await viewer.getByRole("button", { name: "Close", exact: true }).click();
 
     reject = false;
-    await page.getByRole("button", { name: "Sync now", exact: true }).click();
+    await page.getByRole("button", { name: "Account menu", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
     await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({ timeout: 30_000 });
     await page.reload();
     await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
