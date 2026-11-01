@@ -1,3 +1,9 @@
+## Khôi phục phiên nhiều tab không refresh nối tiếp — 2026-11-01
+
+- CI main3a85647 frontend shard3 lộ phiên expired dù hai refresh trả200: một tab rotate lại credential vừa được tab khác thay, khiến access sid của tab trước bị revoke. AuthService nhận credential ban đầu trước shared lock; nếu vault đã đổi trong lúc chờ, nhận phiên BroadcastChannel cùng credential thay vì refresh lại. Chỉ chờ tối đa150ms khi credential đã đổi; thiếu broadcast vẫn refresh xác thực server. Access token vẫn chỉ trong memory, không đổi backend revoke/reuse policy.
+- Thêm unit kiểm delayed shared-session không gọi refresh thừa và không ghi access token vào storage. E2E persistent-session chờ authorized notes200 trước khi ngắt bằng reload, vì cached notes hiện sớm không chứng minh refresh xong. Touch reorder chờ long-press sorting active thay delay280ms; giữ kiểm thứ tự sau reload, không retry/skip/nới assertion.
+- Focused Auth14/14PASS, typecheck và lint4filesPASS. Ba browsercases(session/mouse/touch) chạy3vòng=9executionPASS, không tính thành9ca riêng. Full ESLint,139unit/4config và TypeScript/Vite production buildPASS. Scope chỉ4React source/testfiles vàworklog, không schema/config/deploy; các thay đổi archive/history vẫn trên nhánh review riêng.
+
 ## Main đã xanh và xác minh fixture độc lập — 2026-11-01
 
 - Main946f58a remoteSHA đã xác minh: backend41296051607 SUCCESS; frontend41296051613 cả4shards SUCCESS,233PASS/12SKIP(opt-in theo cấu hình),245total. Shard1:59PASS/2SKIP,shard2:59PASS/6SKIP,shard3:58PASS/4SKIP,shard4:57PASS. Không gọi12skip làPASS; offlineproduction đã kiểm riêng2/2local trong worklog.

@@ -246,6 +246,22 @@ describe("session security", () => {
     auth.savedSessionChanged();
     expect(auth.getSnapshot().status).toBe("anonymous");
   });
+  it("uses a delayed shared session instead of rotating another tab's new credential", async () => {
+    const port = storage();
+    const vault = new SessionVault(port);
+    const transport = vi.fn(async () => ok(session()));
+    const auth = new AuthService(new ApiClient("/api/v1", transport), vault, vi.fn());
+    await auth.login("a@example.test", "synthetic");
+    transport.mockClear();
+    const refreshing = auth.refresh();
+    const shared = session("shared-access", "shared-refresh");
+    vault.write(shared);
+    setTimeout(() => auth.adoptSharedSession(shared), 0);
+    await refreshing;
+    expect(auth.accessToken()).toBe("shared-access");
+    expect(transport).not.toHaveBeenCalled();
+    expect(port.getItem("ntc.session.v1")).not.toContain("shared-access");
+  });
   it("stores only a versioned refresh session, never the access token or private cache", () => {
     const port = storage();
     const vault = new SessionVault(port);

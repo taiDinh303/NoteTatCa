@@ -45,7 +45,7 @@ for (const touch of [false, true]) {
         type: "touchStart",
         touchPoints: [{ x: sx, y: sy, id: 1 }],
       });
-      await page.waitForTimeout(280);
+      await expect(nav.locator(".sorting")).toHaveCount(1);
       await cdp.send("Input.dispatchTouchEvent", {
         type: "touchMove",
         touchPoints: [{ x: tx, y: ty, id: 1 }],
