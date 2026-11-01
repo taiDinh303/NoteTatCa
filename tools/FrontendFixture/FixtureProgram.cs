@@ -22,8 +22,8 @@ public static class FixtureProgram
         await factory.InitializeAsync();
         await SeedAsync(factory);
         using var client = factory.CreateClient();
-        // ApiFactory owns a single in-memory SQLite connection. Serialize access in
-        // this test bridge only; production SQL Server/PostgreSQL use pooled connections.
+        // Serialize reset/seeding with proxied requests in this synthetic bridge.
+        // ApiFactory keeps a shared-memory DB alive; each DbContext owns its connection.
         using var databaseGate = new SemaphoreSlim(1, 1);
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, EnvironmentName = "Testing" });
         builder.WebHost.UseUrls("http://127.0.0.1:5199");
@@ -36,8 +36,7 @@ public static class FixtureProgram
             await databaseGate.WaitAsync();
             try
             {
-                using (var scope = factory.Services.CreateScope())
-                    await scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.EnsureDeletedAsync();
+                await factory.ResetDatabaseAsync();
                 factory.Email.Messages.Clear(); factory.Email.Fail = false; factory.Email.Timeout = false;
                 factory.Clock.Advance(DateTimeOffset.UtcNow - factory.Clock.GetUtcNow());
                 await factory.InitializeAsync(); await SeedAsync(factory);

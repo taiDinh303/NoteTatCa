@@ -92,9 +92,10 @@ public sealed class NoteTests
         using(var scope=f.Services.CreateScope())
         {
             var db=scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            await db.Database.OpenConnectionAsync();
             await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys=OFF");
             try { await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO NoteTags (NoteId,TagId,UserId) VALUES ({id},{tag.GetProperty("id").GetGuid()},{f.A})"); }
-            finally { await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys=ON"); }
+            finally { await db.Database.ExecuteSqlRawAsync("PRAGMA foreign_keys=ON"); await db.Database.CloseConnectionAsync(); }
         }
         Assert.DoesNotContain("PRIVATE-B-LABEL",await (await a.GetAsync($"/api/v1/notes/{id}")).Content.ReadAsStringAsync());
     }
