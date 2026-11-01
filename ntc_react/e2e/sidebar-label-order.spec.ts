@@ -33,6 +33,9 @@ for (const touch of [false, true]) {
     const links = nav.getByRole("link");
     await expect(links).toHaveCount(3);
     const names = await links.allTextContents();
+    // The drawer clip is already open while its translate animation is running.
+    // Coordinate input must wait for the actual target to stop moving.
+    await links.nth(2).click({ trial: true });
     const source = (await links.nth(2).boundingBox())!,
       target = (await links.first().boundingBox())!;
     const sx = source.x + 60,

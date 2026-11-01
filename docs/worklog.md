@@ -1,3 +1,9 @@
+## Chờ nhãn đứng yên trước input tọa độ — 2026-11-01
+
+- Main frontend41298525705/branch41298542689 shard3: persistent-sessionPASS; chỉ touch label reorderFAIL ở long-press chưa sorting. Trace và CSS cho thấy clip-path đã open trong khi drawer vẫn translate160ms; điều kiện clip không bảo đảm tọa độ hit target. Thêm Playwright trial-click chờ stable/receives-events trước boundingBox và CDP gesture; không click thật, không sửa runtime/animation/threshold hay bỏ assertion sau reload.
+- Focused mouse/touch2ca x3vòng=6executionPASS; lintPASS. Probe animation1200ms với cách chờ mớiPASS; probe đối chứng không trial cũngPASS trênWindows nên không claim tái hiện chắc chắn failureLinux. Xóa file probe tạm, không thêm test opt-in/skip/retry.
+- Backend final docs main e7882c6 run41298702107 SUCCESS:161PASS/5WindowsLocalDBSKIP; branch a448588 run41298713797 SUCCESS:170PASS/5SKIP, gồmPG17; strictbuild0warning/error, docs main54files/213links0errors, branch55files/217links0errors, cấu hình/DockerPASS. Publication follow-up chỉ sidebar-label-order E2E và worklog; theo dõi CI snapshot mới sau push.
+
 ## Đồng bộ kế hoạch và phạm vi publication — 2026-11-01
 
 - Main4a8427cae7b626af58702627dbbabc8258e5a606 đã push và ls-remote khớp; nhánh review9df21d935f9109824a6e32de29df3ded75d31071 đã tích hợp cùng bản sửa. Main frontend41298525705 và backend41298525451 đang chạy, chưa ghi nhận finalSUCCESS. Branch frontend41298542689/backend41298542757 đang chạy. Full local139unit/4config,lint/build và3browsercases x3vòngPASS như entry dưới.
