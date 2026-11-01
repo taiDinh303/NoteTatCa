@@ -55,6 +55,9 @@ for (const width of [320, 1440])
         .getByRole("navigation", { name: "Table of contents" })
         .getByRole("button", { name: "Key ideas", exact: true }),
     ).toBeVisible();
+    await view.getByRole("navigation", { name: "Table of contents" })
+      .getByRole("button", { name: "Key ideas", exact: true }).click();
+    await expect(view.getByRole("heading", { name: "Key ideas", exact: true })).toBeFocused();
     await page.screenshot({ path: "artifacts/note-tools-" + width + ".png" });
     expect(
       await page.evaluate(

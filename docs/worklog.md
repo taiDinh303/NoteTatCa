@@ -1,3 +1,9 @@
+## Hoàn tất chờ lưu ở bước bỏ ghim — 2026-11-01
+
+- Main3d92e85: backend SUCCESS; frontend3shards SUCCESS, shard4 còn2ca unpin light/dark. Cả2 reload ngay sau Close của reopened editor. Thêm chờ reopened hidden trước reload, giữ nguyên assertion dữ liệu ghim sau tải lại; không retry/skip/nới threshold.
+- Focused unpin light/dark final2/2PASS với SQLite/captured-mail fixture riêng. Không gửi mail hoặc dùng DB chủ dự án.
+- Mở rộng2ca mẫu/mục lục kiểm click heading ở View và focus đúng, cả320/1440 đã PASS. Note-view/toggle8ca chạy2vòng=16executionPASS (không tính16ca độc lập). Phần archive/history đang trên nhánh dữ liệu, không migration/deployproduction. Publication chỉ workspace E2E, note-tools E2E và worklog; theo dõi latestCI sau push.
+
 ## Archive bảo vệ pending và publication mới nhất — 2026-10-31
 
 - Archive/history browser final2/2PASS, gồm chặn export lúc còn pending→Sync now→JSON chứa nội dung mới. Main3d92e85705f3dc06474e97255122220eab89809a đã push và ls-remote khớp; scope7files(2workflow,NoteEditor/styles,2E2E,worklog), không schema/config. GitHub4shards cuối đang chạy; backendmain/nhánhdữliệu đã cóSUCCESS ở các run ghi trên. Build/lint publicationPASS. Note-view/toggle kiểm2vòng,8ca khác nhau; ghi số execution sau khi hoàn tất.
