@@ -1,6 +1,10 @@
 # Roadmap nội dung và cộng tác — NoteTatCa
 
-> 2026-10-25 | KẾ HOẠCH, CHƯA TRIỂN KHAI | Nguồn: yêu cầu chủ dự án.
+> 2026-10-25 | KẾ HOẠCH, XEM TIẾN ĐỘ TỪNG MỤC | Nguồn: yêu cầu chủ dự án.
+
+## Tiến độ hiện hành — 2026-11-01
+
+TASK-031 có bốn mẫu cấu trúc chèn cuối note và preview/hủy; checklist, mẫu cá nhân/chia sẻ còn mở. TASK-034 có mục lục H1–H3 View/Edit/mobile, heading trùng tên và focus. Browser320/1440 đã kiểm autosave/mở lại; chi tiết ở [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md). Archive/history TASK-022 đang trên nhánh review codex/notes-data-reliability; chưa áp dụng migration hoặc chuyển dữ liệu thật. Các hạng mục media/cộng tác còn là kế hoạch.
 
 ## Định hướng đã được yêu cầu
 

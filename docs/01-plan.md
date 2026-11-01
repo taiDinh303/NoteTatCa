@@ -1,3 +1,9 @@
+## Trạng thái thực thi — 2026-11-01
+
+TASK-031 đã có bản đầu gồm bốn mẫu cấu trúc học tập/nhật ký/kế hoạch/họp, preview/hủy và chèn cuối note; chưa có mẫu checklist hoặc mẫu do user thiết kế. TASK-034 đã có mục lục H1–H3 trong View/Edit, điều hướng/focus, bật/tắt, heading trùng tên và mobile. Hai ca browser320/1440 kiểm chèn giữ nội dung, autosave và mở lại View đã PASS; xem [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+
+TASK-018/022 có source archive JSON/import và revision/restore trên nhánh review codex/notes-data-reliability, chưa merge schema vào main hoặc áp dụng dữ liệu thật. Offline create/edit, xử lý conflict và bảo vệ pending đã có. TASK-020 có runbook và log maintenance trên nhánh review; backup DB/keyring, restore drill provider biệt lập, retention/RPO/RTO và alert vận hành vẫn cần thực hiện. TASK-019 tiếp tục để sau. Các trạng thái lịch sử bên dưới không thay trạng thái hiện hành này.
+
 # 01 — Kế hoạch NoteTatCa
 
 > 2026-10-17 | WORKING PLAN | Áp dụng: YES

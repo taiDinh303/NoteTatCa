@@ -1,3 +1,8 @@
+## Đồng bộ kế hoạch và phạm vi publication — 2026-11-01
+
+- Main4a8427cae7b626af58702627dbbabc8258e5a606 đã push và ls-remote khớp; nhánh review9df21d935f9109824a6e32de29df3ded75d31071 đã tích hợp cùng bản sửa. Main frontend41298525705 và backend41298525451 đang chạy, chưa ghi nhận finalSUCCESS. Branch frontend41298542689/backend41298542757 đang chạy. Full local139unit/4config,lint/build và3browsercases x3vòngPASS như entry dưới.
+- Cập nhật plan/roadmap theo code thực: bốn mẫu cấu trúc/TOC đã có, checklist/mẫu cá nhân còn mở; archive/history và maintenance trên nhánh review, không apply schema/data thật. Sửa đoạn tiến độ chen giữa bảng roadmap ở nhánh review để bảng liền mạch. Publication lần này chỉ3docs(plan,roadmap,worklog), không đổi code/config/migration; CI backend kiểm docs từ snapshot đã push. Node check tương đương H1/encoding/JSON/local links:213links/0errors trong checkout publication; Python không có trên máy, script Python chuẩn chạy trong CI. Các tài sản/mascot và thay đổi local ngoài scope được giữ nguyên.
+
 ## Khôi phục phiên nhiều tab không refresh nối tiếp — 2026-11-01
 
 - CI main3a85647 frontend shard3 lộ phiên expired dù hai refresh trả200: một tab rotate lại credential vừa được tab khác thay, khiến access sid của tab trước bị revoke. AuthService nhận credential ban đầu trước shared lock; nếu vault đã đổi trong lúc chờ, nhận phiên BroadcastChannel cùng credential thay vì refresh lại. Chỉ chờ tối đa150ms khi credential đã đổi; thiếu broadcast vẫn refresh xác thực server. Access token vẫn chỉ trong memory, không đổi backend revoke/reuse policy.
