@@ -1,3 +1,13 @@
+## Chờ focus của lệnh toolbar trước nhập cỡ chữ — 2026-11-01
+
+- Branch af50127 frontend41299905070 shard1 có1FAIL automatic-text-color1280: strong bị thay bằng24. Tiptap focus command dùng requestAnimationFrame; test fill input trước focus từ Bold hoàn tất nên phím số có thể vào content đang selected. Thêm assertion editor focused sau Bold rồi mới fill font size. Không đổi production editor hoặc bỏ kiểm nội dung/bold/font-size/color/autosave/reopen.
+- Focused393/1280 x2vòng=4executionPASS, ESLintPASS. Main b16b570 frontend3/4shards đãSUCCESS; backend41299890419 SUCCESS163PASS/5WindowsLocalDBSKIP; branchbackend41299905099 SUCCESS172PASS/5SKIP, PG thực chạy. Không coi branch frontend làgreen khi1caseFAIL. Follow-up chỉ automatic-text-color E2E vàworklog; CI giữ đủ4shards, không retry/skip/thay threshold.
+
+## Xác minh backend sau publication cuối — 2026-11-01
+
+- Main b16b5704ee0b8b6e727c3ff492a98bf8647b06db remote đã khớp; backend41299890419 SUCCESS:163PASS/5LocalDBSKIP,168total. Nhánh review af501270541a9c2c1286452b568c882ff83170b3 backend41299905099 SUCCESS:172PASS/5LocalDBSKIP,177total. PG17 thực chạy trong CI, strictRelease0warnings/errors; docs/config/DockerPASS. Main54Markdown/213links0errors; branch55Markdown/217links0errors.
+- Frontend final main41299890335 và branch41299905070 đang chạy, chưa gọi finalgreen. File worklog local lưu chứng cứ sau push; không đẩy commit chỉ đổi chứng cứ trong lúc các workflow cuối đang chạy. Không migration/deploy/email/AI thật; giữ các thay đổi local ngoài scope.
+
 ## Hạn mức mascot nhất quán khi request xen kẽ — 2026-11-01
 
 - Main07ca2a7 backend41299378517 lộ201+409 ở Concurrent_requests_reserve_only_one_daily_slot. Đây là race production: latest read chưa thấy job, nhưng slot read đã thấy winner commit; nhánh slot-conflict trả409 trước bước reserve. Re-read latest chỉ khi slot mismatch/pending, trả lại job cho cùng RequestId hoặc429 nếu quota cùngngày;409 của slot cũ vẫn giữ. Không thay quota/index/schema, không retry ghi hay thêm khóa process.

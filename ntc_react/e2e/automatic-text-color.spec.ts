@@ -33,6 +33,8 @@ for (const width of [393, 1280]) {
     await content.fill("Contrast keeps formatting");
     await content.press("ControlOrMeta+A");
     await editor.getByRole("button", { name: "Bold", exact: true }).click();
+    // Tiptap returns focus on the next animation frame after a toolbar command.
+    await expect(content).toBeFocused();
     await editor
       .getByRole("spinbutton", { name: "Font size", exact: true })
       .fill("24");
