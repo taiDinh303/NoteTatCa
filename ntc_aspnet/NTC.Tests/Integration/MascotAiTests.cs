@@ -1,4 +1,5 @@
 using System.Net;
+using NTC.ModelViews.Mascots;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
@@ -168,6 +169,48 @@ public sealed class MascotAiTests
         using var scope = f.Services.CreateScope();
         Assert.Equal(1, await scope.ServiceProvider.GetRequiredService<DatabaseContext>().Set<MascotGeneration>().CountAsync());
         Assert.Equal(0, fake.Calls);
+    }
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Quota_reserved_between_latest_and_slot_reads_preserves_limit_and_idempotency(bool sameRequest)
+    {
+        var fake = new FakeGenerator(); using var f = Fixture(fake); await f.InitializeAsync();
+        using var scope = f.Services.CreateScope();
+        var winner = new MascotGeneration { Id = Guid.NewGuid(), UserId = f.A, RequestId = Guid.NewGuid(),
+            QuotaDay = f.Clock.GetUtcNow().ToString("yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture),
+            State = "queued", OccupiesSlot = true, CreatedAt = f.Clock.GetUtcNow() };
+        var service = new MascotAiService(scope.ServiceProvider.GetRequiredService<IUnitOfWork>(), new Actor(f.A), f.Clock,
+            new ReservedBetweenReadsStore(winner), Options.Create(new MascotAiOptions { Enabled = true, OpenAiApiKey = "synthetic" }));
+        var request = new CreateMascotRequest { RequestId = sameRequest ? winner.RequestId : Guid.NewGuid(),
+            Description = "A synthetic owl", ConsentToSendToOpenAi = true };
+        if (sameRequest) Assert.Equal(winner.Id, (await service.CreateAsync(request, default)).Id);
+        else
+        {
+            var error = await Assert.ThrowsAsync<NTC.Core.Base.BaseException.ErrorException>(() => service.CreateAsync(request, default));
+            Assert.Equal(429, error.StatusCode);
+        }
+        Assert.Equal(0, fake.Calls);
+    }
+    // Models a winner committing after the first latest read, before the slot read.
+    private sealed class ReservedBetweenReadsStore(MascotGeneration winner) : IMascotGenerationStore
+    {
+        private bool firstRead = true;
+        public Task<MascotGeneration?> LatestAsync(Guid userId, CancellationToken token)
+        {
+            var value = firstRead ? null : winner; firstRead = false;
+            return Task.FromResult(value);
+        }
+        public Task<MascotGeneration?> CurrentSlotAsync(Guid userId, CancellationToken token) => Task.FromResult<MascotGeneration?>(winner);
+        public Task<MascotGeneration?> OwnedAsync(Guid userId, Guid id, CancellationToken token) => throw new NotSupportedException();
+        public Task<MascotGeneration?> OptionalSlotAsync(Guid userId, CancellationToken token) => throw new NotSupportedException();
+        public Task<bool> ReserveAsync(MascotGeneration item, CancellationToken token) => throw new NotSupportedException();
+        public Task<MascotGeneration?> ClaimAsync(DateTimeOffset now, CancellationToken token) => throw new NotSupportedException();
+        public Task CompleteAsync(Guid id, byte[] directions, byte[] reactions, DateTimeOffset now, CancellationToken token) => throw new NotSupportedException();
+        public Task FailAsync(Guid id, string code, DateTimeOffset now, CancellationToken token) => throw new NotSupportedException();
+        public Task ExpireAsync(DateTimeOffset now, CancellationToken token) => throw new NotSupportedException();
+        public Task<bool> ApplyAsync(Guid userId, Guid id, byte[] directionsWebp, byte[] reactionsWebp, DateTimeOffset now, CancellationToken token) => throw new NotSupportedException();
+        public Task<bool> DeleteSlotAsync(Guid userId, Guid id, CancellationToken token) => throw new NotSupportedException();
     }
     [Fact]
     public async Task Interrupted_paid_work_is_not_retried_and_old_images_are_expired()

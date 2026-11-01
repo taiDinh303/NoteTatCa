@@ -55,9 +55,19 @@ public sealed class MascotAiService(IUnitOfWork uow, ICurrentUser actor, TimePro
         if (latest?.QuotaDay == Today) throw DailyLimit();
         if (latest?.State is "queued" or "running") throw DomainErrors.Conflict("Your mascot is still being created.");
         var slot = await store.CurrentSlotAsync(userId, token);
-        if ((slot is not null && request.ReplacesId != slot.Id) || (slot is null && request.ReplacesId is not null))
-            throw DomainErrors.Conflict("Each account has one custom mascot. Edit or delete your current mascot first.");
-        if (slot is not null && slot.State is "queued" or "running") throw DomainErrors.Conflict("Your mascot is still being created.");
+        var slotMismatch = (slot is not null && request.ReplacesId != slot.Id) || (slot is null && request.ReplacesId is not null);
+        var slotPending = slot is not null && slot.State is "queued" or "running";
+        if (slotMismatch || slotPending)
+        {
+            // Another request may have reserved today's quota between the two reads.
+            // Recheck before reporting a slot conflict, preserving request idempotency.
+            latest = await store.LatestAsync(userId, token);
+            if (latest?.RequestId == request.RequestId) return View(latest);
+            if (latest?.QuotaDay == Today) throw DailyLimit();
+            throw DomainErrors.Conflict(slotMismatch
+                ? "Each account has one custom mascot. Edit or delete your current mascot first."
+                : "Your mascot is still being created.");
+        }
         if (reference is null && slot is not null)
         {
             var previous = await store.OwnedAsync(userId, slot.Id, token);

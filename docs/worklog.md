@@ -1,3 +1,9 @@
+## Hạn mức mascot nhất quán khi request xen kẽ — 2026-11-01
+
+- Main07ca2a7 backend41299378517 lộ201+409 ở Concurrent_requests_reserve_only_one_daily_slot. Đây là race production: latest read chưa thấy job, nhưng slot read đã thấy winner commit; nhánh slot-conflict trả409 trước bước reserve. Re-read latest chỉ khi slot mismatch/pending, trả lại job cho cùng RequestId hoặc429 nếu quota cùngngày;409 của slot cũ vẫn giữ. Không thay quota/index/schema, không retry ghi hay thêm khóa process.
+- Thêm2ca xác định mô phỏng winner commit giữa latest/slot reads, gồm request mới và idempotent request. Checkout clean với service cũ:2FAIL đúng dự kiến; sau copy fix: full clean162PASS/1PGskip sau loại đúng5LocalDB không cài trên máy, strictRelease0warnings/errors. Focused workingtree mascot7/7PASS, fakeprovider0calls. Lượt đối chứng đầu copy nhầm từ chính checkout nên không match filter, không tính làPASS; lượt2 mới là2FAIL baseline.
+- CI main frontend07ca2a7 shard3 (124827017191) SUCCESS, xác nhận persistent-session và touch-reorder đều quaLinux sau stable-target fix. Các shard khác vẫn chạy; follow-up chỉ MascotAiService/MascotAiTests/worklog. Backend thay đổi sẽ được kiểm lại cả Reactfixture trong workflow hiện hành. Giữ archive migrations ở nhánh review; không DB/email/AI thật.
+
 ## Chờ nhãn đứng yên trước input tọa độ — 2026-11-01
 
 - Main frontend41298525705/branch41298542689 shard3: persistent-sessionPASS; chỉ touch label reorderFAIL ở long-press chưa sorting. Trace và CSS cho thấy clip-path đã open trong khi drawer vẫn translate160ms; điều kiện clip không bảo đảm tọa độ hit target. Thêm Playwright trial-click chờ stable/receives-events trước boundingBox và CDP gesture; không click thật, không sửa runtime/animation/threshold hay bỏ assertion sau reload.
