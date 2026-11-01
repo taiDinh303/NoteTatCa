@@ -50,7 +50,9 @@ public sealed class TestGoogleValidator : IGoogleIdentityValidator
 public sealed class ApiFactory : WebApplicationFactory<Program>
 {
     public const string Password = "Synthetic-password-123!";
-    private readonly SqliteConnection _connection = new("Data Source=:memory:");
+    // Keep one anchor open, while each request owns its own connection. Sharing
+    // a SqliteConnection across concurrent DbContexts is not thread-safe.
+    private readonly SqliteConnection _connection = new($"Data Source=NTC_Test_{Guid.NewGuid():N};Mode=Memory;Cache=Shared;Pooling=False");
     public TestClock Clock { get; } = new();
     public TestEmailSender Email { get; } = new();
     public int AuthLimit { get; set; } = 1000;
@@ -59,6 +61,13 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
     public Guid B { get; private set; }
     public Guid Admin { get; private set; }
     public ApiFactory() => _connection.Open();
+    // The bridge drains requests before resetting. Closing the last connection
+    // destroys this factory's named in-memory database without touching files.
+    public async Task ResetDatabaseAsync()
+    {
+        await _connection.CloseAsync();
+        await _connection.OpenAsync();
+    }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -73,7 +82,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DatabaseContext>(); services.RemoveAll<DbContextOptions<DatabaseContext>>();
-            services.AddDbContext<DatabaseContext>(o => o.UseSqlite(_connection));
+            services.AddDbContext<DatabaseContext>(o => o.UseSqlite(_connection.ConnectionString));
             services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(Clock);
             services.RemoveAll<IEmailSender>(); services.AddSingleton<IEmailSender>(Email);
             services.RemoveAll<IGoogleIdentityValidator>(); services.AddSingleton<IGoogleIdentityValidator, TestGoogleValidator>();

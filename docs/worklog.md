@@ -1,3 +1,15 @@
+## Main đã xanh và xác minh fixture độc lập — 2026-11-01
+
+- Main946f58a remoteSHA đã xác minh: backend41296051607 SUCCESS; frontend41296051613 cả4shards SUCCESS,233PASS/12SKIP(opt-in theo cấu hình),245total. Shard1:59PASS/2SKIP,shard2:59PASS/6SKIP,shard3:58PASS/4SKIP,shard4:57PASS. Không gọi12skip làPASS; offlineproduction đã kiểm riêng2/2local trong worklog.
+- Fixture namedmemory: full cleanmain160PASS/1PGskip sau loại5LocalDB máy chưa cài; workingtree169PASS/1PGskip. Backend concurrency cùngca5lượtPASS. Browser bridge3/3PASS với reset giữa các ca(light/darkunpin và richnote/labels/trash). Reset bridge đóng/mở anchor sau khi databaseGate đã drainrequest, thay EnsureDeleted vốn không hủy namedmemoryDB khi anchor còn mở; giữ DB giả riêng và FK mặc định cho mọi request. Lượt browser đầu phát hiện reset cũ500 trước thao tácUI, đã sửa; finalPASS.
+- Publication4files:ApiFactory,sessionPRAGMA trongNoteTests,FrontendFixture reset/comment vàworklog. Không đổi productionAPI/quota/schema, không gửi email/AI thật. Run buildstrict clean và2focusedregression trướcpush; CI mới kiểm lại fixture chung.
+
+## SQLite fixture: kết nối riêng cho request đồng thời — 2026-11-01
+
+- Nhánh dữ liệu run41296095809 lộ1race ở MascotAiTests.Concurrent_requests_reserve_only_one_daily_slot:201+500 thay201+429. Fixture trước chia sẻ một SqliteConnection cho nhiềuDbContext đồng thời. Chuyển sang named in-memory DB riêng mỗiApiFactory, giữ1anchor mở và cấp connection riêng mỗiDbContext, PoolingFalse. Không đổi production repository/quota hoặc gọi AI thật.
+- Test mô phỏng legacy FK hỏng giờ mở connection rõ ràng để PRAGMA OFF/INSERT/ON cùng session, đóng trongfinally; không tắt FK trên request bình thường. Lượt full đầu phát hiện test này cần giữ session, đã sửa.
+- Actual workingtree backend169PASS/1PGskip sau loại5LocalDB không có trên máy; cùng ca concurrency chạy lại5lượt đềuPASS, không tính thành5ca mới. Release strict0warnings/errors. Publication sạch chỉApiFactory,2dòngsession trongNoteTests vàworklog; không mang revisiontests/schema từworkingtree lênmain. Kiểm clean build/tests trướcpush, giữ mọi test/assertion, không thêmretry/skip.
+
 ## Hoàn tất chờ lưu ở bước bỏ ghim — 2026-11-01
 
 - Main3d92e85: backend SUCCESS; frontend3shards SUCCESS, shard4 còn2ca unpin light/dark. Cả2 reload ngay sau Close của reopened editor. Thêm chờ reopened hidden trước reload, giữ nguyên assertion dữ liệu ghim sau tải lại; không retry/skip/nới threshold.
