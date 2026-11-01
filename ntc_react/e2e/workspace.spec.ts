@@ -1126,6 +1126,7 @@ for (const theme of ["light", "dark"]) {
     await expect(unpinned).toHaveAttribute("aria-pressed", "false");
     await expect(unpinned.locator("svg")).toHaveClass(/lucide-pin$/);
     await reopened.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(reopened).toBeHidden();
     await page.reload();
     await expect(
       page.getByRole("button", { name: `Pin ${title}`, exact: true }),

@@ -1,3 +1,9 @@
+## Hoàn tất chờ lưu ở bước bỏ ghim — 2026-11-01
+
+- Main3d92e85: backend SUCCESS; frontend3shards SUCCESS, shard4 còn2ca unpin light/dark. Cả2 reload ngay sau Close của reopened editor. Thêm chờ reopened hidden trước reload, giữ nguyên assertion dữ liệu ghim sau tải lại; không retry/skip/nới threshold.
+- Focused unpin light/dark final2/2PASS với SQLite/captured-mail fixture riêng. Không gửi mail hoặc dùng DB chủ dự án.
+- Mở rộng2ca mẫu/mục lục kiểm click heading ở View và focus đúng, cả320/1440 đã PASS. Note-view/toggle8ca chạy2vòng=16executionPASS (không tính16ca độc lập). Phần archive/history đang trên nhánh dữ liệu, không migration/deployproduction. Publication chỉ workspace E2E, note-tools E2E và worklog; theo dõi latestCI sau push.
+
 ## CI chỉ chạy bản mới nhất trên mỗi nhánh — 2026-10-31
 
 - Thêm concurrency group theo workflow/ref và cancel-in-progress cho backend/frontend để các push sửa liên tiếp không tiếp tục chạy bản cũ tốn runner. Nhánh dữ liệu vẫn có nhóm riêng; không bỏ job/test hoặc tăng ngưỡng nghiệm thu. Follow-up gồm7files(5source/test/docs đã mô tả ngay dưới và2workflow), giữ raw failure history cũ; chỉ xác nhận latestgreen khi workflow hoàn tất.
