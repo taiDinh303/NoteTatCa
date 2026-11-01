@@ -227,12 +227,21 @@ export class AuthService {
   refresh(): Promise<void> {
     if (this.refreshInFlight) return this.refreshInFlight;
     const generation = this.generation;
+    const requestedCredential = this.snapshot.session?.refreshToken ?? this.vault.read()?.refreshToken;
     this.refreshInFlight = this.withSessionLock(async () => {
-      const saved = this.vault.read();
-      if (!saved) throw new Error("No refresh session");
       await this.beforeAuthentication();
       if (generation !== this.generation)
         throw new Error("The session changed while connecting.");
+      let saved = this.vault.read();
+      if (!saved) throw new Error("No refresh session");
+      if (saved.refreshToken !== requestedCredential) {
+        // A different tab rotated while we waited for the shared lock. Its
+        // access token travels only in memory, and may arrive one task later.
+        if (await this.awaitSharedSession(saved.refreshToken, generation)) return;
+        if (generation !== this.generation) throw new Error("The session changed while refreshing.");
+        saved = this.vault.read();
+        if (!saved) throw new Error("No refresh session");
+      }
       const value = await this.api.request<Session>("/auth/refresh", {
         method: "POST",
         body: { refreshToken: saved.refreshToken },
@@ -245,6 +254,20 @@ export class AuthService {
       this.refreshInFlight = undefined;
     });
     return this.refreshInFlight;
+  }
+  private awaitSharedSession(credential: string, generation: number): Promise<boolean> {
+    const ready = () => this.generation === generation && this.snapshot.status === "authenticated" &&
+      this.snapshot.session?.refreshToken === credential && !!this.snapshot.session.token &&
+      Date.parse(this.snapshot.session.expiredAt) > Date.now();
+    if (ready()) return Promise.resolve(true);
+    return new Promise(resolve => {
+      const finish = (adopted: boolean) => { clearTimeout(timer); unsubscribe(); resolve(adopted); };
+      const unsubscribe = this.subscribe(() => {
+        if (ready()) finish(true);
+        else if (this.generation !== generation) finish(false);
+      });
+      const timer = setTimeout(() => finish(false), 150);
+    });
   }
   expire() {
     this.generation++;
