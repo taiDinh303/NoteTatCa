@@ -1,6 +1,8 @@
-## Cập nhật thực thi 2026-10-31
+## Trạng thái thực thi — 2026-11-01
 
-Trạng thái mới thay các TODO lịch sử bên dưới: TASK-018/022 đã có source JSON archive/import và revision/restore, chưa coi là production-ready khi migration/provider restore chưa được kiểm trên DB biệt lập. Offline create/edit và bảo vệ logout đã có; kiểm hồi quy hiện hành ghi trong worklog. TASK-031/034 đang bổ sung mẫu cấu trúc chèn cuối note và mục lục View/Edit; không thêm media/cộng tác. TASK-019 tiếp tục để sau. TASK-020 có runbook diễn tập và log maintenance; retention/RPO/RTO thực tế cần operator chốt.
+TASK-031 đã có bản đầu gồm bốn mẫu cấu trúc học tập/nhật ký/kế hoạch/họp, preview/hủy và chèn cuối note; chưa có mẫu checklist hoặc mẫu do user thiết kế. TASK-034 đã có mục lục H1–H3 trong View/Edit, điều hướng/focus, bật/tắt, heading trùng tên và mobile. Hai ca browser320/1440 kiểm chèn giữ nội dung, autosave và mở lại View đã PASS; xem [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).
+
+TASK-018/022 có source archive JSON/import và revision/restore trên nhánh review codex/notes-data-reliability, chưa merge schema vào main hoặc áp dụng dữ liệu thật. Offline create/edit, xử lý conflict và bảo vệ pending đã có. TASK-020 có runbook và log maintenance trên nhánh review; backup DB/keyring, restore drill provider biệt lập, retention/RPO/RTO và alert vận hành vẫn cần thực hiện. TASK-019 tiếp tục để sau. Các trạng thái lịch sử bên dưới không thay trạng thái hiện hành này.
 
 # 01 — Kế hoạch NoteTatCa
 

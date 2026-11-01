@@ -1,6 +1,10 @@
 # Roadmap nội dung và cộng tác — NoteTatCa
 
-> 2026-10-25 | KẾ HOẠCH, CHƯA TRIỂN KHAI | Nguồn: yêu cầu chủ dự án.
+> 2026-10-25 | KẾ HOẠCH, XEM TIẾN ĐỘ TỪNG MỤC | Nguồn: yêu cầu chủ dự án.
+
+## Tiến độ hiện hành — 2026-11-01
+
+TASK-031 có bốn mẫu cấu trúc chèn cuối note và preview/hủy; checklist, mẫu cá nhân/chia sẻ còn mở. TASK-034 có mục lục H1–H3 View/Edit/mobile, heading trùng tên và focus. Browser320/1440 đã kiểm autosave/mở lại; chi tiết ở [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md). Archive/history TASK-022 đang trên nhánh review codex/notes-data-reliability; chưa áp dụng migration hoặc chuyển dữ liệu thật. Các hạng mục media/cộng tác còn là kế hoạch.
 
 ## Định hướng đã được yêu cầu
 
@@ -15,8 +19,6 @@ Mỗi giai đoạn có thể phát hành riêng. Ưu tiên hoàn thiện khả n
 | Giai đoạn / task | Phạm vi | Điều kiện hoàn thành |
 | --- | --- | --- |
 | 0 — TASK-022 | Củng cố offline/sync hiện có, version history và export/import có phiên bản | Khôi phục bản trước mà không mất bản hiện tại; export có thể nhập lại; lỗi quota/mất mạng/đổi tài khoản không mất draft; phân biệt cache với backup |
-
-**Tiến độ 2026-10-27:** lịch sử phiên bản nội dung và archive JSON schema1 đã triển khai local, có diễn tập import qua hai SQLite fixture độc lập; xem [worklog](worklog.md). Lịch sử của pin/label/reminder, media manifest khi có media, import hơn giới hạn hiện tại và phép thử migration trên provider thật vẫn là phần mở rộng/kiểm chứng còn lại. Đo1.000note dẫn tới chỉ tải trang đầu khi mở app; chưa triển khai delta sync hoặc virtualization vì số đo hiện tại chưa chứng minh cần, xem [báo cáo đo tải](PERFORMANCE-NOTES-2026-10-27.md).
 | 1 — TASK-023 | Ảnh và tệp đính kèm trước | Upload có tiến độ/hủy/thử lại, resize ảnh/alt text/caption, giới hạn loại và dung lượng; kiểm quyền tải/xóa; thay tên file không vượt kiểm loại; dọn upload mồ côi an toàn |
 | 2 — TASK-024 | Bảng trong note | Thêm/xóa hàng cột, header, resize và cuộn ngang trong bảng trên mobile; copy/paste, undo/redo, view/edit/offline/export không mất dữ liệu. Bản đầu là bảng đơn giản, chưa phải bảng tính có công thức |
 | 3 — TASK-025 | Audio và video | Đính kèm/phát/tua với trạng thái xử lý/lỗi; tải theo yêu cầu, không preload toàn bộ media. Ghi âm cần xin quyền mic khi bấm, có preview trước lưu. Upload file và nhúng link là hai luồng riêng; chưa hứa chuyển mã/ghi hình trực tiếp |
@@ -25,6 +27,8 @@ Mỗi giai đoạn có thể phát hành riêng. Ưu tiên hoàn thiện khả n
 | 6 — TASK-028 | Bình luận | Vai trò Commenter được cấp riêng; thread ở cấp note trước, resolve/reopen và thông báo. Owner quản lý; tác giả sửa/xóa comment của mình theo chính sách đã chốt; Viewer không comment. Thu hồi quyền chặn cả nội dung/comment/attachment |
 | 7 — TASK-029 | Sửa chung thời gian thực — PLANNED theo DEC-030 | Đã đồng ý đưa vào kế hoạch; chốt thiết kế quyền Editor trước khi triển khai. Thiết kế đồng bộ nhiều người, conflict/undo, reconnect và lịch sử attribution; test cùng sửa/offline/thu hồi quyền. Không dùng last-write-wins để giả lập cộng tác |
 | Xuyên suốt — TASK-030 | Quota, an toàn, hiệu năng và khả năng tiếp cận | Giới hạn theo tài khoản/note/file, test quyền mọi đường truy cập, keyboard/screen reader, mobile, i18n; đo tải note và bytes trước/sau; cập nhật Privacy đúng hành vi thực |
+
+**Tiến độ 2026-10-27:** lịch sử phiên bản nội dung và archive JSON schema1 đã triển khai local, có diễn tập import qua hai SQLite fixture độc lập; xem [worklog](worklog.md). Lịch sử của pin/label/reminder, media manifest khi có media, import hơn giới hạn hiện tại và phép thử migration trên provider thật vẫn là phần mở rộng/kiểm chứng còn lại. Đo1.000note dẫn tới chỉ tải trang đầu khi mở app; chưa triển khai delta sync hoặc virtualization vì số đo hiện tại chưa chứng minh cần, xem [báo cáo đo tải](PERFORMANCE-NOTES-2026-10-27.md).
 
 ## Những điểm cần thiết kế trước khi code
 
