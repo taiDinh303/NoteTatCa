@@ -1,3 +1,8 @@
+## Chờ focus của lệnh toolbar trước nhập cỡ chữ — 2026-11-01
+
+- Branch af50127 frontend41299905070 shard1 có1FAIL automatic-text-color1280: strong bị thay bằng24. Tiptap focus command dùng requestAnimationFrame; test fill input trước focus từ Bold hoàn tất nên phím số có thể vào content đang selected. Thêm assertion editor focused sau Bold rồi mới fill font size. Không đổi production editor hoặc bỏ kiểm nội dung/bold/font-size/color/autosave/reopen.
+- Focused393/1280 x2vòng=4executionPASS, ESLintPASS. Main b16b570 frontend3/4shards đãSUCCESS; backend41299890419 SUCCESS163PASS/5WindowsLocalDBSKIP; branchbackend41299905099 SUCCESS172PASS/5SKIP, PG thực chạy. Không coi branch frontend làgreen khi1caseFAIL. Follow-up chỉ automatic-text-color E2E vàworklog; CI giữ đủ4shards, không retry/skip/thay threshold.
+
 ## Hạn mức mascot nhất quán khi request xen kẽ — 2026-11-01
 
 - Main07ca2a7 backend41299378517 lộ201+409 ở Concurrent_requests_reserve_only_one_daily_slot. Đây là race production: latest read chưa thấy job, nhưng slot read đã thấy winner commit; nhánh slot-conflict trả409 trước bước reserve. Re-read latest chỉ khi slot mismatch/pending, trả lại job cho cùng RequestId hoặc429 nếu quota cùngngày;409 của slot cũ vẫn giữ. Không thay quota/index/schema, không retry ghi hay thêm khóa process.
