@@ -1,6 +1,6 @@
 ## Rollout production — 2026-11-02
 
-Schema PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration, giữ nguyên dữ liệu tài khoản/note theo đối soát. Backend source/tests/docs được xuất bản trước; UI backup/privacy mới vẫn trên nhánh review tới khi API Render đã triển khai. Hiện cần quyền Render đúng service để hoàn tất; chi tiết backup/evidence/giới hạn tại [worklog](worklog.md).
+DB PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration; tài khoản/note đối soát không đổi. API Render commit1e10219 đãLIVE trước khi phát hành UI backup/import và cập nhật Privacy. Auto-deploy thực tế của service đang bật theo commit, khác file render.yaml chỉ là tham chiếu; không thay env/secret hoặc tạo deploy trùng. Chứng cứ và kết quả production/UI ở [worklog](worklog.md).
 
 # Roadmap nội dung và cộng tác — NoteTatCa
 

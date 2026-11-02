@@ -1,6 +1,6 @@
 ## Rollout production — 2026-11-02
 
-Theo yêu cầu chủ dự án, Supabase schema ntc đã áp dụng AddNoteRevisions và AddMascotGenerations, đối soát tài khoản/note không đổi. Backend source được xuất bản trước; API Render chưa triển khai vì phiên hiện tại không có quyền service. UI archive/history chưa phát hành tới khi backend sẵn sàng. Snapshot18bảng ứng dụng đã mã hóa/kiểm checksum, chưa là restore drill toàn DB/keyring. Evidence và giới hạn tại [worklog](worklog.md).
+DB PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration; tài khoản/note đối soát không đổi. API Render commit1e10219 đãLIVE trước khi phát hành UI backup/import và cập nhật Privacy. Auto-deploy thực tế của service đang bật theo commit, khác file render.yaml chỉ là tham chiếu; không thay env/secret hoặc tạo deploy trùng. Chứng cứ và kết quả production/UI ở [worklog](worklog.md).
 
 ## Diễn tập workspace và theo dõi job — 2026-10-31
 
