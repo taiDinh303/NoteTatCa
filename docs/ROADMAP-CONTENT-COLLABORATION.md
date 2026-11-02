@@ -1,3 +1,7 @@
+## Rollout production — 2026-11-02
+
+Schema PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration, giữ nguyên dữ liệu tài khoản/note theo đối soát. Backend source/tests/docs được xuất bản trước; UI backup/privacy mới vẫn trên nhánh review tới khi API Render đã triển khai. Hiện cần quyền Render đúng service để hoàn tất; chi tiết backup/evidence/giới hạn tại [worklog](worklog.md).
+
 # Roadmap nội dung và cộng tác — NoteTatCa
 
 > 2026-10-25 | KẾ HOẠCH, XEM TIẾN ĐỘ TỪNG MỤC | Nguồn: yêu cầu chủ dự án.
@@ -27,6 +31,8 @@ Mỗi giai đoạn có thể phát hành riêng. Ưu tiên hoàn thiện khả n
 | 6 — TASK-028 | Bình luận | Vai trò Commenter được cấp riêng; thread ở cấp note trước, resolve/reopen và thông báo. Owner quản lý; tác giả sửa/xóa comment của mình theo chính sách đã chốt; Viewer không comment. Thu hồi quyền chặn cả nội dung/comment/attachment |
 | 7 — TASK-029 | Sửa chung thời gian thực — PLANNED theo DEC-030 | Đã đồng ý đưa vào kế hoạch; chốt thiết kế quyền Editor trước khi triển khai. Thiết kế đồng bộ nhiều người, conflict/undo, reconnect và lịch sử attribution; test cùng sửa/offline/thu hồi quyền. Không dùng last-write-wins để giả lập cộng tác |
 | Xuyên suốt — TASK-030 | Quota, an toàn, hiệu năng và khả năng tiếp cận | Giới hạn theo tài khoản/note/file, test quyền mọi đường truy cập, keyboard/screen reader, mobile, i18n; đo tải note và bytes trước/sau; cập nhật Privacy đúng hành vi thực |
+
+**Tiến độ 2026-10-27:** lịch sử phiên bản nội dung và archive JSON schema1 đã triển khai local, có diễn tập import qua hai SQLite fixture độc lập; xem [worklog](worklog.md). Lịch sử của pin/label/reminder, media manifest khi có media, import hơn giới hạn hiện tại và phép thử migration trên provider thật vẫn là phần mở rộng/kiểm chứng còn lại. Đo1.000note dẫn tới chỉ tải trang đầu khi mở app; chưa triển khai delta sync hoặc virtualization vì số đo hiện tại chưa chứng minh cần, xem [báo cáo đo tải](PERFORMANCE-NOTES-2026-10-27.md).
 
 ## Những điểm cần thiết kế trước khi code
 

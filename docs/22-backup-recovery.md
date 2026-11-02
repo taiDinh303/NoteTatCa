@@ -1,3 +1,15 @@
+## Rollout production — 2026-11-02
+
+Theo yêu cầu chủ dự án, Supabase schema ntc đã áp dụng AddNoteRevisions và AddMascotGenerations, đối soát tài khoản/note không đổi. Backend source được xuất bản trước; API Render chưa triển khai vì phiên hiện tại không có quyền service. UI archive/history chưa phát hành tới khi backend sẵn sàng. Snapshot18bảng ứng dụng đã mã hóa/kiểm checksum, chưa là restore drill toàn DB/keyring. Evidence và giới hạn tại [worklog](worklog.md).
+
+## Diễn tập workspace và theo dõi job — 2026-10-31
+
+Archive JSON schema1 là bản sao nội dung, không thay backup DB/Identity/keyring. Trước diễn tập dùng hai tài khoản giả ở fixture SQLite riêng: tạo rich note/label/reminder/history/Trash, tải archive, nhập vào nơi đã có note; đối soát nội dung, remap ID, owner, thời điểm và reminder inactive. Kiểm import sai schema/tham chiếu không để dữ liệu dở dang. WorkspaceArchiveTests và archive-history.spec.ts thực hiện luồng này, evidence lượt mới ở worklog.
+
+Provider drill còn mở: trên SQL Server/PostgreSQL biệt lập, jobs/email thật tắt, chạy migration mới và restore bản backup thử; kiểm lại FK/owner/hash/UTC, đăng nhập A/B/admin và đo thời gian phục hồi. Không dùng connection chủ dự án hoặc thao tác DB thật từ code task. Chưa chốt retention lịch sử/backup; không tự purge revision.
+
+MaintenanceWorker ghi completed/ElapsedMs/dispatched/delivered, không ghi title/content/email. Operator theo dõi lỗi batch và retry email; khi worker được bật mà không có completed qua nhiều chu kỳ30giây, kiểm process/log/job configuration trước. Completed không có nghĩa thư đã vào inbox. Alert ngoài ứng dụng, backup schedule/RPO/RTO và keyring bền vững vẫn cần cấu hình môi trường có kiểm chứng; không tự bật purge hay mua dịch vụ.
+
 # 22 — Sao lưu và khôi phục
 
 > Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.

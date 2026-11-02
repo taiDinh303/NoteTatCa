@@ -9,6 +9,7 @@ using NTC.Contract.Services.Interface;
 using NTC.Core.Base;
 using NTC.Core.Security;
 using NTC.ModelViews.NoteModelView;
+using NTC.ModelViews.Notes;
 using NTC.Services.Mappings;
 using NTC.Services.Notes;
 using NTC.Services.Shared;
@@ -50,6 +51,49 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
     public async Task<NoteResponseModelView> GetByIdAsync(Guid id) => (await WithDetails(Owned())
         .AsNoTracking().FirstOrDefaultAsync(x => x.Id == id) ?? throw DomainErrors.NotFound("Note")).ToViewModel();
 
+    private static NoteRevision Snapshot(Note note) => new()
+    {
+        NoteId = note.Id, UserId = note.UserId, SourceVersion = note.Version,
+        SavedAt = note.LastUpdatedTime, Title = note.Title, Content = note.Content,
+        DocumentJson = note.DocumentJson, DocumentSchemaVersion = note.DocumentSchemaVersion,
+        IconEmoji = note.IconEmoji, BackgroundColor = note.BackgroundColor
+    };
+    private static NoteRevisionModel ToRevisionModel(NoteRevision item) => new(
+        item.Id, item.NoteId, item.SourceVersion, item.SavedAt, item.Title,
+        item.Content, item.DocumentJson, item.DocumentSchemaVersion,
+        item.IconEmoji, item.BackgroundColor, false);
+
+    public async Task<BasePaginatedList<NoteRevisionModel>> QueryRevisionsAsync(Guid id, int page, int size)
+    {
+        ValidatePage(page, size);
+        if (!await Owned().AsNoTracking().AnyAsync(x => x.Id == id)) throw DomainErrors.NotFound("Note");
+        var query = Repository<NoteRevision>().Entities.AsNoTracking()
+            .Where(x => x.NoteId == id && x.UserId == UserId);
+        var count = await query.CountAsync();
+        var items = await query.OrderByDescending(x => x.SavedAt).ThenByDescending(x => x.Id)
+            .Skip((page - 1) * size).Take(size).Select(x => ToRevisionModel(x)).ToArrayAsync();
+        return new(items, count, page, size);
+    }
+
+    public async Task RestoreRevisionAsync(Guid id, Guid revisionId, Guid expectedVersion)
+    {
+        await InTransactionAsync(async () =>
+        {
+            var note = await Owned().FirstOrDefaultAsync(x => x.Id == id) ?? throw DomainErrors.NotFound("Note");
+            CheckVersion(note, expectedVersion);
+            var revision = await Repository<NoteRevision>().Entities.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == revisionId && x.NoteId == id && x.UserId == UserId)
+                ?? throw DomainErrors.NotFound("Note revision");
+            Validate(revision.Title, revision.Content, revision.DocumentJson, revision.IconEmoji, revision.BackgroundColor);
+            await Repository<NoteRevision>().InsertAsync(Snapshot(note));
+            note.Title = revision.Title; note.Content = revision.Content;
+            note.DocumentJson = revision.DocumentJson;
+            note.DocumentSchemaVersion = revision.DocumentSchemaVersion;
+            note.IconEmoji = revision.IconEmoji; note.BackgroundColor = revision.BackgroundColor;
+            await UnitOfWork.SaveAsync(); return true;
+        });
+    }
+
     public async Task<Note> CreateAsync(CreateNoteModelView model)
     {
         _ = UserId; Validate(model.Title, model.Content, model.DocumentJson, model.IconEmoji, model.BackgroundColor);
@@ -87,6 +131,7 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
             CheckVersion(note, model.Version);
             if (note.DocumentJson != null && model.DocumentJson == null && !model.ConvertToPlainText) throw DomainErrors.Conflict("A rich note must be saved with its document. Use explicit conversion in the editor.");
             var tags = model.TagIds == null ? null : await ValidateTags(model.TagIds);
+            await Repository<NoteRevision>().InsertAsync(Snapshot(note));
             note.Title = model.Title?.Trim() ?? ""; note.Content = ContentRules.PlainText(model.DocumentJson, model.Content);
             note.DocumentJson = model.DocumentJson; note.IconEmoji = ContentRules.Emoji(model.IconEmoji);
             note.BackgroundColor = ContentRules.Color(model.BackgroundColor); note.Priority = model.Priority;

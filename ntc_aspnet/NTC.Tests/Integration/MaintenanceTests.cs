@@ -19,10 +19,16 @@ public sealed class MaintenanceTests
     public async Task A_due_reminder_creates_one_inbox_item_and_one_email_despite_repeated_dispatch()
     {
         using var f=new ApiFactory();await f.InitializeAsync();var(c,_)=await f.LoginAsync();using var client=c;
-        var note=await ApiFactory.Note(c,"DO-NOT-EMAIL-CONTENT");var id=note.GetProperty("id").GetGuid();await AddReminder(f,id,f.Clock.GetUtcNow().AddMinutes(-1));
+        var note=await ApiFactory.Note(c,"Buy milk and bread", "Weekend shopping");var id=note.GetProperty("id").GetGuid();await AddReminder(f,id,f.Clock.GetUtcNow().AddMinutes(-1));
         using(var scope=f.Services.CreateScope())
         {var job=scope.ServiceProvider.GetRequiredService<IBackgroundMaintenanceService>();Assert.Equal(1,await job.DispatchRemindersAsync());Assert.Equal(0,await job.DispatchRemindersAsync());Assert.Equal(1,await job.DeliverEmailsAsync());Assert.Equal(0,await job.DeliverEmailsAsync());}
-        Assert.Single(f.Email.Messages);Assert.DoesNotContain("DO-NOT-EMAIL-CONTENT",f.Email.Messages.Single().Body);
+        var message = Assert.Single(f.Email.Messages);
+        Assert.Equal("a@example.test", message.To);
+        Assert.Equal("Nhắc lịch: Weekend shopping", message.Subject);
+        Assert.Contains("Weekend shopping", message.Body);
+        Assert.Contains("Buy milk and bread", message.Body);
+        Assert.Contains($"href=\"https://client.example.test/notes/{id}\"", message.Body);
+        Assert.Contains("Xem ghi ch", System.Net.WebUtility.HtmlDecode(message.Body));
         var inbox=await ApiFactory.Data(await c.GetAsync("/api/v1/notifications"));var notification=Assert.Single(inbox.GetProperty("items").EnumerateArray());
         Assert.True((await c.PatchAsync($"/api/v1/notifications/{notification.GetProperty("id").GetGuid()}/read",null)).IsSuccessStatusCode);
         Assert.Empty((await ApiFactory.Data(await c.GetAsync("/api/v1/notifications?unreadOnly=true"))).GetProperty("items").EnumerateArray());

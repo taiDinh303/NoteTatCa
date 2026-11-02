@@ -1,10 +1,48 @@
 using System.Text.Encodings.Web;
+using System.Globalization;
 
 namespace NTC.Services.Infrastructure;
 
 public sealed class EmailTemplateRenderer
 {
     private static string Safe(string? value) => HtmlEncoder.Default.Encode(value ?? string.Empty);
+    private static string ShortText(string? value, int limit)
+    {
+        var text = string.Join(" ", (value ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        var elements = StringInfo.ParseCombiningCharacters(text);
+        return elements.Length > limit ? text[..elements[limit]].TrimEnd() + "…" : text;
+    }
+
+    public string ReminderTitle(string? title) => ShortText(title, 100) is { Length: > 0 } text ? text : "Ghi chú không tiêu đề";
+
+    public string RenderReminder(string? title, string? content, string link)
+    {
+        var preview = ShortText(content, 240);
+        var previewRow = preview.Length == 0 ? "" : $"<p style=\"margin:12px 0 0;font-size:15px;line-height:1.7;color:#57606a;overflow-wrap:anywhere;word-break:break-word;\">{Safe(preview)}</p>";
+        return $$"""
+        <!doctype html>
+        <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+        <body style="margin:0;padding:0;background-color:#ffffff;color:#24292f;font-family:Arial,Helvetica,sans-serif;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#ffffff;">
+            <tr><td align="center" style="padding:40px 16px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;">
+                <tr><td align="center" style="padding:0 0 20px;font-size:20px;font-weight:bold;color:#24292f;">NoteTatCa<span style="color:#d99527;">.</span></td></tr>
+                <tr><td style="padding:24px;border:1px solid #d8dee4;border-radius:12px;background-color:#ffffff;">
+                  <p style="margin:0 0 12px;font-size:13px;color:#57606a;">NHẮC LỊCH GHI CHÚ</p>
+                  <h1 style="margin:0;font-size:22px;line-height:1.4;font-weight:600;color:#24292f;overflow-wrap:anywhere;word-break:break-word;">{{Safe(ReminderTitle(title))}}</h1>
+                  {{previewRow}}
+                  <table role="presentation" cellspacing="0" cellpadding="0" style="margin-top:24px;"><tr><td align="center" bgcolor="#24292f" style="border-radius:8px;background-color:#24292f;">
+                    <a href="{{Safe(link)}}" style="display:inline-block;border:1px solid #24292f;border-radius:8px;padding:12px 20px;font-size:14px;font-weight:bold;line-height:20px;color:#ffffff;text-decoration:none;">Xem ghi chú</a>
+                  </td></tr></table>
+                </td></tr>
+                <tr><td align="center" style="padding:18px 8px 0;font-size:12px;line-height:1.6;color:#57606a;">Bạn nhận email này vì đã bật nhắc lịch qua email.</td></tr>
+              </table>
+            </td></tr>
+          </table>
+        </body></html>
+        """;
+    }
+
     public string RenderVerificationCode(string code) =>
         $$"""
         <!doctype html>

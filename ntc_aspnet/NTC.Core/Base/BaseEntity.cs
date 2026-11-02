@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NTC.Core.Utils;
 
 namespace NTC.Core.Base
@@ -20,6 +21,8 @@ namespace NTC.Core.Base
         public DateTimeOffset CreatedTime { get; set; }
         public DateTimeOffset LastUpdatedTime { get; set; }
         public DateTimeOffset? DeletedTime { get; set; }
+        [NotMapped]
+        public bool PreserveImportedTimestamps { get; set; }
     }
 }
 

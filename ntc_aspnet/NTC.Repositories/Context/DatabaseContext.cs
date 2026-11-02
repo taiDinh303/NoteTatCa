@@ -31,6 +31,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
     public DbSet<NoteTag> NoteTags => Set<NoteTag>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<Note> Notes => Set<Note>();
+    public DbSet<NoteRevision> NoteRevisions => Set<NoteRevision>();
     public DbSet<Reminder> Reminders => Set<Reminder>();
     public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
     public DbSet<EmailChallenge> EmailChallenges => Set<EmailChallenge>();
@@ -63,6 +64,15 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
             e.HasIndex(x => new { x.UserId, x.DeletedTime, x.IsPinned, x.SortOrder });
             var filter = Database.IsSqlServer() ? "[CreateRequestId] IS NOT NULL" : "\"CreateRequestId\" IS NOT NULL";
             e.HasIndex(x => new { x.UserId, x.CreateRequestId }).IsUnique().HasFilter(filter);
+        });
+        builder.Entity<NoteRevision>(e =>
+        {
+            e.Property(x => x.Title).IsRequired().HasMaxLength(150);
+            e.Property(x => x.IconEmoji).HasMaxLength(32);
+            e.HasOne(x => x.Note).WithMany().HasForeignKey(x => new { x.NoteId, x.UserId })
+                .HasPrincipalKey(x => new { x.Id, x.UserId }).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.UserId, x.NoteId, x.SavedAt });
+            e.HasIndex(x => new { x.NoteId, x.SourceVersion }).IsUnique();
         });
         builder.Entity<Tag>(e =>
         {
@@ -145,6 +155,8 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
         var entries = ChangeTracker.Entries().ToArray();
         if (entries.Any(x => x.Entity is AdministrativeAuditEvent && x.State is EntityState.Modified or EntityState.Deleted))
             throw DomainErrors.Invalid("Administrative audit events are append-only.");
+        if (entries.Any(x => x.Entity is NoteRevision && x.State is EntityState.Modified or EntityState.Deleted))
+            throw DomainErrors.Invalid("Note revisions are append-only.");
         foreach (var entry in entries.Where(x => x.State is EntityState.Added or EntityState.Modified))
         {
             if (entry.State == EntityState.Modified)
@@ -152,6 +164,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
                 string[] immutable = entry.Entity switch
                 {
                     Note or Tag => ["UserId"],
+                    NoteRevision => ["UserId", "NoteId", "SourceVersion", "SavedAt"],
                     NoteTag => ["UserId", "NoteId", "TagId"],
                     Notification or ReminderDelivery => ["UserId", "NoteId", "ReminderId", "OccurrenceAt"],
                     Reminder => ["NoteId"],
@@ -164,8 +177,10 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
             }
             if (entry.Entity is IAuditableEntity audited)
             {
-                audited.LastUpdatedTime = now; audited.LastUpdatedBy = _actor?.Name ?? "System";
-                if (entry.State == EntityState.Added) { audited.CreatedTime = now; audited.CreatedBy = audited.LastUpdatedBy; }
+                var preserveImported = entry.State == EntityState.Added && entry.Entity is BaseEntity imported && imported.PreserveImportedTimestamps;
+                if (!preserveImported) audited.LastUpdatedTime = now;
+                audited.LastUpdatedBy = _actor?.Name ?? "System";
+                if (entry.State == EntityState.Added) { if (!preserveImported) audited.CreatedTime = now; audited.CreatedBy = audited.LastUpdatedBy; }
                 else
                 {
                     entry.Property(nameof(IAuditableEntity.CreatedTime)).CurrentValue = entry.Property(nameof(IAuditableEntity.CreatedTime)).OriginalValue;

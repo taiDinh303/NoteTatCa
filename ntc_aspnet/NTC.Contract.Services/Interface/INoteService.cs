@@ -1,6 +1,7 @@
 using NTC.Contract.Repositories.Entities;
 using NTC.Core.Base;
 using NTC.ModelViews.NoteModelView;
+using NTC.ModelViews.Notes;
 
 namespace NTC.Contract.Services.Interface
 {
@@ -21,6 +22,8 @@ namespace NTC.Contract.Services.Interface
         Task ReorderAsync(ReorderNoteModelView model);
         Task<BasePaginatedList<NoteResponseModelView>> QueryAsync(int page, int size, string? search = null, Guid? tagId = null, bool trash = false, bool? pinned = null, bool hasReminder = false);
         Task SetPinnedAsync(Guid id, bool pinned, Guid version);
+        Task<BasePaginatedList<NoteRevisionModel>> QueryRevisionsAsync(Guid id, int page, int size);
+        Task RestoreRevisionAsync(Guid id, Guid revisionId, Guid expectedVersion);
     }
 
 }
