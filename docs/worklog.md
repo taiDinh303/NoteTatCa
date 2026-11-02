@@ -1,3 +1,14 @@
+## Thông báo lưu thứ tự dạng popup — 2026-11-02
+
+- Theo yêu cầu chủ dự án, bỏ notice-strip lỗi Note order is not saved khỏi flow danh sách. Dùng Sonner sẵn có ở bottom-right, một toast theo ID cố định, giữ nút Try again, tự dọn khi hết lỗi/rời trang; không thay coordinator, request hoặc logic kéo thả.
+- Validation:3/3 E2E reorder-background PASS (pin/drag khi request chờ, reorder thất bại và retry). Ca lỗi kiểm toolbar bounding box và đầu danh sách giữ nguyên, toaster bottom/right, không còn inline notice; retry lưu thành công và reload giữ thứ tự. Typecheck/ESLint2files/build Production PASS, diffcheck PASS. Fixture biệt lập, không ghi DB thật. Không thêm test mới cho thay đổi đơn giản; tăng kiểm tra ca regression hiện có.
+- Publication scope NotesPage.tsx/reorder-background.spec.ts/worklog, giữ nguyên mascot/asset/config ngoài scope. Push main theo ủy quyền React hiện có; xác minh remote và deployment sau push. Không đổi schema hoặc chạy lại migration.
+## Xác minh publication15fa7b0 — 2026-11-02
+
+- Push main15fa7b0852fee75f6ea502cfaae8c5849b6f278c đã ls-remote khớp; scope4files conflict/runtime/test/worklog, không gồm asset/mascot ngoài scope. Root cập nhật cùng main bằng mixed reset sau kiểm index rỗng, giữ thay đổi có sẵn. Checkout xuất bản sạch build Production PASS.
+- Render dep-dbjuk7rncjis73e1thkg đúng15fa7b0 LIVE2026-11-02T01:42:48Z, auto new_commit. /health/readyHTTP200/ready; appERROR scan01:42:48Z→01:43:27Z trả0logs/hasMorefalse. Không thay env/secret/plan, không trigger deploy trùng.
+- Vercel status15fa7b0 SUCCESS; publicproductionHTTP200, entry index-BqRjT6PW.js/PreferencesPage-BYMVR7Ax.js chứa đủ download/import/pendingguard. Không dùng quyền Verceladmin/logs nên không claim scan lỗi client production hoặc thử CRUD dữ liệu thật.
+- CI đúng15fa7b0 đã hoàn tất SUCCESS: backend41373733929/job125049424806 Release0warnings/errors,172PASS/5WindowsLocalDBSKIP, docs55files/222links/0errors và Docker/config checks PASS. Frontend41373733854 cả4shards SUCCESS:140unitPASS/4environmentPASS, typecheck/lint/buildPASS, E2E61+59+58+57=235PASS/14opt-inSKIP. Ca conflict vừa sửa PASS6.3s trên shard4; không thêm retry/skip hoặc giảm assertion. Checkout xuất bản sạch, remote main và root HEAD khớp15fa7b0. Kết quả cuối chỉ ghi localworklog để tránh tạo deployment log-only; DB/schema/backup giữ nguyên kết quả rollout dưới.
 ## Sửa race khi giữ bản sao conflict — 2026-11-02
 
 - CI frontend main8b837d6/run41371405897: ba shard thành công, shard4 có56PASS/1FAIL tại ca giữ local draft khi phiên khác sửa note. Trace cho thấy GET collection chạy trước POST copy hoàn tất; callback committed của POST hủy list query nên bản remote biến mất khỏi cache. Backend41371405917 thành công; production8b đãLIVE nhưng chưa đạt full CI.

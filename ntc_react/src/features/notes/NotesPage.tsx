@@ -350,6 +350,16 @@ export default function NotesPage({
     workspace.order.subscribe,
     workspace.order.getSnapshot,
   );
+  const orderNotSaved = [...order.groups.values()].some((group) => group.error);
+  useEffect(() => {
+    if (!orderNotSaved) return;
+    const id = toast.error(tr("Note order is not saved."), {
+      id: "note-order-not-saved",
+      duration: Infinity,
+      action: { label: tr("Try again"), onClick: workspace.order.retry },
+    });
+    return () => { toast.dismiss(id); };
+  }, [orderNotSaved]);
   const stored = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
   const all = [true, false].flatMap((pinned) => {
     const group = stored.filter((note) => note.isPinned === pinned);
@@ -525,14 +535,6 @@ export default function NotesPage({
                 ? tr("Search results")
                 : tr("Notes")}
       </h1>
-      {[...order.groups.values()].some((group) => group.error) ? (
-        <div className="notice-strip" role="alert">
-          <span>{tr("Note order is not saved.")}</span>
-          <Button variant="ghost" onClick={workspace.order.retry}>
-            {tr("Try again")}
-          </Button>
-        </div>
-      ) : null}
       <div className={`workspace-toolbar${trash ? " trash-toolbar" : ""}`}>
         {trash ? (
           <div className="notice-strip trash-retention">

@@ -129,6 +129,9 @@ test("failed reorder keeps the requested layout and supports explicit retry", as
   request,
 }) => {
   await signIn(page, request);
+  const toolbar = page.locator(".workspace-toolbar");
+  const toolbarBefore = await toolbar.boundingBox();
+  const sectionBefore = await page.locator(".notes-section").first().boundingBox();
   let fail = true;
   await page.route("**/api/v1/notes/reorder", (route) =>
     fail
@@ -141,10 +144,15 @@ test("failed reorder keeps the requested layout and supports explicit retry", as
   );
   await drag(page, "An idea worth exploring", "Little things, lately");
   const group = page.locator(".notes-section").first();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(page.locator("[data-sonner-toast]")).toContainText(
     "Note order is not saved.",
   );
   await expect(group.locator("h3").first()).toHaveText("Little things, lately");
+  expect(await toolbar.boundingBox()).toEqual(toolbarBefore);
+  expect((await group.boundingBox())?.y).toBe(sectionBefore?.y);
+  await expect(page.locator("[data-sonner-toaster]")).toHaveAttribute("data-x-position", "right");
+  await expect(page.locator("[data-sonner-toaster]")).toHaveAttribute("data-y-position", "bottom");
+  await expect(page.locator(".notice-strip").filter({ hasText: "Note order is not saved." })).toHaveCount(0);
   fail = false;
   const saved = page.waitForResponse(
     (response) =>
@@ -159,10 +167,10 @@ test("failed reorder keeps the requested layout and supports explicit retry", as
       response.ok(),
   );
   await page
-    .getByRole("alert")
+    .locator("[data-sonner-toast]")
     .getByRole("button", { name: "Try again", exact: true })
     .click();
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator("[data-sonner-toast]")).toHaveCount(0);
   await saved;
   await reconciled;
   await page.reload();
