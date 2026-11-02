@@ -212,6 +212,27 @@ describe("offline notes", () => {
     await f.offline.sync();
     expect(f.remote.create.mock.calls[0][0].title).toContain("offline copy");
   });
+  it("finishes conflict resolution after the copy acknowledgement so list revalidation is not cancelled", async () => {
+    const f = setup();
+    await f.offline.rememberNotes([note()]);
+    await f.offline.save("n", { ...draftFrom(note()), title: "Local" }, "v1");
+    f.remote.patch.mockRejectedValueOnce(new ApiError(409));
+    f.remote.find.mockResolvedValueOnce(note("n", "External", "v5"));
+    f.connect();
+    await f.offline.sync();
+    let acknowledge!: () => void;
+    f.remote.create.mockImplementationOnce((draft) => new Promise<Note>(resolve => {
+      acknowledge = () => resolve({ ...note("copied", "old", "v2"), ...draft });
+    }));
+    const resolved = vi.fn();
+    const resolving = f.offline.resolve("n", true).then(resolved);
+    await vi.waitFor(() => expect(f.remote.create).toHaveBeenCalledOnce());
+    expect(resolved).not.toHaveBeenCalled();
+    acknowledge();
+    await resolving;
+    expect(f.offline.getSnapshot().pending).toBe(0);
+    expect(f.committed.mock.lastCall?.[0].id).toBe("copied");
+  });
   it("acknowledges an ambiguous PATCH response only if the online draft matches exactly", async () => {
     const f = setup();
     await f.offline.rememberNotes([note()]);

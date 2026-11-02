@@ -499,7 +499,8 @@ export class OfflineNotes {
     if (result) this.committed(result, id);
     await this.refresh();
     this.changed();
-    void this.sync();
+    // Revalidate only after the copy's final cache commit, which cancels list reads.
+    await this.sync();
   }
   async exportPending(): Promise<OfflineData> {
     const owner = this.requireOwner();

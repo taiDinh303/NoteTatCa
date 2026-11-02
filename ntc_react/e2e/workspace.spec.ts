@@ -1274,6 +1274,17 @@ test("keeps a local draft when another session changes the note", async ({
     exact: true,
   });
   await expect(review).toContainText("My local version");
+  const copyCreated = page.waitForResponse(response =>
+    response.request().method() === "POST" &&
+    new URL(response.url()).pathname === "/api/v1/notes" && response.status() === 201,
+  );
+  // Reproduce a collection read overlapping the copy's final cache commit.
+  await page.route("**/api/v1/notes?**", async route => {
+    const url = new URL(route.request().url());
+    if (!url.searchParams.has("trash") && !url.searchParams.has("hasReminder"))
+      await copyCreated;
+    await route.continue();
+  });
   await review
     .getByRole("button", { name: "Save as a new copy", exact: true })
     .click();
