@@ -1,3 +1,7 @@
+## Rollout production — 2026-11-02
+
+Theo yêu cầu chủ dự án, Supabase schema ntc đã áp dụng AddNoteRevisions và AddMascotGenerations, đối soát tài khoản/note không đổi. Backend source được xuất bản trước; API Render chưa triển khai vì phiên hiện tại không có quyền service. UI archive/history chưa phát hành tới khi backend sẵn sàng. Snapshot18bảng ứng dụng đã mã hóa/kiểm checksum, chưa là restore drill toàn DB/keyring. Evidence và giới hạn tại [worklog](worklog.md).
+
 # 23 — Migration và bảo toàn dữ liệu
 
 > Cập nhật: 2026-10-17 | Áp dụng: YES | Đặc tả làm việc, xem trạng thái từng mục.

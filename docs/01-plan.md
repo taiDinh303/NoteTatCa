@@ -1,3 +1,7 @@
+## Rollout production — 2026-11-02
+
+Schema PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration, giữ nguyên dữ liệu tài khoản/note theo đối soát. Backend source/tests/docs được xuất bản trước; UI backup/privacy mới vẫn trên nhánh review tới khi API Render đã triển khai. Hiện cần quyền Render đúng service để hoàn tất; chi tiết backup/evidence/giới hạn tại [worklog](worklog.md).
+
 ## Trạng thái thực thi — 2026-11-01
 
 TASK-031 đã có bản đầu gồm bốn mẫu cấu trúc học tập/nhật ký/kế hoạch/họp, preview/hủy và chèn cuối note; chưa có mẫu checklist hoặc mẫu do user thiết kế. TASK-034 đã có mục lục H1–H3 trong View/Edit, điều hướng/focus, bật/tắt, heading trùng tên và mobile. Hai ca browser320/1440 kiểm chèn giữ nội dung, autosave và mở lại View đã PASS; xem [frontend](FRONTEND-IMPLEMENTATION.md) và [worklog](worklog.md).

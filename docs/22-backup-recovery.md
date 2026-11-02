@@ -1,3 +1,7 @@
+## Rollout production — 2026-11-02
+
+Theo yêu cầu chủ dự án, Supabase schema ntc đã áp dụng AddNoteRevisions và AddMascotGenerations, đối soát tài khoản/note không đổi. Backend source được xuất bản trước; API Render chưa triển khai vì phiên hiện tại không có quyền service. UI archive/history chưa phát hành tới khi backend sẵn sàng. Snapshot18bảng ứng dụng đã mã hóa/kiểm checksum, chưa là restore drill toàn DB/keyring. Evidence và giới hạn tại [worklog](worklog.md).
+
 ## Diễn tập workspace và theo dõi job — 2026-10-31
 
 Archive JSON schema1 là bản sao nội dung, không thay backup DB/Identity/keyring. Trước diễn tập dùng hai tài khoản giả ở fixture SQLite riêng: tạo rich note/label/reminder/history/Trash, tải archive, nhập vào nơi đã có note; đối soát nội dung, remap ID, owner, thời điểm và reminder inactive. Kiểm import sai schema/tham chiếu không để dữ liệu dở dang. WorkspaceArchiveTests và archive-history.spec.ts thực hiện luồng này, evidence lượt mới ở worklog.
