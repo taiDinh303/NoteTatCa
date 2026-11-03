@@ -1,3 +1,9 @@
+## Mũi tên và mở note trên toàn card — 2026-11-03
+
+- Theo ảnh/yêu cầu chủ dự án: bỏ grab/grabbing trên card, title/preview và drag handle; dùng cursor default cả lúc kéo. Article xử lý click vùng nền/padding/header/footer để mở note, giữ các nút Open/title cho keyboard. Loại target button/link/form/menuitem khỏi handler nền để ghim, menu, labels/mascot và thao tác riêng không mở note thêm. Không đổi dnd-kit sensor/threshold/order, API, autosave hoặc quyền owner.
+- Validation: Chromium11ca khác nhauPASS:3hit-target1440Grid/1440List/393List kiểm5vị trí mép/góc/đáy, cursor card/title/preview, pin/menu không mở, Enter mở;6drag-shape mouse/touch ở393/1440 vàzoom50/75/100/125% kiểmorderpersist/no dialog sau thả;2guest release khôngbaylại/flicker. Bổ sung kiểm kéo từ padding và cursordefault trong lúcdrag vào caGrid; rerun riêng cuối1/1PASS, không cộng thành12ca. TypeScript/Vite productionbuild, scopedESLint3files và .NET solutionRelease -warnaserror -m:1 PASS0warnings/errors; scoped diffcheckPASS. FixtureSQLite/capturedmail riêng, không DB/email thật/fullsuite/thiết bị vật lý/migration/manual deploy. Build giữ mascotBodyFloor có sẵn ngoài scope.
+- Publication scope5files: NotesPage.tsx,styles.css,card-hit-targets.spec.ts mới,drag-shape.spec.ts và entryworklog này. Giữ mascot/assets/local config và evidenceworklog sẵn ngoài commit. Fetch trướcpublication HEAD=origin/main4262794,divergence0/0. Push main theo quyền React hiện có và kiểmremote saupush; hostingrollout chưa xác minh lúccommit.
+
 ## Giảm chờ mở note và công việc chuột — 2026-11-03
 
 - Theo yêu cầu so độ mượt với Keep và bổ sung thử web bằng tài khoản mẫu: [báo cáo](NOTE-RESPONSIVENESS-2026-11-03.md). Bỏ vòng React.lazy/Suspense đầu trên editor đã warm bằng loader module resolve chung Startup/Notes/Reminders/Inbox; cold import vẫn có progress/error boundary. Mascot gom tọa độ pointer mới nhất bằng RAF, cleanup scroll/resize/frame; giữ animation/session và chức năng dữ liệu.

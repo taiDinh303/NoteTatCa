@@ -204,6 +204,7 @@ for (const [width, zoom, touch] of [
       await expect(tall).not.toHaveAttribute("data-dropping", "true");
     }
     expect((await reordered).ok()).toBeTruthy();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
     await expect(group.locator("h3").first()).toHaveText("Tall card");
     await page.reload();
     await expect(

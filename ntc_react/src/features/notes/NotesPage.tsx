@@ -147,6 +147,15 @@ function NoteCard({
       data-testid={`note-${note.id}`}
       onPointerEnter={warmNoteEditor}
       onFocus={warmNoteEditor}
+      onClick={(event) => {
+        // Title/preview and action controls handle their own clicks. Let the
+        // rest of the card open the note without nesting interactive elements.
+        if (
+          !event.defaultPrevented &&
+          event.target instanceof Element &&
+          !event.target.closest("button, a, input, select, textarea, [role='menuitem']")
+        ) onOpen();
+      }}
       data-sort-animating={
         transition && !transition.startsWith("transform 0ms")
           ? "true"

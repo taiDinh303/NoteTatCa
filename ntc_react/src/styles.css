@@ -1061,14 +1061,15 @@ strong {
 .note-card.dragging {
   box-shadow: 0 12px 40px #25304419;
   z-index: 30;
-  cursor: grabbing;
+  cursor: default;
   will-change: transform;
 }
-.note-card.draggable { cursor: grab; }
+.note-card { cursor: default; }
+.note-card.draggable { cursor: default; }
 .note-card.draggable:hover { transform: none; }
-.note-card.draggable.dragging { cursor: grabbing; }
-.note-card.draggable .note-open,
-.note-card.draggable .note-card-identity { cursor: inherit; }
+.note-card.draggable.dragging { cursor: default; }
+.note-card .note-open,
+.note-card .note-card-identity { cursor: default; }
 .note-card-top {
   display: flex;
   justify-content: space-between;
@@ -1095,7 +1096,7 @@ strong {
 .drag-handle {
   touch-action: none;
   opacity: 0;
-  cursor: grab;
+  cursor: default;
 }
 .note-card:hover .drag-handle,
 .drag-handle:focus-visible {
