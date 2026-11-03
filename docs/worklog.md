@@ -1,3 +1,9 @@
+## Header dùng chung theo All notes — 2026-11-03
+
+- Theo yêu cầu chủ dự án, lấy header All notes làm chuẩn cho Settings/Help và các route customer. AppShell vốn đã dùng chung markup; nguyên nhân lệch là list dùng scroller nội bộ/root gutter auto còn Settings/Help dùng root scroll/gutter stable. Mở rộng khung viewport/flex của All notes cho toàn customer shell, chuyển nội dung trang thường sang workspace-main scroll; header/sidebar giữ nguyên vị trí và toàn chiều rộng. Giữ header mobile Back/tên trang theo DEC-024; không đổi admin/auth/API/config.
+- Validation: Chromium 10/10 PASS: workspace-toolbar-alignment tại393/1440/1920 (cả chuyển SPA desktop Notes→Account→Help→Notes, bounding boxes header/search/brand/account/sidebar bằng nhau, root không tràn, Help cuộn tới feedback mà header đứng yên); settings-actions320/393/1440 và Help4ngôn ngữ với copy/download/failed-submit→retry synthetic. Đã xem screenshot Help cuộn desktop1920/mobile393. TypeScript/Vite Production build, full ESLint và .NET solution Release -warnaserror -m:1 PASS0warnings/0errors; scoped diffcheck PASS. Lệnh npm exec đầu parse sai --config nên không khởi động fixture,10ECONNREFUSED; chạy lại đúng CLI/config1worker đạt10PASS, không coi lượt đầu làPASS. Không fullsuite/thiết bị thật/owner DB/email thật/migration/manual deploy.
+- Publication scope chỉ styles.css, workspace-toolbar-alignment.spec.ts và entry worklog này; giữ mascot/assets và worklog evidence có sẵn ngoài commit. Fetch trước publication HEAD=origin/main91bd374, divergence0/0. Push main theo quyền React hiện có, kiểm SHA remote sau push; CI/hosting rollout chưa xác minh lúc commit.
+
 ## Thông báo lưu thứ tự dạng popup — 2026-11-02
 
 - Theo yêu cầu chủ dự án, bỏ notice-strip lỗi Note order is not saved khỏi flow danh sách. Dùng Sonner sẵn có ở bottom-right, một toast theo ID cố định, giữ nút Try again, tự dọn khi hết lỗi/rời trang; không thay coordinator, request hoặc logic kéo thả.

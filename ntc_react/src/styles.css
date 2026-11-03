@@ -4472,13 +4472,16 @@ td {
   font-size: 21px;
   margin: 0 0 20px;
 }
-/* List routes share one fixed-width shell and one toolbar baseline. */
-html:has([data-workspace-list]) { scrollbar-gutter: auto; }
-.customer-shell[data-workspace-list] {
+/* Every customer route uses the All notes shell. Scroll content inside it so
+   root scrollbar changes cannot shift the shared header or sidebar. */
+html:has(.customer-shell) { scrollbar-gutter: auto; }
+.customer-shell {
   height: 100dvh; min-height: 0; display: flex; flex-direction: column;
 }
-.customer-shell[data-workspace-list] > .topbar { flex-shrink: 0; }
-.customer-shell[data-workspace-list] > .main-column { flex: 1; min-height: 0; }
+.customer-shell > .topbar { flex-shrink: 0; }
+.customer-shell > .main-column { flex: 1; min-height: 0; }
+.customer-shell .workspace-main { min-height: 0; overflow-y: auto; }
+/* Lists retain their own scroller and shared toolbar baseline. */
 .customer-shell[data-workspace-list] .workspace-main {
   display: flex; flex-direction: column; min-height: 0; overflow: hidden;
   padding-top: 16px; padding-bottom: 20px;
@@ -4915,9 +4918,6 @@ html:has([data-workspace-list]) { scrollbar-gutter: auto; }
 }
 
 .customer-shell > .sidebar { top: 77px; padding-top: 18px; }
-.customer-shell > .main-column {
-  min-height: calc(100dvh / var(--interface-scale) - 77px);
-}
 @container viewport (max-width: 1100px) {
   .customer-shell > .topbar { gap: 12px; padding-inline: 16px; }
   .topbar-brand { gap: 8px; }
@@ -4945,7 +4945,6 @@ html:has([data-workspace-list]) { scrollbar-gutter: auto; }
     gap: 7px;
     padding-inline: 9px;
   }
-  .customer-shell > .main-column { min-height: calc(100dvh / var(--interface-scale) - 66px); }
 }
 
 .note-color-menu,
