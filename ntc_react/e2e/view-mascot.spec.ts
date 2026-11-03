@@ -1,4 +1,37 @@
 import { expect, test } from "@playwright/test";
+import { mascotDirectionFrame } from "../src/features/mascot/mascotGeometry";
+
+test("pointer bursts use one mascot layout read per frame in an open note", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/Home");
+  await page.getByRole("main").getByRole("link", { name: "Try guest mode", exact: true }).click();
+  await page.locator(".note-card .note-open").first().click();
+  const mascot = page.locator(".note-editor-modal .mascot-page");
+  await expect(mascot).toBeVisible();
+  const reads = await mascot.evaluate(async (element) => {
+    const box = element.getBoundingClientRect();
+    const original = element.getBoundingClientRect;
+    let reads = 0;
+    element.getBoundingClientRect = function () { reads++; return original.call(this); };
+    try {
+      for (let index = 0; index < 120; index++) {
+        window.dispatchEvent(new PointerEvent("pointermove", {
+          clientX: box.x + box.width / 2 + (index === 119 ? 220 : -220),
+          clientY: box.y + box.height / 2,
+          pointerType: "mouse",
+        }));
+      }
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+      return reads;
+    } finally { element.getBoundingClientRect = original; }
+  });
+  console.log("NTC_POINTER_BURST", { events: 120, layoutReads: reads });
+  expect(reads).toBe(1);
+  const frame = mascotDirectionFrame("/mascots/ntc-v6/bunny-directions.webp", 5);
+  await expect(mascot.locator(".mascot-directions")).toHaveCSS(
+    "background-position", `${(frame % 3) * 50}% ${Math.floor(frame / 3) * 50}%`,
+  );
+});
 
 for (const width of [801, 1440]) {
   test(`View mascot has headroom and Edit keeps the same frame ${width}`, async ({

@@ -58,7 +58,7 @@ import { ContentZoomSession } from "./contentZoomSession";
 import ContentZoomOutlet from "./ContentZoomOutlet";
 import RichEditor, { ReadOnlyContent } from "./RichEditor";
 export type NoteOpenAction = "labels" | "reminder";
-type NoteEditorProps = {
+export type NoteEditorProps = {
   noteId?: string;
   onClose: () => void;
   initialAction?: NoteOpenAction;

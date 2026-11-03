@@ -1,7 +1,16 @@
-let loading: Promise<typeof import("./NoteEditor")> | undefined;
+type NoteEditorModule = typeof import("./NoteEditor");
+let loading: Promise<NoteEditorModule> | undefined;
+let loaded: NoteEditorModule | undefined;
+
+export function loadedNoteEditor() {
+  return loaded?.default;
+}
 
 export function loadNoteEditor() {
-  return loading ??= import("./NoteEditor").catch((error: unknown) => {
+  return loading ??= import("./NoteEditor").then((module) => {
+    loaded = module;
+    return module;
+  }).catch((error: unknown) => {
     loading = undefined;
     throw error;
   });

@@ -24,6 +24,36 @@ async function elapsed(page: Page) {
   return page.evaluate(() => Math.round((window as unknown as { audit: { ms: number } }).audit.ms));
 }
 
+test("a cold editor shows progress while its module is held and opens after release", async ({ page, request }, info) => {
+  expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  let held = false;
+  await page.route(/\/assets\/NoteEditor-[^/]+\.js$/, async route => {
+    held = true;
+    await gate;
+    await route.continue();
+  });
+  try {
+    await page.goto("/login");
+    await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
+    await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page.locator(".note-card").first()).toBeVisible();
+    await expect.poll(() => held).toBe(true);
+    await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
+    await expect(page.locator(".note-open-loading")).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    release();
+    await expect(page.getByRole("region", { name: "Note content" })).toBeVisible();
+    await expect(page.locator(".note-open-loading")).toHaveCount(0);
+    await info.attach("cold-module", { body: "Workspace usable while editor JS was held. Opening showed progress and displayed cached content after release.", contentType: "text/plain" });
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+
 for (const width of [1440, 393]) {
   test(`audit cached opening, switching, saving and pinning ${width}`, async ({ page, request }, info) => {
     expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();

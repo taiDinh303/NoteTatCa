@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { lazy, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { ArrowUpRight, Bell, CheckCheck, Inbox } from "lucide-react";
 import { toast } from "sonner";
@@ -8,8 +8,8 @@ import type { InboxItem, Page } from "../../domain/models";
 import { useAuth } from "../../shared/hooks";
 import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
-import { loadNoteEditor, warmNoteEditor } from "../editor/loadNoteEditor";
-const NoteEditor = lazy(loadNoteEditor);
+import { warmNoteEditor } from "../editor/loadNoteEditor";
+import NoteEditor from "../editor/NoteEditorLoader";
 export default function InboxPage() {
   useLanguage();
   const state = useAuth();

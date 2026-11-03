@@ -1,7 +1,6 @@
 import { useMobileLayout } from "../../shared/useMobileLayout";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
-  lazy,
   Suspense,
   useEffect,
   useCallback,
@@ -73,8 +72,8 @@ import {
   Spinner,
 } from "../../shared/ui";
 import { errorMessage } from "../../shared/utils";
-import { loadNoteEditor, warmNoteEditor } from "../editor/loadNoteEditor";
-const NoteEditor = lazy(loadNoteEditor);
+import { warmNoteEditor } from "../editor/loadNoteEditor";
+import NoteEditor from "../editor/NoteEditorLoader";
 import type { NoteOpenAction } from "../editor/NoteEditor";
 function NoteCard({
   note,

@@ -1,5 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
-import { lazy, Suspense, useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   Bell,
@@ -30,8 +30,7 @@ import {
 import { dateTime, errorMessage } from "../../shared/utils";
 import { ReminderForm } from "./ReminderDialog";
 import { commitReminder, pendingReminder } from "./reminderCache";
-import { loadNoteEditor } from "../editor/loadNoteEditor";
-const NoteEditor = lazy(loadNoteEditor);
+import NoteEditor from "../editor/NoteEditorLoader";
 export default function RemindersPage() {
   useLanguage();
   const state = useAuth();

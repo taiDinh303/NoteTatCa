@@ -161,8 +161,10 @@ export function MascotPage(props: MascotPageProps) {
 
     let sector = -1;
     let pointer: { x: number; y: number } | null = null;
+    let frame = 0;
 
     const aim = () => {
+      frame = 0;
       const button = buttonRef.current;
       if (!button || !pointer) return;
 
@@ -189,19 +191,26 @@ export function MascotPage(props: MascotPageProps) {
       setDirection(CLOCKWISE[sector]);
     };
 
+    const schedule = () => {
+      // Use the latest pointer once per paint, including on high-frequency mice.
+      if (!frame) frame = requestAnimationFrame(aim);
+    };
     const onPointerMove = (event: PointerEvent) => {
       pointer = { x: event.clientX, y: event.clientY };
-      aim();
+      schedule();
     };
 
     window.addEventListener("pointermove", onPointerMove, {
       passive: true,
     });
-    window.addEventListener("scroll", aim, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+    window.addEventListener("resize", schedule);
 
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("scroll", aim);
+      window.removeEventListener("scroll", schedule, true);
+      window.removeEventListener("resize", schedule);
+      cancelAnimationFrame(frame);
     };
   }, [setDirection]);
 

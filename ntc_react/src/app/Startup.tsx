@@ -19,6 +19,7 @@ import {
 import { auth, cache, connection, preparation } from "./runtime";
 import { StartupPresentation } from "./startup-context";
 import { useAuth } from "../shared/hooks";
+import { warmNoteEditor } from "../features/editor/loadNoteEditor";
 import { Button, ErrorBanner } from "../shared/ui";
 import { isAdministrator } from "../application/access";
 import type {
@@ -198,8 +199,7 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
           void import("../features/inbox/InboxPage").catch(() => {});
           void import("../features/settings/SettingsPage").catch(() => {});
           // The editor is warmed in the background; slow editor chunks never block sign-in.
-          void import("../features/editor/NoteEditor").catch(() => {});
-          void import("../features/editor/RichEditor").catch(() => {});
+          warmNoteEditor();
           void import("../features/labels/LabelsManager").catch(() => {});
         }
       })
