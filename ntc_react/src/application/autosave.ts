@@ -1,4 +1,5 @@
 import type { Note, NoteDraft } from "../domain/models";
+import { draftFrom } from "../domain/models";
 import { ApiError } from "../infrastructure/http";
 import { validateDocument } from "../domain/document";
 export interface NoteWriter {
@@ -41,6 +42,19 @@ export class AutosaveCoordinator {
     this.snapshot = { status: "saved", dirty: false, note };
   }
   getSnapshot = () => this.snapshot;
+  // A clean readonly session may receive a newer cached/server snapshot.
+  // Never replace a draft or a write whose acknowledgement is still in flight.
+  acceptRemote(note: Note) {
+    if (this.note && (this.note.id !== note.id || this.note.userId !== note.userId)) return false;
+    if (this.dirty() || this.flight) return false;
+    const draft = draftFrom(note);
+    if (this.note?.version === note.version && sameDraft(this.confirmed, draft)) return false;
+    this.note = note;
+    this.draft = copyDraft(draft);
+    this.confirmed = copyDraft(draft);
+    this.emit("saved");
+    return true;
+  }
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
     return () => {

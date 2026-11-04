@@ -2,12 +2,14 @@ import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { NoteMascot } from "../mascot/NoteMascot";
 import { noteFullscreenDefault } from "../../shared/noteFullscreen";
 import { noteEditingDefault } from "../../shared/noteEditing";
+import { useNoteExpansion } from "./useNoteExpansion";
 import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
   Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -60,7 +62,6 @@ import { ContentZoomSession } from "./contentZoomSession";
 import ContentZoomOutlet from "./ContentZoomOutlet";
 import RichEditor from "./RichEditorLoader";
 import ReadOnlyContent from "./ReadOnlyContent";
-import { warmRichEditor } from "./loadRichEditor";
 import NoteToolPanel from "./NoteToolPanel";
 import { useMobileLayout } from "../../shared/useMobileLayout";
 export type NoteOpenAction = "labels" | "reminder";
@@ -151,22 +152,14 @@ function NoteEditorSession({
     );
   if (currentNote && !editing && initialAction === "labels")
     return <NoteLabelsDialog note={currentNote} onClose={onClose} />;
-  if (currentNote && !editing)
-    return (
-      <NoteViewer
-        note={currentNote}
-        onClose={onClose}
-        onEdit={() => setEditing(true)}
-        onRestored={() => { void query.refetch(); void workspace.cache.invalidateQueries({ queryKey: workspace.key("notes") }); }}
-        initialAction={initialAction}
-        fullscreen={fullscreen}
-        onFullscreenChange={setFullscreen}
-      />
-    );
   return (
     <EditorSession
-      key={resolvedId ?? "new"}
+      key={noteId ?? "new"}
       initial={currentNote}
+      editing={editing}
+      onEdit={() => setEditing(true)}
+      initialAction={initialAction}
+      onRestored={() => { void query.refetch(); void workspace.cache.invalidateQueries({ queryKey: workspace.key("notes") }); }}
       onClose={onClose}
       onView={(note) => {
         setCreatedId(note.id);
@@ -291,103 +284,17 @@ function NoteLabelsDialog({
     </Modal>
   );
 }
-function NoteViewer({
-  note,
-  onClose,
-  onEdit,
-  onRestored,
-  initialAction,
-  fullscreen,
-  onFullscreenChange,
-}: {
-  note: Note;
-  onClose: () => void;
-  onEdit: () => void;
-  onRestored: () => void;
-  initialAction?: NoteOpenAction;
-  fullscreen: boolean;
-  onFullscreenChange: (value: boolean) => void;
-}) {
+function NoteInformation({ note, onRestored }: { note: Note; onRestored: () => void }) {
   useLanguage();
   const me = useMe();
   const auth = useAuth();
-  const [historyNote, setHistoryNote] = useState<Note>();
-  const [historyBusy, setHistoryBusy] = useState(false);
-  const [reminderOpen, setReminderOpen] = useState(
-    initialAction === "reminder",
-  );
   const zone = me.data?.account.timeZoneId ?? auth.session?.timeZoneId;
   const modified = new Intl.DateTimeFormat(currentLanguage(), {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: zone,
+    day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: zone,
   }).format(new Date(note.lastUpdatedTime));
-  if (reminderOpen && auth.status !== "guest")
-    return (
-      <ReminderDialog
-        noteId={note.id}
-        title={note.title ?? ""}
-        zone={
-          me.data?.account.timeZoneId ??
-          auth.session?.timeZoneId ??
-          "Asia/Ho_Chi_Minh"
-        }
-        onClose={() => setReminderOpen(false)}
-      />
-    );
-  if (historyNote)
-    return <NoteHistory note={historyNote} onClose={() => setHistoryNote(undefined)} onRestored={onRestored} />;
-  return (
-    <Modal
-      open
-      wide
-      hideTitle
-      title={tr("View note")}
-      onClose={onClose}
-      className={`note-editor-modal note-viewer ${fullscreen ? "fullscreen" : ""}`}
-      style={{
-        ...notePalette(note.backgroundColor),
-        backgroundColor: note.backgroundColor || undefined,
-        ...(note.backgroundColor ? { "--surface": note.backgroundColor } : {}),
-      }}
-    >
-      {!fullscreen ? <NoteMascot size={80} /> : null}
-      <div className="editor-heading note-view-heading">
-        <div className="editor-identity note-view-identity">
-          {note.iconEmoji ? (
-            <span className="note-heading-icon" aria-hidden="true">{note.iconEmoji}</span>
-          ) : <span className="note-heading-icon-space" aria-hidden="true" />}
-          {note.title ? <h2 className="note-heading-title">{note.title}</h2> : null}
-        </div>
-        <div className="row-actions">
-          <IconButton
-            className="editor-pin editor-heading-action"
-            icon={note.isPinned ? PinOff : Pin}
-            label={note.isPinned ? tr("Unpin note") : tr("Pin note")}
-            aria-pressed={note.isPinned}
-            disabled={!!note.deletedTime}
-            onClick={() => { void workspace.pin(note).catch(error => toast.error(errorMessage(error))); }}
-          />
-          <IconButton
-            className="editor-heading-action editor-size-toggle"
-            icon={fullscreen ? Minimize2 : Maximize2}
-            label={fullscreen ? tr("Exit full screen") : tr("Enter full screen")}
-            aria-pressed={fullscreen}
-            onClick={() => onFullscreenChange(!fullscreen)}
-          />
-        </div>
-      </div>
-      <div className="editor-scroll">
-        <Suspense fallback={<Spinner label={tr("Loading note…")} />}>
-          <ReadOnlyContent
-            key={note.documentJson ?? note.content}
-            documentJson={draftFrom(note).documentJson}
-          />
-        </Suspense>
-      </div>
-      <footer className="editor-footer note-view-footer">
+  const [historyNote, setHistoryNote] = useState<Note>();
+  const [historyBusy, setHistoryBusy] = useState(false);
+  return <>
         <Popover.Root>
           <Popover.Trigger asChild>
             <button
@@ -435,19 +342,9 @@ function NoteViewer({
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
-        <div className="note-view-actions">
-          <ContentZoomOutlet popup color={note.backgroundColor ?? undefined} />
-          <Button variant="ghost" onClick={onEdit} onPointerEnter={warmRichEditor} onFocus={warmRichEditor} onTouchStart={warmRichEditor}>
-            <Pencil size={15} />
-            {tr("Edit")}
-          </Button>
-          <Button variant="ghost" onClick={onClose}>
-            {tr("Close")}
-          </Button>
-        </div>
-      </footer>
-    </Modal>
-  );
+
+    {historyNote ? <NoteHistory note={historyNote} onClose={() => setHistoryNote(undefined)} onRestored={onRestored} /> : null}
+  </>;
 }
 type NoteRevision = {
   id: string;
@@ -493,12 +390,20 @@ function NoteHistory({ note, onClose, onRestored }: { note: Note; onClose: () =>
 }
 function EditorSession({
   initial,
+  editing,
+  onEdit,
+  initialAction,
+  onRestored,
   onClose,
   onView,
   fullscreen,
   onFullscreenChange,
 }: {
   initial?: Note;
+  editing: boolean;
+  onEdit: () => void;
+  initialAction?: NoteOpenAction;
+  onRestored: () => void;
   onClose: () => void;
   onView: (note: Note) => void;
   fullscreen: boolean;
@@ -509,7 +414,8 @@ function EditorSession({
   const syncState = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const me = useMe();
   const [draft, setDraft] = useState(() => draftFrom(initial));
-  const [initialDocument] = useState(() => draft.documentJson);
+  const [initialDocument, setInitialDocument] = useState(() => draft.documentJson);
+  const [editorPrepared, setEditorPrepared] = useState(editing);
   const [coordinator] = useState(
     () =>
       new AutosaveCoordinator(
@@ -531,7 +437,7 @@ function EditorSession({
   const [viewing, setViewing] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
-  const [reminderOpen, setReminderOpen] = useState(false);
+  const [reminderOpen, setReminderOpen] = useState(initialAction === "reminder");
   const [closePrompt, setClosePrompt] = useState(false);
   const [trashBusy, setTrashBusy] = useState(false);
   const [otherError, setOtherError] = useState<unknown>();
@@ -539,6 +445,18 @@ function EditorSession({
   const fork = useRef<AutosaveCoordinator | undefined>(undefined);
   const draftRef = useRef(draft);
   const editor = useRef<EditorCommands | null>(null);
+  const editingRef = useRef(editing);
+  useLayoutEffect(() => { editingRef.current = editing; }, [editing]);
+  // First paint uses the lightweight cached document. Prepare the selected
+  // note's editor after that paint, then retain it through all mode switches.
+  useEffect(() => {
+    if (editorPrepared) return;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setEditorPrepared(true));
+    });
+    return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
+  }, [editing, editorPrepared]);
   const blocker = useBlocker(snapshot.dirty);
   const allLabels = labels.data?.pages.flatMap((p) => p.items) ?? [];
   useEffect(() => {
@@ -559,15 +477,17 @@ function EditorSession({
     };
   }, [coordinator]);
   const update = useCallback((patch: Partial<NoteDraft>) => {
+    if (!editingRef.current && initial && coordinator.acceptRemote(initial))
+      draftRef.current = draftFrom(initial);
     const next = { ...draftRef.current, ...patch };
     draftRef.current = next;
     setDraft(next);
     coordinator.update(next);
-  }, [coordinator]);
+  }, [coordinator, initial]);
   const onDocumentChange = useCallback((documentJson: string) => update({ documentJson }), [update]);
   const onEditorReady = useCallback((commands: EditorCommands) => {
     editor.current = commands;
-    if (!document.activeElement?.matches(
+    if (editingRef.current && !document.activeElement?.matches(
       "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, .note-icon-menu *, [role='menuitem'], [role='menuitemradio']",
     )) commands.focus();
   }, []);
@@ -605,6 +525,18 @@ function EditorSession({
     if (blocker.state === "blocked") blocker.proceed();
     else onClose();
   }
+  function beginEditing() {
+    if (initial && coordinator.acceptRemote(initial)) {
+      const next = draftFrom(initial);
+      draftRef.current = next;
+      setDraft(next);
+      setInitialDocument(next.documentJson);
+    }
+    setEditorPrepared(true);
+    onEdit();
+  }
+  const surfaceDraft = !editing && !snapshot.dirty && initial ? draftFrom(initial) : draft;
+  const surfaceRef = useNoteExpansion(initial?.id, fullscreen);
   const status =
     snapshot.status === "saved"
       ? state.status === "guest" ? tr("Saved on this device") : syncState.pending ? tr("Saved on this device; waiting to sync") : tr("All changes saved")
@@ -621,26 +553,29 @@ function EditorSession({
         open
         wide
         onClose={requestClose}
-        title={initial ? tr("Edit note") : tr("New note")}
+        contentRef={surfaceRef}
+        title={!editing ? tr("View note") : initial ? tr("Edit note") : tr("New note")}
         hideTitle
-        className={`note-editor-modal ${fullscreen ? "fullscreen" : ""}`}
+        className={`note-editor-modal note-surface ${editing ? "" : "note-viewer"} ${fullscreen ? "fullscreen" : ""}`}
         style={{
-          ...notePalette(draft.backgroundColor),
-          backgroundColor: draft.backgroundColor || undefined,
-          ...(draft.backgroundColor
-            ? { "--surface": draft.backgroundColor }
+          ...notePalette(surfaceDraft.backgroundColor),
+          backgroundColor: surfaceDraft.backgroundColor || undefined,
+          ...(surfaceDraft.backgroundColor
+            ? { "--surface": surfaceDraft.backgroundColor }
             : {}),
         }}
       >
         {!fullscreen ? <NoteMascot size={80} /> : null}
         <div
-          className={`editor-heading ${draft.iconEmoji ? "" : "editor-heading-no-icon"}`}
+          className={`editor-heading ${editing ? "" : "note-view-heading"} ${surfaceDraft.iconEmoji ? "" : "editor-heading-no-icon"}`}
           style={{
-            ...notePalette(draft.backgroundColor),
-            backgroundColor: draft.backgroundColor || undefined,
+            ...notePalette(surfaceDraft.backgroundColor),
+            backgroundColor: surfaceDraft.backgroundColor || undefined,
           }}
         >
           <div className="editor-identity">
+            {!editing ? <span className={surfaceDraft.iconEmoji ? "note-heading-icon" : "note-heading-icon-space"} aria-hidden="true">{surfaceDraft.iconEmoji}</span> : null}
+            <div style={{ display: editing ? undefined : "none" }}>
             <Popover.Root open={emojiOpen} onOpenChange={setEmojiOpen}>
               <Popover.Trigger asChild>
                 <button
@@ -689,6 +624,7 @@ function EditorSession({
                 </Popover.Content>
               </Popover.Portal>
             </Popover.Root>
+            </div>
             <span
               className="sr-only"
               role="status"
@@ -698,7 +634,9 @@ function EditorSession({
             </span>
           </div>
           <div className="editor-title-wrap">
+            {!editing ? <h2 className="note-heading-title">{surfaceDraft.title}</h2> : null}
             <input
+              hidden={!editing}
               className="editor-title"
               aria-label={tr("Note title")}
               value={draft.title}
@@ -708,11 +646,15 @@ function EditorSession({
           </div>
           <div className="row-actions">
             <IconButton
-              icon={draft.isPinned ? PinOff : Pin}
-              label={draft.isPinned ? tr("Unpin note") : tr("Pin note")}
+              icon={surfaceDraft.isPinned ? PinOff : Pin}
+              label={surfaceDraft.isPinned ? tr("Unpin note") : tr("Pin note")}
               className="editor-pin editor-heading-action"
-              aria-pressed={draft.isPinned}
-              onClick={() => update({ isPinned: !draft.isPinned })}
+              aria-pressed={surfaceDraft.isPinned}
+              onClick={() => {
+                if (!editing && initial && !snapshot.dirty)
+                  void workspace.pin(initial).catch(error => toast.error(errorMessage(error)));
+                else update({ isPinned: !surfaceDraft.isPinned });
+              }}
             />
             <IconButton
               className="editor-heading-action editor-size-toggle"
@@ -794,15 +736,16 @@ function EditorSession({
         ) : null}
         <div className="editor-scroll">
           <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>
-            <RichEditor
-              initial={initialDocument}
+            {editorPrepared || editing ? <RichEditor
+              initial={editing ? initialDocument : surfaceDraft.documentJson}
+              editable={editing}
               onCharacterCount={setCharacterCount}
               onChange={onDocumentChange}
               onReady={onEditorReady}
-            />
+            /> : <ReadOnlyContent documentJson={surfaceDraft.documentJson} />}
           </Suspense>
         </div>
-        <div className="editor-labels">
+        <div className="editor-labels" style={{ display: editing ? undefined : "none" }}>
           {draft.tagIds.map((id) => {
             const label =
               allLabels.find((l) => l.id === id) ??
@@ -891,8 +834,9 @@ function EditorSession({
             ) : null}
           </NoteToolPanel>
         ) : null}
-        <footer className="editor-footer">
-          <div className="editor-tools">
+        <footer className={`editor-footer ${editing ? "" : "note-view-footer"}`}>
+          {!editing && (initial ?? snapshot.note) ? <NoteInformation note={(initial ?? snapshot.note)!} onRestored={onRestored} /> : null}
+          <div className="editor-tools" style={{ display: editing ? undefined : "none" }}>
             <NoteColorPicker
               color={draft.backgroundColor}
               onChange={(backgroundColor) => update({ backgroundColor })}
@@ -971,8 +915,8 @@ function EditorSession({
               ]}
             />
           </div>
-          <div className="row-actions">
-            <span className="editor-count" aria-label={tr("Character count")}>
+          <div className={editing ? "row-actions" : "note-view-actions"}>
+            <span style={{ display: editing ? undefined : "none" }} className="editor-count" aria-label={tr("Character count")}>
               {characterCount.toLocaleString(currentLanguage())} /{" "}
               {(100000).toLocaleString(currentLanguage())}
             </span>
@@ -988,7 +932,7 @@ function EditorSession({
                 {tr("Retry save")}
               </Button>
             ) : null}
-            <Button
+            {!editing ? <><ContentZoomOutlet popup color={surfaceDraft.backgroundColor || undefined} /><Button variant="ghost" onClick={beginEditing}><Pencil size={15} />{tr("Edit")}</Button></> : <Button
               variant="ghost"
               busy={viewing}
               disabled={closing}
@@ -997,7 +941,12 @@ function EditorSession({
                 setViewing(true);
                 void save()
                   .then((note) => {
-                    if (note) onView(note);
+                    if (note) {
+                      setEmojiOpen(false);
+                      setTagsOpen(false);
+                      setInitialDocument(draftRef.current.documentJson);
+                      onView(note);
+                    }
                   })
                   .catch(() => {})
                   .finally(() => setViewing(false));
@@ -1005,7 +954,7 @@ function EditorSession({
             >
               <Eye size={15} />
               {tr("View")}
-            </Button>
+            </Button>}
             <Button
               variant="ghost"
               busy={closing}

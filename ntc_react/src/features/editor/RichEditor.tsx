@@ -2,7 +2,7 @@ import { t as tr, useLanguage } from "../../shared/i18n";
 import NoteTemplates from "./NoteTemplates";
 import NoteOutline from "./NoteOutline";
 import "./NoteTools.css";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
 import {
@@ -135,11 +135,13 @@ export interface EditorCommands {
 }
 export default memo(function RichEditor({
   initial,
+  editable = true,
   onChange,
   onReady,
   onCharacterCount,
 }: {
   initial: string;
+  editable?: boolean;
   onChange: (json: string) => void;
   onReady: (commands: EditorCommands) => void;
   onCharacterCount: (count: number) => void;
@@ -157,15 +159,17 @@ export default memo(function RichEditor({
     shouldRerenderOnTransaction: false,
     extensions,
     content,
+    editable,
     editorProps: {
       attributes: {
         class: "rich-editor",
         "aria-label": tr("Note content"),
-        role: "textbox",
-        "aria-multiline": "true",
+        role: editable ? "textbox" : "region",
+        ...(editable ? { "aria-multiline": "true" } : {}),
       },
     },
     onUpdate: ({ editor }) => {
+      if (!editor.isEditable) return;
       const characterCount = editor.getText().length;
       onCharacterCount(characterCount);
       const json = serialize(editor.state.doc);
@@ -185,27 +189,40 @@ export default memo(function RichEditor({
       onCharacterCount(editor.getText().length);
       onReady({
         // Focus synchronously; a queued frame could run after the user opens the title input.
-        focus: () => editor.view.focus(),
+        focus: () => { if (!editor.isDestroyed && editor.isInitialized) editor.view.focus(); },
         exportMarkdown: () => setMarkdown("export"),
         importMarkdown: () => setMarkdown("import"),
         plainText: () => editor.getText(),
       });
     },
   });
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!editor) return;
+    editor.setEditable(editable, false);
     editor.setOptions({
       editorProps: {
         attributes: {
           class: "rich-editor",
           "aria-label": tr("Note content"),
-          role: "textbox",
-          "aria-multiline": "true",
+          role: editable ? "textbox" : "region",
+          ...(editable ? { "aria-multiline": "true" } : {}),
         },
       },
     });
     editor.view.dispatch(editor.state.tr);
-  }, [editor, language]);
+  }, [editor, language, editable]);
+  useEffect(() => {
+    if (editor && !editable && serialize(editor.state.doc) !== initial)
+      editor.commands.setContent(JSON.parse(initial), { emitUpdate: false });
+  }, [editor, editable, initial, serialize]);
+  useEffect(() => {
+    if (!editor || !editable || editor.isDestroyed || !editor.isInitialized ||
+      document.activeElement?.matches("input, textarea, select, [role='menuitem']")) return;
+    const viewport = editor.view.dom.closest<HTMLElement>("[data-content-zoom]");
+    const scroll = viewport && { top: viewport.scrollTop, left: viewport.scrollLeft };
+    editor.view.focus();
+    if (viewport && scroll) { viewport.scrollTop = scroll.top; viewport.scrollLeft = scroll.left; }
+  }, [editor, editable]);
   const state = useEditorState({
     editor,
     selector: ({ editor }) => ({
@@ -258,7 +275,7 @@ export default memo(function RichEditor({
   if (!editor) return null;
   return (
     <>
-      <div className="editor-toolbar" aria-label={tr("Text formatting")}>
+      {editable ? <div className="editor-toolbar" aria-label={tr("Text formatting")}>
         <ContentZoomOutlet />
         <NoteTemplates editor={editor} />
         <span className="toolbar-divider" />
@@ -531,7 +548,7 @@ export default memo(function RichEditor({
           label={tr("Redo")}
           onClick={() => editor.chain().focus().redo().run()}
         />
-      </div>
+      </div> : null}
       <ErrorBanner error={error} />
       <ContentZoom>
         <NoteOutline editor={editor} />

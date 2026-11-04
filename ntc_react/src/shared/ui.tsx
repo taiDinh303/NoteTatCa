@@ -15,6 +15,7 @@ import type {
   CSSProperties,
   ErrorInfo,
   ReactNode,
+  Ref,
 } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
@@ -288,6 +289,7 @@ export function Modal({
   dismissOnOutside = false,
   onEscapeKeyDown,
   style,
+  contentRef,
 }: {
   open: boolean;
   onClose: () => void;
@@ -301,6 +303,7 @@ export function Modal({
   dismissOnOutside?: boolean;
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   style?: CSSProperties;
+  contentRef?: Ref<HTMLDivElement>;
 }) {
   useLanguage();
   return (
@@ -313,6 +316,7 @@ export function Modal({
       <Dialog.Portal>
         <Dialog.Overlay className="modal-overlay" />
         <Dialog.Content
+          ref={contentRef}
           className={`modal ${wide ? "wide" : ""} ${className}`}
           style={style}
           onEscapeKeyDown={onEscapeKeyDown}

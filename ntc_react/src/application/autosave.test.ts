@@ -22,6 +22,35 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe("autosave serialization", () => {
+  it("adopts a newer clean snapshot before editing and writes using its version", async () => {
+    const initial = draftFrom();
+    const note = makeNote(initial);
+    const next = makeNote({ ...initial, title: "Remote title" }, "v2");
+    const writer = { create: vi.fn(), patch: vi.fn(async (_id, draft) => makeNote(draft, "v3")) };
+    const saver = new AutosaveCoordinator(writer, initial, note, vi.fn());
+    expect(saver.acceptRemote(next)).toBe(true);
+    expect(saver.getSnapshot()).toMatchObject({ dirty: false, note: next });
+    saver.update({ ...draftFrom(next), title: "My edit" });
+    expect(saver.acceptRemote(makeNote(initial, "v4"))).toBe(false);
+    await saver.flush();
+    expect(writer.patch).toHaveBeenCalledWith(note.id, expect.objectContaining({ title: "My edit" }), "v2");
+    expect(saver.acceptRemote({ ...next, id: "another-note" })).toBe(false);
+    expect(saver.acceptRemote({ ...next, userId: "another-owner" })).toBe(false);
+    saver.dispose();
+  });
+  it("does not replace the acknowledged baseline while a write is in flight", async () => {
+    const initial = draftFrom();
+    let release!: (note: Note) => void;
+    const writer = { create: vi.fn(), patch: vi.fn(() => new Promise<Note>(resolve => { release = resolve; })) };
+    const saver = new AutosaveCoordinator(writer, initial, makeNote(initial), vi.fn());
+    saver.update({ ...initial, title: "In flight" });
+    const flight = saver.flush();
+    expect(saver.acceptRemote(makeNote(initial, "other-version"))).toBe(false);
+    release(makeNote({ ...initial, title: "In flight" }, "v2"));
+    await flight;
+    expect(saver.getSnapshot()).toMatchObject({ dirty: false, note: { title: "In flight", version: "v2" } });
+    saver.dispose();
+  });
   it("saves edits made in flight using the acknowledged version", async () => {
     const draft = draftFrom();
     const first = { ...draft, title: "First" };
