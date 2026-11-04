@@ -767,7 +767,8 @@ for (const width of [1440]) {
         scale: new DOMMatrix(getComputedStyle(layer).transform).a,
       };
     });
-    expect(result.scale).toBeCloseTo(Math.exp(144 * 0.0012), 3);
+    // Settled gestures use the displayed whole percentage (100% fit regression).
+    expect(result.scale).toBe(Math.round(Math.exp(144 * 0.0012) * 100) / 100);
     expect(result.horizontalOffsets.every((value) => value === 0)).toBe(true);
     expect(result.verticalOffsets.every((value) => value === 0)).toBe(true);
     expect(result.leftEdges.every((value) => Math.abs(value) < 1)).toBe(true);
@@ -1010,17 +1011,15 @@ for (const { width, theme } of [
                 (el as HTMLElement).style.getPropertyValue("--notes-columns"),
               ),
             );
-          const oldSlots = Math.floor(
-            ((layout.available - 10) / 0.5 + baseGap + 0.01) /
+          const completeSlots = Math.floor(
+            (layout.available / 0.5 + baseGap + 0.01) /
               (baseWidth + baseGap),
           );
-          expect(slots).toBe(oldSlots + 1);
+          expect(slots).toBe(completeSlots);
         }
         if (percent === 100) expect(layout.rightGap).toBeLessThan(1);
-        if (mode === "grid" && percent === 100) {
-          expect(layout.leftMargin).toBeLessThan(width < 600 ? 16.1 : 1);
-          expect(layout.rightMargin).toBeLessThan(width < 600 ? 16.1 : 1);
-        }
+        // Near 100% keeps the nominal columns through 105%. The owner accepts
+        // a partial right remainder; the full-slot bound above still applies.
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
@@ -1137,7 +1136,6 @@ for (const { width, theme } of [
             ((baseWidth + baseGap) * percent) / 100 + 1,
           );
           if (percent === 100) {
-            expect(hidden.remaining).toBeLessThan(1);
             expect(hidden.actualRightGap).toBeLessThan(1);
           }
           await page.screenshot({

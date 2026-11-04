@@ -108,6 +108,10 @@ Nút desktop nhận primary mouse/pen pointerdown để bắt đầu mở/thu ng
 
 ### Zoom danh sách, giữ nguyên giao diện — DEC-031, 2026-10-25
 
+**Hiện hành2026-11-04, theo yêu cầu mới và đính chính của chủ dự án:** trên viewport1910/1920px, Grid sidebar mở giữ5cột ở99/100/101/105%,10cột ở50/51/52/53%; sidebar đóng6/12. Range50–150% giữ nguyên, không mở47–49%. Được tận dụng thêm đệm phải, chừa12px sátmép; phần dư phải dưới1bước cột được chấp nhận cả ở100%, không ép card/gap giãn theo zoom để khít mép. Hàng thiếu note vẫn có slot trống; không sửa dữ liệu hoặc thứ tự để lấp.
+
+Nominal cỡ/sidebar cũ vẫn tính từ F (bề ngang shell trừ padding trái/phải), g=20, K=max(3,round((F+g)/320)), c0=(F−(K−1)g)/K, S=c0+g. Grid dùng c nhỏ hơn một chút để đủ số cột đến105% và53%: A=max(0,paddingRight−12), fit(W,N,s)=((W+A)/s−(N−1)g)/N; c=min(c0,fit(F,K,1.05),fit(F−S,K−1,1.05),fit(F,2K,.53),fit(F−S,2(K−1),.53)). Cỡ c/g/S chỉ đổi khi resize, giữ nguyên qua zoom/toggle. Right allowance A dùng ở50–53% và99–105%, ngoài các khoảng này0; List/mobile không áp dụng. Fit số cột có1CSSpx tolerance, canvas/stage/padding dùng chung fitWidth để card cuối không bị clip. Sidebar vẫn dùng S cũ, header/New/lề trái không đổi. Công thức100%khít/50%chỉ10px dưới đây là lịch sử trước thay đổi này.
+
 Bổ sung theo3ảnh50% ngày2026-10-26: desktop Grid tại scale50% dùng thêm tối đa10px từ đệm phải sẵn có (giữ ít nhất12px cách mép); đủ thêm1cột trước xuống hàng, không đổi width/gap gốc hoặc lề trái. Điều kiện chỉ tại min zoom50%, List/mobile và mốc khác giữ quy tắc cũ. fitWidth dùng chung cho số cột/canvas/stage để không chỉ thêm slot rồi clip card cuối.100% vẫn như trước.
 
 Yêu cầu mới nhất2026-10-26: chủ dự án thấy width thích ứng giật khi dùng thực tế nên hủy thử nghiệm d333dde, trở lại width/gap Grid gốc cố định như c4f6cb5. Bỏ toàn bộ width target/interpolation rAF theo zoom; chỉ scale uniform và animate vị trí khi đổi cột. Không còn yêu cầu khít cả5mốc; ưu tiên100% và chấp nhận phần dư phải tại mức khác. List giữ bề ngang hàng theo viewport như trước.

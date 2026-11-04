@@ -2,7 +2,7 @@ import { useMobileLayout } from "../../shared/useMobileLayout";
 import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { useDisplayZoom } from "../../shared/displayZoom";
 import { t as tr } from "../../shared/i18n";
-import { desktopNoteWidth, DESKTOP_NOTE_GAP } from "../../shared/workspaceGrid";
+import { desktopGridCardWidth, DESKTOP_NOTE_GAP } from "../../shared/workspaceGrid";
 import "./NotesZoomViewport.css";
 
 export function NotesZoomViewport(props: { children: ReactNode; mode: string }) {
@@ -81,11 +81,12 @@ function DesktopNotesZoomViewport({
       frozenGrids.clear();
     }
     function fitWidth(nextScale: number) {
-      // At half scale the next complete column needs half a gap more room.
-      // Borrow that from the existing right inset, keeping card/gap unchanged.
+      // Use the spare right inset to complete a column at the owner's main
+      // zoom stops. Keep 12px clear of the window scrollbar and fixed tracks.
       const allowance =
-        mode !== "list" && window.innerWidth > 800 && nextScale <= 0.50001
-          ? Math.min(gap / 2, Math.max(0, rightInset - 12))
+        mode !== "list" && window.innerWidth > 800 &&
+        (nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001))
+          ? Math.max(0, rightInset - 12)
           : 0;
       return availableWidth + allowance;
     }
@@ -302,8 +303,8 @@ function DesktopNotesZoomViewport({
       const inset = getComputedStyle(view.parentElement!).paddingRight;
       rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
-      // At 100%, closing navigation adds exactly one complete column. Card
-      // width, gap and sidebar width stay fixed during zoom and toggles.
+      // Calibrate fixed grid tracks to keep the nominal columns through 105%.
+      // Card width, gap and sidebar width stay fixed during zoom and toggles.
       const desktop = window.innerWidth > 800;
       const mainStyle = getComputedStyle(view.parentElement!);
       const fullWidth =
@@ -315,7 +316,7 @@ function DesktopNotesZoomViewport({
         ? Math.max(3, Math.round((fullWidth + gap) / (300 + gap)))
         : Math.max(1, Math.round((fullWidth + gap) / (300 + gap)));
       const nextCardWidth = desktop
-        ? desktopNoteWidth(fullWidth)
+        ? desktopGridCardWidth(fullWidth, rightInset)
         : window.innerWidth < 600
           ? Math.max(1, fullWidth - gap)
           : (fullWidth - (fullColumns - 1) * gap) / fullColumns;

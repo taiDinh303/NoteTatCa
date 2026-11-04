@@ -1,3 +1,7 @@
+## Grid quanh100% và50% — 2026-11-04
+
+Theo chủ dự án: giữ5note/hàng ở99–105%,10note/hàng ở50–53% với sidebar mở trên khung1910–1920px; đóngsidebar6/12. Giới hạn zoom50–150% giữ nguyên sau đính chính47–49% là nhầm. Tận dụng đệm phải tới khi còn12px, cho phần dư nhỏ thay vì bắt100% khít tuyệt đối; cỡ card gốc hiệu chỉnh theo viewport rồi cố định qua zoom/sidebar, không animate width. Đây là bổ sung DEC-031 hiện hành, thay các mô tả lịch sử100%r<1/50%chỉ10px bên dưới. Runtime và evidence xem FRONTEND-IMPLEMENTATION/worklog.
+
 ## Admin: đồng nhất giao diện và ưu tiên vận hành — 2026-11-04
 
 Chủ dự án yêu cầu đồng nhất admin với user và rà công cụ quản trị còn thiếu; đã chọn thông báo trong app trước/email sau, ưu tiên thông báo và theo dõi nhắc nhở lỗi. Giao diện và regression của đợt này ghi ở worklog; chức năng announcement/monitoring chưa triển khai. Hiện trạng, thiết kế kế tiếp và các hạng mục PROPOSED tại [rà soát admin](ADMIN-REVIEW-2026-11-04.md). Giữ privacy/ownership; không mặc định cấp quyền đọc/sửa note người khác.
