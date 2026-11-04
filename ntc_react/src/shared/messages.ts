@@ -1,5 +1,12 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+ "Zoom": ["Thu phóng", "缩放", "拡大率"],
+ "Apply": ["Áp dụng", "应用", "適用"],
+ "Edit avatar": ["Chỉnh sửa ảnh đại diện", "编辑头像", "アバターを編集"],
+ "Avatar preview": ["Xem trước ảnh đại diện", "头像预览", "アバターのプレビュー"],
+ "Avatar zoom": ["Phóng to ảnh đại diện", "头像缩放", "アバターの拡大率"],
+ "Horizontal position": ["Vị trí ngang", "水平位置", "水平位置"],
+ "Vertical position": ["Vị trí dọc", "垂直位置", "垂直位置"],
   "Bullet style": ["Kiểu dấu đầu dòng", "项目符号样式", "箇条書きのスタイル"],
   "Dot bullets": ["Dấu chấm", "圆点", "黒丸"],
   "Dash bullets": ["Dấu gạch ngang", "短横线", "ハイフン"],

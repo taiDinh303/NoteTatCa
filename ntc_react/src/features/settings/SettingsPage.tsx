@@ -97,7 +97,7 @@ function ProfileForm({ me }: { me: Me }) {
                   version: p.version,
                   picture: picture || null,
                   address: String(data.get("address")) || null,
-                  locale: String(data.get("locale")) || null,
+                  locale: p.locale ?? null,
                   timeZoneId: String(data.get("timeZoneId")),
                 }
               : {}),
@@ -121,11 +121,22 @@ function ProfileForm({ me }: { me: Me }) {
         }}
       >
         <div className="profile-identity">
-          <Avatar
-            large
-            name={p?.fullName || me.account.userName}
+          <AvatarPicker
             picture={picture}
-          />
+            onChange={(value) => {
+              setPicture(value);
+              setEditing(true);
+            }}
+            onError={setError}
+            onBusy={setAvatarBusy}
+            disabled={busy}
+          >
+            <Avatar
+              large
+              name={p?.fullName || me.account.userName}
+              picture={picture}
+            />
+          </AvatarPicker>
           <div>
             <h2>{p?.fullName || tr("Your profile")}</h2>
             <p>{me.account.email}</p>
@@ -136,15 +147,6 @@ function ProfileForm({ me }: { me: Me }) {
           </div>
         </div>
         <ErrorBanner error={error} />
-        {editing && p ? (
-          <AvatarPicker
-            picture={picture}
-            onChange={setPicture}
-            onError={setError}
-            onBusy={setAvatarBusy}
-            disabled={busy}
-          />
-        ) : null}
         {editing ? (
           <>
             <div className="form-grid">
@@ -197,19 +199,9 @@ function ProfileForm({ me }: { me: Me }) {
                     maxLength={500}
                   />
                 </Field>
-                <div className="form-grid">
-                  <TimezoneField
-                    initial={p.timeZoneId || me.account.timeZoneId}
-                  />
-                  <Field label={tr("Locale")}>
-                    <input
-                      name="locale"
-                      defaultValue={p.locale ?? ""}
-                      placeholder="en"
-                      maxLength={10}
-                    />
-                  </Field>
-                </div>
+                <TimezoneField
+                  initial={p.timeZoneId || me.account.timeZoneId}
+                />
               </>
             ) : null}
             <div className="settings-card-footer">
@@ -251,7 +243,6 @@ function ProfileForm({ me }: { me: Me }) {
                 ],
                 [tr("Address"), p?.address],
                 [tr("Timezone"), p?.timeZoneId || me.account.timeZoneId],
-                [tr("Locale"), p?.locale],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>

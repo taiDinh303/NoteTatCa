@@ -31,6 +31,9 @@ for (const [width, admin] of [
     const zone = page.getByLabel("Timezone", { exact: true });
     await expect(zone).toHaveJSProperty("tagName", "SELECT");
     await zone.selectOption("UTC");
+    await page
+      .getByRole("button", { name: "Edit avatar", exact: true })
+      .click();
     const upload = page.getByLabel("Choose avatar", { exact: true });
     await upload.setInputFiles({
       name: "bad.svg",
@@ -50,6 +53,8 @@ for (const [width, admin] of [
       const ctx = canvas.getContext("2d")!;
       ctx.fillStyle = "#2467ce";
       ctx.fillRect(0, 0, 300, 200);
+      ctx.fillStyle = "#cc0000";
+      ctx.fillRect(0, 0, 150, 200);
       return canvas.toDataURL(type).split(",")[1];
     }, mime);
     await upload.setInputFiles({
@@ -57,11 +62,40 @@ for (const [width, admin] of [
       mimeType: mime,
       buffer: Buffer.from(png, "base64"),
     });
+    await expect(page.locator(".avatar-crop-stage img")).toBeVisible();
+    const stage = await page.locator(".avatar-crop-stage").boundingBox();
+    await page.mouse.move(stage!.x + 120, stage!.y + 120);
+    await page.mouse.down();
+    await page.mouse.move(stage!.x + 150, stage!.y + 130);
+    await page.mouse.up();
+    await expect(
+      page.getByLabel("Horizontal position", { exact: true }),
+    ).toHaveValue("30");
+    await page.getByLabel("Vertical position", { exact: true }).fill("0");
+    await page.getByLabel("Avatar zoom", { exact: true }).fill("0.25");
+    expect(
+      await page
+        .locator(".avatar-crop-stage img")
+        .evaluate((img) => img.getBoundingClientRect().width),
+    ).toBeLessThan(240);
+    await page.getByLabel("Avatar zoom", { exact: true }).fill("1.5");
+    await page.getByLabel("Horizontal position", { exact: true }).fill("20");
+    await page.getByRole("button", { name: "Apply", exact: true }).click();
     const avatar = page.locator(".profile-identity img");
     await expect(avatar).toBeVisible();
     await expect
       .poll(() => avatar.evaluate((img: HTMLImageElement) => img.naturalWidth))
       .toBe(128);
+    const pixel = await avatar.evaluate((img: HTMLImageElement) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 128;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      return Array.from(ctx.getImageData(64, 64, 1, 1).data);
+    });
+    expect(pixel[0]).toBeGreaterThan(150);
+    expect(pixel[1]).toBeLessThan(30);
+    expect(pixel[2]).toBeLessThan(30);
     const src = await avatar.getAttribute("src");
     const zoneLabel = (await page
       .locator(".timezone-heading .field-label")
@@ -78,10 +112,7 @@ for (const [width, admin] of [
       ),
     ).toBeLessThan(2);
     await expect(zone).toHaveCSS("appearance", "none");
-    if (width > 800) {
-      const locale = (await page.getByLabel("Locale", { exact: true }).boundingBox())!;
-      expect(Math.abs((await zone.boundingBox())!.y - locale.y)).toBeLessThan(2);
-    }
+    await expect(page.getByLabel("Locale", { exact: true })).toHaveCount(0);
     await expect(page.locator(".timezone-select > svg")).toHaveCSS(
       "right",
       "12px",
@@ -131,21 +162,21 @@ for (const [width, admin] of [
       .getByRole("button", { name: "Edit profile", exact: true })
       .click();
     await page
-      .getByRole("button", { name: "Remove avatar", exact: true })
+      .getByRole("button", { name: "Edit avatar", exact: true })
       .click();
     const removal = page.getByRole("dialog", {
-      name: "Remove avatar?",
+      name: "Edit avatar",
       exact: true,
     });
-    await expect(removal).toBeVisible();
     await removal.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(avatar).toHaveAttribute("src", src!);
     await page
-      .getByRole("button", { name: "Remove avatar", exact: true })
+      .getByRole("button", { name: "Edit avatar", exact: true })
       .click();
     await removal
       .getByRole("button", { name: "Remove avatar", exact: true })
       .click();
+    await removal.getByRole("button", { name: "Apply", exact: true }).click();
     await expect(avatar).toHaveCount(0);
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
     await expect(avatar).toHaveAttribute("src", src!);
@@ -161,11 +192,12 @@ for (const [width, admin] of [
       ),
     );
     await page
-      .getByRole("button", { name: "Remove avatar", exact: true })
+      .getByRole("button", { name: "Edit avatar", exact: true })
       .click();
     await removal
       .getByRole("button", { name: "Remove avatar", exact: true })
       .click();
+    await removal.getByRole("button", { name: "Apply", exact: true }).click();
     await page
       .getByRole("button", { name: "Save profile", exact: true })
       .click();
