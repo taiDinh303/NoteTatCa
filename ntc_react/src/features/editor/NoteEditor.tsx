@@ -1,6 +1,7 @@
 import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { NoteMascot } from "../mascot/NoteMascot";
 import { noteFullscreenDefault } from "../../shared/noteFullscreen";
+import { noteEditingDefault } from "../../shared/noteEditing";
 import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
@@ -110,7 +111,7 @@ function NoteEditorSession({
   initialAction,
 }: NoteEditorProps) {
   useLanguage();
-  const [editing, setEditing] = useState(!noteId);
+  const [editing, setEditing] = useState(() => !noteId || (!initialAction && noteEditingDefault()));
   const [createdId, setCreatedId] = useState<string>();
   const [fullscreen, setFullscreen] = useState(noteFullscreenDefault);
   const resolvedId = noteId ?? createdId;

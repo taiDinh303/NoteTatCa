@@ -1,5 +1,7 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Preparing note tools…": ["Đang chuẩn bị công cụ ghi chú…", "正在准备笔记工具…", "ノートツールを準備しています…"],
+  "Open notes for editing": ["Mở ghi chú để chỉnh sửa", "打开笔记即可编辑", "ノートを編集モードで開く"],
   "Always open notes in full screen": ["Luôn mở ghi chú toàn màn hình", "始终全屏打开笔记", "常にノートを全画面で開く"],
  "Zoom": ["Thu phóng", "缩放", "拡大率"],
  "Apply": ["Áp dụng", "应用", "適用"],

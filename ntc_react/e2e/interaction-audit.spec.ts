@@ -24,7 +24,7 @@ async function elapsed(page: Page) {
   return page.evaluate(() => Math.round((window as unknown as { audit: { ms: number } }).audit.ms));
 }
 
-test("a cold editor shows progress while its module is held and opens after release", async ({ page, request }, info) => {
+test("workspace preparation waits for cold note code before showing the board", async ({ page, request }, info) => {
   expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
@@ -39,15 +39,27 @@ test("a cold editor shows progress while its module is held and opens after rele
     await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
     await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
-    await expect(page.locator(".note-card").first()).toBeVisible();
     await expect.poll(() => held).toBe(true);
-    await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
-    await expect(page.locator(".note-open-loading")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Preparing your workspace", exact: true })).toBeVisible();
+    await expect(page.locator(".note-card")).toHaveCount(0);
     await expect(page.getByRole("dialog")).toHaveCount(0);
     release();
+    await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
     await expect(page.getByRole("region", { name: "Note content" })).toBeVisible();
     await expect(page.locator(".note-open-loading")).toHaveCount(0);
-    await info.attach("cold-module", { body: "Workspace usable while editor JS was held. Opening showed progress and displayed cached content after release.", contentType: "text/plain" });
+    await page.getByRole("button", { name: "Close", exact: true }).click();
+    await mark(page, '[role="textbox"][aria-label="Note content"]');
+    await page.getByRole("button", { name: "Take a note", exact: true }).click();
+    const createMs = await elapsed(page);
+    await page.getByRole("textbox", { name: "Note title", exact: true }).fill("Prepared capture");
+    await page.getByRole("textbox", { name: "Note content", exact: true }).fill("Ready without another editing chunk.");
+    await mark(page, 'body:not(:has([role="dialog"]))');
+    await page.getByRole("button", { name: "Close", exact: true }).click();
+    const closeMs = await elapsed(page);
+    await page.getByRole("button", { name: "Open Prepared capture", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Note content" })).toHaveText("Ready without another editing chunk.");
+    console.log("NTC_PREPARED_CAPTURE " + JSON.stringify({ createMs, closeMs }));
+    await info.attach("cold-module", { body: "Note code held at startup: preparation remained visible and the board appeared only after release. Cached opening then displayed content.", contentType: "text/plain" });
   } finally {
     release();
     await page.unrouteAll({ behavior: "wait" });
@@ -58,7 +70,7 @@ test.describe("direct cached view", () => {
 // Hold the actual editor import, rather than an asset already precached by the
 // offline worker. Offline functionality is covered by the separate regressions.
 test.use({ serviceWorkers: "block" });
-test("cached View opens without the editing bundle and fresh reopens do not GET the note again", async ({ page, request }, info) => {
+test("editing bundle finishes during preparation and fresh cached reopens do not GET the note again", async ({ page, request }, info) => {
   expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
@@ -89,6 +101,10 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
     await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
     await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect.poll(() => editorRequested).toBe(true);
+    await expect(page.getByRole("heading", { name: "Preparing your workspace", exact: true })).toBeVisible();
+    await expect(page.locator(".note-card")).toHaveCount(0);
+    release();
     const open = page.getByRole("button", { name: "Open Project notes", exact: true });
     await expect(open).toBeVisible();
     const getsBefore = detailGets;
@@ -96,6 +112,8 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
       await open.click();
       const viewer = page.getByRole("dialog", { name: "View note", exact: true });
       await expect(viewer.getByRole("region", { name: "Note content" })).toBeVisible();
+      await expect(viewer.locator('[contenteditable="true"]')).toHaveCount(0);
+      await expect(viewer.getByRole("region", { name: "Note content" })).toHaveAttribute("contenteditable", "false");
       expect(detailGets).toBe(getsBefore);
       await viewer.getByRole("button", { name: "Close", exact: true }).click();
     }
@@ -128,14 +146,13 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
     await expect.poll(() => detailGets).toBe(getsBefore + 2);
     await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     await expect.poll(() => editorRequested).toBe(true);
-    await expect(page.getByText("Loading editor…", { exact: true })).toBeVisible();
-    release();
     const textbox = page.getByRole("textbox", { name: "Note content", exact: true });
     await expect(textbox).toBeVisible();
+    await expect(page.getByText("Loading editor…", { exact: true })).toHaveCount(0);
     await textbox.fill("The shared cached document remains editable.");
     await page.getByRole("button", { name: "View", exact: true }).click();
     await expect(page.getByRole("region", { name: "Note content" })).toHaveText("The shared cached document remains editable.");
-    await info.attach("direct-cache-view", { body: JSON.stringify({ freshOpens: 3, freshExtraDetailGets: 0, staleDetailGets: detailGets - getsBefore, viewReadyWhileEditingBundleHeld: true }), contentType: "application/json" });
+    await info.attach("direct-cache-view", { body: JSON.stringify({ freshOpens: 3, freshExtraDetailGets: 0, staleDetailGets: detailGets - getsBefore, editingBundlePreparedBeforeBoard: true, viewerConstructsEditor: false }), contentType: "application/json" });
   } finally {
     release();
     await page.unrouteAll({ behavior: "wait" });

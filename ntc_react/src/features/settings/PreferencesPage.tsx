@@ -2,6 +2,7 @@ import { SettingsNav } from "./SettingsNav";
 import { useTheme } from "../../shared/useTheme";
 import { useMobileLayout } from "../../shared/useMobileLayout";
 import { useNoteFullscreenPreference } from "../../shared/noteFullscreen";
+import { useNoteEditingPreference } from "../../shared/noteEditing";
 import {
   languages,
   setLanguage,
@@ -25,6 +26,7 @@ export default function PreferencesPage({
   const { theme, toggleTheme } = useTheme();
   const mobile = useMobileLayout();
   const [noteFullscreen, toggleNoteFullscreen] = useNoteFullscreenPreference();
+  const [noteEditing, toggleNoteEditing] = useNoteEditingPreference();
   const language = useLanguage();
   const desktopMascots = useDesktopMascots();
   const title = tr(
@@ -71,6 +73,10 @@ export default function PreferencesPage({
             </button>
           </div>
           <AppearanceZoomRow />
+          {!administration ? <div className="preferences-row">
+            <label htmlFor="note-edit-on-open">{tr("Open notes for editing")}</label>
+            <button id="note-edit-on-open" type="button" className="theme-switch" role="switch" aria-label={tr("Open notes for editing")} aria-checked={noteEditing} onClick={toggleNoteEditing}><span /></button>
+          </div> : null}
             {!mobile && !administration ? <div className="preferences-row">
               <label htmlFor="note-fullscreen">{tr("Always open notes in full screen")}</label>
               <button id="note-fullscreen" type="button" className="theme-switch" role="switch" aria-label={tr("Always open notes in full screen")} aria-checked={noteFullscreen} onClick={toggleNoteFullscreen}><span /></button>

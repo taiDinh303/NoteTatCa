@@ -967,7 +967,7 @@ test("edits content in a full viewport with an optional title and fixed characte
   ).toContainText("Final content");
 });
 
-test("keeps the optional title focused after deferred editor startup", async ({
+test("keeps the optional title focused after editor workspace preparation", async ({
   page,
 }) => {
   let releaseEditor!: () => void;
@@ -979,14 +979,13 @@ test("keeps the optional title focused after deferred editor startup", async ({
     await route.continue();
   });
   try {
-    await login(page);
+    await submitLogin(page);
+    await expect(page.getByRole("heading", { name: "Preparing your workspace", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Take a note", exact: true })).toHaveCount(0);
+    releaseEditor();
     await page
       .getByRole("button", { name: "Take a note", exact: true })
       .click();
-    await expect(
-      page.getByText("Opening editor…", { exact: true }),
-    ).toBeVisible();
-    releaseEditor();
     const dialog = page.getByRole("dialog", { name: "New note", exact: true });
     await dialog.getByLabel("Note title", { exact: true }).click();
     const title = dialog.getByLabel("Note title");
@@ -1153,14 +1152,18 @@ test("creates rich notes, autosaves updates, assigns labels and restores from tr
     .getByRole("textbox", { name: "Hex color", exact: true })
     .fill("#e8e4fc");
   await page.getByRole("button", { name: "Apply color", exact: true }).click();
-  await page.keyboard.press("Escape");
+  await editor.getByRole("button", { name: "Note background color", exact: true }).click();
+  await expect(page.getByRole("textbox", { name: "Hex color", exact: true })).toHaveCount(0);
   await editor
     .getByRole("button", { name: "Note labels", exact: true })
     .click();
-  await editor.locator(".label-chooser").getByRole("button", { name: "Work", exact: true }).click();
+  const labelChooser = page.getByRole("dialog", { name: "Organize with labels", exact: true });
+  await labelChooser.getByRole("button", { name: "Work", exact: true }).click();
   await expect(
-    editor.locator(".label-chooser").getByRole("button", { name: "Work", exact: true }),
+    labelChooser.getByRole("button", { name: "Work", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Note labels", exact: true }).click();
+  await expect(labelChooser).toHaveCount(0);
   await expect(
     editor.getByText("All changes saved", { exact: true }),
   ).toBeVisible();

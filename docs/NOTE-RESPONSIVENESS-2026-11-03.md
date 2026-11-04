@@ -1,5 +1,7 @@
 # Độ phản hồi mở note — 2026-11-03
 
+> Bổ sung2026-11-04: chủ dự án yêu cầu chuyển tải editor vào chuẩn bị workspace và thêm tùy chọn mở thẳng Edit. Xem [báo cáo mới](NOTE-RESPONSIVENESS-2026-11-04.md); chính sách warm nền bên dưới là lịch sử.
+
 ## Bổ sung: đọc trực tiếp cache danh sách, không dựng Tiptap khi View
 
 Yêu cầu tiếp theo của chủ dự án: mở note bằng dữ liệu đã có ở danh sách, giảm việc tải/dựng lại như cảm nhận từ Keep. Ảnh Keep cũng cho thấy một lớp note nổi; không đủ chứng minh họ dùng cùng DOM card hay biết thuật toán nội bộ. Modal không đồng nghĩa tải một trang/dataset mới. NoteTatCa vốn đã seed cache từ danh sách; phần còn dư là khởi tạo Tiptap ở View và detail query luôn stale.

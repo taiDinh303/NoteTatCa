@@ -1,0 +1,51 @@
+import { test, expect } from "@playwright/test";
+
+for (const width of [1440, 393]) {
+  test(`open-for-editing preference persists without changing default View ${width}`, async ({ page, request }, info) => {
+    await request.post("http://127.0.0.1:5199/__fixture/reset");
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/login");
+    await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
+    await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    const open = page.getByRole("button", { name: "Open Project notes", exact: true });
+    await open.click();
+    const viewer = page.getByRole("dialog", { name: "View note", exact: true });
+    await expect(viewer).toBeVisible();
+    await viewer.getByRole("button", { name: "Close", exact: true }).click();
+    await page.goto("/settings/appearance");
+    const toggle = page.getByRole("switch", { name: "Open notes for editing", exact: true });
+    await expect(toggle).not.toBeChecked();
+    await toggle.click();
+    await page.reload();
+    await expect(toggle).toBeChecked();
+    await page.screenshot({ path: info.outputPath("appearance-edit-on-open.png") });
+    await page.goto("/notes");
+    await open.click();
+    const editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+    const content = editor.getByRole("textbox", { name: "Note content", exact: true });
+    await expect(content).toBeVisible();
+    await expect(viewer).toHaveCount(0);
+    await content.press("Control+End");
+    await page.keyboard.type(" direct editing survives close");
+    await editor.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(editor).toHaveCount(0);
+    await page.getByRole("button", { name: "Actions for Project notes", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Add label", exact: true }).click();
+    const labels = page.getByRole("dialog", { name: "Note labels", exact: true });
+    await expect(labels).toBeVisible();
+    await expect(editor).toHaveCount(0);
+    await labels.getByRole("button", { name: "Cancel", exact: true }).click();
+    await open.click();
+    await expect(content).toContainText("direct editing survives close");
+    await editor.getByRole("button", { name: "View", exact: true }).click();
+    await expect(viewer.getByRole("region", { name: "Note content" })).toContainText("direct editing survives close");
+    await viewer.getByRole("button", { name: "Close", exact: true }).click();
+    await page.goto("/settings/appearance");
+    await toggle.click();
+    await page.goto("/notes");
+    await open.click();
+    await expect(viewer).toBeVisible();
+    await expect(editor).toHaveCount(0);
+  });
+}

@@ -45,8 +45,8 @@ import {
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import TurndownService from "turndown";
-import type { RichNode } from "../../domain/models";
-import { canonicalDocument, validateDocument } from "../../domain/document";
+import { validateDocument } from "../../domain/document";
+import { createEditorSerializer } from "./serializeEditorDocument";
 import {
   Button,
   ConfirmDialog,
@@ -152,6 +152,7 @@ export default memo(function RichEditor({
   const [source, setSource] = useState("");
   const [textColorOpen, setTextColorOpen] = useState(false);
   const [content] = useState(() => JSON.parse(initial));
+  const [serialize] = useState(createEditorSerializer);
   const editor = useEditor({
     shouldRerenderOnTransaction: false,
     extensions,
@@ -167,9 +168,7 @@ export default memo(function RichEditor({
     onUpdate: ({ editor }) => {
       const characterCount = editor.getText().length;
       onCharacterCount(characterCount);
-      const json = JSON.stringify(
-        canonicalDocument(editor.getJSON() as RichNode),
-      );
+      const json = serialize(editor.state.doc);
       onChange(json);
       try {
         if (characterCount > 100000)
