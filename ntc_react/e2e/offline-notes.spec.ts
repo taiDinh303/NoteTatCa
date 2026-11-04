@@ -287,7 +287,8 @@ test("notes open before a blocked secondary profile request", async ({
   await expect(page.locator(".offline-toolbar")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Sync now", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+  await page.keyboard.press("Escape");
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   release();
   await expect(

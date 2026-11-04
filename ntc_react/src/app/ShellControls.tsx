@@ -1,3 +1,4 @@
+import { useNetworkOnline } from "../shared/useNetworkOnline";
 import { useMobileLayout } from "../shared/useMobileLayout";
 import { useState } from "react";
 import { OfflineControls } from "./OfflineControls";
@@ -15,14 +16,9 @@ import {
 import {
   auth,
   offline,
-  cache,
-  workspace,
-  onlineWorkspace,
   guest,
 } from "./runtime";
 import { settingsPath, isAdministrator } from "../application/access";
-import { toast } from "sonner";
-import { errorMessage } from "../shared/utils";
 import { useAuth, useMe } from "../shared/hooks";
 import { ActionMenu, Avatar, Modal } from "../shared/ui";
 import { LoginForm } from "../features/auth/AuthPage";
@@ -35,6 +31,7 @@ export function ShellAccountMenu({
   const state = useAuth();
   const mobile = useMobileLayout();
   const [reviewSync, setReviewSync] = useState(false);
+  const online = useNetworkOnline();
   const syncState = useSyncExternalStore(
     offline.subscribe,
     offline.getSnapshot,
@@ -85,27 +82,13 @@ export function ShellAccountMenu({
                 },
               ]
             : []),
-          ...(!guestMode && !isAdministrator(state.session)
+          ...(!guestMode && !isAdministrator(state.session) &&
+              (!online || state.status === "offline" || syncState.pending > 0 || !!syncState.error)
             ? [
                 {
                   label: tr("Review sync"),
                   icon: RefreshCw,
                   action: () => setReviewSync(true),
-                },
-                {
-                  label: tr("Sync now"),
-                  icon: RefreshCw,
-                  action: () => {
-                    void (async () => {
-                      if (!navigator.onLine)
-                        throw new Error(tr("Working offline"));
-                      if (!onlineWorkspace()) await auth.refresh();
-                      await offline.sync();
-                      await cache.invalidateQueries({
-                        queryKey: workspace.key("notes"),
-                      });
-                    })().catch((error) => toast.error(errorMessage(error)));
-                  },
                 },
               ]
             : []),

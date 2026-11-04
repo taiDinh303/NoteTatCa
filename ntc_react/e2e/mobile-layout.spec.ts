@@ -93,16 +93,9 @@ for (const width of [320, 393, 800])
     await expect(
       page.getByRole("spinbutton", { name: "Zoom percentage", exact: true }),
     ).toHaveCount(0);
-    await page
-      .getByRole("menuitem", { name: "Review sync", exact: true })
-      .click();
-    await expect(
-      page.getByRole("dialog", { name: "Note synchronization", exact: true }),
-    ).toBeVisible();
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: "Close", exact: true })
-      .click();
+    await expect(page.getByRole("menuitem", { name: "Review sync", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("menuitem", { name: "Sync now", exact: true })).toHaveCount(0);
+    await page.keyboard.press("Escape");
     await page
       .locator(".note-card")
       .first()

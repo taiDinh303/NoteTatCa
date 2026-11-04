@@ -1,9 +1,8 @@
+import { useNetworkOnline } from "../shared/useNetworkOnline";
 import { useState, useSyncExternalStore } from "react";
 import {
   offline,
   logoutProtection,
-  auth,
-  onlineWorkspace,
   cache,
   workspace,
 } from "./runtime";
@@ -132,24 +131,10 @@ export function OfflineControls({ onClose }: { onClose: () => void }) {
   useLanguage();
   const state = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const session = useAuth();
+  const online = useNetworkOnline();
   const [discard, setDiscard] = useState<string>();
   const [error, setError] = useState<unknown>();
   const [busy, setBusy] = useState(false);
-  async function sync() {
-    if (!navigator.onLine) return;
-    setBusy(true);
-    setError(undefined);
-    try {
-      if (!onlineWorkspace()) await auth.refresh();
-      await offline.sync();
-      if (!offline.getSnapshot().pending)
-        await cache.invalidateQueries({ queryKey: workspace.key("notes") });
-    } catch (failure) {
-      setError(failure);
-    } finally {
-      setBusy(false);
-    }
-  }
   return (
     <>
       <Modal open title={tr("Note synchronization")} onClose={onClose}>
@@ -159,7 +144,7 @@ export function OfflineControls({ onClose }: { onClose: () => void }) {
               ? tr("Syncing notes…")
               : state.pending
                 ? tr("{0} pending changes", state.pending)
-                : session.status === "offline"
+                : !online || session.status === "offline"
                   ? tr("Offline notes on this device")
                   : tr("Notes synced")}
           </p>
@@ -199,9 +184,6 @@ export function OfflineControls({ onClose }: { onClose: () => void }) {
           ))}
         </div>
         <div className="modal-footer">
-          <Button busy={state.syncing || busy} onClick={() => void sync()}>
-            {tr("Sync now")}
-          </Button>
           <Button
             variant="secondary"
             onClick={() => {

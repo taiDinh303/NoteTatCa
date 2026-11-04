@@ -375,7 +375,7 @@ test("keeps the saved session when offline during restore and reconnects on requ
       get: () => true,
     });
   });
-  await page.getByRole("button", { name: "Sync now", exact: true }).click();
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
   await page
     .getByRole("dialog", { name: "Note synchronization", exact: true })
     .getByRole("button", { name: "Close", exact: true })
@@ -1914,6 +1914,7 @@ test("imports safe Markdown with checklists and exports it without a page reload
 test("keeps a durable draft after a network failure and syncs without duplicates", async ({
   page,
 }) => {
+  await page.clock.install();
   await login(page);
   await page.route("**/api/v1/notes", async (route) => {
     if (route.request().method() === "POST") await route.abort("failed");
@@ -1938,7 +1939,10 @@ test("keeps a durable draft after a network failure and syncs without duplicates
   ).toHaveCount(0);
   await page.unroute("**/api/v1/notes");
   await openAccountMenu(page);
-  await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+  await expect(page.getByRole("menuitem", { name: "Review sync", exact: true })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "Sync now", exact: true })).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await page.clock.fastForward(30_000);
   await expect(page.getByText("Notes synced", { exact: true })).toBeAttached();
   await expect(
     page.getByRole("button", {

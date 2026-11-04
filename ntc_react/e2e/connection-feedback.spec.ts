@@ -87,7 +87,7 @@ for (const width of [393, 1440]) {
         get: () => true,
       });
     });
-    await notice.getByRole("button", { name: "Sync now", exact: true }).click();
+    await page.evaluate(() => window.dispatchEvent(new Event("online")));
     await expect(notice.getByText("Notes synced", { exact: true })).toBeVisible();
     await notice.getByRole("button", { name: "Close", exact: true }).click();
     await expect(

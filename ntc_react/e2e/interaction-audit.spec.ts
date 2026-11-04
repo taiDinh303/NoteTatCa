@@ -64,13 +64,24 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
   const gate = new Promise<void>(resolve => { release = resolve; });
   let editorRequested = false;
   let detailGets = 0;
+  let serverUpdated = false;
   await page.route(/\/assets\/RichEditor-[^/]+\.js$/, async route => {
     editorRequested = true;
     await gate;
     await route.continue();
   });
   await page.route("**/api/v1/notes/*", async route => {
-    if (route.request().method() === "GET" && /\/notes\/[^/]+$/.test(new URL(route.request().url()).pathname)) detailGets++;
+    if (route.request().method() === "GET" && /\/notes\/[^/]+$/.test(new URL(route.request().url()).pathname)) {
+      detailGets++;
+      if (serverUpdated) {
+        const response = await route.fetch();
+        const body = await response.json();
+        body.data.content = "Updated in the list cache";
+        body.data.documentJson = JSON.stringify({ type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: body.data.content }] }] });
+        await route.fulfill({ response, json: body });
+        return;
+      }
+    }
     await route.continue();
   });
   try {
@@ -88,6 +99,7 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
       expect(detailGets).toBe(getsBefore);
       await viewer.getByRole("button", { name: "Close", exact: true }).click();
     }
+    serverUpdated = true;
     await page.route("**/api/v1/notes?*", async route => {
       const response = await route.fetch();
       const body = await response.json();
@@ -100,18 +112,20 @@ test("cached View opens without the editing bundle and fresh reopens do not GET 
       await route.fulfill({ response, json: body });
     });
     await page.getByRole("button", { name: "Account menu", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+    await page.keyboard.press("Escape");
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
     await expect(open).toContainText("Updated in the list cache");
     await open.click();
     await expect(page.getByRole("region", { name: "Note content" })).toHaveText("Updated in the list cache");
-    expect(detailGets).toBe(getsBefore);
+    // A reconnect invalidates both list and detail reads; opening refreshes stale detail once.
+    await expect.poll(() => detailGets).toBe(getsBefore + 1);
     await page.getByRole("button", { name: "Close", exact: true }).click();
     await page.unroute("**/api/v1/notes?*");
     await page.clock.install();
     await page.clock.fastForward(31_000);
     await open.click();
     await expect(page.getByRole("region", { name: "Note content" })).toBeVisible();
-    await expect.poll(() => detailGets).toBe(getsBefore + 1);
+    await expect.poll(() => detailGets).toBe(getsBefore + 2);
     await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     await expect.poll(() => editorRequested).toBe(true);
     await expect(page.getByText("Loading editor…", { exact: true })).toBeVisible();

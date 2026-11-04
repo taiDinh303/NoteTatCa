@@ -47,7 +47,8 @@ for (const width of [393, 1280]) {
 
     reject = false;
     await page.getByRole("button", { name: "Account menu", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+    await page.keyboard.press("Escape");
+  await page.evaluate(() => window.dispatchEvent(new Event("online")));
     await expect(page.getByText("Notes synced", { exact: true })).toBeAttached({ timeout: 30_000 });
     await page.reload();
     await page.getByRole("button", { name: "Open Project notes", exact: true }).click();
