@@ -87,6 +87,9 @@ export function DisplayPreferences({ children }: { children: ReactNode }) {
       } else {
         frame = 0;
         lastTime = 0;
+        // The saved/menu percentage is an integer. Commit that same scale,
+        // otherwise a displayed 100% can remain 100.12% and lose a grid column.
+        current.current = target.current = Math.round(target.current);
         listeners.current.forEach((listener) =>
           listener(current.current / 100, true),
         );

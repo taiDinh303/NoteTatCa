@@ -95,7 +95,9 @@ function DesktopNotesZoomViewport({
         : Math.max(
             1,
             Math.floor(
-              (fitWidth(nextScale) / nextScale + gap + 0.01) /
+              // clientWidth rounds to CSS pixels while measured rectangles
+              // retain fractions. A subpixel must not discard a whole column.
+              ((fitWidth(nextScale) + 1) / nextScale + gap) /
                 (cardWidth + gap),
             ),
           );
