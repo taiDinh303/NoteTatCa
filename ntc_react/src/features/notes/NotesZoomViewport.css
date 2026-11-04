@@ -75,9 +75,9 @@ html:has([data-notes-zoom]) {
     var(--notes-columns, 1),
     min(var(--notes-card-width, 320px), 100%)
   );
-  column-gap: 0;
+  column-gap: var(--notes-gap, 20px);
   row-gap: var(--notes-gap, 20px);
-  justify-content: space-between;
+  justify-content: start;
 }
 .notes-zoom-layer .note-grid.list-view {
   grid-template-columns: minmax(0, 1fr);

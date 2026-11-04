@@ -10,7 +10,7 @@ export function desktopNoteWidth(fullWidth: number) {
 
 // Keep the nominal column count through 105%, rather than losing a whole
 // column immediately above 100%. Card width is fixed for this viewport;
-// horizontal spare space is distributed separately by the grid.
+// the fixed reference gap is retained and spare space stays on the right.
 export function desktopGridCardWidth(fullWidth: number, rightInset: number) {
   const nominal = desktopNoteWidth(fullWidth);
   const pitch = nominal + DESKTOP_NOTE_GAP;

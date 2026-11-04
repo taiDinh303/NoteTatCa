@@ -1,3 +1,7 @@
+## Đính chính mới nhất: cố định cả width và gap — 2026-11-05
+
+Theo yêu cầu mới nhất của chủ dự án, width gốc card và gap gốc (20px) đều giữ nguyên khi zoom hoặc đóng/mở sidebar. Zoom chỉ scale toàn bộ danh sách; mép trái tiếp tục thẳng New và heading. Bỏ phân phối phần dư bằng space-between và không dùng cột 1fr. Chỉ thay số cột nguyên; phần không đủ một cột nằm bên phải, chấp nhận không cân hai lề ở mọi mốc. Nội dung bên dưới nói chia dư vào width/gap là lịch sử, đã được đính chính này thay thế. Giữ range 50–150%, cỡ tham chiếu theo viewport và số cột quanh 50/100% đã xác nhận.
+
 ## Kiểu dấu đầu dòng và căn số — 2026-11-04
 
 Toolbar Edit giữ nút Bullet list để bật/tắt, thêm dropdown Bullet style cạnh bên với Dot/Dash/Circle/Square (•/-/○/▪). Chọn kiểu trên đoạn thường tạo list, chọn trên list đổi kiểu mà giữ nội dung; có nhãn dịch4ngôn ngữ và trạng thái radio. `bulletList.attrs.bulletStyle` chỉ nhận disc/dash/circle/square, allowlist đồng bộ canonicalDocument, Tiptap global attribute, ReadOnlyContent và ContentRules backend. Không nhận CSS/HTML tùy ý, note cũ thiếu attr tiếp tục dùng kiểu mặc định. Kiểu lưu trong JSON, giữ qua autosave/reload/View/Edit; Markdown có thể đơn giản hóa kiểu marker theo cảnh báo import/export hiện có.

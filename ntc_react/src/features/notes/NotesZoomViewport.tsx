@@ -84,18 +84,14 @@ function DesktopNotesZoomViewport({
       const nearStop = nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001);
       return availableWidth + (nearStop ? Math.max(0, rightInset - 12) : 0);
     }
-    // Column selection keeps the owner's near-100/50 counts, but the visible
-    // canvas ends at the normal right inset, matching the New button's left.
+    // Keep whole columns at the confirmed near-100/50 stops, using only
+    // the permitted right inset budget. The left anchor never moves.
     function canvasWidth() {
-      return availableWidth;
+      return mode === "list" ? availableWidth : columnBudget(scale);
     }
     function columnsFor(nextScale: number) {
       if (mode === "list") return 1;
-      const desired = Math.floor(((columnBudget(nextScale) + 1) / nextScale + gap) / (cardWidth + gap));
-      // Fixed cards themselves must fit even when the spare budget reduces
-      // the space between columns. A single track can still clamp on resize.
-      const capacity = Math.floor((availableWidth + 1) / nextScale / cardWidth);
-      return Math.max(1, Math.min(desired, capacity));
+      return Math.max(1, Math.floor(((columnBudget(nextScale) + 1) / nextScale + gap) / (cardWidth + gap)));
     }
     function sidebarClock() {
       return main
@@ -128,8 +124,10 @@ function DesktopNotesZoomViewport({
       }
       const columns = columnsFor(scale);
       const fittedWidth = canvasWidth();
-      view.style.paddingRight = `${rightInset}px`;
-      const nextWidth = fittedWidth / scale;
+      view.style.paddingRight = `${rightInset - (fittedWidth - availableWidth)}px`;
+      const nextWidth = mode === "list" ? fittedWidth / scale : Math.min(
+        fittedWidth / scale, columns * cardWidth + (columns - 1) * gap,
+      );
       const tracksChanged =
         content.style.getPropertyValue("--notes-card-width") !==
           `${cardWidth}px` ||
@@ -141,8 +139,8 @@ function DesktopNotesZoomViewport({
       ) {
         return;
       }
-      // Fixed tracks never resize when zooming or toggling navigation. CSS
-      // distributes spare width between columns, without moving the left edge.
+      // Both tracks and gaps stay fixed. Only whole-column boundaries reflow;
+      // any incomplete-column remainder stays on the right, never centered.
       if (
         !tracksChanged &&
         ((mode === "list" && resizeOnly) || mode !== "list") &&
@@ -289,7 +287,7 @@ function DesktopNotesZoomViewport({
       rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
       // Calibrate the fixed column-selection reference through 105%/53%.
-      // Actual fractional tracks fill the canvas; gap/sidebar stay unchanged.
+      // Card width and gap stay fixed; incomplete-column space remains on the right.
       const desktop = window.innerWidth > 800;
       const mainStyle = getComputedStyle(view.parentElement!);
       const fullWidth =

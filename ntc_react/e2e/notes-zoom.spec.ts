@@ -876,7 +876,7 @@ for (const { width, theme } of [
   { width: 2560, theme: "light" },
   { width: 3440, theme: "dark" },
 ]) {
-  test(`fixed grid cards share spare space between columns at every zoom ${width} ${theme}`, async ({
+  test(`fixed grid cards and gaps keep the left anchor at every zoom ${width} ${theme}`, async ({
     page,
   }) => {
     test.setTimeout(90000);
@@ -974,7 +974,6 @@ for (const { width, theme } of [
               getComputedStyle(el.querySelector(".note-grid")!).rowGap,
             ),
             tracks: Number((el.querySelector(".notes-zoom-layer") as HTMLElement).style.getPropertyValue("--notes-columns")),
-            columnAllowance: Math.max(0, parseFloat(getComputedStyle(el.parentElement!).paddingRight) - 12),
             leftMargin: grid.left - el.getBoundingClientRect().left,
             rightMargin:
               el.getBoundingClientRect().left +
@@ -998,7 +997,7 @@ for (const { width, theme } of [
         expect(Math.abs(layout.leftMargin)).toBeLessThan(1);
         expect(Math.abs(layout.groupLeft - layout.newLeft)).toBeLessThan(1);
         expect(layout.rightMargin).toBeGreaterThanOrEqual(-1);
-        expect(layout.rightMargin).toBeLessThan(1);
+        expect(layout.rightMargin).toBeLessThan((layout.baseWidth + layout.baseGap) * percent / 100 + 1);
         expect(Math.abs(layout.headerLeft - layout.groupLeft)).toBeLessThan(1);
         if (!baseWidth) {
           baseWidth = layout.baseWidth;
@@ -1015,13 +1014,13 @@ for (const { width, theme } of [
               ),
             );
           const completeSlots = Math.floor(
-            ((layout.available + layout.columnAllowance + 1) / 0.5 + baseGap) /
+            ((layout.available + 1) / 0.5 + baseGap) /
               (baseWidth + baseGap),
           );
-          expect(slots).toBe(Math.min(completeSlots, Math.floor((layout.available + 1) / 0.5 / baseWidth)));
+          expect(slots).toBe(completeSlots);
         }
         if (percent === 100) expect(layout.rightGap).toBeLessThan(1);
-        // Fixed tracks keep text layout stable; equal spaces absorb the rest.
+        // Both track width and gap stay fixed; the remainder stays on the right.
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
@@ -1038,7 +1037,7 @@ for (const { width, theme } of [
               Math.max(...layout.gaps) - Math.min(...layout.gaps),
             ).toBeLessThan(1);
             expect(Math.min(...layout.gaps)).toBeCloseTo(
-              (layout.available - layout.tracks * baseWidth * percent / 100) / (layout.tracks - 1),
+              baseGap * percent / 100,
               0,
             );
           }
@@ -1134,7 +1133,7 @@ for (const { width, theme } of [
           expect(hidden.gridWidth).toBeLessThanOrEqual(hidden.available + 1);
           expect(Math.abs(hidden.left)).toBeLessThan(1);
           expect(hidden.remaining).toBeGreaterThanOrEqual(-1);
-          expect(hidden.remaining).toBeLessThan(1);
+          expect(hidden.remaining).toBeLessThan((baseWidth + baseGap) * percent / 100 + 1);
           if (percent === 100) {
             expect(hidden.actualRightGap).toBeLessThan(1);
           }

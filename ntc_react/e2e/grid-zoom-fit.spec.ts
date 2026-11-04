@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 for (const width of [1920, 1910]) {
-  test(`grid balances both edges at 50 100 150 and keeps near-stop columns ${width}`, async ({ page, request }, info) => {
+  test(`grid fixes card width and gap through zoom and sidebar changes ${width}`, async ({ page, request }, info) => {
     await request.post("http://127.0.0.1:5199/__fixture/reset");
     await request.post("http://127.0.0.1:5199/__fixture/seed-notes?count=24");
     await page.addInitScript(() => {
@@ -25,7 +25,6 @@ for (const width of [1920, 1910]) {
       const row = boxes.filter(box => Math.abs(box.top - boxes[0].top) < 2);
       const scale = parseFloat(layer.style.getPropertyValue("--notes-scale"));
       const right = Math.max(...row.map(box => box.right));
-      const main = layer.closest(".main-column")!.getBoundingClientRect();
       return {
         columns: row.length,
         card: layer.style.getPropertyValue("--notes-card-width"),
@@ -35,7 +34,8 @@ for (const width of [1920, 1910]) {
         overflow: right - (view.getBoundingClientRect().right - 12),
         remaining: view.getBoundingClientRect().right - 12 - right,
         pitch: boxes[0].width + 20 * scale,
-        edgeDifference: Math.abs((boxes[0].left - main.left) - (main.right - right)),
+        leftAnchor: boxes[0].left - document.querySelector('[aria-label="Take a note"]')!.getBoundingClientRect().left,
+        gaps: row.slice(1).map((box, index) => (box.left - row[index].right) / scale),
       };
     });
     const baseline = await geometry();
@@ -48,8 +48,10 @@ for (const width of [1920, 1910]) {
       const expected = percent <= 53 ? 10 : percent === 150 ? 3 : 5;
       await expect.poll(async () => (await geometry()).columns).toBe(expected);
       await expect.poll(async () => (await geometry()).overflow).toBeLessThanOrEqual(1);
-      await expect.poll(async () => (await geometry()).edgeDifference).toBeLessThan(1.5);
+      await expect.poll(() => page.locator(".notes-zoom-layer").evaluate(el => el.getAnimations({ subtree: true }).filter(a => a.id === "notes-reflow").length)).toBe(0);
       const current = await geometry();
+      expect(Math.abs(current.leftAnchor)).toBeLessThan(1);
+      for (const gap of current.gaps) expect(gap).toBeCloseTo(20, 1);
       expect(current.remaining).toBeLessThan(current.pitch);
       expect(current.card).toBe(baseline.card);
       expect(current.logicalWidth).toBe(baseline.logicalWidth);
@@ -59,7 +61,10 @@ for (const width of [1920, 1910]) {
         await page.screenshot({ path: info.outputPath(`grid-${percent}-open.png`) });
       await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
       await expect.poll(async () => (await geometry()).columns).toBe(percent <= 53 ? 12 : percent === 150 ? 4 : 6);
-      await expect.poll(async () => (await geometry()).edgeDifference).toBeLessThan(1.5);
+      await expect.poll(() => page.locator(".notes-zoom-layer").evaluate(el => el.getAnimations({ subtree: true }).filter(a => a.id === "notes-reflow").length)).toBe(0);
+      const hidden = await geometry();
+      expect(Math.abs(hidden.leftAnchor)).toBeLessThan(1);
+      for (const gap of hidden.gaps) expect(gap).toBeCloseTo(20, 1);
       expect((await geometry()).logicalWidth).toBe(baseline.logicalWidth);
       expect((await geometry()).logicalHeight).toBe(baseline.logicalHeight);
       if (width === 1920 && [50, 100, 150].includes(percent))
