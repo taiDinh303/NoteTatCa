@@ -1589,8 +1589,32 @@ strong {
 }
 .rich-editor ul,
 .rich-editor ol {
-  padding-left: 24px;
+  padding-inline-start: 1.65em;
+  margin-inline: 0;
 }
+.rich-editor ol { padding-inline-start: var(--list-marker-column, 1.8em); }
+.rich-editor ol > li { position: relative; }
+.rich-editor ol > li::marker { content: ""; }
+/* A left-aligned marker column keeps 1. from drifting inward in proportional
+   fonts. Keep the native list-item counter so start and nested lists still work. */
+.rich-editor ol > li::before {
+  content: counter(list-item) ".";
+  position: absolute;
+  inset-inline-end: 100%;
+  inline-size: max-content;
+  min-inline-size: var(--list-marker-column, 1.8em);
+  padding-inline-end: 0.3em;
+  text-align: start;
+  font-family: Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.rich-editor ul[data-bullet-style="disc"] { list-style-type: disc; }
+.rich-editor ul[data-bullet-style="dash"] { list-style-type: "-  "; }
+.rich-editor ul[data-bullet-style="circle"] { list-style-type: circle; }
+.rich-editor ul[data-bullet-style="square"] { list-style-type: square; }
+.bullet-list-control { display: inline-flex; align-items: center; flex-shrink: 0; }
+.editor-toolbar .bullet-style-trigger { width: 20px; min-width: 20px; padding-inline: 0; }
+.bullet-style-preview { width: 20px; flex-shrink: 0; text-align: center; }
 .rich-editor blockquote {
   border-left: 3px solid var(--accent);
   margin: 20px 0;

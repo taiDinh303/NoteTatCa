@@ -8,7 +8,11 @@ import {
   type ReactNode,
 } from "react";
 import type { RichNode } from "../../domain/models";
-import { isNoteFontSize } from "../../domain/formatting";
+import {
+  isBulletStyle,
+  isNoteFontSize,
+  orderedMarkerColumn,
+} from "../../domain/formatting";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import ContentZoom from "./ContentZoom";
 import "./NoteTools.css";
@@ -133,11 +137,25 @@ function renderDocument(document: RichNode, scope: string) {
         );
       }
       case "bulletList":
-        return <ul key={path}>{children}</ul>;
+        return (
+          <ul
+            key={path}
+            data-bullet-style={
+              isBulletStyle(attrs.bulletStyle) ? attrs.bulletStyle : undefined
+            }
+          >
+            {children}
+          </ul>
+        );
       case "orderedList":
         return (
           <ol
             key={path}
+            style={
+              {
+                "--list-marker-column": orderedMarkerColumn(attrs.start),
+              } as CSSProperties
+            }
             start={
               typeof attrs.start === "number" &&
               Number.isInteger(attrs.start) &&

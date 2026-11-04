@@ -1,9 +1,10 @@
-import { isNoteFontSize } from "./formatting";
+import { isBulletStyle, isNoteFontSize } from "./formatting";
 import type { RichNode } from "./models";
 const attributes: Record<string, string[]> = {
   paragraph: ["textAlign"],
   heading: ["level", "textAlign"],
   orderedList: ["start"],
+  bulletList: ["bulletStyle"],
   taskItem: ["checked"],
   codeBlock: ["language"],
   link: ["href"],
@@ -15,7 +16,9 @@ function cleanAttrs(type: string, attrs?: Record<string, unknown>) {
   for (const key of attributes[type] ?? []) {
     const value = attrs?.[key];
     if (value !== null && value !== undefined) {
-      if (key === "textAlign") {
+      if (key === "bulletStyle") {
+        if (isBulletStyle(value)) result[key] = value;
+      } else if (key === "textAlign") {
         if (
           value === "left" ||
           value === "center" ||

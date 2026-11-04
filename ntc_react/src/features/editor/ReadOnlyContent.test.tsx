@@ -12,6 +12,39 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+it.each(["disc", "dash", "circle", "square", "url(unsafe)"])(
+  "renders only allowed bullet style %s in View",
+  (bulletStyle) => {
+    const { container } = render(
+      <ReadOnlyContent
+        documentJson={JSON.stringify({
+          type: "doc",
+          content: [
+            {
+              type: "bulletList",
+              attrs: { bulletStyle },
+              content: [
+                {
+                  type: "listItem",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Item" }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        })}
+      />,
+    );
+    expect(
+      container.querySelector("ul")?.getAttribute("data-bullet-style"),
+    ).toBe(bulletStyle === "url(unsafe)" ? null : bulletStyle);
+  },
+);
+
 it("preserves rich formatting, alignment, ordered lists and read-only checklists without an editor", () => {
   const { container } = render(
     <ReadOnlyContent

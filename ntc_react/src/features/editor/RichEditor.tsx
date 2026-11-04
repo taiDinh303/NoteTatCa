@@ -5,7 +5,12 @@ import "./NoteTools.css";
 import { memo, useEffect, useState } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import * as Popover from "@radix-ui/react-popover";
-import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
+import {
+  EditorContent,
+  Extension,
+  useEditor,
+  useEditorState,
+} from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
@@ -20,6 +25,7 @@ import {
   AlignRight,
   AlignJustify,
   Check,
+  ChevronDown,
   Bold,
   CheckSquare,
   Code2,
@@ -55,6 +61,9 @@ import {
   MAX_FONT_SIZE,
   MIN_FONT_SIZE,
   clampFontSize,
+  BULLET_STYLES,
+  isBulletStyle,
+  orderedMarkerColumn,
 } from "../../domain/formatting";
 import { download } from "../../shared/utils";
 import ContentZoom from "./ContentZoom";
@@ -68,6 +77,40 @@ const alignmentOptions = [
 const extensions = [
   StarterKit.configure({
     link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
+  }),
+  Extension.create({
+    name: "bulletStyle",
+    addGlobalAttributes() {
+      return [
+        {
+          types: ["bulletList"],
+          attributes: {
+            bulletStyle: {
+              default: null,
+              parseHTML: (element) => {
+                const value = element.getAttribute("data-bullet-style");
+                return isBulletStyle(value) ? value : null;
+              },
+              renderHTML: (attributes) =>
+                isBulletStyle(attributes.bulletStyle)
+                  ? { "data-bullet-style": attributes.bulletStyle }
+                  : {},
+            },
+          },
+        },
+        {
+          types: ["orderedList"],
+          attributes: {
+            markerColumn: {
+              default: null,
+              renderHTML: (attributes) => ({
+                style: `--list-marker-column: ${orderedMarkerColumn(attributes.start)}`,
+              }),
+            },
+          },
+        },
+      ];
+    },
   }),
   TextAlign.configure({
     types: ["heading", "paragraph"],
@@ -179,6 +222,8 @@ export default memo(function RichEditor({
         (editor?.getAttributes("textStyle").fontSize as string | undefined) ??
         "",
       bullet: editor?.isActive("bulletList"),
+      bulletStyle: editor?.getAttributes("bulletList").bulletStyle as
+        string | undefined,
       ordered: editor?.isActive("orderedList"),
       tasks: editor?.isActive("taskList"),
       quote: editor?.isActive("blockquote"),
@@ -317,12 +362,64 @@ export default memo(function RichEditor({
             onClick={() => stepFontSize(1)}
           />
         </div>
-        <IconButton
-          icon={List}
-          label={tr("Bullet list")}
-          active={state?.bullet}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-        />
+        <div className="bullet-list-control">
+          <IconButton
+            icon={List}
+            label={tr("Bullet list")}
+            active={state?.bullet}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          />
+          <Dropdown.Root>
+            <Dropdown.Trigger asChild>
+              <IconButton
+                className="bullet-style-trigger"
+                icon={ChevronDown}
+                label={tr("Bullet style")}
+              />
+            </Dropdown.Trigger>
+            <Dropdown.Portal>
+              <Dropdown.Content
+                className="dropdown"
+                sideOffset={7}
+                align="start"
+                aria-label={tr("Bullet style")}
+                onCloseAutoFocus={(event) => {
+                  event.preventDefault();
+                  editor.commands.focus();
+                }}
+              >
+                <Dropdown.RadioGroup
+                  value={state?.bulletStyle ?? "disc"}
+                  onValueChange={(value) => {
+                    if (!isBulletStyle(value)) return;
+                    const chain = editor.chain().focus();
+                    if (!editor.isActive("bulletList"))
+                      chain.toggleBulletList();
+                    chain
+                      .updateAttributes("bulletList", { bulletStyle: value })
+                      .run();
+                  }}
+                >
+                  {BULLET_STYLES.map(({ value, marker, label }) => (
+                    <Dropdown.RadioItem
+                      className="dropdown-item"
+                      key={value}
+                      value={value}
+                    >
+                      <span className="bullet-style-preview" aria-hidden="true">
+                        {marker}
+                      </span>
+                      <span>{tr(label)}</span>
+                      <Dropdown.ItemIndicator>
+                        <Check size={16} />
+                      </Dropdown.ItemIndicator>
+                    </Dropdown.RadioItem>
+                  ))}
+                </Dropdown.RadioGroup>
+              </Dropdown.Content>
+            </Dropdown.Portal>
+          </Dropdown.Root>
+        </div>
         <IconButton
           icon={ListOrdered}
           label={tr("Numbered list")}
@@ -436,7 +533,8 @@ export default memo(function RichEditor({
           onClick={() => editor.chain().focus().redo().run()}
         />
       </div>
-      <ErrorBanner error={error} />      <ContentZoom>
+      <ErrorBanner error={error} />
+      <ContentZoom>
         <NoteOutline editor={editor} />
         <EditorContent className="editor-content" editor={editor} />
       </ContentZoom>

@@ -1,3 +1,9 @@
+## Kiểu dấu đầu dòng và căn số — 2026-11-04
+
+Toolbar Edit giữ nút Bullet list để bật/tắt, thêm dropdown Bullet style cạnh bên với Dot/Dash/Circle/Square (•/-/○/▪). Chọn kiểu trên đoạn thường tạo list, chọn trên list đổi kiểu mà giữ nội dung; có nhãn dịch4ngôn ngữ và trạng thái radio. `bulletList.attrs.bulletStyle` chỉ nhận disc/dash/circle/square, allowlist đồng bộ canonicalDocument, Tiptap global attribute, ReadOnlyContent và ContentRules backend. Không nhận CSS/HTML tùy ý, note cũ thiếu attr tiếp tục dùng kiểu mặc định. Kiểu lưu trong JSON, giữ qua autosave/reload/View/Edit; Markdown có thể đơn giản hóa kiểu marker theo cảnh báo import/export hiện có.
+
+Numbered lists dùng cột marker căn trái và font chữ số có độ rộng đều, cùng lề chữ/wrapped lines ở View/Edit. Giữ semantic ol/li và native list-item counter/start/nesting; không chèn số vào text hoặc flatten document. Không schema/migration/APIroute mới. Evidence, lệnh và giới hạn tại worklog.
+
 ## Hiện trạng ngày 2026-10-31
 
 Mẫu ghi chú học tập/nhật ký/kế hoạch/họp mở từ toolbar editor, xem trước và chèn cuối; không thay nội dung hiện có. Mục lục H1–H3 hoạt động View/Edit, có bật/tắt và focus. Dùng chung autosave, offline, guest và 4 ngôn ngữ. Notes desktop zoom50–150% độc lập chrome; mobile một cột100%, không Grid/List hoặc app zoom. Sync now/Review sync nằm trong account menu.

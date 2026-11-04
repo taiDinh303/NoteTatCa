@@ -98,6 +98,7 @@ public static partial class ContentRules
                 ("paragraph" or "heading", "textAlign") => attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString() is "left" or "center" or "right" or "justify",
                 ("heading", "level") => attr.Value.TryGetInt32(out var level) && level is >= 1 and <= 6,
                 ("orderedList", "start") => attr.Value.TryGetInt32(out var start) && start is >= 1 and <= 1_000_000,
+                ("bulletList", "bulletStyle") => attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString() is "disc" or "dash" or "circle" or "square",
                 ("taskItem", "checked") => attr.Value.ValueKind is JsonValueKind.True or JsonValueKind.False,
                 ("codeBlock", "language") => attr.Value.ValueKind == JsonValueKind.Null || attr.Value.ValueKind == JsonValueKind.String && attr.Value.GetString()!.Length <= 32 && attr.Value.GetString()!.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_' or '+'),
                 ("textStyle", "fontSize") => attr.Value.ValueKind == JsonValueKind.String && FontSizes.Contains(attr.Value.GetString()!),

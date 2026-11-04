@@ -1,6 +1,32 @@
 import { describe, it, expect } from "vitest";
 import { canonicalDocument, serializeDocument } from "./document";
 import { plainDocument } from "./models";
+
+it.each(["disc", "dash", "circle", "square"])(
+  "preserves the safe %s bullet style",
+  (bulletStyle) => {
+    expect(
+      canonicalDocument({
+        type: "bulletList",
+        attrs: { bulletStyle, style: "unsafe" },
+      }).attrs,
+    ).toEqual({ bulletStyle });
+  },
+);
+it("drops untrusted bullet styles and styles on other nodes", () => {
+  expect(
+    canonicalDocument({
+      type: "bulletList",
+      attrs: { bulletStyle: "url(https://evil.test)" },
+    }).attrs,
+  ).toBeUndefined();
+  expect(
+    canonicalDocument({
+      type: "orderedList",
+      attrs: { bulletStyle: "dash", start: 2 },
+    }).attrs,
+  ).toEqual({ start: 2 });
+});
 describe("document contract", () => {
   it("keeps old plain HTML-looking text literal", () => {
     const result = plainDocument("<script>private text</script>");

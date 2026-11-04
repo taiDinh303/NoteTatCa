@@ -1,5 +1,9 @@
 # 15 — Contract API NoteTatCa
 
+## Kiểu bullet list — 2026-11-04
+
+Document JSON chấp nhận `bulletList.attrs.bulletStyle` chỉ với string disc/dash/circle/square. Attr không bắt buộc, note cũ giữ hợp lệ; giá trị khác trả400 theo ContentRules. Không cho style/CSS/URL tùy ý. Không thêm endpoint hoặc schema database; ownership/version/idempotency giữ nguyên. JSON lưu kiểu marker, plain projection vẫn là nội dung note; orderedList.start tiếp tục theo allowlist hiện có.
+
 ## Bổ sung admin hỗ trợ đặt lại mật khẩu — 2026-11-04
 
 `POST /api/v1/admin/users/{id}/password-reset`: Admin-only, không body; trả envelope `data: true` sau khi email sender chấp nhận gửi link tới email verified hiện có của tài khoản. Không nhận email/token/password từ admin, không trả link/token trong response. UI có xác nhận theo yêu cầu chủ tài khoản. Không thay password, xác minh email hoặc revoke sessions lúc gửi; user hoàn tất qua `/api/v1/auth/reset-password` hiện có, reset thành công mới revoke sessions và vô hiệu token đã dùng.

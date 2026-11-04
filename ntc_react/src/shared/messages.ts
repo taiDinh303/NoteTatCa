@@ -1,5 +1,10 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Bullet style": ["Kiểu dấu đầu dòng", "项目符号样式", "箇条書きのスタイル"],
+  "Dot bullets": ["Dấu chấm", "圆点", "黒丸"],
+  "Dash bullets": ["Dấu gạch ngang", "短横线", "ハイフン"],
+  "Circle bullets": ["Vòng tròn", "空心圆", "白丸"],
+  "Square bullets": ["Hình vuông", "方块", "四角"],
   "Send password reset link": ["Gửi liên kết đặt lại mật khẩu", "发送密码重置链接", "パスワード再設定リンクを送信"],
   "Send a password reset link?": ["Gửi liên kết đặt lại mật khẩu?", "发送密码重置链接？", "パスワード再設定リンクを送信しますか？"],
   "Send reset link": ["Gửi liên kết", "发送重置链接", "再設定リンクを送信"],
