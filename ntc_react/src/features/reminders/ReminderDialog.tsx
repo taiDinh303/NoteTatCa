@@ -247,7 +247,7 @@ export default function ReminderDialog({
     networkMode: "always",
   });
   if (noteId.startsWith("local-") && !resolved.data) return (
-    <Modal open onClose={onClose} title={tr("Reminders")}>
+    <Modal open onClose={onClose} title={tr("Reminders")} className="note-tool-sheet">
       {resolved.isError ? <ErrorPanel error={resolved.error} retry={() => void resolved.refetch()} /> : <Spinner />}
     </Modal>
   );
@@ -290,6 +290,7 @@ function ReadyReminderDialog({
       onClose={onClose}
       title={tr("Reminders")}
       description={title || tr("Untitled note")}
+      className="note-tool-sheet"
     >
       <div className="modal-body">
         <ErrorBanner error={error} />

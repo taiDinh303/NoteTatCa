@@ -3,7 +3,8 @@ import { useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Check, Paintbrush, Save, X } from "lucide-react";
 import { notePalette } from "../../domain/color";
-import { IconButton } from "../../shared/ui";
+import { IconButton, Modal } from "../../shared/ui";
+import { useMobileLayout } from "../../shared/useMobileLayout";
 import { useAuth } from "../../shared/hooks";
 import { normalizeHexColor, useSavedColors } from "../../shared/savedColors";
 
@@ -16,7 +17,14 @@ export default function NoteColorPicker({
 }) {
   useLanguage();
   const [open, setOpen] = useState(false);
+  const mobile = useMobileLayout();
   const userId = useAuth().session?.userId ?? "anonymous";
+  if (mobile) return <>
+    <IconButton icon={Paintbrush} label={tr("Note background color")} active={open} onClick={() => setOpen(true)} />
+    {open ? <Modal open title={tr("Note colors")} onClose={() => setOpen(false)} className="note-tool-sheet" dismissOnOutside>
+      <div className="modal-body"><ColorChoices key={userId} userId={userId} color={color} onChange={onChange} onClose={() => setOpen(false)} /></div>
+    </Modal> : null}
+  </>;
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>

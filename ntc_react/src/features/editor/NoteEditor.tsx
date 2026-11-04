@@ -59,6 +59,8 @@ import ContentZoomOutlet from "./ContentZoomOutlet";
 import RichEditor from "./RichEditorLoader";
 import ReadOnlyContent from "./ReadOnlyContent";
 import { warmRichEditor } from "./loadRichEditor";
+import NoteToolPanel from "./NoteToolPanel";
+import { useMobileLayout } from "../../shared/useMobileLayout";
 export type NoteOpenAction = "labels" | "reminder";
 export type NoteEditorProps = {
   noteId?: string;
@@ -66,6 +68,23 @@ export type NoteEditorProps = {
   initialAction?: NoteOpenAction;
 };
 export default function NoteEditor(props: NoteEditorProps) {
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const update = () => {
+      document.documentElement.style.setProperty("--note-viewport-height", `${viewport.height}px`);
+      document.documentElement.style.setProperty("--note-viewport-top", `${viewport.offsetTop}px`);
+      document.documentElement.style.setProperty("--note-bottom-gap", `${Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)}px`);
+    };
+    update();
+    viewport.addEventListener("resize", update);
+    viewport.addEventListener("scroll", update);
+    return () => {
+      viewport.removeEventListener("resize", update);
+      viewport.removeEventListener("scroll", update);
+      for (const key of ["--note-viewport-height", "--note-viewport-top", "--note-bottom-gap"]) document.documentElement.style.removeProperty(key);
+    };
+  }, []);
   return (
     <ZoomSession key={props.noteId ?? "new"}>
       <NoteEditorSession {...props} />
@@ -164,6 +183,7 @@ function NoteLabelsDialog({
   onClose: () => void;
 }) {
   useLanguage();
+  const mobile = useMobileLayout();
   const labels = useLabels();
   const [original] = useState(note);
   const [tagIds, setTagIds] = useState(() =>
@@ -179,9 +199,9 @@ function NoteLabelsDialog({
         if (!busy) onClose();
       }}
       title={tr("Note labels")}
-      hideTitle
-      hideCloseButton
-      className="note-labels-dialog"
+      hideTitle={!mobile}
+      hideCloseButton={!mobile}
+      className="note-labels-dialog note-tool-sheet"
     >
       <form
         onSubmit={(event) => {
@@ -808,7 +828,7 @@ function EditorSession({
           })}
         </div>
         {tagsOpen ? (
-          <div className="label-chooser">
+          <NoteToolPanel title={tr("Organize with labels")} onClose={() => setTagsOpen(false)}>
             <div className="section-heading">
               <strong>{tr("Organize with labels")}</strong>
               <IconButton
@@ -867,7 +887,7 @@ function EditorSession({
                 {tr("Load more labels")}
               </Button>
             ) : null}
-          </div>
+          </NoteToolPanel>
         ) : null}
         <footer className="editor-footer">
           <div className="editor-tools">

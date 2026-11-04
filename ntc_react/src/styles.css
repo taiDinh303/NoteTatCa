@@ -1769,8 +1769,8 @@ strong {
   margin-left: 4px;
 }
 .label-chooser-options {
-  max-height: 220px;
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
 }
@@ -5103,3 +5103,58 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
 /* Reserve the editor add-icon slot in View so title and actions stay still. */
 .note-editor-modal .note-view-identity { gap: 12px; }
 .note-heading-icon-space { flex: 0 0 28px; width: 28px; height: 36px; }
+
+/* Mobile notes own the viewport; tool dialogs share one bottom-sheet scroller. */
+@container viewport (max-width: 800px) {
+  .modal.note-editor-modal:not(.fullscreen), .modal.note-editor-modal.fullscreen {
+    inset: 0;
+    transform: none;
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .note-editor-modal .editor-footer { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  .modal.note-tool-sheet {
+    inset: auto 0 0;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    max-height: 85dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+    animation: none;
+  }
+  .note-tool-sheet > .modal-header { flex-shrink: 0; }
+  .note-tool-sheet > .modal-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+  .note-tool-sheet .saved-note-colors, .note-tool-sheet .label-chooser-options {
+    max-height: none;
+    overflow: visible;
+  }
+  .note-tool-sheet .modal-body > .section-heading { display: none; }
+  body:has(.note-tool-sheet) .note-editor-modal .content-zoom-viewport { overflow: hidden; }
+}
+@container viewport (max-width: 800px) {
+  .modal.note-editor-modal:not(.fullscreen), .modal.note-editor-modal.fullscreen {
+    top: var(--note-viewport-top, 0px);
+    height: var(--note-viewport-height, 100dvh);
+    max-height: var(--note-viewport-height, 100dvh);
+  }
+  .modal.note-tool-sheet {
+    bottom: var(--note-bottom-gap, 0px);
+    max-height: calc(var(--note-viewport-height, 100dvh) * .85);
+  }
+}
+@container viewport (max-width: 800px) {
+  .modal-overlay:has(+ .note-tool-sheet) { z-index: 90; backdrop-filter: none; }
+  .modal.note-tool-sheet { z-index: 91; }
+}
