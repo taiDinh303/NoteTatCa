@@ -11,6 +11,8 @@ export default function NoteToolPanel({ title, onClose, children }: {
   useLayoutEffect(() => { close.current = onClose; });
   const [host] = useState(() => document.querySelector<HTMLElement>(".note-editor-modal"));
   useLayoutEffect(() => {
+    const trigger = document.activeElement as HTMLElement | null;
+    const panelElement = ref.current;
     document.dispatchEvent(new Event(opened));
     const dismiss = () => close.current();
     const hasNestedDialog = () => [...document.querySelectorAll(".modal")].some(dialog => dialog !== host);
@@ -38,6 +40,8 @@ export default function NoteToolPanel({ title, onClose, children }: {
       document.removeEventListener(opened, dismiss);
       document.removeEventListener("pointerdown", outside, true);
       document.removeEventListener("keydown", escape, true);
+      if (trigger?.isConnected && (document.activeElement === document.body || panelElement?.contains(document.activeElement)))
+        trigger.focus({ preventScroll: true });
     };
   }, [host]);
   const panel = <div ref={ref} className="note-tool-popover" role="dialog" aria-label={title}>

@@ -11,7 +11,7 @@ for (const engine of engines) {
         const context = await activeBrowser.newContext({ viewport: { width, height: 860 }, isMobile: width < 800, hasTouch: width < 800 });
         try {
           const page = await context.newPage();
-          await page.goto("http://127.0.0.1:5173/Home");
+          await page.goto(new URL("/Home", test.info().project.use.baseURL).href);
           await page.getByRole("main").getByRole("link", { name: "Try guest mode", exact: true }).click();
           await expect(page.locator(".note-card")).toHaveCount(3);
           await page.evaluate(async () => {
@@ -72,7 +72,9 @@ for (const engine of engines) {
           await expect(viewer).toBeVisible();
           await unchanged();
           const overlay = page.locator(".modal-overlay");
-          await expect(overlay).toHaveCSS("backdrop-filter", width < 800 ? "none" : "blur(3px)");
+          // Note sessions intentionally avoid resampling the workspace at all
+          // widths; the note-specific stylesheet already disables this blur.
+          await expect(overlay).toHaveCSS("backdrop-filter", "none");
           expect(await overlay.boundingBox()).toEqual({ x: 0, y: 0, width, height: 860 });
           if (engine === "webkit" && width < 800) {
             // Mobile WebKit does not support Playwright mouse.wheel.

@@ -1,0 +1,6 @@
+.note-surface-ready[hidden], .note-surface-backdrop[hidden] { display: none !important; }
+.note-surface-ready, .note-surface-backdrop { animation: none !important; }
+.note-surface-slot { display: contents; border-radius: inherit; }
+.note-surface-slot > .editor-heading { border-top-left-radius: inherit; border-top-right-radius: inherit; }
+.note-surface-slot > .editor-footer { border-bottom-left-radius: inherit; border-bottom-right-radius: inherit; }
+.note-surface-slot > .error-banner { margin: 5px 22px; }

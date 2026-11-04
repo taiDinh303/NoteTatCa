@@ -2,7 +2,7 @@ import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { NoteMascot } from "../mascot/NoteMascot";
 import { noteFullscreenDefault } from "../../shared/noteFullscreen";
 import { noteEditingDefault } from "../../shared/noteEditing";
-import { useNoteExpansion } from "./useNoteExpansion";
+import { NoteSurfaceFrame } from "./NoteSurfaceHost";
 import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
@@ -130,7 +130,7 @@ function NoteEditorSession({
     ? listSnapshot.note : query.data;
   if (resolvedId && !currentNote)
     return (
-      <Modal
+      <NoteSurfaceFrame
         open
         wide
         hideTitle
@@ -148,7 +148,7 @@ function NoteEditorSession({
             {tr("Close")}
           </Button>
         </footer>
-      </Modal>
+      </NoteSurfaceFrame>
     );
   if (currentNote && !editing && initialAction === "labels")
     return <NoteLabelsDialog note={currentNote} onClose={onClose} />;
@@ -536,7 +536,7 @@ function EditorSession({
     onEdit();
   }
   const surfaceDraft = !editing && !snapshot.dirty && initial ? draftFrom(initial) : draft;
-  const surfaceRef = useNoteExpansion(initial?.id, fullscreen);
+
   const status =
     snapshot.status === "saved"
       ? state.status === "guest" ? tr("Saved on this device") : syncState.pending ? tr("Saved on this device; waiting to sync") : tr("All changes saved")
@@ -549,11 +549,10 @@ function EditorSession({
             : tr("Could not save");
   return (
     <>
-      <Modal
+      <NoteSurfaceFrame
         open
         wide
         onClose={requestClose}
-        contentRef={surfaceRef}
         title={!editing ? tr("View note") : initial ? tr("Edit note") : tr("New note")}
         hideTitle
         className={`note-editor-modal note-surface ${editing ? "" : "note-viewer"} ${fullscreen ? "fullscreen" : ""}`}
@@ -965,7 +964,7 @@ function EditorSession({
             </Button>
           </div>
         </footer>
-      </Modal>
+      </NoteSurfaceFrame>
       {closePrompt || blocker.state === "blocked" ? (
         <Modal
           open

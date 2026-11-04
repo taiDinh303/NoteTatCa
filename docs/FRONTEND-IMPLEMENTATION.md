@@ -1,3 +1,9 @@
+## Khung note có sẵn trong workspace — 2026-11-05
+
+Theo yêu cầu mới nhất, NotesPage chuẩn bị một NoteSurfaceHost duy nhất lúc vào workspace. Dialog và backdrop ở DOM từ đầu, hidden/aria-hidden khi đóng; chỉ portal nội dung của note đang chọn vào slot, đóng sẽ bỏ nội dung/session nhưng giữ nguyên khung. Dùng dữ liệu cache hiện có, không chờ network để mở note đã tải. Module NoteEditor/RichEditor vẫn được Startup chờ tải song song với dữ liệu; không tạo editor cho mọi card. Bỏ hook phóng từ card 100ms, không fade/scale khi mở khung chính. View/Edit, autosave, offline và Undo dùng session chung như trước.
+
+Khung dùng primitive Dialog không tự khóa modal khi đóng; FocusScope, hideOthers và RemoveScroll chỉ hoạt động khi mở. Khi đóng trả focus, mở popup phụ vẫn dùng cơ chế hiện có; NoteToolPanel trả focus về trigger khi chọn xong. Khung chính không đổi DOM qua đóng/mở hoặc View/Edit. Reminders/Inbox ngoài NotesPage dùng Modal fallback; không thay schema/API/ownership. HTML Keep được đọc như dữ liệu tham khảo, không chạy script hay sao chép nội dung riêng của người dùng vào repo; không đủ để suy ra cách Keep lưu editor.
+
 ## Ưu tiên ba mốc 50/100/150%, width và gap vẫn cố định — 2026-11-05
 
 Chủ dự án chọn cách 1: tính lại width gốc để giảm phần dư tổng thể của sáu trường hợp (50/100/150% × sidebar mở/đóng), chấp nhận không thể cân tuyệt đối mọi mốc. Calibration mới tối thiểu hóa phần dư lớn nhất, dùng tổng bình phương để phân định khi bằng nhau, trong miền width 85–105% nominal. Giữ số cột tại chính 50/100% (1910–1920px: 10/5 mở và 12/6 đóng); các yêu cầu giữ nguyên số cột đến 53/105% trước đây nhường ưu tiên cho ba mốc chính. Width chỉ chọn theo viewport, gap gốc 20px không đổi, zoom chỉ scale, mép trái/New/sidebar không đổi. Không fit riêng width hoặc gap cho từng mức zoom/trạng thái sidebar. Hàng thiếu note vẫn để slot trống.

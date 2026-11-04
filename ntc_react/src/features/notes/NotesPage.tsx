@@ -72,6 +72,7 @@ import {
 import { errorMessage } from "../../shared/utils";
 import { warmNoteEditor } from "../editor/loadNoteEditor";
 import NoteEditor from "../editor/NoteEditorLoader";
+import { NoteSurfaceHost } from "../editor/NoteSurfaceHost";
 import type { NoteOpenAction } from "../editor/NoteEditor";
 function NoteCard({
   note,
@@ -511,7 +512,7 @@ export default function NotesPage({
       </section>
     ) : null;
   return (
-    <>
+    <NoteSurfaceHost open={!trash && !!(editor || selected) && editor?.action !== "labels"} onClose={closeEditor}>
       <h1
         className="sr-only"
       >
@@ -702,7 +703,7 @@ export default function NotesPage({
           }}
         />
       ) : null}
-    </>
+    </NoteSurfaceHost>
   );
 }
 import { useQuery } from "@tanstack/react-query";
