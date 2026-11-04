@@ -1,5 +1,6 @@
 import { t as tr, useLanguage, currentLanguage } from "../../shared/i18n";
 import { NoteMascot } from "../mascot/NoteMascot";
+import { noteFullscreenDefault } from "../../shared/noteFullscreen";
 import { MascotAnimationSession } from "../mascot/MascotAnimationSession";
 import "../mascot/NoteMascot.css";
 import {
@@ -111,7 +112,7 @@ function NoteEditorSession({
   useLanguage();
   const [editing, setEditing] = useState(!noteId);
   const [createdId, setCreatedId] = useState<string>();
-  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreen, setFullscreen] = useState(noteFullscreenDefault);
   const resolvedId = noteId ?? createdId;
   const listSnapshot = resolvedId ? workspace.cachedNote(resolvedId) : undefined;
   const query = useQuery({

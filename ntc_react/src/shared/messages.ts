@@ -1,5 +1,6 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Always open notes in full screen": ["Luôn mở ghi chú toàn màn hình", "始终全屏打开笔记", "常にノートを全画面で開く"],
  "Zoom": ["Thu phóng", "缩放", "拡大率"],
  "Apply": ["Áp dụng", "应用", "適用"],
  "Edit avatar": ["Chỉnh sửa ảnh đại diện", "编辑头像", "アバターを編集"],

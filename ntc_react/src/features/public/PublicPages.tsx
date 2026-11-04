@@ -5,7 +5,7 @@ import {
   t as tr,
   useLanguage,
 } from "../../shared/i18n";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Bell,
@@ -17,10 +17,14 @@ import {
   Search,
   Sparkles,
   Tag,
+  LogOut,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useAuth, useMe } from "../../shared/hooks";
 import { homePath } from "../../application/access";
-import { Avatar, Logo, Spinner } from "../../shared/ui";
+import { ActionMenu, Avatar, IconButton, Logo, Spinner } from "../../shared/ui";
+import { useTheme } from "../../shared/useTheme";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 
 function LanguageFlag({ code }: { code: Language }) {
@@ -59,6 +63,8 @@ export function Landing({
 }) {
   useLanguage();
   const auth = useAuth();
+  const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const me = useMe();
   if (redirectAuthenticated && (auth.status === "authenticated" || auth.status === "offline" || auth.status === "guest"))
     return <Navigate to={homePath(auth.session)} replace />;
@@ -82,6 +88,7 @@ export function Landing({
           <Logo />
         </Link>
         <nav>
+          <IconButton icon={theme === "dark" ? Sun : Moon} label={tr(theme === "dark" ? "Use light theme" : "Use dark theme")} onClick={toggleTheme} />
           <LandingLanguageSelect />
           {!signedIn ? (
             <Link className="button primary" to="/login">
@@ -89,10 +96,13 @@ export function Landing({
               <ArrowRight size={15} />
             </Link>
           ) : (
-            <Link
+            <ActionMenu label={tr("Account menu")} items={[
+              { label: tr("Workspace"), icon: ArrowRight, action: () => { void navigate(destination); } },
+              { label: tr(auth.status === "guest" ? "Leave guest mode" : "Sign out"), icon: LogOut, separator: true, action: () => { void navigate("/logout"); } },
+            ]}>
+            <button type="button"
               className="avatar-menu"
-              to={destination}
-              aria-label={tr("Open workspace")}
+              aria-label={tr("Account menu")}
             >
               <Avatar
                 name={accountName}
@@ -102,8 +112,8 @@ export function Landing({
                     : auth.session?.picture
                 }
               />
-              <span className="account-name">{accountName.split(" ")[0]}</span>
-            </Link>
+            </button>
+            </ActionMenu>
           )}
         </nav>
       </header>

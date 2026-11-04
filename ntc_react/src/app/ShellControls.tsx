@@ -130,7 +130,6 @@ export function ShellAccountMenu({
               me.data ? me.data.profile?.picture : state.session?.picture
             }
           />
-          <span className="account-name">{name.split(" ")[0]}</span>
           <ChevronDown size={12} />
         </button>
       </ActionMenu>

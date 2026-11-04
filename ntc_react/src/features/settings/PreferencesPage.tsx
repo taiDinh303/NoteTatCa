@@ -1,5 +1,7 @@
 import { SettingsNav } from "./SettingsNav";
 import { useTheme } from "../../shared/useTheme";
+import { useMobileLayout } from "../../shared/useMobileLayout";
+import { useNoteFullscreenPreference } from "../../shared/noteFullscreen";
 import {
   languages,
   setLanguage,
@@ -21,6 +23,8 @@ export default function PreferencesPage({
   administration?: boolean;
 }) {
   const { theme, toggleTheme } = useTheme();
+  const mobile = useMobileLayout();
+  const [noteFullscreen, toggleNoteFullscreen] = useNoteFullscreenPreference();
   const language = useLanguage();
   const desktopMascots = useDesktopMascots();
   const title = tr(
@@ -67,6 +71,10 @@ export default function PreferencesPage({
             </button>
           </div>
           <AppearanceZoomRow />
+            {!mobile && !administration ? <div className="preferences-row">
+              <label htmlFor="note-fullscreen">{tr("Always open notes in full screen")}</label>
+              <button id="note-fullscreen" type="button" className="theme-switch" role="switch" aria-label={tr("Always open notes in full screen")} aria-checked={noteFullscreen} onClick={toggleNoteFullscreen}><span /></button>
+            </div> : null}
           {!administration && desktopMascots ? <MascotSettings /> : null}
         </div>
       ) : null}

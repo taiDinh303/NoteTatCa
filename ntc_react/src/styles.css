@@ -5201,3 +5201,8 @@ body:has(.note-tool-popover) .note-editor-modal .content-zoom-viewport { overflo
 
 :root, [data-theme] { --tool-surface: var(--surface); --tool-text: var(--text); --tool-border: var(--border); --tool-muted: var(--muted); --tool-hover: var(--hover); }
 .note-tool-popover { --surface: var(--tool-surface); --text: var(--tool-text); --border: var(--tool-border); --muted: var(--tool-muted); --hover: var(--tool-hover); }
+
+.landing header .landing-language { background: transparent; color: inherit; }
+.landing header .landing-language:hover, .landing header .landing-language[data-state="open"] { background: color-mix(in srgb, var(--text) 8%, transparent); }
+
+@media (max-width:480px){.landing > header{padding-inline:12px;gap:8px}.landing > header .brand{font-size:14px;gap:6px}.landing > header .brand-mark{width:34px;height:34px}.landing > header nav{gap:6px}.landing > header nav .button{padding-inline:8px}.landing > header nav .button > svg{display:none}.landing > header .landing-language{width:36px;flex-basis:36px;height:40px}.landing > header nav .icon-button{width:32px;min-width:32px}}
