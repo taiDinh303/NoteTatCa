@@ -1,4 +1,6 @@
-## Grid quanh100% và50% — 2026-11-04
+## Grid cân lề50/100/150% — 2026-11-04
+
+Yêu cầu mới hơn cùng ngày: giữ nguyên mép trái thẳngNew/heading, cân mép phải gần tương đương trái tại50/100/150% với sidebar mở/đóng. Canvas dùng chiều rộng khả dụng bình thường, cột1fr chia phần dư vào card; không di chuyển/căn giữa nhóm và không thay padding trái/sidebar/header. Số cột5/10 (mở) và6/12 (đóng) ở gần100/50 vẫn giữ trên1910–1920px;150% tương ứng3/4. Cỡ card thực tế được điều chỉnh theo canvas/số cột, thay quy định cố định cỡ card bên dưới; reference chọn cột/gap vẫn cố định theo viewport. Chi tiết tạiFRONTEND-IMPLEMENTATION/worklog.
 
 Theo chủ dự án: giữ5note/hàng ở99–105%,10note/hàng ở50–53% với sidebar mở trên khung1910–1920px; đóngsidebar6/12. Giới hạn zoom50–150% giữ nguyên sau đính chính47–49% là nhầm. Tận dụng đệm phải tới khi còn12px, cho phần dư nhỏ thay vì bắt100% khít tuyệt đối; cỡ card gốc hiệu chỉnh theo viewport rồi cố định qua zoom/sidebar, không animate width. Đây là bổ sung DEC-031 hiện hành, thay các mô tả lịch sử100%r<1/50%chỉ10px bên dưới. Runtime và evidence xem FRONTEND-IMPLEMENTATION/worklog.
 

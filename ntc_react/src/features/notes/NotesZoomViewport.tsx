@@ -81,14 +81,19 @@ function DesktopNotesZoomViewport({
       frozenGrids.clear();
     }
     function fitWidth(nextScale: number) {
-      // Use the spare right inset to complete a column at the owner's main
-      // zoom stops. Keep 12px clear of the window scrollbar and fixed tracks.
+      // The spare inset is a column-count budget only. Visible tracks fit the
+      // normal canvas below, so using this budget never shifts either edge.
       const allowance =
         mode !== "list" && window.innerWidth > 800 &&
         (nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001))
           ? Math.max(0, rightInset - 12)
           : 0;
       return availableWidth + allowance;
+    }
+    // Column selection keeps the owner's near-100/50 counts, but the visible
+    // canvas ends at the normal right inset, matching the New button's left.
+    function canvasWidth() {
+      return availableWidth;
     }
     function columnsFor(nextScale: number) {
       return mode === "list"
@@ -133,15 +138,9 @@ function DesktopNotesZoomViewport({
         return;
       }
       const columns = columnsFor(scale);
-      const fittedWidth = fitWidth(scale);
-      view.style.paddingRight = `${rightInset - (fittedWidth - availableWidth)}px`;
-      const nextWidth =
-        mode === "list"
-          ? fittedWidth / scale
-          : Math.min(
-              fittedWidth / scale,
-              columns * cardWidth + (columns - 1) * gap,
-            );
+      const fittedWidth = canvasWidth();
+      view.style.paddingRight = `${rightInset}px`;
+      const nextWidth = fittedWidth / scale;
       const tracksChanged =
         content.style.getPropertyValue("--notes-card-width") !==
           `${cardWidth}px` ||
@@ -153,21 +152,18 @@ function DesktopNotesZoomViewport({
       ) {
         return;
       }
-      // Fixed card/gap tracks keep their geometry until a column boundary is
-      // crossed. Do not measure or restart card motion on each resize tick.
+      // Fractional grid tracks absorb the remainder without moving the left
+      // edge. Same-column updates need no per-card measurements/animations.
       if (
         !tracksChanged &&
         ((mode === "list" && resizeOnly) || mode !== "list") &&
         content.style.getPropertyValue("--notes-columns") === String(columns)
       ) {
-        const clamped = width < cardWidth || nextWidth < cardWidth;
         width = nextWidth;
         content.style.width = `${width}px`;
-        space.style.width = `${fitWidth(scale)}px`;
-        if (mode === "list" || clamped) {
-          height = content.offsetHeight;
-          space.style.height = `${height * scale}px`;
-        }
+        space.style.width = `${canvasWidth()}px`;
+        height = content.offsetHeight;
+        space.style.height = `${height * scale}px`;
         return;
       }
       const nodes = cards();
@@ -181,7 +177,7 @@ function DesktopNotesZoomViewport({
       content.style.setProperty("--notes-card-width", `${cardWidth}px`);
       content.style.setProperty("--notes-gap", `${gap}px`);
       height = content.offsetHeight;
-      space.style.width = `${fitWidth(scale)}px`;
+      space.style.width = `${canvasWidth()}px`;
       space.style.height = `${height * scale}px`;
       view.scrollLeft = 0;
       updateScrollbar();
@@ -276,7 +272,7 @@ function DesktopNotesZoomViewport({
       scale = next;
       content.style.transform = `scale(${scale})`;
       content.style.setProperty("--notes-scale", String(scale));
-      space.style.width = `${fitWidth(scale)}px`;
+      space.style.width = `${canvasWidth()}px`;
       space.style.height = `${height * scale}px`;
       // Zoom grows from the top-left. Keep the scroll offset instead of
       // moving toward the pointer and hiding the start of the notes.
@@ -303,8 +299,8 @@ function DesktopNotesZoomViewport({
       const inset = getComputedStyle(view.parentElement!).paddingRight;
       rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
-      // Calibrate fixed grid tracks to keep the nominal columns through 105%.
-      // Card width, gap and sidebar width stay fixed during zoom and toggles.
+      // Calibrate the fixed column-selection reference through 105%/53%.
+      // Actual fractional tracks fill the canvas; gap/sidebar stay unchanged.
       const desktop = window.innerWidth > 800;
       const mainStyle = getComputedStyle(view.parentElement!);
       const fullWidth =

@@ -2,6 +2,8 @@
 
 > Cập nhật: 2026-10-17 | DRAFT | Áp dụng: YES | Người quyết định: chủ dự án
 
+DEC-031 yêu cầu mới hơn2026-11-04: cân lề phải tương đương lề trái ở50/100/150%, cả sidebar mở/đóng; chủ dự án nhấn mạnh giữ nguyên trái làm mốc. Grid chia phần dư vào bề ngang card bằng cột đều1fr, canvas lấp chiều rộng khả dụng với padding phải gốc; không dịch/căn giữa nhóm, không thay New/header/sidebar. Số cột quanh100%/50% và range50–150% giữ như đợt trước, nhưng cỡ card thực tế nay thích ứng theo canvas/số cột để cân lề, thay yêu cầu cỡ card cố định của các mô tả lịch sử bên dưới. Hàng thiếu note vẫn có slot trống, không kéo card ít ỏi giãn cả hàng hoặc đổi dữ liệu.
+
 DEC-031 bổ sung theo chủ dự án2026-11-04: màn hình như ảnh1910–1920px, sidebar mở cần5cột quanh99–105% và10cột quanh50–53%; sidebar đóng tương ứng6/12. Giữ giới hạn thu nhỏ50% (chủ dự án đính chính47–49% là nhầm), range50–150%. Cho dùng thêm đệm phải để vừa note và chấp nhận phần dư nhỏ, không buộc100% khít tuyệt đối. Hiệu chỉnh cỡ card gốc một lần theo viewport để đủ ở105%/53%, giữ cỡ/gap cố định qua zoom/toggle; không co giãn liên tục. Sidebar/New/lề trái/chrome giữ nguyên; chi tiết hiện hành tại FRONTEND-IMPLEMENTATION. Quy tắc10px và công thức cũ bên dưới là lịch sử, được bổ sung này thay thế.
 
 
