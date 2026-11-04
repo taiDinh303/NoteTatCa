@@ -108,12 +108,14 @@ function DesktopContentZoom({
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         document.style.willChange = "auto";
-        setPercent(Math.round(target));
+        if (Math.round(target) === 100) { hand.current = false; setHandEnabled(false); }
+      setPercent(Math.round(target));
       }, 120);
     }
     change.current = (value) => {
       setAnchor(view.clientWidth / 2, view.clientHeight / 2);
       update(value);
+      if (Math.round(target) === 100) { hand.current = false; setHandEnabled(false); }
       setPercent(Math.round(target));
     };
     const observer = new ResizeObserver(() => {
@@ -372,7 +374,7 @@ function DesktopContentZoom({
       {!mobile && session?.target
         ? createPortal(controls, session.target)
         : null}
-      {!mobile && session?.handTarget
+      {!mobile && percent !== 100 && session?.handTarget
         ? createPortal(
             <IconButton
               icon={Hand}

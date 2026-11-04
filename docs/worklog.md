@@ -1,3 +1,9 @@
+## Bỏ chevron avatar và ẩn bàn tay tại100% — 2026-11-04
+
+- Theo2yêu cầu nối tiếp: gỡ ChevronDown/import khỏi ShellAccountMenu, avatar vẫn là trigger Account menu ở workspace/admin; Home đã chỉ có avatar từ bản trước. ContentZoom chỉ portal Pan content khi percent khác100; khi chốt target100 thì tắt cả hand ref/state để không giữ cursor grab hoặc pan ngầm. Các mức zoom khác và thao tác zoom/View/Edit giữ nguyên.
+- Validation:2uniqueChromium PASS: signed-in Home→Workspace/nameẩn/dropdown→Signout; desktop hand pan cả2trục ởView/Edit/200%, fullscreen toggle, chọntext khi tắtPan, bổ sung activePan→100ẩnbutton/data-handfalse→200hiệnlại/aria-pressedfalse. LượtPan đầu harness tham chiếu editView trước khai báo, đổi locator lấy trực tiếp dialog, rerunPASS không sửa assertion/runtime để né lỗi. React TypeScript/ViteProduction build và scopedESLint3files PASS; .NET solutionRelease -warnaserror -m:1 PASS0warnings/errors; scoped diffcheckPASS. Không fullsuite/backendHTTP riêng/liveDB/mail thật/thiết bị thật/manualdeploy/migration. Build giữ mascot edits sẵn ngoài scope.
+- Publication scope4files:ShellControls.tsx,ContentZoom.tsx,content-zoom.spec.ts và riêng entryworklog này; indexriêng giữ assets/mascot/config/worklog evidence sẵn ngoài commit. HEAD/remote main trướcpush cùng6169f67; pushmain theo quyền React hiện có, kiểmremote saupush. CI/hosting chưa xác minh lúccommit.
+
 ## Home avatar/theme và công tắc mở note fullscreen — 2026-11-04
 
 - Theo các yêu cầu nối tiếp: bỏ tên cạnh avatar ở Home và ShellAccountMenu của workspace/admin. Home avatar thành ActionMenu với Workspace (homePath theo role) và Sign out/Leave guest mode qua /logout hiện có, giữ pending-draft/guest guards. Giữ tên làm nguồn initials/ảnh, không hiển thị account-name span. Thêm nút Sun/Moon ở Home dùng chung useTheme/localStorage với workspace; nền nút cờ transparent/hover theo header và thu gọn header<=480px để đủ controls.

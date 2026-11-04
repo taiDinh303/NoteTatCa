@@ -394,6 +394,12 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
   });
   await expect(editHand).toHaveAttribute("aria-pressed", "false");
   await editHand.click();
+  await setZoom(page, 100);
+  await expect(editHand).toHaveCount(0);
+  await expect(dialog.locator(".content-zoom-viewport")).toHaveAttribute("data-hand", "false");
+  await setZoom(page, 200);
+  await expect(editHand).toHaveAttribute("aria-pressed", "false");
+  await editHand.click();
   const editView = dialog.locator(".content-zoom-viewport");
   const original = await dialog
     .getByRole("textbox", { name: "Note content" })

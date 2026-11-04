@@ -6,7 +6,6 @@ import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ChevronDown,
   LogOut,
   Settings,
   RefreshCw,
@@ -130,7 +129,6 @@ export function ShellAccountMenu({
               me.data ? me.data.profile?.picture : state.session?.picture
             }
           />
-          <ChevronDown size={12} />
         </button>
       </ActionMenu>
       {reviewSync ? (
