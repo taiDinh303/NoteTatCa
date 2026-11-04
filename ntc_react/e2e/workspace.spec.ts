@@ -1361,9 +1361,7 @@ test("creates reminders and reads the resulting inbox notification", async ({
     .getByRole("button", { name: "Set reminder", exact: true })
     .click();
   await expect(reminders.getByText(/Does not repeat · Active/)).toBeVisible();
-  await reminders
-    .getByRole("button", { name: "Close dialog", exact: true })
-    .click();
+  await editor.getByRole("button", { name: "Note reminders", exact: true }).click();
   editor = page.getByRole("dialog", { name: "Edit note", exact: true });
   await editor.getByRole("button", { name: "Close", exact: true }).click();
   await request.post(fixture + "/__fixture/advance?minutes=3");

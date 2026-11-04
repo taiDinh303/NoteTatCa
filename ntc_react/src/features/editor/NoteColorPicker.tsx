@@ -1,10 +1,9 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
+import NoteToolPanel from "./NoteToolPanel";
 import { Check, Paintbrush, Save, X } from "lucide-react";
 import { notePalette } from "../../domain/color";
-import { IconButton, Modal } from "../../shared/ui";
-import { useMobileLayout } from "../../shared/useMobileLayout";
+import { IconButton } from "../../shared/ui";
 import { useAuth } from "../../shared/hooks";
 import { normalizeHexColor, useSavedColors } from "../../shared/savedColors";
 
@@ -17,43 +16,13 @@ export default function NoteColorPicker({
 }) {
   useLanguage();
   const [open, setOpen] = useState(false);
-  const mobile = useMobileLayout();
   const userId = useAuth().session?.userId ?? "anonymous";
-  if (mobile) return <>
-    <IconButton icon={Paintbrush} label={tr("Note background color")} active={open} onClick={() => setOpen(true)} />
-    {open ? <Modal open title={tr("Note colors")} onClose={() => setOpen(false)} className="note-tool-sheet" dismissOnOutside>
-      <div className="modal-body"><ColorChoices key={userId} userId={userId} color={color} onChange={onChange} onClose={() => setOpen(false)} /></div>
-    </Modal> : null}
+  return <>
+    <IconButton data-note-tool-trigger icon={Paintbrush} label={tr("Note background color")} active={open} onClick={() => setOpen(!open)} />
+    {open ? <NoteToolPanel title={tr("Note colors")} onClose={() => setOpen(false)}>
+      <ColorChoices key={userId} userId={userId} color={color} onChange={onChange} onClose={() => setOpen(false)} />
+    </NoteToolPanel> : null}
   </>;
-  return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
-        <IconButton
-          icon={Paintbrush}
-          label={tr("Note background color")}
-          active={open}
-        />
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          className="note-color-menu"
-          side="top"
-          align="start"
-          sideOffset={12}
-          collisionPadding={12}
-          aria-label={tr("Note colors")}
-        >
-          <ColorChoices
-            key={userId}
-            userId={userId}
-            color={color}
-            onChange={onChange}
-            onClose={() => setOpen(false)}
-          />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-  );
 }
 
 function ColorChoices({

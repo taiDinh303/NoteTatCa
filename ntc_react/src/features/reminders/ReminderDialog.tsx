@@ -1,3 +1,4 @@
+import NoteToolPanel from "../editor/NoteToolPanel";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -234,9 +235,9 @@ export function ReminderForm({
   );
 }
 export default function ReminderDialog({
-  noteId, title, zone, onClose,
+  noteId, title, zone, onClose, anchored = false,
 }: {
-  noteId: string; title: string; zone: string; onClose: () => void;
+  noteId: string; title: string; zone: string; onClose: () => void; anchored?: boolean;
 }) {
   useLanguage();
   const resolved = useQuery({
@@ -251,7 +252,7 @@ export default function ReminderDialog({
       {resolved.isError ? <ErrorPanel error={resolved.error} retry={() => void resolved.refetch()} /> : <Spinner />}
     </Modal>
   );
-  return <ReadyReminderDialog noteId={resolved.data?.id ?? noteId} title={title} zone={zone} onClose={onClose} />;
+  return <ReadyReminderDialog noteId={resolved.data?.id ?? noteId} title={title} zone={zone} onClose={onClose} anchored={anchored} />;
 }
 
 function ReadyReminderDialog({
@@ -259,11 +260,13 @@ function ReadyReminderDialog({
   title,
   zone,
   onClose,
+  anchored,
 }: {
   noteId: string;
   title: string;
   zone: string;
   onClose: () => void;
+  anchored: boolean;
 }) {
   useLanguage();
   const query = useQuery({
@@ -284,8 +287,9 @@ function ReadyReminderDialog({
     ]);
     setEditing(undefined);
   }
+  const Container = anchored ? NoteToolPanel : Modal;
   return (
-    <Modal
+    <Container
       open
       onClose={onClose}
       title={tr("Reminders")}
@@ -436,6 +440,6 @@ function ReadyReminderDialog({
           }}
         />
       ) : null}
-    </Modal>
+    </Container>
   );
 }

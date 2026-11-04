@@ -57,7 +57,7 @@ test("creates a reminder immediately while the request saves in background", asy
   expect(postedZone).toBe(
     await page.evaluate(() => Intl.DateTimeFormat().resolvedOptions().timeZone),
   );
-  await dialog.getByRole("button", { name: "Close dialog" }).click();
+  await page.getByRole("button", { name: "Note reminders", exact: true }).click();
   await page
     .getByRole("dialog", { name: "Edit note", exact: true })
     .getByRole("button", { name: "Close", exact: true })

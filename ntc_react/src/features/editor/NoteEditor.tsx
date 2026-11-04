@@ -898,15 +898,19 @@ function EditorSession({
             <span className="toolbar-divider" />
             <IconButton
               icon={Tag}
+              data-note-tool-trigger
               label={tr("Note labels")}
               active={tagsOpen}
               onClick={() => setTagsOpen(!tagsOpen)}
             />
             <IconButton
               icon={Bell}
+              data-note-tool-trigger
               label={tr("Note reminders")}
               disabled={state.status === "guest"}
+              active={reminderOpen}
               onClick={() => {
+                if (reminderOpen) { setReminderOpen(false); return; }
                 void save()
                   .then((note) => {
                     if (note) setReminderOpen(true);
@@ -1051,6 +1055,7 @@ function EditorSession({
       ) : null}
       {reminderOpen && snapshot.note ? (
         <ReminderDialog
+          anchored
           noteId={snapshot.note.id}
           title={draft.title}
           zone={
