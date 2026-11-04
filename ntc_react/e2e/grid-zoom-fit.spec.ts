@@ -16,6 +16,7 @@ for (const width of [1920, 1910]) {
     await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(page.locator(".note-card").first()).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
     const geometry = () => page.locator(".notes-zoom-layer").evaluate(element => {
       const layer = element as HTMLElement;
       const view = layer.closest(".notes-zoom-viewport")!;
@@ -28,6 +29,8 @@ for (const width of [1920, 1910]) {
       return {
         columns: row.length,
         card: layer.style.getPropertyValue("--notes-card-width"),
+        logicalWidth: (grid.querySelector(".note-card") as HTMLElement).offsetWidth,
+        logicalHeight: (grid.querySelector(".note-card") as HTMLElement).offsetHeight,
         sidebar: layer.closest(".customer-shell")!.querySelector(".sidebar")!.getBoundingClientRect().width,
         overflow: right - (view.getBoundingClientRect().right - 12),
         remaining: view.getBoundingClientRect().right - 12 - right,
@@ -49,12 +52,16 @@ for (const width of [1920, 1910]) {
       const current = await geometry();
       expect(current.remaining).toBeLessThan(current.pitch);
       expect(current.card).toBe(baseline.card);
+      expect(current.logicalWidth).toBe(baseline.logicalWidth);
+      expect(current.logicalHeight).toBe(baseline.logicalHeight);
       expect(current.sidebar).toBe(baseline.sidebar);
       if (width === 1920 && [50, 100, 150].includes(percent))
         await page.screenshot({ path: info.outputPath(`grid-${percent}-open.png`) });
       await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
       await expect.poll(async () => (await geometry()).columns).toBe(percent <= 53 ? 12 : percent === 150 ? 4 : 6);
       await expect.poll(async () => (await geometry()).edgeDifference).toBeLessThan(1.5);
+      expect((await geometry()).logicalWidth).toBe(baseline.logicalWidth);
+      expect((await geometry()).logicalHeight).toBe(baseline.logicalHeight);
       if (width === 1920 && [50, 100, 150].includes(percent))
         await page.screenshot({ path: info.outputPath(`grid-${percent}-closed.png`) });
       await page.getByRole("button", { name: "Show sidebar", exact: true }).click();

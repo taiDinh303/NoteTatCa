@@ -1,4 +1,6 @@
-## Grid cân lề50/100/150% — 2026-11-04
+## Grid width cố định, giữ mốc trái — 2026-11-05
+
+Chủ dự án đính chính sau bảnf7a28b7: width gốc card cố định suốt zoom/sidebar, không dùng1fr hoặc fit lại width gây rewrap. Khôi phục fixedtracks, chia khoảng trống vào gap ngang bằngspace-between, mép trái vẫn thẳngNew/heading. Số cột/bound50–150% giữ; kiểm actualwidth/height trước/sau thao tác và trong các frame motion. Cânlề cho hàng đủ từ2cột, không kéo giãncard ở1cột/thiếunote. Phần mô tả width thích ứng ngay dưới đây là lịch sử triển khai trước đính chính.
 
 Yêu cầu mới hơn cùng ngày: giữ nguyên mép trái thẳngNew/heading, cân mép phải gần tương đương trái tại50/100/150% với sidebar mở/đóng. Canvas dùng chiều rộng khả dụng bình thường, cột1fr chia phần dư vào card; không di chuyển/căn giữa nhóm và không thay padding trái/sidebar/header. Số cột5/10 (mở) và6/12 (đóng) ở gần100/50 vẫn giữ trên1910–1920px;150% tương ứng3/4. Cỡ card thực tế được điều chỉnh theo canvas/số cột, thay quy định cố định cỡ card bên dưới; reference chọn cột/gap vẫn cố định theo viewport. Chi tiết tạiFRONTEND-IMPLEMENTATION/worklog.
 

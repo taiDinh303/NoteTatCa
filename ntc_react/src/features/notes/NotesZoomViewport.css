@@ -73,11 +73,11 @@ html:has([data-notes-zoom]) {
 .notes-zoom-layer .note-grid {
   grid-template-columns: repeat(
     var(--notes-columns, 1),
-    minmax(0, 1fr)
+    min(var(--notes-card-width, 320px), 100%)
   );
-  column-gap: var(--notes-gap, 20px);
+  column-gap: 0;
   row-gap: var(--notes-gap, 20px);
-  justify-content: start;
+  justify-content: space-between;
 }
 .notes-zoom-layer .note-grid.list-view {
   grid-template-columns: minmax(0, 1fr);
@@ -98,4 +98,5 @@ html:has([data-notes-zoom]) {
 }
 
 .notes-mobile-layer { position: relative; width: 100%; }
+.notes-mobile-layer .note-grid { grid-template-columns: minmax(0, 1fr); }
 .notes-mobile-layer .note-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }

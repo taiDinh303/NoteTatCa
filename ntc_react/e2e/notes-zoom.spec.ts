@@ -111,7 +111,7 @@ for (const mode of ["grid", "list"]) {
               width: card.offsetWidth,
               gap: parseFloat(
                 getComputedStyle(document.querySelector(".note-grid")!)
-                  .columnGap,
+                  .rowGap,
               ),
               running: card
                 .getAnimations()
@@ -146,7 +146,7 @@ for (const mode of ["grid", "list"]) {
     expect(
       frames.every(
         (f) =>
-          f.width > expectedWidth / 2 && f.width < expectedWidth * 2 &&
+          (mode === "list" || f.width === expectedWidth) &&
           f.gap === 20 &&
           f.running === 0 &&
           f.measured <= cardCount * 8,
@@ -262,10 +262,7 @@ for (const zoom of [75, 100, 125]) {
       expect(
         Math.max(...result.frames.map((f) => Math.abs(f.delta))),
       ).toBeLessThan(1);
-      // Fitted card widths may rewrap text. Once sidebar motion ends the
-      // resulting heights must stay stable instead of restarting a resize.
-      const settledHeights = result.frames.filter(f => !f.mainMoving && f.time > 185).map(f => f.heightError);
-      expect(Math.max(...settledHeights) - Math.min(...settledHeights)).toBeLessThan(0.1);
+      expect(Math.max(...result.frames.map(f => f.heightError))).toBeLessThan(0.1);
       expect(result.frames.some((f) => f.mainMoving && f.running > 0)).toBe(
         true,
       );
@@ -504,8 +501,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       expect(result.frames.length).toBeGreaterThan(5);
       expect(result.firstMotion).toBeLessThan(result.lastInput);
       expect(result.maxTextScaleError).toBeLessThan(0.001);
-      // Width/height may reflow to balance the edges; glyphs themselves must
-      // never stretch and no height animation may fight document layout.
+      expect(result.maxLogicalWidthError).toBeLessThan(1);
+      expect(result.maxLogicalHeightError).toBeLessThan(0.1);
       expect(result.heightKeyframes).toBe(0);
       const widths = result.frames.map((frame) => frame[0].width);
       expect(
@@ -879,7 +876,7 @@ for (const { width, theme } of [
   { width: 2560, theme: "light" },
   { width: 3440, theme: "dark" },
 ]) {
-  test(`fitted grid cards and New share balanced edges at every zoom ${width} ${theme}`, async ({
+  test(`fixed grid cards share spare space between columns at every zoom ${width} ${theme}`, async ({
     page,
   }) => {
     test.setTimeout(90000);
@@ -974,7 +971,7 @@ for (const { width, theme } of [
               ).getPropertyValue("--notes-card-width"),
             ),
             baseGap: parseFloat(
-              getComputedStyle(el.querySelector(".note-grid")!).columnGap,
+              getComputedStyle(el.querySelector(".note-grid")!).rowGap,
             ),
             tracks: Number((el.querySelector(".notes-zoom-layer") as HTMLElement).style.getPropertyValue("--notes-columns")),
             columnAllowance: Math.max(0, parseFloat(getComputedStyle(el.parentElement!).paddingRight) - 12),
@@ -1021,10 +1018,10 @@ for (const { width, theme } of [
             ((layout.available + layout.columnAllowance + 1) / 0.5 + baseGap) /
               (baseWidth + baseGap),
           );
-          expect(slots).toBe(completeSlots);
+          expect(slots).toBe(Math.min(completeSlots, Math.floor((layout.available + 1) / 0.5 / baseWidth)));
         }
         if (percent === 100) expect(layout.rightGap).toBeLessThan(1);
-        // The canvas fills its available width; equal tracks absorb the rest.
+        // Fixed tracks keep text layout stable; equal spaces absorb the rest.
         expect(
           Math.max(...layout.widths) - Math.min(...layout.widths),
         ).toBeLessThan(1);
@@ -1033,7 +1030,7 @@ for (const { width, theme } of [
           expect(layout.widths[0]).toBeCloseTo(layout.available, 0);
         } else {
           expect(layout.widths[0]).toBeCloseTo(
-            (layout.available - (layout.tracks - 1) * baseGap * percent / 100) / layout.tracks,
+            Math.min(baseWidth * percent / 100, layout.available),
             0,
           );
           if (layout.gaps.length) {
@@ -1041,7 +1038,7 @@ for (const { width, theme } of [
               Math.max(...layout.gaps) - Math.min(...layout.gaps),
             ).toBeLessThan(1);
             expect(Math.min(...layout.gaps)).toBeCloseTo(
-              (baseGap * percent) / 100,
+              (layout.available - layout.tracks * baseWidth * percent / 100) / (layout.tracks - 1),
               0,
             );
           }
@@ -1095,7 +1092,7 @@ for (const { width, theme } of [
                 getComputedStyle(layer).getPropertyValue("--notes-card-width"),
               ),
               gap: parseFloat(
-                getComputedStyle(el.querySelector(".note-grid")!).columnGap,
+                getComputedStyle(el.querySelector(".note-grid")!).rowGap,
               ),
               overflow: el.scrollWidth - el.clientWidth,
               sectionLefts: Array.from(

@@ -9,8 +9,8 @@ export function desktopNoteWidth(fullWidth: number) {
 }
 
 // Keep the nominal column count through 105%, rather than losing a whole
-// column immediately above 100%. Only the grid track is calibrated here;
-// sidebar width and the fixed 20px gap retain their existing geometry.
+// column immediately above 100%. Card width is fixed for this viewport;
+// horizontal spare space is distributed separately by the grid.
 export function desktopGridCardWidth(fullWidth: number, rightInset: number) {
   const nominal = desktopNoteWidth(fullWidth);
   const pitch = nominal + DESKTOP_NOTE_GAP;

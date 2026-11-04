@@ -80,15 +80,9 @@ function DesktopNotesZoomViewport({
       });
       frozenGrids.clear();
     }
-    function fitWidth(nextScale: number) {
-      // The spare inset is a column-count budget only. Visible tracks fit the
-      // normal canvas below, so using this budget never shifts either edge.
-      const allowance =
-        mode !== "list" && window.innerWidth > 800 &&
-        (nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001))
-          ? Math.max(0, rightInset - 12)
-          : 0;
-      return availableWidth + allowance;
+    function columnBudget(nextScale: number) {
+      const nearStop = nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001);
+      return availableWidth + (nearStop ? Math.max(0, rightInset - 12) : 0);
     }
     // Column selection keeps the owner's near-100/50 counts, but the visible
     // canvas ends at the normal right inset, matching the New button's left.
@@ -96,17 +90,12 @@ function DesktopNotesZoomViewport({
       return availableWidth;
     }
     function columnsFor(nextScale: number) {
-      return mode === "list"
-        ? 1
-        : Math.max(
-            1,
-            Math.floor(
-              // clientWidth rounds to CSS pixels while measured rectangles
-              // retain fractions. A subpixel must not discard a whole column.
-              ((fitWidth(nextScale) + 1) / nextScale + gap) /
-                (cardWidth + gap),
-            ),
-          );
+      if (mode === "list") return 1;
+      const desired = Math.floor(((columnBudget(nextScale) + 1) / nextScale + gap) / (cardWidth + gap));
+      // Fixed cards themselves must fit even when the spare budget reduces
+      // the space between columns. A single track can still clamp on resize.
+      const capacity = Math.floor((availableWidth + 1) / nextScale / cardWidth);
+      return Math.max(1, Math.min(desired, capacity));
     }
     function sidebarClock() {
       return main
@@ -152,8 +141,8 @@ function DesktopNotesZoomViewport({
       ) {
         return;
       }
-      // Fractional grid tracks absorb the remainder without moving the left
-      // edge. Same-column updates need no per-card measurements/animations.
+      // Fixed tracks never resize when zooming or toggling navigation. CSS
+      // distributes spare width between columns, without moving the left edge.
       if (
         !tracksChanged &&
         ((mode === "list" && resizeOnly) || mode !== "list") &&
