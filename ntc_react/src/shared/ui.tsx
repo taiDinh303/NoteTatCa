@@ -410,11 +410,13 @@ export function ActionMenu({
   label = tr("More actions"),
   children,
   extra,
+  align = "end",
 }: {
   items: MenuAction[];
   label?: string;
   children?: ReactNode;
   extra?: ReactNode;
+  align?: "start" | "center" | "end";
 }) {
   useLanguage();
   return (
@@ -423,7 +425,7 @@ export function ActionMenu({
         {children ?? <IconButton icon={MoreHorizontal} label={label} />}
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content className="dropdown" sideOffset={7} align="end">
+        <Dropdown.Content className="dropdown" side="bottom" sideOffset={7} align={align} collisionPadding={8}>
           {items.map((item, i) => (
             <span key={item.label}>
               {item.separator && i > 0 ? (

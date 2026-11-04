@@ -1315,18 +1315,9 @@ test("manages labels and reorders notes through keyboard-friendly controls", asy
   await expect(
     page.getByRole("link", { name: "Research", exact: true }),
   ).toBeVisible();
-  const response = page.waitForResponse(
-    (r) =>
-      r.url().endsWith("/notes/reorder") && r.request().method() === "POST",
-  );
-  await page
-    .getByRole("button", { name: "Actions for Project notes", exact: true })
-    .click();
-  await page
-    .getByRole("menuitem", { name: "Move earlier", exact: true })
-    .click();
-  expect((await response).ok()).toBeTruthy();
-  await expect(page.getByText("Note moved", { exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Actions for Project notes", exact: true }).click();
+  await expect(page.getByRole("menuitem", { name: "Move earlier", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("menuitem", { name: "Move later", exact: true })).toHaveCount(0);
 });
 
 test("creates reminders and reads the resulting inbox notification", async ({

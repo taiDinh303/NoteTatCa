@@ -28,8 +28,6 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import {
-  ArrowDown,
-  ArrowUp,
   Bell,
   FileText,
   LayoutGrid,
@@ -81,7 +79,6 @@ function NoteCard({
   trash,
   busy,
   onAction,
-  onMove,
   draggable,
   onOrganize,
   hasMascot = false,
@@ -91,7 +88,6 @@ function NoteCard({
   trash: boolean;
   busy: boolean;
   onAction: (action: "pin" | "trash" | "restore" | "delete") => void;
-  onMove: (direction: number) => void;
   draggable: boolean;
   onOrganize: (action: NoteOpenAction) => void;
   hasMascot?: boolean;
@@ -265,6 +261,7 @@ function NoteCard({
           ) : (
             <ActionMenu
               label={tr("Actions for {0}", title)}
+              align="start"
               items={[
                 {
                   label: tr("Add label"),
@@ -277,18 +274,6 @@ function NoteCard({
                   icon: Bell,
                   action: () => onOrganize("reminder"),
                   disabled: busy || guestMode,
-                },
-                {
-                  label: tr("Move earlier"),
-                  icon: ArrowUp,
-                  action: () => onMove(-1),
-                  disabled: !draggable || busy,
-                },
-                {
-                  label: tr("Move later"),
-                  icon: ArrowDown,
-                  action: () => onMove(1),
-                  disabled: !draggable || busy,
                 },
                 {
                   label: tr("Move to trash"),
@@ -497,7 +482,7 @@ export default function NotesPage({
         </div>
 
         <div className={`note-grid ${view === "list" ? "list-view" : ""}`}>
-          {group.map((note, index) => {
+          {group.map((note) => {
             const isTargetCard =
               !trash &&
               mascotPerch === note.id;
@@ -519,9 +504,6 @@ export default function NotesPage({
                   }
                 }}
                 onAction={(action) => void act(note, action)}
-                onMove={(direction) =>
-                  void reorder(group, index, index + direction)
-                }
               />
             );
           })}

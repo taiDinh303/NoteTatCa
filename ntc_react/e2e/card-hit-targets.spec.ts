@@ -52,6 +52,21 @@ for (const scenario of [
     await card.getByRole("button", { name: /^Actions for / }).click();
     await expect(page.getByRole("menuitem", { name: "Add label", exact: true })).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("menuitem", { name: "Move earlier", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("menuitem", { name: "Move later", exact: true })).toHaveCount(0);
+    const menu = page.getByRole("menu");
+    const trigger = (await card.locator('button[aria-label^="Actions for "]').boundingBox())!;
+    const rect = (await menu.boundingBox())!;
+    expect(rect.x).toBeGreaterThanOrEqual(0);
+    expect(rect.x + rect.width).toBeLessThanOrEqual(scenario.width);
+    expect(rect.y).toBeGreaterThanOrEqual(0);
+    expect(rect.y + rect.height).toBeLessThanOrEqual(900);
+    if (trigger.y + trigger.height + 7 + rect.height <= 892 && trigger.x + rect.width <= scenario.width - 8) {
+      await expect(menu).toHaveAttribute("data-side", "bottom");
+      await expect(menu).toHaveAttribute("data-align", "start");
+      expect(rect.y).toBeGreaterThanOrEqual(trigger.y + trigger.height);
+      expect(Math.abs(rect.x - trigger.x)).toBeLessThan(2);
+    }
     await page.keyboard.press("Escape");
     // The existing open button retains keyboard access.
     await card.locator(".note-open").focus();
