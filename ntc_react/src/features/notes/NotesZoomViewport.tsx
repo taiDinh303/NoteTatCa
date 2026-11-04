@@ -286,7 +286,7 @@ function DesktopNotesZoomViewport({
       const inset = getComputedStyle(view.parentElement!).paddingRight;
       rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
-      // Calibrate the fixed column-selection reference through 105%/53%.
+      // Calibrate the fixed width across 50/100/150% and both sidebar states.
       // Card width and gap stay fixed; incomplete-column space remains on the right.
       const desktop = window.innerWidth > 800;
       const mainStyle = getComputedStyle(view.parentElement!);

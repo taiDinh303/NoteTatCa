@@ -1,3 +1,7 @@
+## Ưu tiên ba mốc 50/100/150%, width và gap vẫn cố định — 2026-11-05
+
+Chủ dự án chọn cách 1: tính lại width gốc để giảm phần dư tổng thể của sáu trường hợp (50/100/150% × sidebar mở/đóng), chấp nhận không thể cân tuyệt đối mọi mốc. Calibration mới tối thiểu hóa phần dư lớn nhất, dùng tổng bình phương để phân định khi bằng nhau, trong miền width 85–105% nominal. Giữ số cột tại chính 50/100% (1910–1920px: 10/5 mở và 12/6 đóng); các yêu cầu giữ nguyên số cột đến 53/105% trước đây nhường ưu tiên cho ba mốc chính. Width chỉ chọn theo viewport, gap gốc 20px không đổi, zoom chỉ scale, mép trái/New/sidebar không đổi. Không fit riêng width hoặc gap cho từng mức zoom/trạng thái sidebar. Hàng thiếu note vẫn để slot trống.
+
 ## Đính chính mới nhất: cố định cả width và gap — 2026-11-05
 
 Theo yêu cầu mới nhất của chủ dự án, width gốc card và gap gốc (20px) đều giữ nguyên khi zoom hoặc đóng/mở sidebar. Zoom chỉ scale toàn bộ danh sách; mép trái tiếp tục thẳng New và heading. Bỏ phân phối phần dư bằng space-between và không dùng cột 1fr. Chỉ thay số cột nguyên; phần không đủ một cột nằm bên phải, chấp nhận không cân hai lề ở mọi mốc. Nội dung bên dưới nói chia dư vào width/gap là lịch sử, đã được đính chính này thay thế. Giữ range 50–150%, cỡ tham chiếu theo viewport và số cột quanh 50/100% đã xác nhận.

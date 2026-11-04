@@ -39,13 +39,13 @@ for (const width of [1920, 1910]) {
       };
     });
     const baseline = await geometry();
-    for (const percent of [99, 100, 101, 105, 50, 51, 52, 53, 100, 150]) {
+    for (const percent of [50, 100, 150, 100]) {
       await page.getByRole("button", { name: "Account menu", exact: true }).click();
       const zoom = page.getByRole("spinbutton", { name: "Zoom percentage", exact: true });
       await zoom.fill(String(percent));
       await zoom.press("Enter");
       await page.keyboard.press("Escape");
-      const expected = percent <= 53 ? 10 : percent === 150 ? 3 : 5;
+      const expected = percent === 50 ? 10 : percent === 150 ? 3 : 5;
       await expect.poll(async () => (await geometry()).columns).toBe(expected);
       await expect.poll(async () => (await geometry()).overflow).toBeLessThanOrEqual(1);
       await expect.poll(() => page.locator(".notes-zoom-layer").evaluate(el => el.getAnimations({ subtree: true }).filter(a => a.id === "notes-reflow").length)).toBe(0);
@@ -53,6 +53,9 @@ for (const width of [1920, 1910]) {
       expect(Math.abs(current.leftAnchor)).toBeLessThan(1);
       for (const gap of current.gaps) expect(gap).toBeCloseTo(20, 1);
       expect(current.remaining).toBeLessThan(current.pitch);
+      const normalRemainder = current.remaining - 38;
+      expect(Math.abs(normalRemainder)).toBeLessThan(percent === 150 ? 170 : 25);
+      console.log(`${width}px ${percent}% sidebar open: right remainder ${normalRemainder.toFixed(1)}px`);
       expect(current.card).toBe(baseline.card);
       expect(current.logicalWidth).toBe(baseline.logicalWidth);
       expect(current.logicalHeight).toBe(baseline.logicalHeight);
@@ -60,9 +63,10 @@ for (const width of [1920, 1910]) {
       if (width === 1920 && [50, 100, 150].includes(percent))
         await page.screenshot({ path: info.outputPath(`grid-${percent}-open.png`) });
       await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
-      await expect.poll(async () => (await geometry()).columns).toBe(percent <= 53 ? 12 : percent === 150 ? 4 : 6);
+      await expect.poll(async () => (await geometry()).columns).toBe(percent === 50 ? 12 : percent === 150 ? 4 : 6);
       await expect.poll(() => page.locator(".notes-zoom-layer").evaluate(el => el.getAnimations({ subtree: true }).filter(a => a.id === "notes-reflow").length)).toBe(0);
       const hidden = await geometry();
+      expect(Math.abs(hidden.remaining - 38)).toBeLessThan(25);
       expect(Math.abs(hidden.leftAnchor)).toBeLessThan(1);
       for (const gap of hidden.gaps) expect(gap).toBeCloseTo(20, 1);
       expect((await geometry()).logicalWidth).toBe(baseline.logicalWidth);
