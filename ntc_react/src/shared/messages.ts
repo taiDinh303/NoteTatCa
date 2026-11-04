@@ -1,5 +1,12 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
 export const messages: Record<string, readonly [string, string, string]> = {
+  "Send password reset link": ["Gửi liên kết đặt lại mật khẩu", "发送密码重置链接", "パスワード再設定リンクを送信"],
+  "Send a password reset link?": ["Gửi liên kết đặt lại mật khẩu?", "发送密码重置链接？", "パスワード再設定リンクを送信しますか？"],
+  "Send reset link": ["Gửi liên kết", "发送重置链接", "再設定リンクを送信"],
+  "Password reset email sent": ["Đã gửi email đặt lại mật khẩu", "密码重置邮件已发送", "パスワード再設定メールを送信しました"],
+  "Send a recovery link to {0} at the account owner's request. They will choose a new password. Current access stays unchanged until the password is reset.": ["Gửi liên kết khôi phục tới {0} theo yêu cầu của chủ tài khoản. Người dùng sẽ tự chọn mật khẩu mới. Quyền truy cập hiện tại giữ nguyên cho đến khi đặt lại mật khẩu.", "应账户所有者要求，向 {0} 发送恢复链接。用户自行设置新密码，重置前当前访问权限保持不变。", "アカウント所有者の依頼により {0} に復旧リンクを送信します。新しいパスワードは本人が設定し、再設定するまでは現在のアクセスが維持されます。"],
+  "Unlock and restore this account before requesting a password reset.": ["Hãy mở khóa và khôi phục tài khoản trước khi yêu cầu đặt lại mật khẩu.", "请先解锁并恢复此账户，再请求重置密码。", "パスワード再設定の前にアカウントを解除・復元してください。"],
+  "A verified email is required for password recovery.": ["Cần email đã xác minh để khôi phục mật khẩu.", "恢复密码需要已验证的邮箱。", "パスワード復旧には確認済みのメールアドレスが必要です。"],
   "Sync pending edits before downloading a workspace backup.": ["Đồng bộ thay đổi đang chờ trước khi tải bản sao lưu workspace.", "下载工作区备份前请先同步待处理的更改。", "ワークスペースのバックアップ前に保留中の変更を同期してください。"],
   "Table of contents": ["Mục lục","目录","目次"],
   "Note templates": ["Mẫu ghi chú","笔记模板","ノートテンプレート"],

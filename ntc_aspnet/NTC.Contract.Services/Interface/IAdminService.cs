@@ -5,6 +5,7 @@ namespace NTC.Contract.Services.Interface;
 public interface IAdminService
 {
     Task SetLockedAsync(Guid userId, bool locked);
+    Task SendPasswordResetLinkAsync(Guid userId);
     Task<AdminStatistics> GetStatisticsAsync();
     Task<BasePaginatedList<AdministrativeAuditResponse>> GetAuditEventsAsync(int page, int size, Guid? targetUserId, AdministrativeAction? action);
 }

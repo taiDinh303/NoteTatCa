@@ -21,16 +21,14 @@ for (const [width, admin] of [
       .fill("Synthetic-password-123!");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await expect(page).toHaveURL(admin ? /\/admin\/overview$/ : /\/notes$/);
-    if (!admin) {
-      if (width < 800)
-        await page
-          .getByRole("button", { name: "Open navigation", exact: true })
-          .click();
+    if (width < 800)
       await page
-        .getByRole("link", { name: "Settings", exact: true })
-        .filter({ visible: true })
+        .getByRole("button", { name: "Open navigation", exact: true })
         .click();
-    } else await page.goto("/admin/settings");
+    await page
+      .getByRole("link", { name: "Settings", exact: true })
+      .filter({ visible: true })
+      .click();
     const base = admin ? "/admin/settings" : "/settings";
     await expect(page).toHaveURL(
       new RegExp(base + (width < 800 ? "$" : "/account$")),

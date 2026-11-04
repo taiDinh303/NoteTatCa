@@ -7,6 +7,7 @@ using NTC.ModelViews.Notifications;
 using NTC.ModelViews.UserInfoModelView;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using NTC.API.Controllers.Shared;
 using NTC.Contract.Services.Interface;
 using NTC.ModelViews.Administration;
@@ -22,6 +23,9 @@ public sealed class AdminController(IUserService users, IAdminService admin) : B
     public async Task<IActionResult> GetUser(Guid id) => Success(await users.GetByIdAsync(id));
     [HttpPost("users")] [ProducesResponseType(typeof(NTC.Core.Base.BaseResponse<bool>), 200)]
         public async Task<IActionResult> Create(CreateUserModelView request) { await users.CreateAsync(request); return Success(true); }
+    [HttpPost("users/{id:guid}/password-reset"), EnableRateLimiting("auth")]
+    [ProducesResponseType(typeof(BaseResponse<bool>), 200)]
+    public async Task<IActionResult> PasswordReset(Guid id) { await admin.SendPasswordResetLinkAsync(id); return Success(true); }
     [HttpPatch("users/{id:guid}/lock")] [ProducesResponseType(typeof(NTC.Core.Base.BaseResponse<bool>), 200)]
         public async Task<IActionResult> Lock(Guid id, LockUserRequest request) { await admin.SetLockedAsync(id, request.IsLocked); return Success(true); }
     [HttpGet("statistics")] [ProducesResponseType(typeof(BaseResponse<AdminStatistics>), 200)]

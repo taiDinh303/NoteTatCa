@@ -22,6 +22,7 @@ import { SessionExpiredDialog, ShellAccountMenu } from "./ShellControls";
 
 function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
   useLanguage();
+  const { pathname } = useLocation();
   return (
     <>
       <nav className="primary-nav" aria-label={tr("Administration")}>
@@ -42,28 +43,17 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
           {tr("Audit trail")}
         </NavLink>
       </nav>
-      <div className="sidebar-section-heading">
-        <span>{tr("YOUR ADMIN ACCOUNT")}</span>
-      </div>
-      <nav className="primary-nav" aria-label={tr("Administrator settings")}>
-        <NavLink to="/admin/settings/profile" onClick={onNavigate}>
-          <Users size={18} />
-          {tr("Profile")}
-        </NavLink>
-        <NavLink to="/admin/settings/account" onClick={onNavigate}>
-          <Settings size={18} />
-          {tr("Account & security")}
-        </NavLink>
-        <NavLink to="/admin/settings/sessions" onClick={onNavigate}>
-          <ShieldCheck size={18} />
-          {tr("Active sessions")}
-        </NavLink>
-        <NavLink to="/admin/preferences" onClick={onNavigate}>
-          <Settings size={18} />
-          {tr("App settings")}
-        </NavLink>
-      </nav>
       <div className="sidebar-bottom">
+        <NavLink
+          to="/admin/settings"
+          className={`settings-link ${/^\/admin\/(settings|preferences)(\/|$)/.test(pathname) ? "active" : ""}`}
+          onPointerEnter={warmSettings}
+          onFocus={warmSettings}
+          onClick={onNavigate}
+        >
+          <Settings size={18} />
+          {tr("Settings")}
+        </NavLink>
         <div className="sidebar-footer">
           {tr("Administration console")}
           <span>NoteTatCa</span>

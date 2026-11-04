@@ -9,6 +9,7 @@ import {
   ChevronRight,
   FileText,
   LockKeyhole,
+  Mail,
   Pencil,
   Plus,
   RefreshCw,
@@ -200,6 +201,7 @@ function Accounts() {
   const [create, setCreate] = useState(false);
   const [detailsFor, setDetailsFor] = useState<Account>();
   const [rolesFor, setRolesFor] = useState<Account>();
+  const [passwordResetFor, setPasswordResetFor] = useState<Account>();
   const [target, setTarget] = useState<{
     account: Account;
     action: "lock" | "deactivate" | "restore";
@@ -323,6 +325,16 @@ function Accounts() {
                             disabled: !!user.deactivatedAt,
                           },
                           {
+                            label: tr("Send password reset link"),
+                            icon: Mail,
+                            action: () => setPasswordResetFor(user),
+                            disabled:
+                              user.isLocked ||
+                              !!user.deactivatedAt ||
+                              !user.emailConfirmed ||
+                              !user.email,
+                          },
+                          {
                             label: user.isLocked
                               ? tr("Unlock account")
                               : tr("Lock account"),
@@ -437,6 +449,21 @@ function Accounts() {
       ) : null}
       {rolesFor ? (
         <Memberships user={rolesFor} onClose={() => setRolesFor(undefined)} />
+      ) : null}
+      {passwordResetFor ? (
+        <ConfirmDialog
+          title={tr("Send a password reset link?")}
+          description={tr(
+            "Send a recovery link to {0} at the account owner's request. They will choose a new password. Current access stays unchanged until the password is reset.",
+            passwordResetFor.email,
+          )}
+          confirmLabel={tr("Send reset link")}
+          onClose={() => setPasswordResetFor(undefined)}
+          onConfirm={async () => {
+            await admin.sendPasswordReset(passwordResetFor.id);
+            toast.success(tr("Password reset email sent"));
+          }}
+        />
       ) : null}
       {detailsFor ? (
         <AccountDetails

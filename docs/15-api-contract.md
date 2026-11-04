@@ -1,5 +1,11 @@
 # 15 — Contract API NoteTatCa
 
+## Bổ sung admin hỗ trợ đặt lại mật khẩu — 2026-11-04
+
+`POST /api/v1/admin/users/{id}/password-reset`: Admin-only, không body; trả envelope `data: true` sau khi email sender chấp nhận gửi link tới email verified hiện có của tài khoản. Không nhận email/token/password từ admin, không trả link/token trong response. UI có xác nhận theo yêu cầu chủ tài khoản. Không thay password, xác minh email hoặc revoke sessions lúc gửi; user hoàn tất qua `/api/v1/auth/reset-password` hiện có, reset thành công mới revoke sessions và vô hiệu token đã dùng.
+
+Lỗi:401 chưa đăng nhập,403 không Admin,404 account không tồn tại,400 account khóa/deactivated/chưa verified hoặc không email,429 giới hạn policy auth hiện có (cộng thêm global API limit),500 email sender lỗi. Không tự mở khóa/khôi phục account. Request và sender acceptance ghi structured server logs actor/target/time, không token/email/body; chưa đưa vào database Audit trail để giữ schema/check constraint cũ. Không có migration cho chức năng này. Bộ kiểm thử dùng captured mail/SQLite riêng; không chứng minh delivery thực tế.
+
 > 2026-10-17 | CURRENT từ controller/DTO/OpenAPI và integration tests. React client được triển khai tại ntc_react, xem FRONTEND-IMPLEMENTATION.
 
 ## Điểm vào và envelope

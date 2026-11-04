@@ -228,6 +228,9 @@ export class InboxRepository {
 }
 export class AdminRepository {
   constructor(readonly api: ApiClient) {}
+  sendPasswordReset(id: string) {
+    return this.api.request<boolean>(`/admin/users/${id}/password-reset`, { method: "POST" });
+  }
   user(id: string) {
     return this.api.request<Account>(`/admin/users/${id}`);
   }

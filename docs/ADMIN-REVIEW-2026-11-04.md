@@ -14,7 +14,7 @@ Header toàn chiều ngang, logo/menu cùng vị trí với user, cùng màu/fon
 
 | Nhóm | Đang có | Thiếu hoặc giới hạn |
 | --- | --- | --- |
-| Tài khoản | Tìm/phân trang, tạo User/Admin, xem metadata, khóa/mở khóa, vô hiệu hóa/khôi phục, xem/gán vai trò | Chưa có màn hình sửa hồ sơ người khác, thu hồi phiên theo tài khoản, gửi link hỗ trợ khôi phục; self-service không phải công cụ admin |
+| Tài khoản | Tìm/phân trang, tạo User/Admin, xem metadata, khóa/mở khóa, vô hiệu hóa/khôi phục, xem/gán vai trò; gửi link đặt lại mật khẩu theo yêu cầu chủ tài khoản | Chưa có màn hình sửa hồ sơ người khác hoặc thu hồi phiên riêng theo tài khoản; self-service không phải công cụ admin |
 | Quyền | Admin/User, CRUD vai trò tùy chỉnh và membership | Vai trò tùy chỉnh chưa tương đương tập quyền API chi tiết; chưa có ma trận capability |
 | Bảo vệ admin | Chặn tự khóa, tự vô hiệu hóa, tự gỡ Admin; thay role/khóa thu hồi phiên | Cần rà invariant luôn còn ít nhất một admin hoạt động khi tác động admin khác, kể cả yêu cầu đồng thời |
 | Tổng quan | Tổng tài khoản, tài khoản khóa, note active/trash, reminder active, email pending | Chưa có số lỗi/retry/abandoned, backlog quá hạn, trạng thái worker/lần chạy gần nhất; pending không chứng minh worker khỏe |
@@ -49,9 +49,17 @@ Phạm vi đã chọn: trong app trước, email sau. Chi tiết dưới là đ�
 
 ## Mở rộng đề xuất sau hai ưu tiên
 
-1. Hỗ trợ tài khoản: chỉnh display name/phone với lý do và audit, revoke sessions, gửi link khôi phục có hạn. Không xem mật khẩu/token hoặc đặt mật khẩu âm thầm.
+1. Hỗ trợ tài khoản: chỉnh display name/phone với lý do và audit, revoke sessions. Gửi link khôi phục đã có source trong đợt bổ sung cùng ngày, token theo Identity hiện có; không xem mật khẩu/token hoặc đặt mật khẩu âm thầm.
 2. Nhật ký dễ tra cứu, lọc actor/time, liên kết tài khoản; bảo vệ admin hoạt động cuối cùng.
 3. Cấu hình hệ thống: đăng ký mới, banner bảo trì, hạn mức có validation/version/audit. Không đưa JWT/DB/SMTP secrets vào giao diện.
 4. Hàng đợi hỗ trợ/feedback; xóa tài khoản thực theo quyết định vòng đời dữ liệu, xác nhận hậu quả và chính sách lưu audit.
 
 Các mục mở rộng là PROPOSED, không coi là đã duyệt triển khai toàn bộ. Kết quả lệnh và giới hạn tại [worklog](worklog.md).
+
+## Bổ sung theo yêu cầu trực tiếp cùng ngày
+
+Sidebar admin gom bốn mục Profile/Account & security/Active sessions/App settings thành một Settings ở cuối, dùng index/tabs hiện có. Đường dẫn con cũ tiếp tục hoạt động.
+
+Menu Accounts thêm Send password reset link, xác nhận email đích trước gửi. Chỉ Admin dùng endpoint mới, gửi tới email đã xác minh lưu trong tài khoản; chặn account khóa/deactivated/chưa verified. Dùng rate limit auth hiện có. Không gửi mật khẩu tạm, không trả token/link cho admin, không đổi password/revoke phiên khi chỉ yêu cầu gửi. User dùng link email qua luồng reset hiện có; reset thành công mới thu hồi phiên cũ, token không dùng lại được.
+
+Nhật ký reset là structured server logs chứa actor/target ID và thời điểm yêu cầu, thêm event accepted sau khi email sender thành công. Không chứa email/body/token; không thêm enum vào AdministrativeAuditEvent vì check constraint hiện chỉ chấp nhận1–12. Vì vậy thao tác này chưa xuất hiện trong trang Audit trail của database. Không thay schema/migration hoặc cấu hình SMTP; kiểm thử chỉ captured mail giả. Provider chấp nhận gửi không chứng minh email đã tới hộp thư.

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NTC.Contract.Repositories.Entities;
 using NTC.Contract.Repositories.Entities.Tasks;
 using NTC.Contract.Repositories.IUOW;
@@ -11,9 +12,27 @@ using NTC.Services.Security;
 using NTC.Services.Shared;
 using NTC.Contract.Repositories.Entities.Identity;
 namespace NTC.Services.Service;
-public sealed class AdminService(IUnitOfWork work, ICurrentUser actor, TimeProvider clock, UserManager<ApplicationUser> users)
+public sealed class AdminService(IUnitOfWork work, ICurrentUser actor, TimeProvider clock, UserManager<ApplicationUser> users,
+    IEmailService email, ILogger<AdminService> logger)
     : BaseService(work, actor, clock), IAdminService
 {
+    public async Task SendPasswordResetLinkAsync(Guid userId)
+    {
+        RequireAdmin();
+        var user = await users.FindByIdAsync(userId.ToString()) ?? throw DomainErrors.NotFound("Account");
+        if (user.IsLocked || user.DeletedTime != null)
+            throw DomainErrors.Invalid("Unlock and restore this account before requesting a password reset.");
+        if (!user.EmailConfirmed || string.IsNullOrWhiteSpace(user.Email))
+            throw DomainErrors.Invalid("A verified email is required for password recovery.");
+
+        // Audit metadata only. The reset token and email body must never reach logs or API responses.
+        logger.LogInformation("Administrator {ActorUserId} requested password recovery for account {TargetUserId} at {OccurredAt}",
+            UserId, userId, UtcNow);
+        var token = await users.GeneratePasswordResetTokenAsync(user);
+        await email.SendForgotPasswordLinkAsync(user, token);
+        logger.LogInformation("Password recovery email accepted for account {TargetUserId}, requested by administrator {ActorUserId}",
+            userId, UserId);
+    }
     public async Task SetLockedAsync(Guid userId, bool locked)
     {
         RequireAdmin(); if (userId == UserId) throw DomainErrors.Invalid("You cannot lock your current administrator account.");
