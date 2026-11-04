@@ -1,3 +1,7 @@
+## Admin: đồng nhất giao diện và ưu tiên vận hành — 2026-11-04
+
+Chủ dự án yêu cầu đồng nhất admin với user và rà công cụ quản trị còn thiếu; đã chọn thông báo trong app trước/email sau, ưu tiên thông báo và theo dõi nhắc nhở lỗi. Giao diện và regression của đợt này ghi ở worklog; chức năng announcement/monitoring chưa triển khai. Hiện trạng, thiết kế kế tiếp và các hạng mục PROPOSED tại [rà soát admin](ADMIN-REVIEW-2026-11-04.md). Giữ privacy/ownership; không mặc định cấp quyền đọc/sửa note người khác.
+
 ## Rollout production — 2026-11-02
 
 DB PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration; tài khoản/note đối soát không đổi. API Render commit1e10219 đãLIVE trước khi phát hành UI backup/import và cập nhật Privacy. Auto-deploy thực tế của service đang bật theo commit, khác file render.yaml chỉ là tham chiếu; không thay env/secret hoặc tạo deploy trùng. Chứng cứ và kết quả production/UI ở [worklog](worklog.md).

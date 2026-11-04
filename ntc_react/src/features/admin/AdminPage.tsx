@@ -47,7 +47,6 @@ export default function AdminPage({
   return (
     <>
       <PageHeading
-        eyebrow={tr("ADMINISTRATION")}
         title={
           section === "overview"
             ? tr("System overview")
@@ -127,7 +126,6 @@ function Overview() {
             </div>
             <span>{tr(statisticsLabels[key] ?? key)}</span>
             <strong>{value.toLocaleString(currentLanguage())}</strong>
-            <small>{tr("Current system total")}</small>
           </div>
         ))}
       </div>
@@ -148,17 +146,12 @@ function Overview() {
           <span>{tr("Trace administrative changes and their actors.")}</span>
         </Link>
       </div>
-      <div className="privacy-callout">
-        <ShieldCheck size={30} />
-        <div>
-          <h2>{tr("Privacy is part of the design.")}</h2>
-          <p>
-            {tr(
-              "Administrative access includes account metadata and aggregate totals. It never grants access to another person’s note titles or content.",
-            )}
-          </p>
-        </div>
-      </div>
+      <p className="admin-privacy-note">
+        <ShieldCheck size={16} aria-hidden="true" />
+        {tr(
+          "Administrative access includes account metadata and aggregate totals. It never grants access to another person’s note titles or content.",
+        )}
+      </p>
     </>
   );
 }

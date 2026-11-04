@@ -1555,6 +1555,13 @@ test("administrator has a separate responsive area with no personal workspace re
   await expect(
     page.getByRole("navigation", { name: "Administration", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Hide sidebar", exact: true }).click();
+  await expect(page.locator("#admin-navigation")).toHaveAttribute("inert", "");
+  await expect(page.getByRole("navigation", { name: "Administration", exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Show sidebar", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Show sidebar", exact: true }).click();
+  await expect(page.getByRole("navigation", { name: "Administration", exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "New note", exact: true }),
   ).toHaveCount(0);
@@ -1614,6 +1621,7 @@ test("administrator has a separate responsive area with no personal workspace re
     fullPage: true,
   });
   await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => page.locator(".admin-shell > .main-column").evaluate((element) => element.getBoundingClientRect().left)).toBe(0);
   await expect
     .poll(() =>
       page.evaluate(
@@ -1637,6 +1645,14 @@ test("administrator has a separate responsive area with no personal workspace re
   await expect(
     page.getByRole("heading", { name: "Accounts", exact: true }),
   ).toBeVisible();
+  await page.setViewportSize({ width: 320, height: 740 });
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/admin/overview");
+  await page.getByRole("button", { name: "Use dark theme", exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect.poll(() => page.locator(".admin-shell > .main-column").evaluate((element) => element.getBoundingClientRect().left)).toBeCloseTo(230.4, 0);
+  await page.screenshot({ path: "../artifacts/frontend/admin-dark-desktop.png", fullPage: true });
   expect(personalRequests).toEqual([]);
   expect(errors).toEqual([]);
 });
