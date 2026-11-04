@@ -20,6 +20,7 @@ import { auth, cache, connection, preparation } from "./runtime";
 import { StartupPresentation } from "./startup-context";
 import { useAuth } from "../shared/hooks";
 import { warmNoteEditor } from "../features/editor/loadNoteEditor";
+import { warmRichEditor } from "../features/editor/loadRichEditor";
 import { Button, ErrorBanner } from "../shared/ui";
 import { isAdministrator } from "../application/access";
 import type {
@@ -200,6 +201,9 @@ export function WorkspaceReady({ children }: { children: ReactNode }) {
           void import("../features/settings/SettingsPage").catch(() => {});
           // The editor is warmed in the background; slow editor chunks never block sign-in.
           warmNoteEditor();
+          // Prepare editing once in the background; cached View never waits
+          // for this module and never constructs an editor just to read a note.
+          warmRichEditor();
           void import("../features/labels/LabelsManager").catch(() => {});
         }
       })

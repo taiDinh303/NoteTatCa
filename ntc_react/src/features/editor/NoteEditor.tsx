@@ -56,7 +56,9 @@ import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
 import { ContentZoomSession } from "./contentZoomSession";
 import ContentZoomOutlet from "./ContentZoomOutlet";
-import RichEditor, { ReadOnlyContent } from "./RichEditor";
+import RichEditor from "./RichEditorLoader";
+import ReadOnlyContent from "./ReadOnlyContent";
+import { warmRichEditor } from "./loadRichEditor";
 export type NoteOpenAction = "labels" | "reminder";
 export type NoteEditorProps = {
   noteId?: string;
@@ -92,16 +94,19 @@ function NoteEditorSession({
   const [createdId, setCreatedId] = useState<string>();
   const [fullscreen, setFullscreen] = useState(false);
   const resolvedId = noteId ?? createdId;
+  const listSnapshot = resolvedId ? workspace.cachedNote(resolvedId) : undefined;
   const query = useQuery({
     networkMode: "always",
     queryKey: workspace.key("note", resolvedId),
     queryFn: () => notes.find(resolvedId!),
     enabled: !!resolvedId,
-    staleTime: 0,
-    initialData: () => resolvedId ? workspace.cachedNote(resolvedId)?.note : undefined,
-    initialDataUpdatedAt: () => resolvedId ? workspace.cachedNote(resolvedId)?.updatedAt : undefined,
+    staleTime: 30_000,
+    initialData: () => listSnapshot?.note,
+    initialDataUpdatedAt: () => listSnapshot?.updatedAt,
   });
-  if (resolvedId && !query.data)
+  const currentNote = listSnapshot && (listSnapshot.updatedAt ?? 0) > query.dataUpdatedAt
+    ? listSnapshot.note : query.data;
+  if (resolvedId && !currentNote)
     return (
       <Modal
         open
@@ -123,12 +128,12 @@ function NoteEditorSession({
         </footer>
       </Modal>
     );
-  if (query.data && !editing && initialAction === "labels")
-    return <NoteLabelsDialog note={query.data} onClose={onClose} />;
-  if (query.data && !editing)
+  if (currentNote && !editing && initialAction === "labels")
+    return <NoteLabelsDialog note={currentNote} onClose={onClose} />;
+  if (currentNote && !editing)
     return (
       <NoteViewer
-        note={query.data}
+        note={currentNote}
         onClose={onClose}
         onEdit={() => setEditing(true)}
         onRestored={() => { void query.refetch(); void workspace.cache.invalidateQueries({ queryKey: workspace.key("notes") }); }}
@@ -140,7 +145,7 @@ function NoteEditorSession({
   return (
     <EditorSession
       key={resolvedId ?? "new"}
-      initial={query.data}
+      initial={currentNote}
       onClose={onClose}
       onView={(note) => {
         setCreatedId(note.id);
@@ -410,7 +415,7 @@ function NoteViewer({
         </Popover.Root>
         <div className="note-view-actions">
           <ContentZoomOutlet popup color={note.backgroundColor ?? undefined} />
-          <Button variant="ghost" onClick={onEdit}>
+          <Button variant="ghost" onClick={onEdit} onPointerEnter={warmRichEditor} onFocus={warmRichEditor} onTouchStart={warmRichEditor}>
             <Pencil size={15} />
             {tr("Edit")}
           </Button>

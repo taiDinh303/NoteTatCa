@@ -1,6 +1,23 @@
 # Độ phản hồi mở note — 2026-11-03
 
-## Kết quả và thay đổi
+## Bổ sung: đọc trực tiếp cache danh sách, không dựng Tiptap khi View
+
+Yêu cầu tiếp theo của chủ dự án: mở note bằng dữ liệu đã có ở danh sách, giảm việc tải/dựng lại như cảm nhận từ Keep. Ảnh Keep cũng cho thấy một lớp note nổi; không đủ chứng minh họ dùng cùng DOM card hay biết thuật toán nội bộ. Modal không đồng nghĩa tải một trang/dataset mới. NoteTatCa vốn đã seed cache từ danh sách; phần còn dư là khởi tạo Tiptap ở View và detail query luôn stale.
+
+- View mới render rich JSON từ cache thành React elements theo đủ13node/8mark của schema hiện hành, không dựng Editor/EditorView/Tiptap. Giữ heading/mục lục, alignment, font/color/highlight, code/list/checklist và zoom/pan. Chỉ dựng bộ soạn thảo khi Edit; module editing vẫn được warm một lần ở nền để không chuyển khoảng chờ sang lần bấm Edit đầu. Không render raw HTML, không dùng tag/attrs/style tùy ý; URL chỉ http/https/mailto và text được React escape.
+- Detail cache mới dùng30giây freshness. Mở lặp khi còn mới không GET lại; quá hạn hoặc invalidate vẫn đọc nền. Khi list snapshot mới hơn detail cache thì chọn ngay bản list mới; metadata version và coordinator/pending protection vẫn giữ. Không dùng cache khác owner/trash, không bỏ version conflict hoặc chờ local commit trước Close/View. Tham khảo [TanStack defaults](https://tanstack.com/query/latest/docs/framework/react/guides/important-defaults).
+- Note overlay chỉ dim nền, bỏ blur desktop tương tự ảnh tham khảo; không thay gesture/card width, View/Edit hay engine soạn thảo. Vẫn có khung note nổi và DOM hiển thị riêng, dùng chung dữ liệu nguồn; không tuyên bố tái sử dụng nguyên DOM card hoặc đạt latency giống Keep.
+- Gói NoteEditor từ546KB trước tách còn khoảng30KB +14KB shared NoteTools; RichEditor506KB tách riêng. Đây là kích thước JS build chưa gzip, không phải tổng tải app. Offline worker vẫn có thể precache thư viện ở nền; View không cần đợi thư viện đó.
+
+Production local cuối: desktop note ngắn mở112→62ms,90k/450paragraph174→77ms, View→Edit ngắn88→75ms,90kEdit118→134ms, reopen39→35ms. Viewport393 sau sửa mở33ms/90k65ms. Từng sample click→DOM/RAF, không median/p95 INP/điện thoại thật/production cloud/Keep. First Edit tài liệu lớn chưa nhanh hơn; không claim mọi thao tác đều cải thiện. Drag200card cuối p9533,4ms/5gaps>32ms, không thay thuật toán drag. Raw `artifacts/direct-note-baseline`, `direct-note-core`, `direct-note-final`, `direct-note-final-cache`.
+
+Browser kiểm mới giữ RichEditor chunk không trả về (serviceWorkers:block riêng ca này để tránh precache vượt qua route) nhưng3lần View vẫn hiện từ cache,0detailGET; Sync now cập nhật list mới thì View lấy bản mới dù detail cache cũ; fast-forward31giây kiểm1GETnền; Edit mới chờ chunk, release→gõ→View giữ nội dung. Chế độ offline vẫn được kiểm bằng suite riêng, không tắt worker của sản phẩm.
+
+Validation:42ca Chromium khác nhau PASS qua3zoom-core +39regressions về màu/font/geometry/TOC/readonly/zoom/pan/cache/offline/mascot; sau chỉnh chọn snapshot mới và background warm chạy lại14/14cache/interaction/offline PASS. Thêm4workspace focus/conflict/reminder→Inbox/account isolation PASS. Unit143/143 và environment4/4PASS;3unit mới kiểm định dạng, text/URL/style injection và duplicate-heading focus/update. React build/lint và .NET Release strict0warnings/errors PASS. Lượt đầu3zoom FAIL thiếu attribute contenteditable=false (đã giữ lại contract); ca gate đầu bị worker precache nên harness block worker riêng và chạy lại PASS. Hai lệnh Vitest đầu sai root/config không chạy test; dev warning spread-key đã sửa giữ nguyên key. Không coi các lượt lỗi/dừng sớm là PASS.
+
+Không DB thật/mail thật/migration/manual deploy hoặc sửa nội dung note cũ. Kiểm production sau push sẽ ghi worklog local. Khi schema mở rộng, cập nhật renderer cùng schema/format regression tests.
+
+## Lượt trước: giảm khoảng chờ lazy và công việc chuột
 
 Theo yêu cầu chủ dự án, kiểm lại mở note và chuột trong note; bổ sung kiểm web production bằng tài khoản mẫu được cung cấp. Có độ trễ có thể giảm ở lần mở đầu, không phải mọi thao tác đều chờ API.
 

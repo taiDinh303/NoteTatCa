@@ -54,6 +54,81 @@ test("a cold editor shows progress while its module is held and opens after rele
   }
 });
 
+test.describe("direct cached view", () => {
+// Hold the actual editor import, rather than an asset already precached by the
+// offline worker. Offline functionality is covered by the separate regressions.
+test.use({ serviceWorkers: "block" });
+test("cached View opens without the editing bundle and fresh reopens do not GET the note again", async ({ page, request }, info) => {
+  expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  let editorRequested = false;
+  let detailGets = 0;
+  await page.route(/\/assets\/RichEditor-[^/]+\.js$/, async route => {
+    editorRequested = true;
+    await gate;
+    await route.continue();
+  });
+  await page.route("**/api/v1/notes/*", async route => {
+    if (route.request().method() === "GET" && /\/notes\/[^/]+$/.test(new URL(route.request().url()).pathname)) detailGets++;
+    await route.continue();
+  });
+  try {
+    await page.goto("/login");
+    await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
+    await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    const open = page.getByRole("button", { name: "Open Project notes", exact: true });
+    await expect(open).toBeVisible();
+    const getsBefore = detailGets;
+    for (let index = 0; index < 3; index++) {
+      await open.click();
+      const viewer = page.getByRole("dialog", { name: "View note", exact: true });
+      await expect(viewer.getByRole("region", { name: "Note content" })).toBeVisible();
+      expect(detailGets).toBe(getsBefore);
+      await viewer.getByRole("button", { name: "Close", exact: true }).click();
+    }
+    await page.route("**/api/v1/notes?*", async route => {
+      const response = await route.fetch();
+      const body = await response.json();
+      for (const note of body.data.items) {
+        if (note.title === "Project notes") {
+          note.content = "Updated in the list cache";
+          note.documentJson = JSON.stringify({ type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: note.content }] }] });
+        }
+      }
+      await route.fulfill({ response, json: body });
+    });
+    await page.getByRole("button", { name: "Account menu", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Sync now", exact: true }).click();
+    await expect(open).toContainText("Updated in the list cache");
+    await open.click();
+    await expect(page.getByRole("region", { name: "Note content" })).toHaveText("Updated in the list cache");
+    expect(detailGets).toBe(getsBefore);
+    await page.getByRole("button", { name: "Close", exact: true }).click();
+    await page.unroute("**/api/v1/notes?*");
+    await page.clock.install();
+    await page.clock.fastForward(31_000);
+    await open.click();
+    await expect(page.getByRole("region", { name: "Note content" })).toBeVisible();
+    await expect.poll(() => detailGets).toBe(getsBefore + 1);
+    await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
+    await expect.poll(() => editorRequested).toBe(true);
+    await expect(page.getByText("Loading editor…", { exact: true })).toBeVisible();
+    release();
+    const textbox = page.getByRole("textbox", { name: "Note content", exact: true });
+    await expect(textbox).toBeVisible();
+    await textbox.fill("The shared cached document remains editable.");
+    await page.getByRole("button", { name: "View", exact: true }).click();
+    await expect(page.getByRole("region", { name: "Note content" })).toHaveText("The shared cached document remains editable.");
+    await info.attach("direct-cache-view", { body: JSON.stringify({ freshOpens: 3, freshExtraDetailGets: 0, staleDetailGets: detailGets - getsBefore, viewReadyWhileEditingBundleHeld: true }), contentType: "application/json" });
+  } finally {
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+  }
+});
+});
+
 for (const width of [1440, 393]) {
   test(`audit cached opening, switching, saving and pinning ${width}`, async ({ page, request }, info) => {
     expect((await request.post(fixture + "/__fixture/reset")).ok()).toBeTruthy();
@@ -78,6 +153,7 @@ for (const width of [1440, 393]) {
     await mark(page, '[role="region"][aria-label="Note content"]');
     await open.click();
     results.firstCachedOpenMs = await elapsed(page);
+    results.detailGetStarted = held;
     results.cachedOpenBeforeGetReleased = true;
     release();
     await page.unrouteAll({ behavior: "wait" });

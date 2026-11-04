@@ -4520,6 +4520,8 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
    fade on each mode switch flashes both the note and the whole workspace. */
 .modal-overlay:has(~ .note-editor-modal) {
   animation: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 .modal.note-editor-modal {
   height: calc(100dvh / var(--interface-scale) - 176px);

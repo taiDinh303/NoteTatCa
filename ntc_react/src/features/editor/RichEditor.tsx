@@ -90,42 +90,6 @@ export interface EditorCommands {
   focus: () => void;
   plainText: () => string;
 }
-export function ReadOnlyContent({ documentJson }: { documentJson: string }) {
-  const language = useLanguage();
-  const [content] = useState(() => JSON.parse(documentJson));
-  const editor = useEditor({
-    shouldRerenderOnTransaction: false,
-    extensions: extensions.filter(
-      (extension) => extension.name !== "placeholder",
-    ),
-    content,
-    editable: false,
-    editorProps: {
-      attributes: {
-        class: "rich-editor",
-        "aria-label": tr("Note content"),
-        role: "region",
-      },
-    },
-  });
-  useEffect(() => {
-    editor?.setOptions({
-      editorProps: {
-        attributes: {
-          class: "rich-editor",
-          "aria-label": tr("Note content"),
-          role: "region",
-        },
-      },
-    });
-  }, [editor, language]);
-  return (
-    <ContentZoom>
-      <NoteOutline editor={editor} />
-      <EditorContent editor={editor} />
-    </ContentZoom>
-  );
-}
 export default memo(function RichEditor({
   initial,
   onChange,
