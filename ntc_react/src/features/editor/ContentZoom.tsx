@@ -27,6 +27,7 @@ function DesktopContentZoom({
   const stage = useRef<HTMLDivElement>(null);
   const layer = useRef<HTMLDivElement>(null);
   const change = useRef<(value: number) => void>(() => {});
+  const synchronizeLayout = useRef<() => void>(() => {});
   const session = useContext(ContentZoomSession);
   const savedPercent = session?.percent;
   const savedScroll = session?.scroll;
@@ -118,18 +119,23 @@ function DesktopContentZoom({
       if (Math.round(target) === 100) { hand.current = false; setHandEnabled(false); }
       setPercent(Math.round(target));
     };
-    const observer = new ResizeObserver(() => {
+    const resize = () => {
       width = view.clientWidth;
       document.style.width = `${width}px`;
       document.style.minHeight = `${view.clientHeight}px`;
       height = document.offsetHeight;
-      schedule();
-    });
+      // Toolbar/footer changes must settle the scroll extent before paint,
+      // not leave the previous mode's height until the next animation frame.
+      if (frame) cancelAnimationFrame(frame);
+      paint();
+    };
+    synchronizeLayout.current = resize;
+    const observer = new ResizeObserver(resize);
     document.style.width = `${width}px`;
     document.style.minHeight = `${view.clientHeight}px`;
     observer.observe(view);
     observer.observe(document);
-    schedule();
+    paint();
     function rememberScroll() {
       if (savedScroll && !restoreScroll)
         savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
@@ -280,6 +286,7 @@ function DesktopContentZoom({
     view.addEventListener("lostpointercapture", pointerEnd);
     view.addEventListener("click", click, true);
     return () => {
+      synchronizeLayout.current = () => {};
       change.current = () => {};
       observer.disconnect();
       view.removeEventListener("scroll", rememberScroll);
@@ -301,6 +308,9 @@ function DesktopContentZoom({
       view.removeEventListener("click", click, true);
     };
   }, [savedPercent, savedScroll, mobile]);
+  // React mode changes can resize the toolbar before ResizeObserver delivery.
+  // Settle that commit synchronously, ahead of the next browser frame.
+  useLayoutEffect(() => { synchronizeLayout.current(); });
   function commit(input: HTMLInputElement) {
     const value = input.value.trim() ? Number(input.value) : NaN;
     if (Number.isFinite(value)) change.current(value);

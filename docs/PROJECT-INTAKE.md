@@ -1,3 +1,9 @@
+## View/Edit không sinh thanh cuộn tạm — 2026-11-05
+
+Theo phản hồi mới nhất, ContentZoom đồng bộ width/min-height/scroll extent ngay trong layout commit của React khi đổi mode và đồng bộ ResizeObserver trước paint, thay vì chờ rAF kế tiếp. Hủy frame đo cũ khi resize, giữ scheduler rAF cho gesture zoom. Viewport dùng scrollbar-gutter stable để không đổi bề ngang khi có/không có scrollbar thật. Thanh công cụ vẫn overflow-x auto để kéo ngang/chạm/bàn phím, nhưng ẩn native scrollbar bằng scrollbar-width none và WebKit scrollbar display none. Scrollbar thật của document dài vẫn giữ; không cấm cuộn hoặc che nội dung dài, không thêm delay/sleep/timeout vào View/Edit.
+
+Regression desktop/mobile lấy mẫu mỗi rAF250ms qua Edit/View/Edit/View: note ngắn không có overflow ngang/dọc tạm, clientWidth ổn định, toolbar mobile kéo ngang được dù ẩn rail, không ResizeObserver errors. Unified regression giữ scroll400, frame/editor identity sau lần Edit đầu, Undo/Redo và tạo note. Không thay autosave/ownership/API/schema hoặc width/gap grid.
+
 ## Không chớp lại note trước khi mở note khác — 2026-11-05
 
 NoteSurfaceHost đăng ký metadata theo session note/action và token của Frame. Chỉ hiện khi metadata khớp đúng phiên đang mở, cleanup giải phóng đúng token và bỏ title/style/onClose cũ, không để cleanup phiên cũ xóa phiên mới. Khung DOM vẫn dùng lại. View giữ ReadOnlyContent ổn định, không tự thay bằng Tiptap sau hai rAF nữa; bấm Edit mới tạo editor, rồi giữ instance/Undo qua các lần View/Edit trong cùng phiên. Mã editor vẫn preload ở Startup, không thêm request tải khi bấm note. Focus lần Edit đầu được thực hiện khi Tiptap đã có view trong onCreate, không chặn sai vì cờ isInitialized chưa cập nhật.

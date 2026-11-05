@@ -13,9 +13,14 @@
   flex: 1;
   min-height: 0;
   overflow: auto;
+  scrollbar-gutter: stable;
   touch-action: pan-x pan-y;
   overscroll-behavior: contain;
 }
+/* Tools remain horizontally scrollable without a native rail flashing as the
+   toolbar appears. The document keeps its real scrollbar when content is long. */
+.note-editor-modal .editor-toolbar { scrollbar-width: none; }
+.note-editor-modal .editor-toolbar::-webkit-scrollbar { display: none; }
 .content-zoom-stage {
   position: relative;
   min-width: 100%;
