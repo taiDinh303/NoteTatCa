@@ -7,6 +7,7 @@ import { IconButton } from "../../shared/ui";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import "./ContentZoom.css";
 import { ContentZoomSession } from "./contentZoomSession";
+import { NoteSurfaceVisibility } from "./noteSurfaceVisibility";
 
 const clamp = (value: number) => Math.min(300, Math.max(50, value));
 
@@ -29,6 +30,9 @@ function DesktopContentZoom({
   const change = useRef<(value: number) => void>(() => {});
   const synchronizeLayout = useRef<() => void>(() => {});
   const session = useContext(ContentZoomSession);
+  // Portal children mount while the persistent host is display:none. Subscribe
+  // to reveal so even memoized View content measures the real width pre-paint.
+  const surfaceVisible = useContext(NoteSurfaceVisibility);
   const savedPercent = session?.percent;
   const savedScroll = session?.scroll;
   const hand = useRef(false);
@@ -310,7 +314,7 @@ function DesktopContentZoom({
   }, [savedPercent, savedScroll, mobile]);
   // React mode changes can resize the toolbar before ResizeObserver delivery.
   // Settle that commit synchronously, ahead of the next browser frame.
-  useLayoutEffect(() => { synchronizeLayout.current(); });
+  useLayoutEffect(() => { if (surfaceVisible) synchronizeLayout.current(); });
   function commit(input: HTMLInputElement) {
     const value = input.value.trim() ? Number(input.value) : NaN;
     if (Number.isFinite(value)) change.current(value);

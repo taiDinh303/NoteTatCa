@@ -7,6 +7,7 @@ import { RemoveScroll } from "react-remove-scroll";
 import { Modal } from "../../shared/ui";
 import { t as tr } from "../../shared/i18n";
 import "./NoteSurfaceHost.css";
+import { NoteSurfaceVisibility } from "./noteSurfaceVisibility";
 
 type SurfaceProps = ComponentProps<typeof Modal>;
 type Frame = Pick<SurfaceProps, "title" | "className" | "style" | "onClose">;
@@ -40,6 +41,7 @@ export function NoteSurfaceHost({ open, session, onClose, children }: {
     return () => { restore(); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
   }, [visible]);
   return <Surface.Provider value={context}>
+    <NoteSurfaceVisibility.Provider value={visible}>
     {children}
     <Dialog.Root open={visible} modal={false} onOpenChange={value => { if (!value) (frame?.onClose ?? onClose)(); }}>
       <Dialog.Portal forceMount>
@@ -69,6 +71,7 @@ export function NoteSurfaceHost({ open, session, onClose, children }: {
         </RemoveScroll>
       </Dialog.Portal>
     </Dialog.Root>
+    </NoteSurfaceVisibility.Provider>
   </Surface.Provider>;
 }
 

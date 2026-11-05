@@ -1,3 +1,9 @@
+## Mở note không ép chữ thành cột trong frame đầu — 2026-11-05
+
+ContentZoom nhận trạng thái hiển thị từ context riêng của NoteSurfaceHost. Nội dung portal có thể mount khi khung còn `display:none`; khi host reveal, context buộc ContentZoom cập nhật và đo lại width/min-height/scroll extent trong layout effect trước paint, kể cả ReadOnlyContent được memo hóa. Không chờ ResizeObserver để sửa width=0 sau frame đầu. Context này độc lập metadata đăng ký khung để không tạo vòng cleanup/reveal; modal ngoài workspace mặc định visible. Giữ DOM khung, editor/Undo, autosave và zoom hiện có, không thêm delay hoặc animation.
+
+Regression lấy mẫu từng rAF trong 350ms cho hai lần mở/đóng trên 393/1440px × fullscreen bật/tắt × View/Edit mặc định: layer khớp viewport ngay từ mẫu đầu, chiều cao đoạn và số dòng không đổi. Trước sửa, ca mobile fullscreen View bắt được layer width=0 đúng hiện tượng chữ dồn dọc trong video. Evidence/giới hạn thực tế tại worklog.
+
 ## View/Edit không sinh thanh cuộn tạm — 2026-11-05
 
 Theo phản hồi mới nhất, ContentZoom đồng bộ width/min-height/scroll extent ngay trong layout commit của React khi đổi mode và đồng bộ ResizeObserver trước paint, thay vì chờ rAF kế tiếp. Hủy frame đo cũ khi resize, giữ scheduler rAF cho gesture zoom. Viewport dùng scrollbar-gutter stable để không đổi bề ngang khi có/không có scrollbar thật. Thanh công cụ vẫn overflow-x auto để kéo ngang/chạm/bàn phím, nhưng ẩn native scrollbar bằng scrollbar-width none và WebKit scrollbar display none. Scrollbar thật của document dài vẫn giữ; không cấm cuộn hoặc che nội dung dài, không thêm delay/sleep/timeout vào View/Edit.
