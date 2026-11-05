@@ -1,3 +1,9 @@
+## Không lưu phép đo 0px khi khung note còn ẩn — 2026-11-05
+
+Bổ sung sau video mới và xác nhận PC cũng bị: chỉ đồng bộ lại khi reveal chưa loại bỏ phép đo0px trong lúc mount. ContentZoom nay bỏ qua viewport không có width, dùng chung resize cho khởi tạo và ResizeObserver, không ghi width/min-height/stageheight từ khung display:none. Layer có CSS width100% làm bố cục mặc định trước phép đo dương đầu tiên; context reveal vẫn đồng bộ extent trước paint. Không ẩn scrollbar thật của note dài, không thêm delay hoặc đổi dữ liệu/editor.
+
+Regression mở rộng dùng đoạn thường/checklist/căn phải, theo dõi cả mutationstyle lúc mountẩn và rAF350ms lúc hiện: không lưu width/height0px, chiều rộng/số dòng/chiều cao ổn định, viewport và dialog không tràn ngang/dọc với note ngắn. Chạy cả desktop và Chromium giả lập Pixel; không coi chỉ kiểm geometry lúc đã ổn định là đủ. Kết quả và giới hạn tại worklog. Các mục trước giữ lịch sử của bản sửa context.
+
 ## Mở note không ép chữ thành cột trong frame đầu — 2026-11-05
 
 ContentZoom nhận trạng thái hiển thị từ context riêng của NoteSurfaceHost. Nội dung portal có thể mount khi khung còn `display:none`; khi host reveal, context buộc ContentZoom cập nhật và đo lại width/min-height/scroll extent trong layout effect trước paint, kể cả ReadOnlyContent được memo hóa. Không chờ ResizeObserver để sửa width=0 sau frame đầu. Context này độc lập metadata đăng ký khung để không tạo vòng cleanup/reveal; modal ngoài workspace mặc định visible. Giữ DOM khung, editor/Undo, autosave và zoom hiện có, không thêm delay hoặc animation.

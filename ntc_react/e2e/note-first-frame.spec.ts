@@ -32,6 +32,26 @@ for (const width of [393, 1440])
                     },
                   ],
                 },
+                {
+                  type: "taskList",
+                  content: ["First task", "Second task", "Third task"].map(
+                    (text) => ({
+                      type: "taskItem",
+                      attrs: { checked: false },
+                      content: [
+                        {
+                          type: "paragraph",
+                          content: [{ type: "text", text }],
+                        },
+                      ],
+                    }),
+                  ),
+                },
+                {
+                  type: "paragraph",
+                  attrs: { textAlign: "right" },
+                  content: [{ type: "text", text: "Right aligned" }],
+                },
               ],
             }),
           },
@@ -68,7 +88,29 @@ for (const width of [393, 1440])
             const state = window as unknown as {
               widths: number[][];
               samplingDone: boolean;
+              zeroMeasurements: string[];
             };
+            state.zeroMeasurements = [];
+            const observer = new MutationObserver((records) => {
+              for (const record of records) {
+                const target = record.target as HTMLElement;
+                if (!target.matches(".content-zoom-layer, .content-zoom-stage"))
+                  continue;
+                for (const value of [
+                  record.oldValue,
+                  target.getAttribute("style"),
+                ]) {
+                  if (value && /(?:^|;)\s*(?:width|height):\s*0px/.test(value))
+                    state.zeroMeasurements.push(value);
+                }
+              }
+            });
+            observer.observe(document.body, {
+              subtree: true,
+              attributes: true,
+              attributeFilter: ["style"],
+              attributeOldValue: true,
+            });
             state.widths = [];
             state.samplingDone = false;
             document.addEventListener(
@@ -96,12 +138,19 @@ for (const width of [393, 1440])
                         layer.offsetWidth,
                         p.offsetHeight,
                         range.getClientRects().length,
+                        view.scrollWidth - view.clientWidth,
+                        view.scrollHeight - view.clientHeight,
+                        frame.scrollWidth - frame.clientWidth,
+                        frame.scrollHeight - frame.clientHeight,
                       ]);
                     }
                   }
                   if (performance.now() - start < 350)
                     requestAnimationFrame(sample);
-                  else state.samplingDone = true;
+                  else {
+                    observer.disconnect();
+                    state.samplingDone = true;
+                  }
                 };
                 requestAnimationFrame(sample);
               },
@@ -124,12 +173,23 @@ for (const width of [393, 1440])
             body: JSON.stringify(widths),
             contentType: "application/json",
           });
+          const zeroMeasurements = await page.evaluate(
+            () =>
+              (window as unknown as { zeroMeasurements: string[] })
+                .zeroMeasurements,
+          );
+          expect(
+            zeroMeasurements,
+            "Hidden surfaces must not persist zero-sized document geometry",
+          ).toEqual([]);
           expect(widths.length).toBeGreaterThan(2);
-          for (const [view, layer, height, lines] of widths) {
+          for (const [view, layer, height, lines, ...overflow] of widths) {
             expect(layer).toBeGreaterThan(250);
             expect(Math.abs(view - layer)).toBeLessThan(1);
             expect(height).toBe(widths.at(-1)![2]);
             expect(lines).toBe(widths.at(-1)![3]);
+            for (const extent of overflow)
+              expect(extent).toBeLessThanOrEqual(1);
           }
           await page
             .getByRole("dialog", {

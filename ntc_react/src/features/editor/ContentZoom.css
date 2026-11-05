@@ -29,6 +29,9 @@
   position: absolute;
   top: 0;
   left: 0;
+  /* Lay out normal text immediately on reveal, even before JS can measure a
+     portal that mounted hidden. Zoom replaces this with a positive fixed width. */
+  width: 100%;
   transform-origin: top left;
   display: flex;
   flex-direction: column;

@@ -124,7 +124,11 @@ function DesktopContentZoom({
       setPercent(Math.round(target));
     };
     const resize = () => {
-      width = view.clientWidth;
+      const nextWidth = view.clientWidth;
+      // The portal mounts under display:none and can be hidden again before
+      // observer cleanup. Never turn that absence of layout into a 0px document.
+      if (nextWidth <= 0) return;
+      width = nextWidth;
       document.style.width = `${width}px`;
       document.style.minHeight = `${view.clientHeight}px`;
       height = document.offsetHeight;
@@ -135,11 +139,9 @@ function DesktopContentZoom({
     };
     synchronizeLayout.current = resize;
     const observer = new ResizeObserver(resize);
-    document.style.width = `${width}px`;
-    document.style.minHeight = `${view.clientHeight}px`;
     observer.observe(view);
     observer.observe(document);
-    paint();
+    resize();
     function rememberScroll() {
       if (savedScroll && !restoreScroll)
         savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
