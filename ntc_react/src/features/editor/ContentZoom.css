@@ -17,6 +17,12 @@
   touch-action: pan-x pan-y;
   overscroll-behavior: contain;
 }
+/* The mobile document fits its viewport at 100%; only desktop zoom needs a
+   horizontal scroll axis. Keep native vertical scrolling and its scrollbar. */
+.content-zoom-viewport[data-mobile="true"] {
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
 /* Tools remain horizontally scrollable without a native rail flashing as the
    toolbar appears. The document keeps its real scrollbar when content is long. */
 .note-editor-modal .editor-toolbar { scrollbar-width: none; }

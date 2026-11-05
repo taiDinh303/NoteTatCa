@@ -89,7 +89,7 @@ function DesktopContentZoom({
           height * scale >= restoreScroll.top + view.clientHeight ||
           stableRestoreFrames >= 2
         ) {
-          view.scrollLeft = restoreScroll.left;
+          view.scrollLeft = mobile ? 0 : restoreScroll.left;
           view.scrollTop = restoreScroll.top;
           restoreScroll = undefined;
           rememberScroll();
@@ -143,6 +143,9 @@ function DesktopContentZoom({
     observer.observe(document);
     resize();
     function rememberScroll() {
+      // Mobile has no document zoom/pan. Keep focus restoration or a slightly
+      // diagonal swipe from retaining a horizontal offset from desktop layout.
+      if (mobile && view.scrollLeft !== 0) view.scrollLeft = 0;
       if (savedScroll && !restoreScroll)
         savedScroll.current = { left: view.scrollLeft, top: view.scrollTop };
     }
@@ -378,6 +381,7 @@ function DesktopContentZoom({
       <div
         className="content-zoom-viewport"
         data-content-zoom
+        data-mobile={mobile}
         data-hand={handEnabled}
         ref={viewport}
       >

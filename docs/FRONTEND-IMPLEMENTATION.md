@@ -1,3 +1,9 @@
+## Chỉ cuộn dọc nội dung note trên mobile — 2026-11-06
+
+ContentZoom dùng useMobileLayout để đánh dấu viewport mobile; chỉ trên mobile đặt overflow-x hidden/touch-action pan-y, giữ scrollbar dọc và scrollposition dọc thật. Khôi phục/ghi nhớ scroll không mang độ lệch ngang desktop sang mobile; focus/cuộn mobile giữ left0. Desktop zoom/hand hai trục giữ nguyên, toolbar và mục emoji gần đây vẫn cuộn ngang độc lập. Không ẩn toàn bộ scrollbar document hoặc đổi nội dung/selection/autosave.
+
+ProductionChromium mobile/touch DPR2.75 tại320/393/430/800:65dòng/URLdài/Việt/Nhật/emoji, CDPvuốt chéo qua View/Edit/View, left0/không overflow/tăngscrollTop và reload giữtext đềuPASS. Cùng18regressions desktopzoom/hand/mobilelayout/modescrollbarsPASS; buildReact/.NETstrict/scopedlint/diffcheckPASS. Baseline computedoverflowauto chứng minh hai trục vẫn được bật trước sửa, không thay bằng khẳng định đã tái hiện native scrollbar trên thiết bị thật. ChưaWebKit/thiếtbịthật/fullsuite; xemworklog cho assertionreload đã sửa/lệnh/evidence.
+
 ## Emoji dạng ngang thấp, Search ngắn — 2026-11-06
 
 Bảng emoji riêng rộng theo khung note trừ32px, cao tối đa300px (vẫn giới hạn theo chiều cao note), nằm trên footer. Search/category cùng hàng desktop, xếp hai hàng ở<=480px. Placeholder chỉ Search, aria-label vẫn mô tả tìm emoji/ký tự. Recently used tối đa24ký tự thành một hàng cuộn ngang; danh sách chính cuộn dọc và giữ96items/Show more để tránh lag. Các tool khác giữ kích thước cũ. Bảng vẫn che phần dưới nhưng thấp hơn bản dọc trước, không thay kích thước editor hoặc scrollposition khi mở.
