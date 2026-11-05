@@ -80,18 +80,13 @@ function DesktopNotesZoomViewport({
       });
       frozenGrids.clear();
     }
-    function columnBudget(nextScale: number) {
-      const nearStop = nextScale <= 0.53001 || (nextScale >= 0.98999 && nextScale <= 1.05001);
-      return availableWidth + (nearStop ? Math.max(0, rightInset - 12) : 0);
-    }
-    // Keep whole columns at the confirmed near-100/50 stops, using only
-    // the permitted right inset budget. The left anchor never moves.
+    // Never borrow the right inset to fit another column, at any zoom.
     function canvasWidth() {
-      return mode === "list" ? availableWidth : columnBudget(scale);
+      return availableWidth;
     }
     function columnsFor(nextScale: number) {
       if (mode === "list") return 1;
-      return Math.max(1, Math.floor(((columnBudget(nextScale) + 1) / nextScale + gap) / (cardWidth + gap)));
+      return Math.max(1, Math.floor(((availableWidth + 0.01) / nextScale + gap) / (cardWidth + gap)));
     }
     function sidebarClock() {
       return main
@@ -299,7 +294,7 @@ function DesktopNotesZoomViewport({
         ? Math.max(3, Math.round((fullWidth + gap) / (300 + gap)))
         : Math.max(1, Math.round((fullWidth + gap) / (300 + gap)));
       const nextCardWidth = desktop
-        ? desktopGridCardWidth(fullWidth, rightInset)
+        ? desktopGridCardWidth(fullWidth)
         : window.innerWidth < 600
           ? Math.max(1, fullWidth - gap)
           : (fullWidth - (fullColumns - 1) * gap) / fullColumns;

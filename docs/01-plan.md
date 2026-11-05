@@ -1,3 +1,7 @@
+## Bảo vệ lề phải ở mọi mức zoom — 2026-11-05
+
+Theo phản hồi mới nhất, grid không được lấn vào đệm phải để giữ thêm cột ở102% hoặc bất kỳ mốc nào. Bỏ budget đệm phải quanh50/100%; chọn số cột theo chiều rộng giữa hai inset gốc, chỉ cho sai số subpixel0.01px. Nếu cột cuối vượt vùng đó thì xuống hàng. Width/gap gốc vẫn cố định, mốc trái/New/sidebar không đổi. Calibration50/100/150 dùng chính vùng khả dụng bình thường, không dùng allowance12px cũ; ưu tiên bảo vệ lề phải hơn giữ số cột ở các mức trung gian. Tại1910–1920px giữ10/5 cột ở50/100 mở sidebar và12/6 đóng;102% tương ứng4/5. Các đoạn lịch sử cho mượn đệm phải được thay thế bởi yêu cầu này.
+
 ## Khung note có sẵn trong workspace — 2026-11-05
 
 Theo yêu cầu mới nhất, NotesPage chuẩn bị một NoteSurfaceHost duy nhất lúc vào workspace. Dialog và backdrop ở DOM từ đầu, hidden/aria-hidden khi đóng; chỉ portal nội dung của note đang chọn vào slot, đóng sẽ bỏ nội dung/session nhưng giữ nguyên khung. Dùng dữ liệu cache hiện có, không chờ network để mở note đã tải. Module NoteEditor/RichEditor vẫn được Startup chờ tải song song với dữ liệu; không tạo editor cho mọi card. Bỏ hook phóng từ card 100ms, không fade/scale khi mở khung chính. View/Edit, autosave, offline và Undo dùng session chung như trước.

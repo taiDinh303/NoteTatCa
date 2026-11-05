@@ -10,16 +10,15 @@ export function desktopNoteWidth(fullWidth: number) {
 
 // Choose once per viewport, never per zoom/sidebar state. Minimize the worst
 // right-edge remainder over all six anchor layouts, with fixed 20px gaps.
-export function desktopGridCardWidth(fullWidth: number, rightInset: number) {
+export function desktopGridCardWidth(fullWidth: number) {
   const nominal = desktopNoteWidth(fullWidth);
   const pitch = nominal + DESKTOP_NOTE_GAP;
   const columns = Math.round((fullWidth + DESKTOP_NOTE_GAP) / pitch);
-  const allowance = Math.max(0, rightInset - 12);
   const openWidth = fullWidth - pitch;
   const layouts = [fullWidth, openWidth].flatMap((width, index) =>
     [0.5, 1, 1.5].map(scale => ({
       width, scale,
-      budget: width + (scale <= 1 ? allowance : 0),
+      budget: width,
       expected: scale <= 1 ? (columns - index) / scale : undefined,
     })),
   );
@@ -43,7 +42,7 @@ export function desktopGridCardWidth(fullWidth: number, rightInset: number) {
     let total = 0;
     let valid = true;
     for (const { width, budget, scale, expected } of layouts) {
-      const count = Math.max(1, Math.floor(((budget + 1) / scale + DESKTOP_NOTE_GAP) / (candidate + DESKTOP_NOTE_GAP)));
+      const count = Math.max(1, Math.floor(((budget + 0.01) / scale + DESKTOP_NOTE_GAP) / (candidate + DESKTOP_NOTE_GAP)));
       if (expected !== undefined && count !== expected) { valid = false; break; }
       const remainder = Math.abs(width - scale * (count * candidate + (count - 1) * DESKTOP_NOTE_GAP));
       worst = Math.max(worst, remainder);
