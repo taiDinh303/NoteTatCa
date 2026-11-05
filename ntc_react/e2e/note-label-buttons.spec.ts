@@ -56,17 +56,13 @@ for (const width of [320, 1440]) {
       exact: true,
     });
     await expect(dialog.locator(".note-label-option")).toHaveCount(40);
-    await expect(dialog.locator(".modal-title-hidden")).toHaveCSS(
-      "width",
-      "1px",
-    );
-    await expect(dialog.locator(".modal-title-hidden")).toHaveCSS(
-      "clip",
-      "rect(0px, 0px, 0px, 0px)",
-    );
-    await expect(
-      dialog.getByRole("button", { name: "Close dialog" }),
-    ).toHaveCount(0);
+    if (width > 800) {
+      await expect(dialog.locator(".modal-title-hidden")).toHaveCSS("width", "1px");
+      await expect(dialog.locator(".modal-title-hidden")).toHaveCSS("clip", "rect(0px, 0px, 0px, 0px)");
+    } else {
+      await expect(dialog.getByRole("heading", { name: "Note labels", exact: true })).toBeVisible();
+    }
+    await expect(dialog.getByRole("button", { name: "Close dialog" })).toHaveCount(width > 800 ? 0 : 1);
     const save = dialog.getByRole("button", { name: "Save", exact: true });
     const cancel = dialog.getByRole("button", { name: "Cancel", exact: true });
     await expect(

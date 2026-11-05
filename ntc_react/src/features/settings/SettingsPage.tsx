@@ -61,7 +61,7 @@ export default function SettingsPage({
       ) : me.isError ? (
         <ErrorPanel error={me.error} retry={() => void me.refetch()} />
       ) : section === "profile" ? (
-        <ProfileForm key={me.data.profile?.version ?? "new"} me={me.data} />
+        <ProfileForm key={me.data.account.id} me={me.data} />
       ) : (
         <AccountSettings me={me.data} />
       )}
@@ -123,9 +123,21 @@ function ProfileForm({ me }: { me: Me }) {
         <div className="profile-identity">
           <AvatarPicker
             picture={picture}
-            onChange={(value) => {
+            onChange={async (value) => {
+              const profileKey = workspace.key("me");
+              const currentOwner = () => auth.getSnapshot().session?.userId === me.account.id;
+              if (!currentOwner()) return;
+              let profile = p;
+              if (!profile) {
+                profile = await account.profile({ givenName: me.account.userName.slice(0, 25) }, false);
+                if (!currentOwner()) return;
+                cache.setQueryData<Me>(profileKey, { ...me, profile });
+              }
+              const saved = await account.profile({ version: profile.version, picture: value || null }, true);
+              if (!currentOwner()) return;
               setPicture(value);
-              setEditing(true);
+              cache.setQueryData<Me>(profileKey, current => current ? { ...current, profile: saved } : { ...me, profile: saved });
+              toast.success(tr("Profile updated"));
             }}
             onError={setError}
             onBusy={setAvatarBusy}

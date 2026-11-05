@@ -215,3 +215,73 @@ it("publishes canonical reorder without invalidating the list and cancels stale 
     vi.useRealTimers();
   }
 });
+
+it("queues background label writes and keeps the newest optimistic selection", async () => {
+  const cache = new QueryClient();
+  const repository = new NotesRepository(new ApiClient('/api/v1'));
+  const service = new WorkspaceService(repository, cache, () => 'owner');
+  const a = { id:'A', name:'A', color:null, icon:null, version:'l1' };
+  const b = { ...a, id:'B', name:'B' };
+  let server = note;
+  vi.spyOn(repository, 'find').mockImplementation(async () => server);
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  vi.spyOn(repository, 'setLabels').mockImplementation(async (base, ids) => {
+    if (ids[0] === 'A') await gate;
+    expect(base.version).toBe(server.version);
+    server = { ...server, version: ids[0] === 'A' ? 'v2' : 'v3', tags: ids[0] === 'A' ? [a] : [b] };
+    return server;
+  });
+  service.commit(note);
+  const first = service.setNoteLabels(note, [a]);
+  expect(cache.getQueryData(service.key('note', note.id))).toMatchObject({ tags:[a] });
+  await vi.waitFor(() => expect(repository.setLabels).toHaveBeenCalledTimes(1));
+  const second = service.setNoteLabels(note, [b]);
+  expect(cache.getQueryData(service.key('note', note.id))).toMatchObject({ tags:[b] });
+  release();
+  await Promise.all([first, second]);
+  expect(repository.setLabels).toHaveBeenCalledTimes(2);
+  expect(cache.getQueryData(service.key('note', note.id))).toMatchObject({ version:'v3', tags:[b] });
+  cache.clear();
+});
+
+it("rolls failed labels back without replacing newer note content and ignores another owner", async () => {
+  const cache = new QueryClient();
+  const repository = new NotesRepository(new ApiClient('/api/v1'));
+  let owner = 'owner';
+  const service = new WorkspaceService(repository, cache, () => owner);
+  const label = { id:'A', name:'A', color:null, icon:null, version:'l1' };
+  vi.spyOn(repository, 'find').mockResolvedValue(note);
+  let reject!: (error: Error) => void;
+  vi.spyOn(repository, 'setLabels').mockImplementation(() => new Promise((_resolve, fail) => { reject = fail; }));
+  const saving = service.setNoteLabels(note, [label]);
+  const failure = expect(saving).rejects.toThrow('Unavailable');
+  await vi.waitFor(() => expect(repository.setLabels).toHaveBeenCalledTimes(1));
+  service.commit({ ...note, version:'new-content', content:'Keep this newer edit', tags:[label] });
+  reject(new Error('Unavailable'));
+  await failure;
+  expect(cache.getQueryData(service.key('note', note.id))).toMatchObject({ content:'Keep this newer edit', version:'new-content', tags:[] });
+  owner = 'another';
+  await service.setNoteLabels(note, [label]);
+  expect(repository.setLabels).toHaveBeenCalledTimes(1);
+  expect(cache.getQueryData(service.key('note', note.id))).toBeUndefined();
+  cache.clear();
+});
+
+it("does not restore a note trashed while its label acknowledgement is pending", async () => {
+  const cache = new QueryClient();
+  const repository = new NotesRepository(new ApiClient('/api/v1'));
+  const service = new WorkspaceService(repository, cache, () => 'owner');
+  const label = { id:'A', name:'A', color:null, icon:null, version:'l1' };
+  vi.spyOn(repository, 'find').mockResolvedValue(note);
+  let finish!: (value: Note) => void;
+  vi.spyOn(repository, 'setLabels').mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+  const saving = service.setNoteLabels(note, [label]);
+  await vi.waitFor(() => expect(repository.setLabels).toHaveBeenCalledTimes(1));
+  service.commit({ ...note, deletedTime:'2026-11-06T00:00:00Z' });
+  finish({ ...note, version:'labels-saved', tags:[label] });
+  await saving;
+  expect(cache.getQueryData(service.key('note', note.id))).toBeUndefined();
+  expect(cache.getQueryData(service.key('trash-note', note.id))).toMatchObject({ deletedTime:'2026-11-06T00:00:00Z' });
+  cache.clear();
+});

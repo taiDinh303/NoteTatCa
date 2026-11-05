@@ -6,11 +6,12 @@ export function AvatarPicker({
   picture,
   onChange,
   onError,
+  onBusy,
   disabled,
   children,
 }: {
   picture: string;
-  onChange: (value: string) => void;
+  onChange: (value: string) => Promise<void>;
   onError: (error: unknown) => void;
   onBusy: (busy: boolean) => void;
   disabled: boolean;
@@ -28,6 +29,18 @@ export function AvatarPicker({
     drag = useRef<{ x: number; y: number; px: number; py: number } | null>(
       null,
     );
+  const [saving, setSaving] = useState(false);
+  const apply = async (value: string) => {
+    setSaving(true);
+    onBusy(true);
+    setError(undefined);
+    try {
+      await onChange(value);
+      onError(undefined);
+      setOpen(false);
+    } catch (error) { setError(error); }
+    finally { setSaving(false); onBusy(false); }
+  };
   const reset = () => {
     setZoom(1);
     setPosition({ x: 0, y: 0 });
@@ -50,7 +63,7 @@ export function AvatarPicker({
         {children}
       </button>
       {open && (
-        <Modal open title={tr("Edit avatar")} onClose={() => setOpen(false)}>
+        <Modal open title={tr("Edit avatar")} onClose={() => { if (!saving) setOpen(false); }}>
           <div className="modal-body">
             <ErrorBanner error={error} />
             <div
@@ -58,6 +71,7 @@ export function AvatarPicker({
               role="img"
               aria-label={tr("Avatar preview")}
               onPointerDown={(e) => {
+                if (saving) return;
                 e.currentTarget.setPointerCapture(e.pointerId);
                 drag.current = {
                   x: e.clientX,
@@ -127,6 +141,7 @@ export function AvatarPicker({
               <input
                 aria-label={tr("Avatar zoom")}
                 type="range"
+                disabled={saving}
                 min="0.25"
                 max="4"
                 step="0.01"
@@ -140,6 +155,7 @@ export function AvatarPicker({
                 <input
                   aria-label={tr("Horizontal position")}
                   type="range"
+                  disabled={saving}
                   min="-240"
                   max="240"
                   value={position.x}
@@ -153,6 +169,7 @@ export function AvatarPicker({
                 <input
                   aria-label={tr("Vertical position")}
                   type="range"
+                  disabled={saving}
                   min="-240"
                   max="240"
                   value={position.y}
@@ -166,6 +183,7 @@ export function AvatarPicker({
               hidden
               ref={input}
               type="file"
+              disabled={saving}
               accept="image/png,image/jpeg,image/webp"
               aria-label={tr("Choose avatar")}
               onChange={(e) => {
@@ -206,13 +224,14 @@ export function AvatarPicker({
             <div className="form-actions">
               <Button
                 variant="secondary"
+                disabled={saving}
                 onClick={() => input.current?.click()}
               >
                 {tr("Choose avatar")}
               </Button>
               <Button
                 variant="ghost"
-                disabled={!source}
+                disabled={saving || !source}
                 onClick={() => setSource("")}
               >
                 {tr("Remove avatar")}
@@ -220,16 +239,16 @@ export function AvatarPicker({
             </div>
           </div>
           <div className="modal-footer">
-            <Button variant="secondary" onClick={() => setOpen(false)}>
+            <Button variant="secondary" disabled={saving} onClick={() => setOpen(false)}>
               {tr("Cancel")}
             </Button>
             <Button
               disabled={!!source && !ready}
+              busy={saving}
               onClick={() => {
                 try {
                   if (!source) {
-                    onChange("");
-                    setOpen(false);
+                    void apply("");
                     return;
                   }
                   const img = image.current;
@@ -245,9 +264,7 @@ export function AvatarPicker({
                     (size.w * zoom * 128) / 240,
                     (size.h * zoom * 128) / 240,
                   );
-                  onChange(canvas.toDataURL("image/png"));
-                  onError(undefined);
-                  setOpen(false);
+                  void apply(canvas.toDataURL("image/png"));
                 } catch (err) {
                   setError(err);
                 }

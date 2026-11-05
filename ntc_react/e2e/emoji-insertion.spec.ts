@@ -109,7 +109,7 @@ for (const width of [320, 393, 1440]) {
   });
 }
 
-test("Vietnamese categories, pagination and keyboard insertion", async ({ page }) => {
+test("Vietnamese categories show every character with scrolling and keyboard insertion", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("ntc.language.v1", "vi"));
   await page.goto("/guest");
   await page.getByRole("button", { name: "Tạo ghi chú", exact: true }).click();
@@ -120,10 +120,13 @@ test("Vietnamese categories, pagination and keyboard insertion", async ({ page }
   await dialog.getByRole("button", { name: "Chèn emoji hoặc ký tự", exact: true }).click();
   const picker = page.getByRole("dialog", { name: "Emoji và ký tự", exact: true });
   const group = picker.getByLabel("Nhóm emoji", { exact: true });
+  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(4019);
+  await expect(picker.getByRole("button", { name: "Xem thêm ký tự", exact: true })).toHaveCount(0);
+  await picker.locator(".emoji-symbol-grid button").last().scrollIntoViewIfNeeded();
+  expect(await picker.evaluate(el => el.querySelector(".note-tool-body")!.scrollTop)).toBeGreaterThan(0);
+  await picker.getByLabel("Nhóm emoji", { exact: true }).scrollIntoViewIfNeeded();
   await group.selectOption({ label: "Con người và cơ thể" });
-  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
-  await picker.getByRole("button", { name: "Xem thêm ký tự", exact: true }).click();
-  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(192);
+  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(2418);
   await group.selectOption({ label: "Ký tự đặc biệt" });
   const search = picker.getByLabel("Tìm emoji hoặc ký tự", { exact: true });
   await search.fill("zzzz no match");

@@ -29,7 +29,7 @@ async function openReminderForm(page: import("@playwright/test").Page) {
 
 test("creates a reminder immediately while the request saves in background", async ({
   page,
-}) => {
+}, info) => {
   const dialog = await openReminderForm(page);
   await expect(dialog.getByLabel("Recurrence timezone")).toHaveCount(0);
   await expect(dialog).toContainText("device timezone");
@@ -63,6 +63,8 @@ test("creates a reminder immediately while the request saves in background", asy
     .getByRole("button", { name: "Close", exact: true })
     .click();
   await page.getByRole("link", { name: "Reminders", exact: true }).click();
+  const icon = page.locator(".feature-banner .feature-icon");
+  await expect(icon).toHaveCSS("color", "rgb(63, 100, 66)");
   const card = page
     .locator(".reminder-card")
     .filter({ hasText: "Project notes" });
@@ -75,6 +77,9 @@ test("creates a reminder immediately while the request saves in background", asy
       (value) => (document.documentElement.dataset.theme = value),
       theme,
     );
+    await expect(icon).toHaveCSS("color", theme === "dark" ? "rgb(213, 239, 207)" : "rgb(63, 100, 66)");
+    await expect(icon).toHaveCSS("opacity", "1");
+    await page.locator(".feature-banner").screenshot({ path: info.outputPath(`reminder-banner-${theme}.png`) });
     const status = card.locator(".status-pill");
     await expect(status).toHaveCSS(
       "color",

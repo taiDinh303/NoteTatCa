@@ -112,6 +112,7 @@ function NoteEditorSession({
   initialAction,
 }: NoteEditorProps) {
   useLanguage();
+  const session = useAuth().session;
   const [editing, setEditing] = useState(() => !noteId || (!initialAction && noteEditingDefault()));
   const [createdId, setCreatedId] = useState<string>();
   const [fullscreen, setFullscreen] = useState(noteFullscreenDefault);
@@ -152,6 +153,8 @@ function NoteEditorSession({
     );
   if (currentNote && !editing && initialAction === "labels")
     return <NoteLabelsDialog note={currentNote} onClose={onClose} />;
+  if (currentNote && initialAction === "reminder")
+    return <ReminderDialog noteId={currentNote.id} title={currentNote.title ?? ""} zone={session?.timeZoneId ?? "Asia/Ho_Chi_Minh"} onClose={onClose} />;
   return (
     <EditorSession
       key={noteId ?? "new"}
@@ -184,15 +187,11 @@ function NoteLabelsDialog({
   const [tagIds, setTagIds] = useState(() =>
     note.tags.map((label) => label.id),
   );
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<unknown>();
   const allLabels = labels.data?.pages.flatMap((page) => page.items) ?? [];
   return (
     <Modal
       open
-      onClose={() => {
-        if (!busy) onClose();
-      }}
+      onClose={onClose}
       title={tr("Note labels")}
       hideTitle={!mobile}
       hideCloseButton={!mobile}
@@ -201,20 +200,16 @@ function NoteLabelsDialog({
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          setBusy(true);
-          setError(undefined);
-          void notes
-            .setLabels(original, tagIds)
-            .then((updated) => {
-              workspace.commit(updated);
-              onClose();
-            })
-            .catch(setError)
-            .finally(() => setBusy(false));
+          const available = [...allLabels, ...original.tags];
+          const selected = tagIds.flatMap(id => { const label = available.find(label => label.id === id); return label ? [label] : []; });
+          const save = () => { void workspace.setNoteLabels(original, selected).catch(error => {
+            toast.error(errorMessage(error), { duration: Infinity, action: { label: tr("Retry"), onClick: save } });
+          }); };
+          save();
+          onClose();
         }}
       >
         <div className="modal-body">
-          <ErrorBanner error={error} />
           {labels.isError ? (
             <ErrorPanel
               error={labels.error}
@@ -231,7 +226,7 @@ function NoteLabelsDialog({
                   className="note-label-option"
                   aria-pressed={tagIds.includes(label.id)}
                   disabled={
-                    busy || (!tagIds.includes(label.id) && tagIds.length >= 20)
+                    !tagIds.includes(label.id) && tagIds.length >= 20
                   }
                   onClick={() =>
                     setTagIds((current) =>
@@ -261,7 +256,6 @@ function NoteLabelsDialog({
           {labels.hasNextPage ? (
             <Button
               variant="ghost"
-              disabled={busy}
               onClick={() => void labels.fetchNextPage()}
             >
               {tr("Load more labels")}
@@ -269,12 +263,11 @@ function NoteLabelsDialog({
           ) : null}
         </div>
         <footer className="modal-footer">
-          <Button variant="ghost" disabled={busy} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             {tr("Cancel")}
           </Button>
           <Button
             type="submit"
-            busy={busy}
             disabled={labels.isPending || labels.isError}
           >
             {tr("Save")}

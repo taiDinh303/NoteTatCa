@@ -1883,7 +1883,7 @@ strong {
   height: 55px;
   border-radius: 14px;
   background: #ffffff80;
-  color: #96a58b;
+  color: #3f6442;
 }
 .feature-banner > div:nth-child(2) {
   flex: 1;
@@ -3405,6 +3405,10 @@ td {
 [data-theme="dark"] .privacy-callout {
   background: #2a332c;
   border-color: #344037;
+}
+[data-theme="dark"] .feature-banner .feature-icon {
+  background: #354d3c;
+  color: #d5efcf;
 }
 [data-theme="dark"] .inbox-row.unread {
   background: #302d26;

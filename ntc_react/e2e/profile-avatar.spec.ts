@@ -1,5 +1,48 @@
 import { test, expect } from "@playwright/test";
 
+test("avatar Apply saves from read mode, keeps crop on failure, and survives reload without Save profile", async ({ page, request }) => {
+  await request.post("http://127.0.0.1:5199/__fixture/reset");
+  await page.goto("/login");
+  await page.getByLabel("Email address", { exact: true }).fill("a@example.test");
+  await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/notes$/);
+  await page.goto("/settings/profile");
+  await page.getByRole("button", { name: "Edit avatar", exact: true }).click();
+  const data = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 32;
+    canvas.getContext("2d")!.fillRect(0, 0, 32, 32);
+    return canvas.toDataURL("image/png").split(",")[1];
+  });
+  await page.getByLabel("Choose avatar", { exact: true }).setInputFiles({ name: "avatar.png", mimeType: "image/png", buffer: Buffer.from(data, "base64") });
+  const modal = page.getByRole("dialog", { name: "Edit avatar", exact: true });
+  await expect(modal.locator(".avatar-crop-stage img")).toBeVisible();
+  await expect(modal.getByRole("button", { name: "Apply", exact: true })).toBeEnabled();
+  let fail = true;
+  const bodies: Record<string, unknown>[] = [];
+  await page.route("**/api/v1/me", async route => {
+    if (route.request().method() !== "PATCH") return route.continue();
+    bodies.push(route.request().postDataJSON());
+    if (fail) return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ message: "Synthetic avatar failure" }) });
+    await route.continue();
+  });
+  await modal.getByRole("button", { name: "Apply", exact: true }).click();
+  await expect(modal.getByRole("alert")).toBeVisible();
+  await expect(modal.locator(".avatar-crop-stage img")).toBeVisible();
+  fail = false;
+  await modal.getByRole("button", { name: "Apply", exact: true }).click();
+  await expect(modal).toBeHidden();
+  expect(bodies).toHaveLength(2);
+  expect(Object.keys(bodies[1]).sort()).toEqual(["picture", "version"]);
+  await expect(page.getByRole("button", { name: "Save profile", exact: true })).toHaveCount(0);
+  const avatar = page.locator(".profile-identity img");
+  const saved = await avatar.getAttribute("src");
+  expect(saved).toMatch(/^data:image\/png;base64,/);
+  await page.reload();
+  await expect(avatar).toHaveAttribute("src", saved!);
+});
+
 for (const [width, admin] of [
   [393, false],
   [1440, false],
@@ -179,7 +222,7 @@ for (const [width, admin] of [
     await removal.getByRole("button", { name: "Apply", exact: true }).click();
     await expect(avatar).toHaveCount(0);
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
-    await expect(avatar).toHaveAttribute("src", src!);
+    await expect(avatar).toHaveCount(0);
     await page
       .getByRole("button", { name: "Edit profile", exact: true })
       .click();
@@ -191,13 +234,6 @@ for (const [width, admin] of [
         () => Intl.DateTimeFormat().resolvedOptions().timeZone,
       ),
     );
-    await page
-      .getByRole("button", { name: "Edit avatar", exact: true })
-      .click();
-    await removal
-      .getByRole("button", { name: "Remove avatar", exact: true })
-      .click();
-    await removal.getByRole("button", { name: "Apply", exact: true }).click();
     await page
       .getByRole("button", { name: "Save profile", exact: true })
       .click();

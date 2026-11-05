@@ -1,3 +1,13 @@
+## Emoji cuộn toàn bộ, avatar Apply và tác vụ ngoài thẻ — 2026-11-06
+
+Theo phản hồi mới nhất: bỏ giới hạn96/nút Show more characters của bảng emoji; hiển thị toàn bộ4.019ký tự hoặc toàn bộ nhóm/kết quả đang lọc trong thanh cuộn hiện có. Thay mô tả phân trang ở mục trước.
+
+Avatar Apply tự lưu picture bằng PATCH/version ngay trong hộp crop, kể cả khi chưa Edit profile; không cần Save profile. Nếu tài khoản chưa có profile, tạo profile tối thiểu bằng username hiện có rồi PATCH picture. Modal giữ crop/error để retry, khóa Apply/Cancel/controls khi gửi. Hủy trước Apply không lưu; sau Apply thành công thì Cancel profile chỉ hủy các trường hồ sơ khác. Avatar ack chỉ cập nhật cache đúng owner/session đã bắt đầu request. Form key theo accountID để cache version mới không remount/mất draft timezone/name/address đang sửa; Save profile tiếp dùng version mới.
+
+Icon calendar trong banner Reminders dùng màu xanh đậm trên nền sáng và màu sáng/nền xanh đậm trong dark, giữ opacity1. Menu Add reminder ngoài note mở Modal độc lập/căn giữa; NoteSurfaceHost vẫn hidden và không tạo viewer/editor phía sau. Nút reminder trong editor giữ anchored panel.
+
+Hộp gán nhãn: Save commit tags lên cache và đóng ngay, gọi lưu nền qua WorkspaceService. Queue theo owner/note, fetch version mới trước PATCH, chỉ kết quả mới nhất được commit/rollback; giữ nội dung note mới hơn khi lỗi, không đưa note đã Trash/xóa trở lại danh sách do acknowledgement trễ. Toast lỗi có Retry giữ đến khi xử lý, retry dùng lại lựa chọn và kiểm owner. Không đổi giới hạn20nhãn, API/ownership hoặc policy offline phải sync trước khi gán nhãn; queue trong phiên app, không bổ sung cơ chế lưu nhãn offline bền vững. Kết quả test/ảnh/giới hạn ở worklog.
+
 ## Chèn emoji và ký tự như văn bản — 2026-11-06
 
 Theo ba lựa chọn chủ dự án: nút Smile sau bảng màu/trước nhãn trong Edit trên desktop/mobile, chèn vào title hoặc content vừa focus, thay vùng chọn và tiến con trỏ để chèn liên tiếp. Bảng giữ mở, đóng khi bấm ngoài/Escape hoặc chuyển công cụ/View; status aria-live và nút bàn phím giữ. Tìm Việt/Anh không phân biệt dấu, 10 nhóm, 24 ký tự dùng gần đây lưu local riêng user/guest; không đồng bộ lịch sử lên server. Hiển thị 96 kết quả mỗi đợt và nút xem thêm.

@@ -512,7 +512,7 @@ export default function NotesPage({
       </section>
     ) : null;
   return (
-    <NoteSurfaceHost session={`${editor?.id ?? selected ?? "new"}:${editor?.action ?? "view"}`} open={!trash && !!(editor || selected) && editor?.action !== "labels"} onClose={closeEditor}>
+    <NoteSurfaceHost session={`${editor?.id ?? selected ?? "new"}:${editor?.action ?? "view"}`} open={!trash && !!(editor || selected) && !editor?.action} onClose={closeEditor}>
       <h1
         className="sr-only"
       >

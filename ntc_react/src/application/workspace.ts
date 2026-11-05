@@ -1,5 +1,5 @@
 import type { InfiniteData, QueryClient } from "@tanstack/react-query";
-import type { Note, NoteFilter, Page } from "../domain/models";
+import type { Label, Note, NoteFilter, Page } from "../domain/models";
 import { matchesNote, sortNotes } from "../domain/models";
 import { NotesRepository } from "../infrastructure/repositories";
 import { NoteOrderCoordinator } from "./noteOrder";
@@ -7,6 +7,8 @@ export class WorkspaceService {
   readonly order: NoteOrderCoordinator;
   private pinQueue: Promise<void> = Promise.resolve();
   private pinRevisions = new Map<string, number>();
+  private labelQueues = new Map<string, Promise<void>>();
+  private labelRevisions = new Map<string, number>();
   constructor(
     readonly notes: NotesRepository,
     readonly cache: QueryClient,
@@ -130,6 +132,50 @@ export class WorkspaceService {
     await this.cache.invalidateQueries({ queryKey: this.key("reminders") });
     await this.cache.invalidateQueries({ queryKey: this.key("inbox") });
     await this.cache.invalidateQueries({ queryKey: this.key("unread") });
+  }
+  async setNoteLabels(note: Note, labels: Label[]) {
+    const owner = this.identity();
+    if (!owner || note.userId !== owner) return;
+    const key = `${owner}:${note.id}`;
+    const revision = (this.labelRevisions.get(key) ?? 0) + 1;
+    this.labelRevisions.set(key, revision);
+    const current = () => this.identity() === owner && this.labelRevisions.get(key) === revision;
+    const cached = () => this.cache.getQueryData<Note>(this.key("note", note.id))
+      ?? this.cache.getQueryData<Note>(this.key("trash-note", note.id)) ?? this.cachedNote(note.id)?.note;
+    const original = cached() ?? note;
+    const cancellation = Promise.all([
+      this.cache.cancelQueries({ queryKey: this.key("notes") }),
+      this.cache.cancelQueries({ queryKey: this.key("note", note.id), exact: true }),
+    ]);
+    this.commit({ ...original, tags: labels });
+    const previous = this.labelQueues.get(key);
+    let done!: () => void;
+    const queued = new Promise<void>(resolve => { done = resolve; });
+    this.labelQueues.set(key, queued);
+    let base = original;
+    try {
+      await Promise.all([previous, cancellation]);
+      if (this.identity() !== owner) return;
+      base = await this.notes.find(note.id);
+      if (this.identity() !== owner || base.userId !== owner) return;
+      const saved = await this.notes.setLabels(base, labels.map(label => label.id));
+      if (current()) {
+        const latest = cached();
+        if (!latest || latest.deletedTime) return;
+        this.commit(latest.version === original.version || latest.version === base.version
+          ? saved : { ...latest, tags: saved.tags });
+      }
+    } catch (error) {
+      if (current()) {
+        const latest = cached();
+        if (!latest || latest.deletedTime) return;
+        this.commit({ ...latest, tags: base.tags });
+        throw error;
+      }
+    } finally {
+      done();
+      if (this.labelQueues.get(key) === queued) this.labelQueues.delete(key);
+    }
   }
   async pin(note: Note) {
     const owner = this.identity();

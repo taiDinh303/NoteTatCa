@@ -161,9 +161,12 @@ for (const width of [393, 1280]) {
     ).toHaveCount(0);
     await labels.getByRole("button", { name: "Work", exact: true }).click();
     let rejectLabelSave = true;
+    let releaseLabelSave!: () => void;
+    const labelGate = new Promise<void>(resolve => { releaseLabelSave = resolve; });
     await page.route("**/api/v1/notes/*", async (route) => {
       if (route.request().method() === "PATCH" && rejectLabelSave) {
         rejectLabelSave = false;
+        await labelGate;
         await route.fulfill({
           status: 503,
           contentType: "application/json",
@@ -172,11 +175,10 @@ for (const width of [393, 1280]) {
       } else await route.continue();
     });
     await labels.getByRole("button", { name: "Save", exact: true }).click();
-    await expect(
-      labels.getByRole("button", { name: "Work", exact: true }),
-    ).toHaveAttribute("aria-pressed", "true");
-    await expect(labels.getByRole("alert")).toBeVisible();
-    await labels.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(labels).toBeHidden();
+    await expect(card.locator(".note-tags")).toContainText("Work");
+    releaseLabelSave();
+    await page.getByRole("button", { name: "Retry", exact: true }).click();
     await expect(card.locator(".note-tags")).toContainText("Work");
     await card
       .getByRole("button", { name: "Actions for Read first note", exact: true })
@@ -189,6 +191,14 @@ for (const width of [393, 1280]) {
       exact: true,
     });
     await expect(reminders).toBeVisible();
+    await expect(page.locator(".note-editor-modal:visible")).toHaveCount(0);
+    await expect(page.locator(".note-tool-popover")).toHaveCount(0);
+    const viewport = page.viewportSize()!;
+    await expect.poll(async () => {
+      const bounds = (await reminders.boundingBox())!;
+      return Math.max(Math.abs(bounds.x + bounds.width / 2 - viewport.width / 2), Math.abs(bounds.y + bounds.height / 2 - viewport.height / 2));
+    }).toBeLessThan(2);
+    await reminders.screenshot({ path: `artifacts/ui-followups/reminder-standalone-${width}.png` });
     await reminders
       .getByRole("button", { name: "Add reminder", exact: true })
       .click();
@@ -198,6 +208,7 @@ for (const width of [393, 1280]) {
     await expect(reminders.getByText(/Does not repeat · Active/)).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(reminders).toBeHidden();
+    await card.locator(".note-open").click();
     viewer = page.getByRole("dialog", { name: "View note", exact: true });
     await expect(
       viewer.getByRole("region", { name: "Note content" }),
