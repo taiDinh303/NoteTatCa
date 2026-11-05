@@ -2,6 +2,8 @@ import { useMobileLayout } from "../../shared/useMobileLayout";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   Suspense,
+  memo,
+  useMemo,
   useEffect,
   useCallback,
   useLayoutEffect,
@@ -74,7 +76,7 @@ import { warmNoteEditor } from "../editor/loadNoteEditor";
 import NoteEditor from "../editor/NoteEditorLoader";
 import { NoteSurfaceHost } from "../editor/NoteSurfaceHost";
 import type { NoteOpenAction } from "../editor/NoteEditor";
-function NoteCard({
+const NoteCard = memo(function NoteCard({
   note,
   onOpen,
   trash,
@@ -85,12 +87,12 @@ function NoteCard({
   hasMascot = false,
 }: {
   note: Note;
-  onOpen: () => void;
+  onOpen: (id: string) => void;
   trash: boolean;
   busy: boolean;
-  onAction: (action: "pin" | "trash" | "restore" | "delete") => void;
+  onAction: (note: Note, action: "pin" | "trash" | "restore" | "delete") => void;
   draggable: boolean;
-  onOrganize: (action: NoteOpenAction) => void;
+  onOrganize: (id: string, action: NoteOpenAction) => void;
   hasMascot?: boolean;
 }) {
   useLanguage();
@@ -151,7 +153,7 @@ function NoteCard({
           !event.defaultPrevented &&
           event.target instanceof Element &&
           !event.target.closest("button, a, input, select, textarea, [role='menuitem']")
-        ) onOpen();
+        ) onOpen(note.id);
       }}
       data-sort-animating={
         transition && !transition.startsWith("transform 0ms")
@@ -171,7 +173,7 @@ function NoteCard({
           <button
             type="button"
             className="note-card-identity"
-            onClick={onOpen}
+            onClick={() => onOpen(note.id)}
             aria-label={tr("View {0}", title)}
           >
             {note.iconEmoji ? (
@@ -203,7 +205,7 @@ function NoteCard({
               }
               active={note.isPinned}
               disabled={busy}
-              onClick={() => onAction("pin")}
+              onClick={() => onAction(note, "pin")}
             />
           ) : null}
         </div>
@@ -211,7 +213,7 @@ function NoteCard({
       <button
         type="button"
         className="note-open"
-        onClick={onOpen}
+        onClick={() => onOpen(note.id)}
         aria-label={tr("Open {0}", title)}
       >
         {note.content ? (
@@ -250,13 +252,13 @@ function NoteCard({
                 icon={RotateCcw}
                 label={tr("Restore {0}", title)}
                 disabled={busy || expiry === 0}
-                onClick={() => onAction("restore")}
+                onClick={() => onAction(note, "restore")}
               />
               <IconButton
                 icon={Trash2}
                 label={tr("Delete {0} permanently", title)}
                 disabled={busy}
-                onClick={() => onAction("delete")}
+                onClick={() => onAction(note, "delete")}
               />
             </>
           ) : (
@@ -267,13 +269,13 @@ function NoteCard({
                 {
                   label: tr("Add label"),
                   icon: Tag,
-                  action: () => onOrganize("labels"),
+                  action: () => onOrganize(note.id, "labels"),
                   disabled: busy,
                 },
                 {
                   label: tr("Add reminder"),
                   icon: Bell,
-                  action: () => onOrganize("reminder"),
+                  action: () => onOrganize(note.id, "reminder"),
                   disabled: busy || guestMode,
                 },
                 {
@@ -281,7 +283,7 @@ function NoteCard({
                   icon: Trash2,
                   danger: true,
                   separator: true,
-                  action: () => onAction("trash"),
+                  action: () => onAction(note, "trash"),
                   disabled: busy,
                 },
               ]}
@@ -293,7 +295,7 @@ function NoteCard({
       {hasMascot ? <NoteMascot size={80} /> : null}
     </article>
   );
-}
+});
 export default function NotesPage({
   trash = false,
   reminderView = false,
@@ -354,16 +356,24 @@ export default function NotesPage({
     });
     return () => { toast.dismiss(id); };
   }, [orderNotSaved]);
-  const stored = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
-  const all = [true, false].flatMap((pinned) => {
-    const group = stored.filter((note) => note.isPinned === pinned);
-    const desired = order.groups.get(pinned);
-    if (!desired) return group;
-    const ranks = new Map(desired.ids.map((id, index) => [id, index]));
-    return group.sort(
-      (a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity),
-    );
-  });
+  const all = useMemo(() => {
+    const stored = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
+    return [true, false].flatMap((pinned) => {
+      const group = stored.filter((note) => note.isPinned === pinned);
+      const desired = order.groups.get(pinned);
+      if (!desired) return group;
+      const ranks = new Map(desired.ids.map((id, index) => [id, index]));
+      return group.sort(
+        (a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity),
+      );
+    });
+  }, [query.data, order]);
+  const sortableIds = useMemo(() => all.map(note => note.id), [all]);
+  const openNote = useCallback((id: string) => {
+    if (trash) navigate(`/trash?note=${id}`);
+    setEditor({ id });
+  }, [navigate, trash]);
+  const organizeNote = useCallback((id: string, action: NoteOpenAction) => setEditor({ id, action }), []);
   const motionLayout = useRef<ReturnType<typeof captureNoteLayout> | null>(
     null,
   );
@@ -464,14 +474,14 @@ export default function NotesPage({
       setParams(next, { replace: true });
     }
   }
-  const groupSortingStrategy: SortingStrategy = (args) => {
+  const groupSortingStrategy = useCallback<SortingStrategy>((args) => {
     if (
       all[args.activeIndex]?.isPinned !== all[args.overIndex]?.isPinned ||
       all[args.index]?.isPinned !== all[args.activeIndex]?.isPinned
     )
       return null;
     return rectSortingStrategy(args);
-  };
+  }, [all]);
   const renderGroup = (group: Note[], title: string) =>
     group.length ? (
       <section className="notes-section">
@@ -495,16 +505,9 @@ export default function NotesPage({
                 trash={trash}
                 draggable={canDrag}
                 hasMascot={!!isTargetCard && !editor && !selected}
-                onOrganize={(action) => setEditor({ id: note.id, action })}
-                onOpen={() => {
-                  if (trash) {
-                    navigate(`/trash?note=${note.id}`);
-                    setEditor({ id: note.id });
-                  } else {
-                    setEditor({ id: note.id });
-                  }
-                }}
-                onAction={(action) => void act(note, action)}
+                onOrganize={organizeNote}
+                onOpen={openNote}
+                onAction={act}
               />
             );
           })}
@@ -512,7 +515,7 @@ export default function NotesPage({
       </section>
     ) : null;
   return (
-    <NoteSurfaceHost open={!trash && !!(editor || selected) && editor?.action !== "labels"} onClose={closeEditor}>
+    <NoteSurfaceHost session={`${editor?.id ?? selected ?? "new"}:${editor?.action ?? "view"}`} open={!trash && !!(editor || selected) && editor?.action !== "labels"} onClose={closeEditor}>
       <h1
         className="sr-only"
       >
@@ -633,7 +636,7 @@ export default function NotesPage({
             onDragEnd={dragEnd}
           >
             <SortableContext
-              items={all.map((n) => n.id)}
+              items={sortableIds}
               strategy={groupSortingStrategy}
             >
               {trash ? (

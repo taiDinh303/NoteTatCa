@@ -77,7 +77,7 @@ for (const width of [393, 1280]) {
     await expect(
       viewer.locator(
         '[contenteditable=true], input:not([type=checkbox]):not([aria-label="Content zoom percentage"]), .editor-toolbar, .editor-tools, .editor-labels',
-      ),
+      ).filter({ visible: true }),
     ).toHaveCount(0);
     await expect(
       viewer.locator('input[aria-label="Content zoom percentage"]'),
@@ -85,7 +85,7 @@ for (const width of [393, 1280]) {
     await expect(
       viewer.getByRole("button", { name: "Content zoom", exact: true }),
     ).toHaveCount(width <= 800 ? 0 : 1);
-    await expect(viewer.getByLabel("Character count")).toHaveCount(0);
+    await expect(viewer.getByLabel("Character count").filter({ visible: true })).toHaveCount(0);
     if (width <= 800) {
       const bounds = (await viewer.boundingBox())!;
       expect(bounds.width).toBeGreaterThan(width * .85);
@@ -196,9 +196,8 @@ for (const width of [393, 1280]) {
       .getByRole("button", { name: "Set reminder", exact: true })
       .click();
     await expect(reminders.getByText(/Does not repeat · Active/)).toBeVisible();
-    await reminders
-      .getByRole("button", { name: "Close dialog", exact: true })
-      .click();
+    await page.keyboard.press("Escape");
+    await expect(reminders).toBeHidden();
     viewer = page.getByRole("dialog", { name: "View note", exact: true });
     await expect(
       viewer.getByRole("region", { name: "Note content" }),

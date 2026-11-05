@@ -15,7 +15,7 @@ export default function NoteToolPanel({ title, onClose, children }: {
     const panelElement = ref.current;
     document.dispatchEvent(new Event(opened));
     const dismiss = () => close.current();
-    const hasNestedDialog = () => [...document.querySelectorAll(".modal")].some(dialog => dialog !== host);
+    const hasNestedDialog = () => [...document.querySelectorAll(".modal:not([hidden]):not([data-state='closed'])")].some(dialog => dialog !== host);
     const outside = (event: PointerEvent) => {
       if (hasNestedDialog()) return;
       const target = event.target as Element;

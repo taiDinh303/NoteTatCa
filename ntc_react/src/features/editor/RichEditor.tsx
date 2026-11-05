@@ -189,7 +189,7 @@ export default memo(function RichEditor({
       onCharacterCount(editor.getText().length);
       onReady({
         // Focus synchronously; a queued frame could run after the user opens the title input.
-        focus: () => { if (!editor.isDestroyed && editor.isInitialized) editor.view.focus(); },
+        focus: () => { if (!editor.isDestroyed) editor.view.focus(); },
         exportMarkdown: () => setMarkdown("export"),
         importMarkdown: () => setMarkdown("import"),
         plainText: () => editor.getText(),

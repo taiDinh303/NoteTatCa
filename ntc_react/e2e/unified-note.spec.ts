@@ -17,10 +17,9 @@ for (const width of [1440, 393]) {
     const viewer = page.getByRole("dialog", { name: "View note", exact: true });
     await expect(viewer.getByRole("region", { name: "Note content", exact: true })).toContainText("Line 99");
     const rich = page.locator(".editor-content .tiptap");
-    await expect(rich).toHaveAttribute("contenteditable", "false");
-    expect(await rich.getAttribute("aria-multiline")).toBeNull();
+    await expect(rich).toHaveCount(0);
     await expect(viewer.getByRole("button", { name: "Bold", exact: true })).toHaveCount(0);
-    await rich.evaluate(element => {
+    await viewer.getByRole("region", { name: "Note content", exact: true }).evaluate(element => {
       const state = window as unknown as { noteFrame: Element | null; noteDocument: Element; noteViewport: Element | null };
       state.noteFrame = element.closest('[role="dialog"]');
       state.noteDocument = element;
@@ -38,6 +37,12 @@ for (const width of [1440, 393]) {
     await expect(rich).toHaveAttribute("contenteditable", "true");
     await expect(rich).toHaveAttribute("aria-multiline", "true");
     await expect(rich).toBeFocused();
+    expect(await rich.evaluate(element => element.closest('[role="dialog"]') === (window as unknown as { noteFrame: Element }).noteFrame)).toBe(true);
+    await rich.evaluate(element => {
+      const state = window as unknown as { noteDocument: Element; noteViewport: Element | null };
+      state.noteDocument = element;
+      state.noteViewport = element.closest("[data-content-zoom]");
+    });
     await assertIdentity();
     await expect.poll(() => page.locator("[data-content-zoom]").evaluate(el => el.scrollTop)).toBe(400);
     await expect(editor.getByRole("button", { name: "Bold", exact: true })).toBeVisible();

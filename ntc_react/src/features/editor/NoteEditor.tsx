@@ -447,16 +447,8 @@ function EditorSession({
   const editor = useRef<EditorCommands | null>(null);
   const editingRef = useRef(editing);
   useLayoutEffect(() => { editingRef.current = editing; }, [editing]);
-  // First paint uses the lightweight cached document. Prepare the selected
-  // note's editor after that paint, then retain it through all mode switches.
-  useEffect(() => {
-    if (editorPrepared) return;
-    let second = 0;
-    const first = requestAnimationFrame(() => {
-      second = requestAnimationFrame(() => setEditorPrepared(true));
-    });
-    return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
-  }, [editing, editorPrepared]);
+  // View remains on its lightweight document. Mount the editor only on Edit,
+  // then retain it for Undo and subsequent mode switches in this session.
   const blocker = useBlocker(snapshot.dirty);
   const allLabels = labels.data?.pages.flatMap((p) => p.items) ?? [];
   useEffect(() => {

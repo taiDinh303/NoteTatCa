@@ -1,3 +1,10 @@
+## Không chớp lại note trước khi mở note khác — 2026-11-05
+
+NoteSurfaceHost đăng ký metadata theo session note/action và token của Frame. Chỉ hiện khi metadata khớp đúng phiên đang mở, cleanup giải phóng đúng token và bỏ title/style/onClose cũ, không để cleanup phiên cũ xóa phiên mới. Khung DOM vẫn dùng lại. View giữ ReadOnlyContent ổn định, không tự thay bằng Tiptap sau hai rAF nữa; bấm Edit mới tạo editor, rồi giữ instance/Undo qua các lần View/Edit trong cùng phiên. Mã editor vẫn preload ở Startup, không thêm request tải khi bấm note. Focus lần Edit đầu được thực hiện khi Tiptap đã có view trong onCreate, không chặn sai vì cờ isInitialized chưa cập nhật.
+
+Ghi chú hiệu năng: danh sách, sortable IDs và sorting strategy chỉ tính lại khi data/order đổi; NoteCard memo dùng callback ổn định và so sánh mặc định, không bỏ qua callback. Mở/đóng note không bắt các card không đổi render lại. Escape đã được tool xử lý không được listener khung xử lý lần nữa.
+Regression mở A/B/A/B với nội dung và màu khác nhau, chặn note GET, lấy mẫu từng rAF350ms trên desktop/mobile: mọi frame nhìn thấy đều đúng nội dung/màu hiện tại, không note cũ và không thay DOM document khi đang View. Kiểm tiếp frame/scroll/Undo sau lần Edit đầu và mở lại. Đây thay cách chuẩn bị editor sau first paint của các đoạn lịch sử bên dưới; không đổi autosave/ownership/API/schema.
+
 ## Bảo vệ lề phải ở mọi mức zoom — 2026-11-05
 
 Theo phản hồi mới nhất, grid không được lấn vào đệm phải để giữ thêm cột ở102% hoặc bất kỳ mốc nào. Bỏ budget đệm phải quanh50/100%; chọn số cột theo chiều rộng giữa hai inset gốc, chỉ cho sai số subpixel0.01px. Nếu cột cuối vượt vùng đó thì xuống hàng. Width/gap gốc vẫn cố định, mốc trái/New/sidebar không đổi. Calibration50/100/150 dùng chính vùng khả dụng bình thường, không dùng allowance12px cũ; ưu tiên bảo vệ lề phải hơn giữ số cột ở các mức trung gian. Tại1910–1920px giữ10/5 cột ở50/100 mở sidebar và12/6 đóng;102% tương ứng4/5. Các đoạn lịch sử cho mượn đệm phải được thay thế bởi yêu cầu này.
