@@ -128,6 +128,7 @@ const extensions = [
   }),
 ];
 export interface EditorCommands {
+  insertText: (text: string) => boolean;
   exportMarkdown: () => void;
   importMarkdown: () => void;
   focus: () => void;
@@ -187,15 +188,30 @@ export default memo(function RichEditor({
     },
     onCreate: ({ editor }) => {
       onCharacterCount(editor.getText().length);
-      onReady({
-        // Focus synchronously; a queued frame could run after the user opens the title input.
-        focus: () => { if (!editor.isDestroyed) editor.view.focus(); },
-        exportMarkdown: () => setMarkdown("export"),
-        importMarkdown: () => setMarkdown("import"),
-        plainText: () => editor.getText(),
-      });
+      // EditorContent mounts after the parent layout effect. Keep first-Edit
+      // focus here, while registering commands against the current hook instance.
+      if (editor.isEditable && !document.activeElement?.matches(
+        "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-tool-popover *, [role='menuitem'], [role='menuitemradio']",
+      )) editor.view.focus();
     },
   });
+  useLayoutEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    onReady({
+      insertText: (text) => {
+        if (editor.isDestroyed || !editor.isEditable) return false;
+        const { from, to } = editor.state.selection;
+        const selected = editor.state.doc.textBetween(from, to, "\n").length;
+        if (editor.getText().length - selected + text.length > 100000) return false;
+        return editor.commands.command(({ tr }) => { tr.insertText(text); return true; });
+      },
+      // Focus synchronously; a queued frame could run after the user opens the title input.
+      focus: () => { if (!editor.isDestroyed) editor.view.focus(); },
+      exportMarkdown: () => setMarkdown("export"),
+      importMarkdown: () => setMarkdown("import"),
+      plainText: () => editor.getText(),
+    });
+  }, [editor, onReady]);
   useLayoutEffect(() => {
     if (!editor) return;
     editor.setEditable(editable, false);

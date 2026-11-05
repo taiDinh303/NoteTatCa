@@ -54,6 +54,7 @@ import {
   Spinner,
 } from "../../shared/ui";
 import NoteColorPicker from "./NoteColorPicker";
+import NoteEmojiPicker from "./NoteEmojiPicker";
 import "./NoteLabelsDialog.css";
 import ReminderDialog from "../reminders/ReminderDialog";
 import type { EditorCommands } from "./RichEditor";
@@ -443,6 +444,9 @@ function EditorSession({
   const fork = useRef<AutosaveCoordinator | undefined>(undefined);
   const draftRef = useRef(draft);
   const editor = useRef<EditorCommands | null>(null);
+  const titleInput = useRef<HTMLInputElement>(null);
+  const insertionTarget = useRef<"title" | "content">("content");
+  const titleSelection = useRef({ start: 0, end: 0 });
   const editingRef = useRef(editing);
   useLayoutEffect(() => { editingRef.current = editing; }, [editing]);
   // View remains on its lightweight document. Mount the editor only on Edit,
@@ -475,6 +479,33 @@ function EditorSession({
     coordinator.update(next);
   }, [coordinator, initial]);
   const onDocumentChange = useCallback((documentJson: string) => update({ documentJson }), [update]);
+  const insertCharacter = (text: string) => {
+    if (!editingRef.current) return false;
+    if (insertionTarget.current === "content") {
+      const inserted = editor.current?.insertText(text) ?? false;
+      if (!inserted) toast.error(tr("Note content can contain up to 100,000 characters."));
+      return inserted;
+    }
+    const input = titleInput.current;
+    if (!input) return false;
+    const { start, end } = titleSelection.current;
+    if (draftRef.current.title.length - (end - start) + text.length > 150) {
+      toast.error(tr("Note title can contain up to 150 characters."));
+      return false;
+    }
+    const previousFocus = document.activeElement as HTMLElement | null;
+    input.focus({ preventScroll: true });
+    input.setSelectionRange(start, end);
+    // Native insertion keeps the input's undo history. The fallback supports
+    // browsers that do not implement insertText on text inputs.
+    if (!document.execCommand("insertText", false, text)) {
+      input.setRangeText(text, start, end, "end");
+    }
+    update({ title: input.value });
+    titleSelection.current = { start: start + text.length, end: start + text.length };
+    previousFocus?.focus({ preventScroll: true });
+    return true;
+  };
   const onEditorReady = useCallback((commands: EditorCommands) => {
     editor.current = commands;
     if (editingRef.current && !document.activeElement?.matches(
@@ -572,11 +603,14 @@ function EditorSession({
           <div className="editor-title-wrap">
             {!editing ? <h2 className="note-heading-title">{surfaceDraft.title}</h2> : null}
             <input
+              ref={titleInput}
               hidden={!editing}
               className="editor-title"
               aria-label={tr("Note title")}
               value={draft.title}
               maxLength={150}
+              onFocus={() => { insertionTarget.current = "title"; }}
+              onSelect={event => { const input = event.currentTarget; titleSelection.current = { start: input.selectionStart ?? 0, end: input.selectionEnd ?? 0 }; }}
               onChange={(e) => update({ title: e.target.value })}
             />
           </div>
@@ -670,7 +704,9 @@ function EditorSession({
             </div>
           </div>
         ) : null}
-        <div className="editor-scroll">
+        <div className="editor-scroll" onFocusCapture={event => {
+          if ((event.target as HTMLElement).closest(".rich-editor")) insertionTarget.current = "content";
+        }}>
           <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>
             {editorPrepared || editing ? <RichEditor
               initial={editing ? initialDocument : surfaceDraft.documentJson}
@@ -777,6 +813,7 @@ function EditorSession({
               color={draft.backgroundColor}
               onChange={(backgroundColor) => update({ backgroundColor })}
             />
+            {editing ? <NoteEmojiPicker onInsert={insertCharacter} /> : null}
             <span className="toolbar-divider" />
             <IconButton
               icon={Tag}

@@ -1,0 +1,12 @@
+.emoji-symbol-picker { display: grid; gap: 10px; }
+.emoji-symbol-picker > input, .emoji-symbol-picker > select { width: 100%; min-width: 0; }
+.emoji-symbol-picker h3, .emoji-symbol-count { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+.emoji-symbol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 3px; }
+.emoji-symbol-grid button {
+  display: grid; place-items: center; min-width: 40px; height: 42px;
+  border: 0; border-radius: 7px; background: transparent; color: var(--text);
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 24px; cursor: pointer;
+}
+.emoji-symbol-grid button:hover { background: var(--hover); }
+.emoji-symbol-grid button:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }

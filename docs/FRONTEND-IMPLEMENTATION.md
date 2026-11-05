@@ -1,3 +1,9 @@
+## Chèn emoji và ký tự như văn bản — 2026-11-06
+
+Theo ba lựa chọn chủ dự án: nút Smile sau bảng màu/trước nhãn trong Edit trên desktop/mobile, chèn vào title hoặc content vừa focus, thay vùng chọn và tiến con trỏ để chèn liên tiếp. Bảng giữ mở, đóng khi bấm ngoài/Escape hoặc chuyển công cụ/View; status aria-live và nút bàn phím giữ. Tìm Việt/Anh không phân biệt dấu, 10 nhóm, 24 ký tự dùng gần đây lưu local riêng user/guest; không đồng bộ lịch sử lên server. Hiển thị 96 kết quả mỗi đợt và nút xem thêm.
+
+Catalog cục bộ có 4.019 chuỗi Unicode17/CLDR ghim commit, gồm các nhóm run.vn và ký tự đặc biệt. Không iframe/copy HTML hoặc request tới run.vn lúc dùng; được tải cùng module editor nên chọn lần đầu khi đã vào workspace vẫn dùng offline. Emoji mới hiển thị theo font thiết bị. Generator/provenance/license tại scripts/generate-emoji-catalog.mjs và ntc_react/src/features/editor/emoji. Giới hạn title150/content100000 giữ nguyên, không đổi iconEmoji/API/schema/ownership. Content dùng transaction editor để giữ marks/Undo; title dùng native insertText để giữ undo và fallback setRangeText ở browser thiếu lệnh. RichEditor đăng ký commands theo instance đang mount bằng layout effect, tránh giữ instance onCreate cũ đã destroy trong StrictMode. Evidence/giới hạn tại worklog; phần “bước sau” ở mục cũ dưới đây đã được thực hiện trong đợt này.
+
 ## Tiêu đề thẳng lề và bỏ icon riêng — 2026-11-06
 
 Tiêu đề trong View/Edit dùng cùng lề trái với nội dung, bỏ ô icon/ô trống và bộ chọn icon riêng ở đầu note. Thẻ note cũng chỉ hiển thị tiêu đề. Emoji nhập trực tiếp trong tiêu đề/nội dung tiếp tục được lưu và hiển thị như văn bản. Trường iconEmoji hiện có vẫn được giữ trong draft/API/archive; không chuyển hoặc xóa dữ liệu cũ. Bộ chèn emoji dành cho máy tính là bước sau, chưa triển khai trong đợt này. Bổ sung này thay mô tả lịch sử về icon đại diện trong UI bên dưới; evidence và giới hạn ở worklog.
