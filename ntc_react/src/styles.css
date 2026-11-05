@@ -974,6 +974,18 @@ strong {
   text-align: left;
   white-space: nowrap;
 }
+.workspace-toolbar .select-menu {
+  left: auto;
+  right: 0;
+  max-width: min(260px, calc(100vw - 32px));
+}
+.workspace-toolbar .select-option {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.workspace-toolbar .select-option svg {
+  flex-shrink: 0;
+}
 .select-option:hover {
   background: var(--hover);
 }

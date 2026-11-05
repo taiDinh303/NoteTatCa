@@ -1,3 +1,11 @@
+## Dropdown mobile và chế độ cài app — 2026-11-06
+
+Menu lọc ghim trong workspace neo mép phải trigger và giới hạn theo viewport, cho nhãn dài xuống dòng; các Select trong form khác giữ nguyên. Manifest tại /manifest.webmanifest khai báo display standalone, scope/id /, start_url /notes; icon PNG192/512, maskable512 và Apple180 dùng hình favicon hiện hữu. HTML liên kết manifest và metadata mobile/Apple. Vercel rewrite bỏ qua manifest/icons/offline-worker; offline shell precache cả metadata/icons.
+
+Sau bản mới được phát hành, mở website bằng Chrome trên Android, tải lại và cài ứng dụng từ menu Chrome, sau đó mở từ biểu tượng vừa cài. Lối tắt cũ có thể vẫn mở dạng browser/custom tab và cần thay bằng app vừa cài. Không xóa dữ liệu trang hoặc gỡ ứng dụng khi còn ghi chú chưa đồng bộ; thanh browser không thể bị CSS của trang xóa. Standalone giữ thanh trạng thái hệ thống; native install/display cần kiểm trên điện thoại thật. Tham khảo [MDN standalone](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Create_a_standalone_app) và [manifest web.dev](https://web.dev/learn/pwa/web-app-manifest).
+
+Validation: production Chromium7/7PASS, gồm filter320/393/430/1440, manifest/PNG và offline shell guest/authenticated với synthetic HTTP fixture; build React, .NET strict Release, scoped ESLint và configuration4/4PASS. Đã xem screenshot393. Chưa Android/iOS native install, WebKit hoặc fullsuite; xem worklog cho lệnh/evidence và giới hạn.
+
 ## Khôi phục Show more để mở bảng emoji nhẹ hơn — 2026-11-06
 
 Theo phản hồi lag sau khi hiện toàn bộ: bảng emoji trở lại 96 kết quả lúc mở; Show more characters thêm 96 nút mỗi lần. Đổi nhóm/từ tìm kiếm hoặc đóng/mở lại sẽ đặt giới hạn về 96. Tìm kiếm vẫn xét toàn bộ 4.019 ký tự; dữ liệu/keywords được tải một lần cùng module editor và giữ trong bộ nhớ, không tải từ run.vn lúc mở bảng. Không cần lưu thêm một bản catalog trong localStorage khi đăng nhập. Mục dùng gần đây vẫn tối đa 24 ký tự.

@@ -26,7 +26,13 @@ export default defineConfig(({ mode }) => {
             .update(readFileSync("dist/index.html"))
             .digest("hex")
             .slice(0, 16);
-          const sources = JSON.stringify(["/index.html", ...files]);
+          const sources = JSON.stringify([
+            "/index.html",
+            "/manifest.webmanifest",
+            "/favicon.svg",
+            ...readdirSync("public/icons").map((name) => "/icons/" + name),
+            ...files,
+          ]);
           writeFileSync(
             join("dist", "offline-worker.js"),
             `
