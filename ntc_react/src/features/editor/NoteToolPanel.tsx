@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
 const opened = "ntc-note-tool-open";
-export default function NoteToolPanel({ title, onClose, children }: {
-  title: string; onClose: () => void; children: ReactNode;
+export default function NoteToolPanel({ title, onClose, children, className = "" }: {
+  title: string; onClose: () => void; children: ReactNode; className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);
@@ -44,7 +44,7 @@ export default function NoteToolPanel({ title, onClose, children }: {
         trigger.focus({ preventScroll: true });
     };
   }, [host]);
-  const panel = <div ref={ref} className="note-tool-popover" role="dialog" aria-label={title}>
+  const panel = <div ref={ref} className={`note-tool-popover ${className}`} role="dialog" aria-label={title}>
     <div className="note-tool-heading">{title}</div>
     <div className="note-tool-body">{children}</div>
   </div>;

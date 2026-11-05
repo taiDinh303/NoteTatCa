@@ -14,6 +14,13 @@ for (const width of [320, 393, 1440]) {
     await content.press("Control+b");
     await dialog.getByRole("button", { name: "Insert emoji or symbol", exact: true }).click();
     let picker = page.getByRole("dialog", { name: "Emoji and symbols", exact: true });
+    await expect(picker.getByLabel("Search emoji or symbols")).toHaveAttribute("placeholder", "Search");
+    const initialBounds = (await picker.boundingBox())!;
+    const editorBounds = (await dialog.boundingBox())!;
+    expect(initialBounds.height).toBeLessThanOrEqual(301);
+    expect(Math.abs(initialBounds.width - (editorBounds.width - 32))).toBeLessThanOrEqual(2);
+    expect(initialBounds.y).toBeGreaterThan(editorBounds.y + editorBounds.height / 3);
+    await page.screenshot({ path: info.outputPath(`emoji-horizontal-${width}.png`) });
     await picker.getByLabel("Search emoji or symbols").fill("trái tim");
     await picker.getByRole("button").filter({ hasText: /^❤️$/ }).click();
 
@@ -159,6 +166,15 @@ for (const [width, theme] of [[393, "dark"], [1440, "light"]] as const) {
     await dialog.getByRole("button", { name: "Insert emoji or symbol", exact: true }).click();
     const picker = page.getByRole("dialog", { name: "Emoji and symbols", exact: true });
     await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
+    await expect(picker.getByLabel("Search emoji or symbols")).toHaveAttribute("placeholder", "Search");
+    const panelBounds = (await picker.boundingBox())!;
+    expect(panelBounds.height).toBeLessThanOrEqual(301);
+    const controls = picker.locator(".emoji-symbol-controls");
+    const searchBounds = (await controls.locator("input").boundingBox())!;
+    const categoryBounds = (await controls.locator("select").boundingBox())!;
+    if (width > 480) expect(Math.abs(searchBounds.y - categoryBounds.y)).toBeLessThan(2);
+    else expect(categoryBounds.y).toBeGreaterThanOrEqual(searchBounds.y + searchBounds.height);
+    await page.screenshot({ path: info.outputPath(`horizontal-initial-${theme}.png`) });
     await info.attach("first-open", { body: JSON.stringify({ width, theme, milliseconds: Date.now() - started, buttons: 96 }), contentType: "application/json" });
     const more = picker.getByRole("button", { name: "Show more characters", exact: true });
     await expect(more).toHaveCSS("color", await picker.evaluate(el => getComputedStyle(el).color));

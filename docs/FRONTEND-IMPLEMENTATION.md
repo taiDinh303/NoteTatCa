@@ -1,3 +1,9 @@
+## Emoji dạng ngang thấp, Search ngắn — 2026-11-06
+
+Bảng emoji riêng rộng theo khung note trừ32px, cao tối đa300px (vẫn giới hạn theo chiều cao note), nằm trên footer. Search/category cùng hàng desktop, xếp hai hàng ở<=480px. Placeholder chỉ Search, aria-label vẫn mô tả tìm emoji/ký tự. Recently used tối đa24ký tự thành một hàng cuộn ngang; danh sách chính cuộn dọc và giữ96items/Show more để tránh lag. Các tool khác giữ kích thước cũ. Bảng vẫn che phần dưới nhưng thấp hơn bản dọc trước, không thay kích thước editor hoặc scrollposition khi mở.
+
+Production Chromium9/9PASS ở320/393/1440 gồm bounds/placeholder, caret/title/Undo/Redo/lưu/offline/nhóm Việt và Show more/light/dark. Đã xem screenshotdesktop1440/dark393. Reactbuild/.NETstrictRelease/scopedlint/diffcheckPASS; chưa thiết bịthật/WebKit/fullsuite. Xem worklog cho lệnh/evidence.
+
 ## Dropdown mobile và chế độ cài app — 2026-11-06
 
 Menu lọc ghim trong workspace neo mép phải trigger và giới hạn theo viewport, cho nhãn dài xuống dòng; các Select trong form khác giữ nguyên. Manifest tại /manifest.webmanifest khai báo display standalone, scope/id /, start_url /notes; icon PNG192/512, maskable512 và Apple180 dùng hình favicon hiện hữu. HTML liên kết manifest và metadata mobile/Apple. Vercel rewrite bỏ qua manifest/icons/offline-worker; offline shell precache cả metadata/icons.

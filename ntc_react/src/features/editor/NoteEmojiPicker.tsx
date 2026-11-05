@@ -25,7 +25,7 @@ export default function NoteEmojiPicker({ onInsert }: { onInsert: (text: string)
   const userId = useAuth().session?.userId ?? "guest";
   return <>
     <IconButton data-note-tool-trigger icon={Smile} label={tr("Insert emoji or symbol")} aria-expanded={open} active={open} onClick={() => setOpen(!open)} />
-    {open ? <NoteToolPanel title={tr("Emoji and symbols")} onClose={() => setOpen(false)}>
+    {open ? <NoteToolPanel className="note-emoji-panel" title={tr("Emoji and symbols")} onClose={() => setOpen(false)}>
       <EmojiChoices key={userId} storageKey={`ntc.emoji.recent.v1.${userId}`} onInsert={onInsert} />
     </NoteToolPanel> : null}
   </>;
@@ -56,11 +56,13 @@ function EmojiChoices({ storageKey, onInsert }: { storageKey: string; onInsert: 
     })}
   </div>;
   return <div className="emoji-symbol-picker">
-    <input type="search" aria-label={tr("Search emoji or symbols")} placeholder={tr("Search in English or Vietnamese…")} value={query} onChange={event => { setQuery(event.target.value); setLimit(96); }} />
+    <div className="emoji-symbol-controls">
+    <input type="search" aria-label={tr("Search emoji or symbols")} placeholder={tr("Search")} value={query} onChange={event => { setQuery(event.target.value); setLimit(96); }} />
     <select aria-label={tr("Emoji category")} value={group} onChange={event => { setGroup(event.target.value); setLimit(96); }}>
       <option value="">{tr("All emoji and symbols")}</option>
       {catalog.groups.map((name, index) => <option key={name} value={index}>{tr(name)}</option>)}
     </select>
+    </div>
     {recent.length && !query && !group ? <section aria-label={tr("Recently used")}><h3>{tr("Recently used")}</h3>{buttons(recent)}</section> : null}
     <p className="emoji-symbol-count">{tr("Characters: {0}", filtered.length)}</p>
     {filtered.length ? buttons(filtered.slice(0, limit).map(entry => entry.value)) : <p role="status">{tr("No emoji or symbols found.")}</p>}
