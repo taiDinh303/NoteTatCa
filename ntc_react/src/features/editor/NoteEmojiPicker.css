@@ -10,3 +10,8 @@
 }
 .emoji-symbol-grid button:hover { background: var(--hover); }
 .emoji-symbol-grid button:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+.note-tool-popover .emoji-symbol-picker .emoji-load-more {
+  color: var(--text);
+  background: var(--hover);
+  border: 1px solid var(--border);
+}

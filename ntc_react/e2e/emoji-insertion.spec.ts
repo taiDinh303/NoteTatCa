@@ -109,7 +109,7 @@ for (const width of [320, 393, 1440]) {
   });
 }
 
-test("Vietnamese categories show every character with scrolling and keyboard insertion", async ({ page }) => {
+test("Vietnamese categories paginate locally and support keyboard insertion", async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("ntc.language.v1", "vi"));
   await page.goto("/guest");
   await page.getByRole("button", { name: "Tạo ghi chú", exact: true }).click();
@@ -120,13 +120,14 @@ test("Vietnamese categories show every character with scrolling and keyboard ins
   await dialog.getByRole("button", { name: "Chèn emoji hoặc ký tự", exact: true }).click();
   const picker = page.getByRole("dialog", { name: "Emoji và ký tự", exact: true });
   const group = picker.getByLabel("Nhóm emoji", { exact: true });
-  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(4019);
-  await expect(picker.getByRole("button", { name: "Xem thêm ký tự", exact: true })).toHaveCount(0);
+  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
+  await picker.getByRole("button", { name: "Xem thêm ký tự", exact: true }).click();
+  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(192);
   await picker.locator(".emoji-symbol-grid button").last().scrollIntoViewIfNeeded();
   expect(await picker.evaluate(el => el.querySelector(".note-tool-body")!.scrollTop)).toBeGreaterThan(0);
   await picker.getByLabel("Nhóm emoji", { exact: true }).scrollIntoViewIfNeeded();
   await group.selectOption({ label: "Con người và cơ thể" });
-  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(2418);
+  await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
   await group.selectOption({ label: "Ký tự đặc biệt" });
   const search = picker.getByLabel("Tìm emoji hoặc ký tự", { exact: true });
   await search.fill("zzzz no match");
@@ -140,3 +141,33 @@ test("Vietnamese categories show every character with scrolling and keyboard ins
   await page.keyboard.press("Escape");
   await expect(dialog.getByRole("button", { name: "Chèn emoji hoặc ký tự", exact: true })).toBeFocused();
 });
+
+for (const [width, theme] of [[393, "dark"], [1440, "light"]] as const) {
+  test(`emoji opens offline with 96 buttons and readable Show more ${width} ${theme}`, async ({ page }, info) => {
+    await page.addInitScript(value => localStorage.setItem("ntc.theme.v1", value), theme);
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/guest");
+    await page.getByRole("button", { name: "Take a note", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "New note", exact: true });
+    await dialog.getByLabel("Note title", { exact: true }).fill("Local emoji catalog");
+    await dialog.getByRole("button", { name: "Note background color", exact: true }).click();
+    await page.getByRole("textbox", { name: "Hex color", exact: true }).fill("#fff4d4");
+    await page.getByRole("button", { name: "Apply color", exact: true }).click();
+    await page.keyboard.press("Escape");
+    await page.context().setOffline(true);
+    const started = Date.now();
+    await dialog.getByRole("button", { name: "Insert emoji or symbol", exact: true }).click();
+    const picker = page.getByRole("dialog", { name: "Emoji and symbols", exact: true });
+    await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
+    await info.attach("first-open", { body: JSON.stringify({ width, theme, milliseconds: Date.now() - started, buttons: 96 }), contentType: "application/json" });
+    const more = picker.getByRole("button", { name: "Show more characters", exact: true });
+    await expect(more).toHaveCSS("color", await picker.evaluate(el => getComputedStyle(el).color));
+    await more.click();
+    await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(192);
+    await more.scrollIntoViewIfNeeded();
+    await picker.screenshot({ path: info.outputPath(`show-more-${theme}.png`) });
+    await page.keyboard.press("Escape");
+    await dialog.getByRole("button", { name: "Insert emoji or symbol", exact: true }).click();
+    await expect(picker.locator(".emoji-symbol-grid button")).toHaveCount(96);
+  });
+}

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Smile } from "lucide-react";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { useAuth } from "../../shared/hooks";
-import { IconButton } from "../../shared/ui";
+import { Button, IconButton } from "../../shared/ui";
 import NoteToolPanel from "./NoteToolPanel";
 import catalog from "./emoji/catalog.json";
 import "./NoteEmojiPicker.css";
@@ -34,6 +34,7 @@ function EmojiChoices({ storageKey, onInsert }: { storageKey: string; onInsert: 
   const language = useLanguage();
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState("");
+  const [limit, setLimit] = useState(96);
   const [recent, setRecent] = useState(() => readRecent(storageKey));
   const [last, setLast] = useState("");
   const filtered = useMemo(() => {
@@ -55,14 +56,15 @@ function EmojiChoices({ storageKey, onInsert }: { storageKey: string; onInsert: 
     })}
   </div>;
   return <div className="emoji-symbol-picker">
-    <input type="search" aria-label={tr("Search emoji or symbols")} placeholder={tr("Search in English or Vietnamese…")} value={query} onChange={event => setQuery(event.target.value)} />
-    <select aria-label={tr("Emoji category")} value={group} onChange={event => setGroup(event.target.value)}>
+    <input type="search" aria-label={tr("Search emoji or symbols")} placeholder={tr("Search in English or Vietnamese…")} value={query} onChange={event => { setQuery(event.target.value); setLimit(96); }} />
+    <select aria-label={tr("Emoji category")} value={group} onChange={event => { setGroup(event.target.value); setLimit(96); }}>
       <option value="">{tr("All emoji and symbols")}</option>
       {catalog.groups.map((name, index) => <option key={name} value={index}>{tr(name)}</option>)}
     </select>
     {recent.length && !query && !group ? <section aria-label={tr("Recently used")}><h3>{tr("Recently used")}</h3>{buttons(recent)}</section> : null}
     <p className="emoji-symbol-count">{tr("Characters: {0}", filtered.length)}</p>
-    {filtered.length ? buttons(filtered.map(entry => entry.value)) : <p role="status">{tr("No emoji or symbols found.")}</p>}
+    {filtered.length ? buttons(filtered.slice(0, limit).map(entry => entry.value)) : <p role="status">{tr("No emoji or symbols found.")}</p>}
+    {filtered.length > limit ? <Button variant="ghost" className="emoji-load-more" onClick={() => setLimit(value => value + 96)}>{tr("Show more characters")}</Button> : null}
     <span className="sr-only" role="status" aria-live="polite">{last ? tr("Inserted {0}", last) : ""}</span>
   </div>;
 }

@@ -1,3 +1,9 @@
+## Khôi phục Show more để mở bảng emoji nhẹ hơn — 2026-11-06
+
+Theo phản hồi lag sau khi hiện toàn bộ: bảng emoji trở lại 96 kết quả lúc mở; Show more characters thêm 96 nút mỗi lần. Đổi nhóm/từ tìm kiếm hoặc đóng/mở lại sẽ đặt giới hạn về 96. Tìm kiếm vẫn xét toàn bộ 4.019 ký tự; dữ liệu/keywords được tải một lần cùng module editor và giữ trong bộ nhớ, không tải từ run.vn lúc mở bảng. Không cần lưu thêm một bản catalog trong localStorage khi đăng nhập. Mục dùng gần đây vẫn tối đa 24 ký tự.
+
+Nút dùng Button chung với màu chữ/background/border lấy trực tiếp từ theme của tool panel, tránh kế thừa màu chữ của note nền vàng trong dark mode. Thay quyết định cuộn toàn bộ trong mục lịch sử ngay bên dưới; giữ thao tác chèn/Undo/autosave/offline và các thay đổi avatar/label/reminder.
+
 ## Emoji cuộn toàn bộ, avatar Apply và tác vụ ngoài thẻ — 2026-11-06
 
 Theo phản hồi mới nhất: bỏ giới hạn96/nút Show more characters của bảng emoji; hiển thị toàn bộ4.019ký tự hoặc toàn bộ nhóm/kết quả đang lọc trong thanh cuộn hiện có. Thay mô tả phân trang ở mục trước.
