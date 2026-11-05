@@ -27,11 +27,6 @@ for (const dark of [false, true]) {
     await editor
       .getByRole("textbox", { name: "Note content" })
       .fill("A note with a full background");
-    await editor.getByRole("button", { name: "Choose note icon" }).click();
-    await page
-      .getByRole("dialog", { name: "Note icons", exact: true })
-      .getByRole("button", { name: "💡", exact: true })
-      .click();
     await editor
       .getByRole("button", { name: "Note background color", exact: true })
       .click();
@@ -82,14 +77,7 @@ for (const dark of [false, true]) {
     const heading = card.locator(".note-card-identity h3");
     await expect(heading).toHaveText("Card appearance");
     await expect(card.getByRole("heading")).toHaveCount(1);
-    const titleBox = (await heading.boundingBox())!;
-    const iconBox = (await card.locator(".note-emoji").boundingBox())!;
-    expect(titleBox.x).toBeGreaterThan(iconBox.x);
-    expect(
-      Math.abs(
-        titleBox.y + titleBox.height / 2 - iconBox.y - iconBox.height / 2,
-      ),
-    ).toBeLessThan(2);
+    await expect(card.locator(".note-emoji")).toHaveCount(0);
     await card.screenshot({
       path: `../artifacts/frontend/card-identity-${dark ? "dark-mobile" : "light-desktop"}.png`,
     });

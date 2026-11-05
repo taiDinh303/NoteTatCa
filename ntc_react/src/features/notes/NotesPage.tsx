@@ -169,16 +169,13 @@ const NoteCard = memo(function NoteCard({
       }}
     >
       <div className="note-card-top">
-        {note.iconEmoji || note.title?.trim() ? (
+        {note.title?.trim() ? (
           <button
             type="button"
             className="note-card-identity"
             onClick={() => onOpen(note.id)}
             aria-label={tr("View {0}", title)}
           >
-            {note.iconEmoji ? (
-              <span className="note-emoji">{note.iconEmoji}</span>
-            ) : null}
             {note.title?.trim() ? (
               <h3 title={note.title}>{note.title}</h3>
             ) : null}

@@ -1,3 +1,7 @@
+## Tiêu đề thẳng lề và bỏ icon riêng — 2026-11-06
+
+Tiêu đề trong View/Edit dùng cùng lề trái với nội dung, bỏ ô icon/ô trống và bộ chọn icon riêng ở đầu note. Thẻ note cũng chỉ hiển thị tiêu đề. Emoji nhập trực tiếp trong tiêu đề/nội dung tiếp tục được lưu và hiển thị như văn bản. Trường iconEmoji hiện có vẫn được giữ trong draft/API/archive; không chuyển hoặc xóa dữ liệu cũ. Bộ chèn emoji dành cho máy tính là bước sau, chưa triển khai trong đợt này. Bổ sung này thay mô tả lịch sử về icon đại diện trong UI bên dưới; evidence và giới hạn ở worklog.
+
 ## Không lưu phép đo 0px khi khung note còn ẩn — 2026-11-05
 
 Bổ sung sau video mới và xác nhận PC cũng bị: chỉ đồng bộ lại khi reveal chưa loại bỏ phép đo0px trong lúc mount. ContentZoom nay bỏ qua viewport không có width, dùng chung resize cho khởi tạo và ResizeObserver, không ghi width/min-height/stageheight từ khung display:none. Layer có CSS width100% làm bố cục mặc định trước phép đo dương đầu tiên; context reveal vẫn đồng bộ extent trước paint. Không ẩn scrollbar thật của note dài, không thêm delay hoặc đổi dữ liệu/editor.

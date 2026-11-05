@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdir } from "node:fs/promises";
 for (const width of [320, 393, 430, 768, 1280]) {
-  test(`compact editor heading and icon dropdown ${width}`, async ({
+  test(`aligned editor heading and inline emoji ${width}`, async ({
     page,
     request,
   }) => {
@@ -43,7 +43,6 @@ for (const width of [320, 393, 430, 768, 1280]) {
     const heading = editor.locator(".editor-heading");
     const boxes = await Promise.all(
       [
-        editor.getByRole("button", { name: "Choose note icon" }),
         editor.getByLabel("Note title"),
         editor.getByRole("button", { name: "Pin note", exact: true }),
         ...(width > 800 ? [editor.getByRole("button", { name: "Enter full screen" })] : []),
@@ -56,28 +55,23 @@ for (const width of [320, 393, 430, 768, 1280]) {
     }
     await expect(heading.locator('[role="status"]')).toHaveClass("sr-only");
     await expect(editor.locator('[data-save-state="saved"]')).toBeAttached();
-    const before = (await heading.boundingBox())!.height;
-    await editor.getByRole("button", { name: "Choose note icon" }).click();
-    const picker = page.getByRole("dialog", {
-      name: "Note icons",
-      exact: true,
-    });
-    await expect(picker).toBeVisible();
-    expect((await heading.boundingBox())!.height).toBe(before);
-    await mkdir("../artifacts/frontend", { recursive: true });
-    await page.screenshot({
-      path: `../artifacts/frontend/editor-header-${width}.png`,
-    });
-    await picker.getByRole("button", { name: "💡", exact: true }).click();
-    await expect(picker).toBeHidden();
-    await expect(
-      editor.getByRole("button", { name: "Choose note icon" }),
-    ).toHaveText("💡");
+    await expect(editor.getByRole("button", { name: "Choose note icon" })).toHaveCount(0);
+    const title = editor.getByLabel("Note title", { exact: true });
+    const paragraph = editor.locator(".rich-editor p").first();
+    expect(Math.abs((await title.boundingBox())!.x - (await paragraph.boundingBox())!.x)).toBeLessThan(1);
+    await title.fill("💡 Compact header title");
     await expect(editor.locator('[data-save-state="saved"]')).toBeAttached();
+    await editor.getByRole("button", { name: "View", exact: true }).click();
+    const view = page.getByRole("dialog", { name: "View note", exact: true });
+    expect(Math.abs((await view.locator(".note-heading-title").boundingBox())!.x - (await view.locator(".rich-editor p").first().boundingBox())!.x)).toBeLessThan(1);
+    await view.getByRole("button", { name: "Edit", exact: true }).click();
+    editor = page.getByRole("dialog", { name: "Edit note", exact: true });
+    await mkdir("../artifacts/frontend", { recursive: true });
+    await page.screenshot({ path: `../artifacts/frontend/editor-header-${width}.png` });
     await editor.getByRole("button", { name: "Close", exact: true }).click();
     await page.reload();
     await page
-      .getByRole("button", { name: "Open Compact header title", exact: true })
+      .getByRole("button", { name: "Open 💡 Compact header title", exact: true })
       .click();
     await page.getByRole("dialog", { name: "View note", exact: true }).getByRole("button", { name: "Edit", exact: true }).click();
     editor = page.getByRole("dialog", { name: "Edit note", exact: true });
@@ -93,12 +87,7 @@ for (const width of [320, 393, 430, 768, 1280]) {
     } else {
       await expect(editor.getByRole("button", { name: "Enter full screen", exact: true })).toBeVisible();
     }
-    await expect(
-      editor.getByRole("button", { name: "Choose note icon" }),
-    ).toHaveText("💡");
-    await editor.getByRole("button", { name: "Choose note icon" }).click();
-    await page.keyboard.press("Escape");
-    await expect(picker).toBeHidden();
-    await expect(editor).toBeVisible();
+    await expect(editor.getByLabel("Note title", { exact: true })).toHaveValue("💡 Compact header title");
+    await expect(editor.getByRole("button", { name: "Choose note icon" })).toHaveCount(0);
   });
 }

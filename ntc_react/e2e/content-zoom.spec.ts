@@ -603,7 +603,7 @@ for (const [width, theme] of [
           actionScrollRange: actions ? actions.scrollWidth - actions.clientWidth : null,
         };
       });
-    const compare = async (hasIcon: boolean) => {
+    const compare = async () => {
       await dialog.getByRole("button", { name: "View", exact: true }).click();
       await expect(dialog.getByRole("button", { name: "Edit", exact: true })).toBeVisible();
       const view = await measure();
@@ -623,25 +623,12 @@ for (const [width, theme] of [
       expect(edit.content!.y - view.content!.y).toBeGreaterThanOrEqual(0);
       expect(view.fontSize).toBe(edit.fontSize);
       expect(view.fontWeight).toBe(edit.fontWeight);
-      if (hasIcon) {
-        expect(view.icon).not.toBeNull();
-        expect(edit.icon).not.toBeNull();
-        near(view.icon!.x, edit.icon!.x);
-        near(view.icon!.y, edit.icon!.y);
-        near(view.icon!.width, edit.icon!.width);
-        near(view.icon!.height, edit.icon!.height);
-      } else {
-        expect(view.icon).toBeNull();
-      }
+      expect(view.icon).toBeNull();
+      expect(edit.icon).toBeNull();
+      near(view.title!.x, view.content!.x);
+      near(edit.title!.x, edit.content!.x);
     };
 
-    await compare(false);
-    await dialog.getByRole("button", { name: "Choose note icon" }).click();
-    await page
-      .getByRole("dialog", { name: "Note icons", exact: true })
-      .getByRole("button", { name: "💡", exact: true })
-      .click();
-    await expect(dialog.getByText("Saved on this device", { exact: true })).toBeVisible();
-    await compare(true);
+    await compare();
   });
 }

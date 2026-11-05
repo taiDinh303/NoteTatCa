@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-for (const title of ["", "Plain title"]) {
+for (const title of ["", "Plain title", "💡 Inline emoji"]) {
   test(`header actions stay at the right without an icon, title=${title || "empty"}`, async ({
     page,
   }) => {
@@ -24,7 +24,7 @@ for (const title of ["", "Plain title"]) {
         get.onsuccess = () => {
           const data = get.result;
           data.notes.forEach((note) => {
-            note.iconEmoji = "";
+            note.iconEmoji = "🌿";
             note.title = title;
           });
           data.revision++;
@@ -67,26 +67,28 @@ for (const title of ["", "Plain title"]) {
         .boundingBox())!;
     expect(Math.abs(editedPin.x - pin.x)).toBeLessThan(1);
     expect(Math.abs(editedSize.x - size.x)).toBeLessThan(1);
-    const iconButton = edit.getByRole("button", {
-      name: "Choose note icon",
-      exact: true,
-    });
-    const emptyIcon = (await iconButton.boundingBox())!;
-    const titleBefore = (await edit
-      .getByRole("textbox", { name: "Note title", exact: true })
-      .boundingBox())!;
-    expect(emptyIcon.x).toBeLessThan(titleBefore.x);
-    await iconButton.click();
-    await page.locator(".note-icon-grid button").nth(1).click();
-    const chosenIcon = (await iconButton.boundingBox())!;
-    const titleAfter = (await edit
-      .getByRole("textbox", { name: "Note title", exact: true })
-      .boundingBox())!;
-    expect(Math.abs(chosenIcon.x - emptyIcon.x)).toBeLessThan(1);
-    expect(chosenIcon.width).toBe(emptyIcon.width);
-    expect(Math.abs(titleAfter.x - titleBefore.x)).toBeLessThan(1);
+    await expect(edit.getByRole("button", { name: "Choose note icon", exact: true })).toHaveCount(0);
+    await expect(edit.locator(".note-heading-icon, .note-heading-icon-space")).toHaveCount(0);
+    const titleBox = (await edit.getByRole("textbox", { name: "Note title", exact: true }).boundingBox())!;
+    const contentBox = (await edit.locator(".rich-editor p").first().boundingBox())!;
+    expect(Math.abs(titleBox.x - contentBox.x)).toBeLessThan(1);
     await editPin.click();
     await edit.getByRole("button", { name: "View", exact: true }).click();
     await expect(viewPin).toHaveAttribute("aria-pressed", before!);
+    await view.getByRole("button", { name: "Close", exact: true }).click();
+    await expect(page.locator(".note-emoji")).toHaveCount(0);
+    const icons = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve) => {
+        const request = indexedDB.open("ntc.guest.v1", 1);
+        request.onsuccess = () => resolve(request.result);
+      });
+      const data = await new Promise<{ notes: { iconEmoji: string }[] }>((resolve) => {
+        const request = db.transaction("workspace").objectStore("workspace").get("guest");
+        request.onsuccess = () => resolve(request.result);
+      });
+      db.close();
+      return data.notes.map(note => note.iconEmoji);
+    });
+    expect(icons).toEqual(["🌿", "🌿", "🌿"]);
   });
 }

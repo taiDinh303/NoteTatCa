@@ -30,7 +30,6 @@ import {
   Pencil,
   Pin,
   PinOff,
-  Plus,
   RotateCcw,
   Tag,
   Trash2,
@@ -41,7 +40,7 @@ import { toast } from "sonner";
 import { AutosaveCoordinator } from "../../application/autosave";
 import { api, notes, workspace, offline } from "../../app/runtime";
 import type { Note, NoteDraft } from "../../domain/models";
-import { draftFrom, EMOJIS } from "../../domain/models";
+import { draftFrom } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
 import { useAuth, useLabels, useMe } from "../../shared/hooks";
 import { dateTime, errorMessage } from "../../shared/utils";
@@ -436,7 +435,6 @@ function EditorSession({
   const [closing, setClosing] = useState(false);
   const [viewing, setViewing] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
-  const [emojiOpen, setEmojiOpen] = useState(false);
   const [reminderOpen, setReminderOpen] = useState(initialAction === "reminder");
   const [closePrompt, setClosePrompt] = useState(false);
   const [trashBusy, setTrashBusy] = useState(false);
@@ -480,7 +478,7 @@ function EditorSession({
   const onEditorReady = useCallback((commands: EditorCommands) => {
     editor.current = commands;
     if (editingRef.current && !document.activeElement?.matches(
-      "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, .note-icon-menu *, [role='menuitem'], [role='menuitemradio']",
+      "input, textarea, select, [contenteditable='true'], [aria-expanded='true'], .note-color-menu *, [role='menuitem'], [role='menuitemradio']",
     )) commands.focus();
   }, []);
   async function save() {
@@ -558,72 +556,19 @@ function EditorSession({
       >
         {!fullscreen ? <NoteMascot size={80} /> : null}
         <div
-          className={`editor-heading ${editing ? "" : "note-view-heading"} ${surfaceDraft.iconEmoji ? "" : "editor-heading-no-icon"}`}
+          className={`editor-heading ${editing ? "" : "note-view-heading"}`}
           style={{
             ...notePalette(surfaceDraft.backgroundColor),
             backgroundColor: surfaceDraft.backgroundColor || undefined,
           }}
         >
-          <div className="editor-identity">
-            {!editing ? <span className={surfaceDraft.iconEmoji ? "note-heading-icon" : "note-heading-icon-space"} aria-hidden="true">{surfaceDraft.iconEmoji}</span> : null}
-            <div style={{ display: editing ? undefined : "none" }}>
-            <Popover.Root open={emojiOpen} onOpenChange={setEmojiOpen}>
-              <Popover.Trigger asChild>
-                <button
-                  type="button"
-                  className={`emoji-trigger ${draft.iconEmoji ? "" : "empty"}`}
-                  aria-label={tr("Choose note icon")}
-                  title={tr(draft.iconEmoji ? "Choose note icon" : "Add icon")}
-                >
-                  {draft.iconEmoji || <Plus size={18} aria-hidden="true" />}
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="note-icon-menu"
-                  side="bottom"
-                  align="start"
-                  sideOffset={10}
-                  collisionPadding={12}
-                  aria-label={tr("Note icons")}
-                >
-                  <div className="note-icon-grid">
-                    {EMOJIS.map((emoji) => (
-                      <button
-                        key={emoji || "none"}
-                        type="button"
-                        aria-label={emoji || tr("Remove icon")}
-                        aria-pressed={draft.iconEmoji === emoji}
-                        onClick={() => {
-                          update({ iconEmoji: emoji });
-                          setEmojiOpen(false);
-                        }}
-                      >
-                        {emoji || "×"}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    aria-label={tr("Custom note emoji")}
-                    placeholder={tr("Or paste an emoji")}
-                    value={draft.iconEmoji}
-                    maxLength={32}
-                    onChange={(event) =>
-                      update({ iconEmoji: event.target.value })
-                    }
-                  />
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-            </div>
-            <span
-              className="sr-only"
-              role="status"
-              data-save-state={snapshot.status}
-            >
-              {status}
-            </span>
-          </div>
+          <span
+            className="sr-only"
+            role="status"
+            data-save-state={snapshot.status}
+          >
+            {status}
+          </span>
           <div className="editor-title-wrap">
             {!editing ? <h2 className="note-heading-title">{surfaceDraft.title}</h2> : null}
             <input
@@ -933,7 +878,6 @@ function EditorSession({
                 void save()
                   .then((note) => {
                     if (note) {
-                      setEmojiOpen(false);
                       setTagsOpen(false);
                       setInitialDocument(draftRef.current.documentJson);
                       onView(note);
