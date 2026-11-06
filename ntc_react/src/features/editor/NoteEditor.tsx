@@ -718,6 +718,7 @@ function EditorSession({
             return label ? (
               <button
                 className="label-chip"
+                title={label.name}
                 key={id}
                 style={
                   label.color
@@ -732,7 +733,7 @@ function EditorSession({
                   size={11}
                   style={label.color ? { color: label.color } : undefined}
                 />
-                {label.name}
+                <span className="label-chip-name">{label.name}</span>
               </button>
             ) : null;
           })}

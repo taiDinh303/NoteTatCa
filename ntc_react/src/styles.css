@@ -1702,8 +1702,19 @@ strong {
   display: none;
 }
 .editor-labels .label-chip {
+  min-width: 0;
+  max-width: 100%;
   font-size: 11px;
   padding: 5px 8px;
+}
+.editor-labels .label-chip svg {
+  flex-shrink: 0;
+}
+.editor-labels .label-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .editor-footer {
   display: flex;

@@ -583,3 +583,7 @@ Profile Edit có Change avatar/Remove avatar và preview; chọn PNG/JPG/WebP≤
 Remove avatar mở ConfirmDialog có Cancel/xác nhận trước khi xóa preview; mô tả rõ vẫn cần Save profile để ghi việc bỏ ảnh. Hủy xác nhận giữ ảnh; xác nhận rồi Cancel hồ sơ vẫn giữ ảnh trên máy chủ. Timezone dùng chevron riêng cách phải12px và select padding-right40px, native appearance none; Use device timezone cùng hàng nhãn Timezone, Locale/select cùng đường căn desktop. Hành vi chọn múi giờ/lưu hồ sơ không đổi.
 
 Timezone thay input/datalist bằng select IANA từ Intl.supportedValuesOf cộng UTC, múi giờ hiện tại và thiết bị; tên bỏ underscore và kèm GMT offset theo thời điểm hiện tại. Use device timezone chỉ chọn giá trị, vẫn cần Save profile. Có mô tả ngắn nhắc giờ/ngày, không yêu cầu user tự gõ mã. Backend giữ ReminderSchedule.Zone validation; không thay lịch reminder cũ tự động. UI/action/error mới có4ngôn ngữ. Tài khoản legacy chưa có profile cần tạo profile trước khi đổi avatar như luồng hiện hành.
+
+## Nhãn dài và sidebar — 2026-11-07
+
+Card luôn hiện tên nhãn đầu với ellipsis khi thiếu chỗ, nhãn còn lại gom +N; editor chip một dòng, hộp chọn/quản lý giữ tên đầy đủ. Quota50 không đổi. Sidebar lấy shell.clientWidth cùng grid và hẹp hơn12px; Chromium kiểm reload/toggle5cột mở/6cột đóng ở1910–1920. Evidence/giới hạn tại worklog.

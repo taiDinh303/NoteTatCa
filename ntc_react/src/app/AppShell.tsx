@@ -225,10 +225,10 @@ export default function AppShell() {
       if (!column || !workspace) return;
       const style = getComputedStyle(workspace);
       const fullWidth =
-        window.innerWidth -
+        element.clientWidth -
         parseFloat(style.paddingLeft) -
         parseFloat(style.paddingRight);
-      const width = desktopNoteWidth(fullWidth) + DESKTOP_NOTE_GAP;
+      const width = desktopNoteWidth(fullWidth) + DESKTOP_NOTE_GAP - 12;
       const next = `${width}px`;
       if (element.style.getPropertyValue("--workspace-sidebar-width") === next)
         return;

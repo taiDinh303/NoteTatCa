@@ -8,10 +8,11 @@ function LabelChip({ label }: { label: Label }) {
   return (
     <span
       className="label-chip"
+      title={label.name}
       style={{ background: labelTint(label.color) ?? undefined }}
     >
       <Tag size={10} style={{ color: label.color ?? undefined }} />
-      {label.name}
+      <span className="label-chip-name">{label.name}</span>
     </span>
   );
 }
@@ -43,7 +44,7 @@ export function CardLabels({ labels }: { labels: Label[] }) {
           count++;
         }
       }
-      setVisibleCount(count);
+      setVisibleCount(Math.max(labels.length ? 1 : 0, count));
     });
     observer.observe(root);
     observer.observe(sizing);

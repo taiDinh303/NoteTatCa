@@ -13,9 +13,19 @@
   overflow: hidden;
 }
 .card-labels .label-chip {
-  flex: 0 0 auto;
-  max-width: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   white-space: nowrap;
+}
+.label-chip-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.card-labels .label-overflow {
+  flex: 0 0 auto;
 }
 .card-labels .label-chip svg {
   flex-shrink: 0;
