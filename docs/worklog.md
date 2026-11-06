@@ -2410,3 +2410,14 @@ Bắt đầu 2026-10-17: Git HEAD 176a968, chỉ hai appsettings có thay đổi
 - Theo ảnh/phương án chủ dự án xác nhận: email và Verified/Not verified cùng flex row, wrap khi thiếu chiều ngang; bỏ mô tả nhỏ dưới Password/Connected accounts, giữ hướng dẫn trong form và lỗi/xác nhận. Google đã liên kết bỏ chữ G trang trí/strong riêng, chỉ chữ Google font inherit cùng giá trị tài khoản; Google sign-in button thật không đổi. Không đổi API/auth/disconnect/setup-password/ownership.
 - Actual validation: Chromium settings-actions3/3PASS tại320/393/1440: row/action bounds, synthetic Google linked/no-password, setup form/cancel, signout confirmation/no overflow. Đã xem screenshot mobile393cuối: email+Verified cùng hàng, Google font thường không logo/mô tả. ESLint/TypeScript/Production Vite buildPASS; .NET Release strict -warnaserror -m:1 PASS0warnings/0errors; scoped diff checkPASS. Không thêm test mirror cho sửa markup/CSS nhỏ; chạy lại behavior suite hiện có. Không fullsuite/admin/thiết bị thật/production/owner DB/email thật/Google OAuth thật/deploy/migrate.
 - Publication scope3files: SettingsPage.tsx, settings.css và entry này của worklog. Index đang chứa font-size/backend/docs khác có sẵn; commit bằng index riêng chỉ chứa scope, giữ nguyên cả trạng thái staged và working content ngoài scope. Fetch trước publication divergence0/0. Push main theo quyền chủ dự án, kiểm SHA remote sau push; rollout hosting chưa xác minh.
+
+
+## Grid initial width consistent with sidebar toggle — 2026-11-07
+
+- Owner reports five columns on load versus desired six after sidebar toggle at desktop width. Unified initial/resize measurement with sidebar destination geometry (shell width minus sidebar and workspace insets), retaining fixed card width/gap and right inset.
+- Validation: Chromium grid-initial-fit 2/2 PASS (initial hidden sidebar, 1910–1920 widths, fractional shell, toggle and exact settled zoom); React TypeScript/Vite production build PASS; .NET Release -warnaserror -m:1 PASS, zero warnings/errors; scoped diff check PASS. Synthetic fixture only, no owner DB/email/migration/manual deploy. No physical-device or production verification. Existing local changes preserved.
+
+## Publication grid/sidebar và đối chiếu hiện trạng — 2026-11-07
+
+- Chủ dự án yêu cầu push fix sidebar và cập nhật đúng tình hình. Đọc docs/source/deploy manifest; thêm PROJECT-STATUS phân biệt hiện trạng với snapshot lịch sử, dẫn từ sáu tài liệu chủ quản; AGENTS dùng Git root hiện hành. README sản phẩm giữ nguyên.
+- Scope publication: NotesZoomViewport, AGENTS, PROJECT-STATUS, các link trạng thái docs và riêng hai entry worklog 07/11; giữ mascot/assets/flows/config và evidence worklog có sẵn ngoài commit. Grid Chromium 2/2, React production build, .NET Release strict zero warnings/errors, scoped ESLint và diff check PASS ở lượt sửa trước. Không chạy lại fullsuite/DB/email thật; rollout và remote xác minh sau push.

@@ -312,7 +312,14 @@ function DesktopNotesZoomViewport({
           )
       )
         sidebarMoving = false;
-      const available = view.getBoundingClientRect().width - parseFloat(inset);
+      // Use the same destination geometry on initial load and sidebar toggles.
+      // Measuring the scrollport can include a rounded/intermediate CSS width.
+      const sidebar = shell?.querySelector<HTMLElement>(":scope > .sidebar");
+      const sidebarWidth = shell?.classList.contains("sidebar-hidden") || !sidebar
+        ? 0 : parseFloat(getComputedStyle(sidebar).width);
+      const available = shell && main
+        ? fullWidth - sidebarWidth
+        : view.getBoundingClientRect().width - parseFloat(inset);
       if (tracksChanged || (!sidebarMoving && available !== availableWidth)) {
         availableWidth = available;
         fit(initialized, true);

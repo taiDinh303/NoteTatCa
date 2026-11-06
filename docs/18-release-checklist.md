@@ -1,3 +1,5 @@
+> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+
 ## Rollout production — 2026-11-02
 
 DB PostgreSQL thật đã áp dụng NoteRevisions và MascotGeneration; tài khoản/note đối soát không đổi. API Render commit1e10219 đãLIVE trước khi phát hành UI backup/import và cập nhật Privacy. Auto-deploy thực tế của service đang bật theo commit, khác file render.yaml chỉ là tham chiếu; không thay env/secret hoặc tạo deploy trùng. Chứng cứ và kết quả production/UI ở [worklog](worklog.md).

@@ -4,7 +4,7 @@ Read docs/00-README.md, docs/PROJECT-INTAKE.md, docs/01-plan.md,
 docs/BACKEND-IMPLEMENTATION.md and the latest worklog before changes.
 The human user's current instruction takes precedence.
 
-- Repository root is D:\My Project\NTC. Backend projects and solutions live in
+- Repository root is the directory containing this AGENTS.md (currently D:\My Projects\NoteTatCa). Backend projects and solutions live in
   ntc_aspnet/. docs/ at the repository root is the only maintained documentation.
   Repository scripts, .github/, .config/, Dockerfile and render.yaml live here.
 

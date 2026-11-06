@@ -1,3 +1,5 @@
+> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+
 # NoteTatCa — Tài liệu dự án
 
 > Chuẩn cấu hình hiện hành: [CONFIGURATION-STANDARD](CONFIGURATION-STANDARD.md) — JSON Production sạch, sáu biến triển khai cơ bản, kiểm cấu hình không chạm DB và script chung cho NTC/Marixa.

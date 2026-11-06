@@ -1,3 +1,5 @@
+> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+
 ## View/Edit không sinh thanh cuộn tạm — 2026-11-05
 
 Theo phản hồi mới nhất, ContentZoom đồng bộ width/min-height/scroll extent ngay trong layout commit của React khi đổi mode và đồng bộ ResizeObserver trước paint, thay vì chờ rAF kế tiếp. Hủy frame đo cũ khi resize, giữ scheduler rAF cho gesture zoom. Viewport dùng scrollbar-gutter stable để không đổi bề ngang khi có/không có scrollbar thật. Thanh công cụ vẫn overflow-x auto để kéo ngang/chạm/bàn phím, nhưng ẩn native scrollbar bằng scrollbar-width none và WebKit scrollbar display none. Scrollbar thật của document dài vẫn giữ; không cấm cuộn hoặc che nội dung dài, không thêm delay/sleep/timeout vào View/Edit.

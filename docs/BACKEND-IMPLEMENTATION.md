@@ -1,3 +1,5 @@
+> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+
 # Backend implementation contract — 2026-10-17
 
 > Contract viết trước code theo yêu cầu2026-10-17; CURRENT backend đã triển khai, bằng chứng tại06/worklog. Frontend/cloud rollout ngoài đợt code.

@@ -1,3 +1,5 @@
+> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+
 # 31 — Bàn giao và bảo trì
 
 > 2026-10-17 | CURRENT backend implementation; chưa phát hành cloud.
