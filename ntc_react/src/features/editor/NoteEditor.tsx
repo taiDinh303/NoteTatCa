@@ -8,6 +8,7 @@ import "../mascot/NoteMascot.css";
 import {
   Suspense,
   useCallback,
+  useContext,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -16,7 +17,8 @@ import {
   useSyncExternalStore,
 } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { useBlocker } from "react-router-dom";
+import { useNoteBack } from "./useNoteBack";
+import {NoteBackContext} from "./NoteBackContext";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
   Bell,
@@ -71,6 +73,11 @@ export type NoteEditorProps = {
   initialAction?: NoteOpenAction;
 };
 export default function NoteEditor(props: NoteEditorProps) {
+  const finishPending=useRef(props.onClose);
+  const closeHandler=useRef<{close:()=>void;dirty:()=>boolean}|undefined>(undefined);
+  const backNavigation=useNoteBack(()=>closeHandler.current?.dirty()??false,()=>{if(closeHandler.current)closeHandler.current.close();else finishPending.current();},props.onClose);
+  useLayoutEffect(()=>{finishPending.current=backNavigation.finish;});
+  const register=useCallback((handler:{close:()=>void;dirty:()=>boolean})=>{closeHandler.current=handler;return()=>{if(closeHandler.current===handler)closeHandler.current=undefined;};},[]);
   useEffect(() => {
     const viewport = window.visualViewport;
     if (!viewport) return;
@@ -89,9 +96,11 @@ export default function NoteEditor(props: NoteEditorProps) {
     };
   }, []);
   return (
+    <NoteBackContext.Provider value={{...backNavigation,register}}>
     <ZoomSession key={props.noteId ?? "new"}>
-      <NoteEditorSession {...props} />
+      <NoteEditorSession {...props} onClose={backNavigation.finish} />
     </ZoomSession>
+    </NoteBackContext.Provider>
   );
 }
 function ZoomSession({ children }: { children: React.ReactNode }) {
@@ -444,7 +453,9 @@ function EditorSession({
   useLayoutEffect(() => { editingRef.current = editing; }, [editing]);
   // View remains on its lightweight document. Mount the editor only on Edit,
   // then retain it for Undo and subsequent mode switches in this session.
-  const blocker = useBlocker(snapshot.dirty);
+  const navigation=useContext(NoteBackContext)!;
+  const {blocker,finish:finishClose,backRequested}=navigation;
+  useLayoutEffect(()=>navigation.register({close:requestClose,dirty:()=>coordinator.getSnapshot().dirty}));
   const allLabels = labels.data?.pages.flatMap((p) => p.items) ?? [];
   useEffect(() => {
     const handle = (event: BeforeUnloadEvent) => {
@@ -527,17 +538,15 @@ function EditorSession({
       }
       return;
     }
-    onClose();
+    finishClose();
   }
   function discard() {
     coordinator.dispose();
-    if (blocker.state === "blocked") blocker.proceed();
-    else onClose();
+    finishClose();
   }
   async function closeSaved() {
     await save();
-    if (blocker.state === "blocked") blocker.proceed();
-    else onClose();
+    finishClose();
   }
   function beginEditing() {
     if (initial && coordinator.acceptRemote(initial)) {
@@ -932,7 +941,7 @@ function EditorSession({
           </div>
         </footer>
       </NoteSurfaceFrame>
-      {closePrompt || blocker.state === "blocked" ? (
+      {closePrompt || (blocker.state === "blocked" && !backRequested) ? (
         <Modal
           open
           onClose={() => {

@@ -587,3 +587,7 @@ Timezone thay input/datalist bằng select IANA từ Intl.supportedValuesOf cộ
 ## Nhãn dài và sidebar — 2026-11-07
 
 Card luôn hiện tên nhãn đầu với ellipsis khi thiếu chỗ, nhãn còn lại gom +N; editor chip một dòng, hộp chọn/quản lý giữ tên đầy đủ. Quota50 không đổi. Sidebar lấy shell.clientWidth cùng grid và hẹp hơn12px; Chromium kiểm reload/toggle5cột mở/6cột đóng ở1910–1920. Evidence/giới hạn tại worklog.
+
+## Mobile Back đóng note — 2026-11-07
+
+Trên màn hình mobile, mở note thêm một entry cùng route; nút Quay lại gọi luồng Close, giữ người dùng trong app. Chờ save hoặc giữ prompt/draft khi không thể lưu; desktop giữ hành vi cũ. Reader/handler gắn tại biên NoteEditor để loading cũng có entry. Four Chromium regressions và build độc lập PASS; native devices/WebKit chưa kiểm. Evidence và publication tại worklog.

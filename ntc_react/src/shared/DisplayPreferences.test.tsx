@@ -162,7 +162,8 @@ it("eases coarse wheel deltas over multiple frames, caps each impulse, and ignor
   expect(settlements).toEqual([1]);
   act(() => vi.advanceTimersByTime(1000));
   expect(frames.length).toBeGreaterThan(15);
-  expect(frames.at(-1)).toBeCloseTo(Math.exp(80 * 0.0012), 5);
+  // The settled geometry must match the saved integer percentage exactly.
+  expect(frames.at(-1)).toBe(1.1);
   expect(settlements).toHaveLength(2);
   expect(settlements.at(-1)).toBe(frames.at(-1));
   expect(localStorage.getItem("ntc.interface.zoom.v1")).toBe("110");
