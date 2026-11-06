@@ -697,7 +697,7 @@ function EditorSession({
             </div>
           </div>
         ) : null}
-        <div className="editor-scroll" onFocusCapture={event => {
+        <div className="editor-scroll" onDoubleClick={event => { if (window.matchMedia("(max-width: 800px)").matches && !editing && !(event.target as HTMLElement).closest("a,button,input,select,textarea,summary")) beginEditing(); }} onFocusCapture={event => {
           if ((event.target as HTMLElement).closest(".rich-editor")) insertionTarget.current = "content";
         }}>
           <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>

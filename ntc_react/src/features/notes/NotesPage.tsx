@@ -1,4 +1,4 @@
-import { useMobileLayout } from "../../shared/useMobileLayout";
+
 import { t as tr, useLanguage } from "../../shared/i18n";
 import {
   Suspense,
@@ -305,7 +305,7 @@ export default function NotesPage({
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const q = useDebounced(params.get("q") ?? "");
-  const mobileLayout = useMobileLayout();
+
   const [pinFilter, setPinFilter] = useState("all");
   const filter: NoteFilter = {
     ...(q ? { q } : {}),
@@ -333,7 +333,7 @@ export default function NotesPage({
       return "grid";
     }
   });
-  const view = mobileLayout ? "grid" : savedView;
+  const view = savedView;
   const [confirm, setConfirm] = useState<{
     note: Note;
     action: "delete";
@@ -564,7 +564,7 @@ export default function NotesPage({
               <option value="unpinned">{tr("Unpinned only")}</option>
             </Select>
           ) : null}
-          {!mobileLayout ? <div
+          {<div
             className="view-toggle"
             role="group"
             aria-label={tr("Notes view")}
@@ -594,7 +594,7 @@ export default function NotesPage({
                 />
               );
             })}
-          </div> : null}
+          </div>}
         </div>
       </div>
       {query.isPending ? (

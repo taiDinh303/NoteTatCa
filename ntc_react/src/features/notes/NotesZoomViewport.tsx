@@ -9,7 +9,7 @@ export function NotesZoomViewport(props: { children: ReactNode; mode: string }) 
   const mobile = useMobileLayout();
   return mobile ? (
     <div className="notes-zoom-viewport notes-mobile-viewport" data-notes-zoom tabIndex={0} role="region" aria-label={tr("All notes")}>
-      <div className="notes-zoom-layer notes-mobile-layer" data-layout="grid">{props.children}</div>
+      <div className="notes-zoom-layer notes-mobile-layer" data-layout={props.mode}>{props.children}</div>
     </div>
   ) : <DesktopNotesZoomViewport {...props} />;
 }

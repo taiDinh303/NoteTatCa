@@ -35,7 +35,7 @@ for (const width of [320, 393, 800])
     await expect(page.locator(".note-card")).toHaveCount(total);
     await expect(
       page.getByRole("group", { name: "Notes view", exact: true }),
-    ).toHaveCount(0);
+    ).toBeVisible();
     await expect(page.locator(".offline-toolbar")).toHaveCount(0);
     const geometry = () =>
       page.evaluate(() => {

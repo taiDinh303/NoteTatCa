@@ -1,3 +1,7 @@
+## Mobile Grid/List và double tap — 2026-11-06
+
+Mobile dùng savedView chung với desktop: Grid hai cột/preview3dòng; List một dòng tiêu đề/một dòng preview và giữ label/footer. Chạm hai lần nội dung View trên mobile gọi Edit hiện hữu, bỏ qua tương tác link/control. Production Chromium6/6PASS ở320/393/430/800; buildReact/.NETstrict/lintPASS. Chưa thiết bị thật/WebKit/fullsuite; xem worklog.
+
 ## Chỉ cuộn dọc nội dung note trên mobile — 2026-11-06
 
 ContentZoom dùng useMobileLayout để đánh dấu viewport mobile; chỉ trên mobile đặt overflow-x hidden/touch-action pan-y, giữ scrollbar dọc và scrollposition dọc thật. Khôi phục/ghi nhớ scroll không mang độ lệch ngang desktop sang mobile; focus/cuộn mobile giữ left0. Desktop zoom/hand hai trục giữ nguyên, toolbar và mục emoji gần đây vẫn cuộn ngang độc lập. Không ẩn toàn bộ scrollbar document hoặc đổi nội dung/selection/autosave.
