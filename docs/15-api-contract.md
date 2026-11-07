@@ -1,6 +1,6 @@
-## API ghi chú ẩn trên nhánh review — 2026-11-07
+## API ghi chú ẩn — 2026-11-07
 
-Bổ sung /api/v1/hidden-notes: status/configure/unlock/lock/heartbeat/reset-code/reset, list/create và {id}/visibility. CustomerWorkspace + Bearer; grant X-Note-Vault kiểm owner/session/expiry; list thường và archive không xuất note ẩn. Contract đầy đủ và lỗi tại [HIDDEN-NOTES](HIDDEN-NOTES.md). Chưa coi là API production trước rollout schema/API.
+Bổ sung /api/v1/hidden-notes: status/configure/unlock/lock/heartbeat/reset-code/reset, list/create và {id}/visibility. CustomerWorkspace + Bearer; grant X-Note-Vault kiểm owner/session/expiry; list thường và archive không xuất note ẩn. Contract đầy đủ và lỗi tại [HIDDEN-NOTES](HIDDEN-NOTES.md). Schema/API20f721d đã triển khai 07/11; smoke public kiểm health/auth/CORS, không kiểm authenticated owner flow trên live.
 
 # 15 — Contract API NoteTatCa
 

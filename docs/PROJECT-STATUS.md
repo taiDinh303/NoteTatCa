@@ -24,4 +24,4 @@
 
 ## Bổ sung 2026-11-07: Back và vault
 
-Mobile Back đóng note đã publish riêng commit68a8d1e; production verification xem worklog. Ghi chú ẩn DEC-032 đã được chủ dự án chốt và đang ở nhánh review codex/hidden-notes-vault; chưa apply schema hoặc deploy backend/UI live. Không coi feature là đã có trên website trước rollout theo HIDDEN-NOTES.
+Mobile Back đóng note đã publish riêng commit68a8d1e; production verification xem worklog. Ghi chú ẩn DEC-032 đã được chủ dự án chốt và yêu cầu triển khai. PostgreSQL migration20261106223452 đã apply; snapshot20bảng cùngDB, dữ liệu cũ giữ nguyên trongtransaction,48notes/6users tại thời điểmapply. API20f721d live Render và smoke health/auth/CORS PASS. UI commitd694ee4 phát hành sau API và CI; kết quả remote/Vercel/public browser cuối xem worklog và HIDDEN-NOTES. Chưa nghiệm thu thiết bị thật/real email/full external restore drill.

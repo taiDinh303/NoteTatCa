@@ -1,6 +1,6 @@
 ## DEC-032 — Khu vực ghi chú ẩn, 2026-11-07
 
-Đã chốt PIN6/pattern3×3, reset qua email, cả PC/mobile, online-only và auto-lock5phút/rời app. TASK-045 triển khai API authorization, isolation khỏi offline/export, UI và migrations additive trên nhánh review; production rollout cần schema review riêng. [Thiết kế/rollout](HIDDEN-NOTES.md), actual evidence tại worklog.
+Đã chốt PIN6/pattern3×3, reset qua email, cả PC/mobile, online-only và auto-lock5phút/rời app. TASK-045 triển khai API authorization, isolation khỏi offline/export, UI và migrations additive. Chủ dự án đã yêu cầu phát hành; PostgreSQL migration và API20f721d đã live, UI theo sau kiểm tra CI. [Thiết kế/rollout](HIDDEN-NOTES.md), actual evidence tại worklog.
 
 > Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
 

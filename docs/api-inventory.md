@@ -1,4 +1,4 @@
-> Nhánh review codex/hidden-notes-vault: inventory fixture mới, chưa phải xác nhận API production. Các endpoint ghi chú ẩn cần rollout theo [HIDDEN-NOTES](HIDDEN-NOTES.md).
+> Inventory từ OpenAPI fixture; schema/API ghi chú ẩn đã triển khai 07/11 theo [HIDDEN-NOTES](HIDDEN-NOTES.md). Public smoke chỉ kiểm health/auth/CORS; không coi inventory là nghiệm thu owner flows production.
 
 # NoteTatCa — API inventory
 

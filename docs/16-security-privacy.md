@@ -1,6 +1,6 @@
 ## Ghi chú ẩn — DEC-032, 2026-11-07
 
-Thêm secondary lock phía server, không chỉ CSS. Note vẫn private theo owner; admin không có vault grant. PasswordHasher hash PIN/pattern, purpose-bound email reset, attempt reservation/concurrency, grant memory-only gắn phiên. Khóa xóa DOM/cache đọc, bản nháp chưa ACK chỉ giữ RAM đúng account và có bảo vệ logout/reload. Online-only; bản đã tải trước không thể thu hồi tức thì khỏi thiết bị khác. Không E2EE; operator DB/backup vẫn phải được bảo vệ. Contract/migration/rollback/privacy tại [HIDDEN-NOTES](HIDDEN-NOTES.md); nhánh review chưa live.
+Thêm secondary lock phía server, không chỉ CSS. Note vẫn private theo owner; admin không có vault grant. PasswordHasher hash PIN/pattern, purpose-bound email reset, attempt reservation/concurrency, grant memory-only gắn phiên. Khóa xóa DOM/cache đọc, bản nháp chưa ACK chỉ giữ RAM đúng account và có bảo vệ logout/reload. Online-only; bản đã tải trước không thể thu hồi tức thì khỏi thiết bị khác. Không E2EE; operator DB/backup vẫn phải được bảo vệ. Contract/migration/rollback/privacy tại [HIDDEN-NOTES](HIDDEN-NOTES.md); schema/API đã live07/11, UI theo sau CI; giới hạn kiểm thử thực tế tại worklog.
 
 # 16 — Bảo mật và riêng tư
 
