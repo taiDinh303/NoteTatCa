@@ -75,3 +75,26 @@
   width: min(100%, 360px);
   overflow-y: auto;
 }
+
+.vault-recovery-link {
+  text-align: center;
+  padding: 8px;
+  color: var(--subtle);
+}
+.vault-recovery-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--subtle);
+}
+.vault-recovery h1 {
+  margin: 0;
+  font-size: 20px;
+}
+.vault-recovery-fields {
+  display: grid;
+  gap: 16px;
+}
+.vault-recovery-fields p {
+  margin: 0;
+}

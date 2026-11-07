@@ -239,7 +239,7 @@ export const router = createBrowserRouter([
                 element: <AppShell />,
                 children: [
                   { path: "/notes", element: <NotesPage /> },
-                  { path: "/hidden-notes", element: <HiddenNotes /> },
+                  { path: "/hidden-notes/*", element: <HiddenNotes /> },
                   { path: "/notes/:id", element: <NoteRoute /> },
                   { path: "/labels/:tagId", element: <NotesPage /> },
                   { path: "/trash", element: <NotesPage trash /> },

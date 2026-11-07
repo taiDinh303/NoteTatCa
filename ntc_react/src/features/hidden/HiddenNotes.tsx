@@ -6,7 +6,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   List,
@@ -41,6 +41,7 @@ import type { Note, Page } from "../../domain/models";
 import { draftFrom, sortNotes } from "../../domain/models";
 import NoteEditor from "../editor/NoteEditorLoader";
 import { EditorScopeContext } from "../editor/EditorScope";
+import { VaultRecovery } from "./VaultRecovery";
 import { PatternLock } from "./PatternLock";
 import {
   vaultApi,
@@ -62,12 +63,13 @@ type Status = {
 };
 export default function HiddenNotes() {
   useLanguage();
+  const location = useLocation();
   const session = useAuth();
   if (session.status !== "authenticated")
     return <p>{tr("Hidden notes need an online connection.")}</p>;
   return (
     <QueryClientProvider client={vaultCache}>
-      <VaultPage />
+      <VaultPage key={`${auth.identity()}:${location.pathname}`} />
     </QueryClientProvider>
   );
 }
@@ -84,8 +86,7 @@ function VaultPage() {
   const [secret, setSecret] = useState("");
   const [confirm, setConfirm] = useState("");
   const [step, setStep] = useState<"enter" | "confirm">("enter");
-  const [mode, setMode] = useState<"unlock" | "reset" | "change">("unlock");
-  const [code, setCode] = useState("");
+  const [mode, setMode] = useState<"unlock" | "change">("unlock");
   const unlocked = useSyncExternalStore(subscribeVault, isVaultUnlocked);
   const [view, setView] = useState(() =>
     localStorage.getItem("ntc.view.v1") === "list" ? "list" : "grid",
@@ -101,7 +102,11 @@ function VaultPage() {
   const [selected, setSelected] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
-  const [notice, setNotice] = useState<string>();
+  const [notice, setNotice] = useState<string | undefined>(() =>
+    location.state?.vaultReset
+      ? tr("Your lock was reset. Hidden notes were kept.")
+      : undefined,
+  );
   const configuredKind = useRef<"pin" | "pattern">("pin");
   const epoch = useRef(0);
   const newRequest = useRef<string | undefined>(undefined);
@@ -118,7 +123,6 @@ function VaultPage() {
     setTrash(false);
     setSecret("");
     setConfirm("");
-    setCode("");
     setStep("enter");
     setMode("unlock");
     void lockVault();
@@ -180,8 +184,7 @@ function VaultPage() {
       setBusy(false);
     }
   }
-  const configure =
-    !status?.configured || mode === "change" || mode === "reset";
+  const configure = !status?.configured || mode === "change";
   async function submit() {
     await action(async () => {
       if (configure && step === "enter") {
@@ -199,17 +202,6 @@ function VaultPage() {
       }
       if (configure && secret !== confirm)
         throw new Error(tr("The locks do not match. Try again."));
-      if (mode === "reset") {
-        await api.request("/hidden-notes/reset", {
-          method: "POST",
-          body: { code, kind, secret },
-        });
-        configuredKind.current = kind;
-        setStatus((s) => (s ? { ...s, configured: true, kind } : s));
-        lock();
-        setNotice(tr("Your lock was reset. Hidden notes were kept."));
-        return;
-      }
       if (configure) {
         const client = mode === "change" ? vaultApi : api;
         await client.request("/hidden-notes/configure", {
@@ -252,11 +244,27 @@ function VaultPage() {
       await load();
     });
   }
+  if (location.pathname === "/hidden-notes/recover")
+    return (
+      <VaultRecovery
+        onReset={() => {
+          lock();
+          navigate("/hidden-notes", {
+            replace: true,
+            state: { vaultReset: true },
+          });
+        }}
+      />
+    );
   return (
     <section className="vault-page">
       <h1 className="sr-only">{tr("Hidden notes")}</h1>
-      {notice ? <p role="status">{notice}</p> : null}
-      {hiddenDraftProtection.has(auth.identity() ?? "") ? (
+      {unlocked && mode === "unlock" && notice ? (
+        <p role="status">{notice}</p>
+      ) : null}
+      {unlocked &&
+      mode === "unlock" &&
+      hiddenDraftProtection.has(auth.identity() ?? "") ? (
         <p role="status">
           {tr(
             "An unsent hidden draft is kept in this tab. Unlock to save it before reloading or signing out.",
@@ -274,21 +282,14 @@ function VaultPage() {
             void submit();
           }}
         >
-          <p>
-            {tr(
-              "Hidden notes are online only. They lock after fifteen minutes without activity or when you close or reload the app.",
-            )}
-          </p>
           {!status.emailVerified ? (
-            <p>
-              {tr(
-                "Verify your email in Account settings before setting up hidden notes.",
-              )}
-            </p>
+            <Link className="button secondary" to="/settings/security">
+              {tr("Verify email")}
+            </Link>
           ) : null}
           {configure ? (
             <label>
-              {tr("Lock type")}
+              <span className="sr-only">{tr("Lock type")}</span>
               <Select
                 label={tr("Lock type")}
                 value={kind}
@@ -305,19 +306,7 @@ function VaultPage() {
               </Select>
             </label>
           ) : null}
-          {mode === "reset" ? (
-            <label>
-              {tr("Email reset code")}
-              <input
-                value={code}
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                maxLength={6}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-              />
-            </label>
-          ) : null}
-          <strong>
+          <strong className="sr-only">
             {tr(
               configure
                 ? step === "confirm"
@@ -328,7 +317,7 @@ function VaultPage() {
           </strong>
           {kind === "pin" ? (
             <label>
-              {tr("Six-digit PIN")}
+              <span className="sr-only">{tr("Six-digit PIN")}</span>
               <input
                 aria-label={tr("Six-digit PIN")}
                 type="password"
@@ -366,45 +355,9 @@ function VaultPage() {
             )}
           </Button>
           {status.configured && mode === "unlock" ? (
-            <Button
-              type="button"
-              variant="ghost"
-              busy={busy}
-              onClick={() =>
-                void action(async () => {
-                  await api.request("/hidden-notes/reset-code", {
-                    method: "POST",
-                  });
-                  setMode("reset");
-                  setSecret("");
-                  setStep("enter");
-                  setNotice(
-                    tr("A reset code was sent to your verified email."),
-                  );
-                })
-              }
-            >
+            <Link className="button ghost vault-recovery-link" to="/hidden-notes/recover">
               {tr("Forgot lock?")}
-            </Button>
-          ) : null}
-          {mode === "reset" ? (
-            <Button
-              type="button"
-              variant="secondary"
-              busy={busy}
-              onClick={() =>
-                void action(async () => {
-                  await api.request("/hidden-notes/reset-code", {
-                    method: "POST",
-                  });
-                  setNotice(
-                    tr("A reset code was sent to your verified email."),
-                  );
-                })
-              }
-            >
-              {tr("Send another code")}
-            </Button>
+            </Link>
           ) : null}
           {mode !== "unlock" ? (
             <Button
@@ -635,7 +588,9 @@ function VaultPage() {
           {deleting ? (
             <ConfirmDialog
               title={tr("Permanently delete note?")}
-              description={tr("This removes the note and its related reminders permanently. This cannot be undone.")}
+              description={tr(
+                "This removes the note and its related reminders permanently. This cannot be undone.",
+              )}
               confirmLabel={tr("Delete permanently")}
               danger
               onClose={() => setDeleting(undefined)}

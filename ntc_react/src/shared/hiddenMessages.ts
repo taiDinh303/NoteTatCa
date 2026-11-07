@@ -1,5 +1,23 @@
 export const hiddenMessages: Record<string, readonly [string, string, string]> =
   {
+    "Back to unlock": ["Quay lại mở khóa", "返回解锁", "ロック解除に戻る"],
+    "Reset hidden notes lock": [
+      "Đặt lại khóa ghi chú ẩn",
+      "重置隐藏笔记锁",
+      "非表示ノートのロックをリセット",
+    ],
+    "Send reset code": ["Gửi mã đặt lại", "发送重置码", "リセットコードを送信"],
+    "Enter the six-digit email code.": [
+      "Nhập mã email gồm 6 số.",
+      "请输入邮件中的6位验证码。",
+      "メールの6桁のコードを入力してください。",
+    ],
+    "Send a code to your verified email to reset your lock. Your hidden notes will be kept.":
+      [
+        "Gửi mã đến email đã xác minh để đặt lại khóa. Ghi chú ẩn của bạn vẫn được giữ nguyên.",
+        "向已验证邮箱发送验证码以重置锁。隐藏笔记将保留。",
+        "確認済みメールにコードを送信してロックをリセットします。非表示ノートは保持されます。",
+      ],
     "Unlock hidden notes and save or discard your unsent draft before signing out.":
       [
         "Mở khóa ghi chú ẩn rồi lưu hoặc bỏ bản nháp chưa gửi trước khi đăng xuất.",

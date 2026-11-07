@@ -594,4 +594,6 @@ Trên màn hình mobile, mở note thêm một entry cùng route; nút Quay lạ
 
 ## Ghi chú ẩn — 2026-11-07
 
+Theo điều chỉnh sau đó07/11: màn khóa chỉ giữ các control/nút, không hiển thị mô tả/heading/field-label; nhãn vẫn có cho accessibility. Route /hidden-notes/recover là màn riêng với bước gửi email, nhập mã, chọn và xác nhận khóa mới; link quay lại không trộn recovery vào form Unlock. Vào recovery không tự gửi email. Validation/publication thực tế xem worklog.
+
 Menu account mở /hidden-notes; card menu Hide note; mobile có pull-down tại đầu danh sách và nút menu thay thế. PIN6/pattern3×3 có keyboard/touch/midpoint, email reset; unlock/lock, create/edit/history/trash/restore/unhide dùng scope/writer/QueryClient RAM riêng. Điều chỉnh của chủ dự án sau release07/11: bỏ tiêu đề nhìn thấy, dùng chung NoteCard/NotesZoomViewport với Grid/List/màu/nhãn/nhóm ghim; grant RAM giữ qua SPA navigation và chuyển tab. Auto-lock15phút idle/đóng/reload/offline/Lock now, hủy requests/xóa DOM và cache đọc; unsent drafts giữ RAM đúng account, có guard logout/reload và version conflict. Hide xóa cache của đúng user ID (khác identity stamp role), tombstone chặn late snapshot/outbox ghi lại hidden note. Quota/name/editor/autosave thường giữ nguyên. Contract và trình tự rollout: [HIDDEN-NOTES](HIDDEN-NOTES.md); evidence/giới hạn tại worklog.
