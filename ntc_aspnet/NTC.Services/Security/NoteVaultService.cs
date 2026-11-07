@@ -59,7 +59,7 @@ public sealed class NoteVaultService(IUnitOfWork work, ICurrentUser actor, TimeP
   var valid = request.Secret.Length <= 9 && request.Kind == vault.Kind && hasher.VerifyHashedPassword(vault, vault.SecretHash, request.Secret) != PasswordVerificationResult.Failed;
   if (!valid) throw new BaseException.ErrorException(400,"INVALID_VAULT_SECRET","Incorrect lock.");
   vault.FailedAttempts = 0; vault.LockedUntil = null; await UnitOfWork.SaveAsync();
-  var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)); var expires = UtcNow.AddMinutes(5);
+  var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)); var expires = UtcNow.AddMinutes(15);
   foreach (var old in await Repository<NoteVaultGrant>().Entities.Where(x => x.UserId == UserId && (x.SessionId == sid || x.ExpiresAt <= UtcNow)).ToListAsync()) await Repository<NoteVaultGrant>().DeleteAsync(old);
   await Repository<NoteVaultGrant>().InsertAsync(new() { UserId = UserId, SessionId = sid, VaultVersion = vault.CredentialVersion, TokenHash = Hash(token), ExpiresAt = expires });
   await UnitOfWork.SaveAsync(); return new(token, expires);
@@ -69,7 +69,7 @@ public sealed class NoteVaultService(IUnitOfWork work, ICurrentUser actor, TimeP
   var hash = Hash(token); var sid = Session(); var grant = await Repository<NoteVaultGrant>().Entities.SingleOrDefaultAsync(x => x.TokenHash == hash && x.UserId == UserId && x.SessionId == sid);
   if (grant == null || grant.ExpiresAt <= UtcNow) return false;
   var vault = await Vaults.AsNoTracking().SingleOrDefaultAsync(); if (vault == null || vault.CredentialVersion != grant.VaultVersion || vault.LockedUntil > UtcNow) return false;
-  grant.ExpiresAt = UtcNow.AddMinutes(5); await UnitOfWork.SaveAsync(); access.HiddenNotesUnlocked = true; return true;
+  grant.ExpiresAt = UtcNow.AddMinutes(15); await UnitOfWork.SaveAsync(); access.HiddenNotesUnlocked = true; return true;
  }
  public async Task LockAsync(string token) {
   access.HiddenNotesUnlocked = false;

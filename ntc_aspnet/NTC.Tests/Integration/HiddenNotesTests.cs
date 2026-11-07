@@ -36,7 +36,8 @@ public sealed class HiddenNotesTests {
   await ApiFactory.Data(await owner.PostAsJsonAsync("/api/v1/hidden-notes/configure",new{kind="pin",secret="123456"}));var token=await Unlock(owner);
   var again=await f.LoginAsync();using var second=again.Client;second.DefaultRequestHeaders.Add("X-Note-Vault",token);
   Assert.Equal(HttpStatusCode.Forbidden,(await second.GetAsync("/api/v1/hidden-notes")).StatusCode);
-  f.Clock.Advance(TimeSpan.FromMinutes(6));Assert.Equal(HttpStatusCode.Forbidden,(await owner.GetAsync("/api/v1/hidden-notes")).StatusCode);
+  f.Clock.Advance(TimeSpan.FromMinutes(6));Assert.Equal(HttpStatusCode.OK,(await owner.GetAsync("/api/v1/hidden-notes")).StatusCode);
+  f.Clock.Advance(TimeSpan.FromMinutes(16));Assert.Equal(HttpStatusCode.Forbidden,(await owner.GetAsync("/api/v1/hidden-notes")).StatusCode);
  }
  [Fact] public async Task Wrong_attempts_lock_out_and_reset_is_purpose_bound_single_use_and_preserves_notes() {
   using var f=new ApiFactory();await f.InitializeAsync();var login=await f.LoginAsync();using var owner=login.Client;
