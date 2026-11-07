@@ -21,6 +21,10 @@ for (const width of [320, 1440])
     await signIn(page);
     const card = page.locator(".note-card").first();
     const originalTitle = await card.getByRole("heading").innerText();
+    const originalWidth = (await card.boundingBox())!.width;
+    const originalColor = await card.evaluate(
+      (el) => getComputedStyle(el).backgroundColor,
+    );
     await card.getByRole("button", { name: /^Actions for / }).click();
     await page
       .getByRole("menuitem", { name: "Hide note", exact: true })
@@ -32,7 +36,26 @@ for (const width of [320, 1440])
       .getByRole("button", { name: "Confirm lock", exact: true })
       .click();
     await page.getByRole("button", { name: "Hide note", exact: true }).click();
-    await expect(page.locator(".vault-card")).toHaveCount(1);
+    await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
+    await expect(page.locator(".vault-page .note-card")).toHaveCSS(
+      "background-color",
+      originalColor,
+    );
+    expect(
+      Math.abs(
+        (await page.locator(".vault-page .note-card").boundingBox())!.width -
+          originalWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await expect(page.locator(".vault-page > h1")).toHaveClass("sr-only");
+    await page.getByRole("button", { name: "list view", exact: true }).click();
+    await expect(page.locator(".vault-page .notes-zoom-layer")).toHaveAttribute("data-layout", "list");
+    if (width === 1440) expect((await page.locator(".vault-page .note-card").boundingBox())!.width).toBeGreaterThan(originalWidth * 2);
+    await page.getByRole("button", { name: "grid view", exact: true }).click();
+    const pin = page.locator(".vault-page .note-card").getByRole("button", { name: /^(Unpin|Pin) / });
+    const oldPinLabel = await pin.getAttribute("aria-label");
+    await pin.click();
+    await expect(pin).not.toHaveAttribute("aria-label", oldPinLabel!);
     const localTitles = await page.evaluate(async () => {
       const db = await new Promise<IDBDatabase>((resolve, reject) => {
         const r = indexedDB.open("ntc.offline.v1", 1);
@@ -52,7 +75,7 @@ for (const width of [320, 1440])
     });
     expect(localTitles).not.toContain(originalTitle);
 
-    await page.locator(".vault-open").click();
+    await page.locator(".vault-page .note-open").click();
     await page.getByRole("button", { name: "Edit", exact: true }).click();
     await page
       .getByRole("textbox", { name: "Note title", exact: true })
@@ -68,14 +91,21 @@ for (const width of [320, 1440])
     await expect(
       page.getByRole("heading", { name: "Hidden fixture title", exact: true }),
     ).toBeVisible();
-    await page.evaluate(() => window.dispatchEvent(new Event("blur")));
-    await expect(page.locator(".vault-card")).toHaveCount(0);
-    await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
-    await page.getByRole("button", { name: "Unlock", exact: true }).click();
+    await page.evaluate(() => {
+      window.dispatchEvent(new Event("blur"));
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+    await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
     await page
-      .getByRole("button", { name: "Unhide note", exact: true })
+      .getByRole("button", {
+        name: "Actions for Hidden fixture title",
+        exact: true,
+      })
       .click();
-    await expect(page.locator(".vault-card")).toHaveCount(0);
+    await page
+      .getByRole("menuitem", { name: "Unhide note", exact: true })
+      .click();
+    await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
     await page.goto("/notes");
     await expect(
       page.getByText("Hidden fixture title", { exact: true }),
@@ -138,7 +168,7 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
   await page
     .getByRole("textbox", { name: "Note title", exact: true })
     .fill("Unsaved private fixture");
-  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
   await expect(
     page.getByRole("button", { name: "Close", exact: true }),
   ).toBeHidden();
@@ -160,7 +190,7 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
     .click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Unlock", exact: true }).click();
-  await page.locator(".vault-open").first().click();
+  await page.locator(".vault-page .note-open").first().click();
   await expect(
     page.getByText("Unsaved private fixture", { exact: true }).last(),
   ).toBeVisible();
@@ -179,12 +209,12 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
   });
   expect(stored).not.toContain("Unsaved private fixture");
   await page.clock.install();
-  await page.mouse.move(1,1);
-  await page.clock.fastForward(300001);
+  await page.mouse.move(1, 1);
+  await page.clock.fastForward(900001);
   await expect(
     page.getByRole("button", { name: "Unlock", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".vault-card")).toHaveCount(0);
+  await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
 });
 
 test.describe("touch hidden notes", () => {
@@ -275,7 +305,11 @@ test("email reset keeps hidden notes and hidden trash restores privately", async
   await page.getByRole("button", { name: "Close", exact: true }).click();
   await page.getByRole("button", { name: "Lock now", exact: true }).click();
   await page.getByRole("button", { name: "Forgot lock?", exact: true }).click();
-  await expect(page.getByText("A reset code was sent to your verified email.",{exact:true})).toBeVisible();
+  await expect(
+    page.getByText("A reset code was sent to your verified email.", {
+      exact: true,
+    }),
+  ).toBeVisible();
   const messages = await (
     await request.get(base + "/__fixture/mail?email=a%40example.test")
   ).json();
@@ -291,7 +325,7 @@ test("email reset keeps hidden notes and hidden trash restores privately", async
     page.getByRole("heading", { name: "Private reset fixture", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "artifacts/hidden-notes/vault-1440.png" });
-  await page.locator(".vault-open").first().click();
+  await page.locator(".vault-page .note-open").first().click();
   await page.getByRole("button", { name: "Edit", exact: true }).click();
   await page.getByRole("button", { name: "Note options", exact: true }).click();
   await page
@@ -300,17 +334,34 @@ test("email reset keeps hidden notes and hidden trash restores privately", async
   await expect(
     page.getByRole("button", { name: "Close", exact: true }),
   ).toBeHidden();
-  await expect(page.locator(".vault-card")).toHaveCount(0);
-  await page.getByRole("button", { name: "Trash", exact: true }).click();
+  await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Hidden notes options", exact: true })
+    .click();
+  await page.getByRole("menuitem", { name: "Trash", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Private reset fixture", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Restore", exact: true }).click();
-  await expect(page.locator(".vault-card")).toHaveCount(0);
-  await page.getByRole("button", { name: "Hidden notes", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Restore Private reset fixture", exact: true })
+    .click();
+  await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Hidden notes options", exact: true })
+    .click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Private reset fixture", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Actions for Private reset fixture", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Move to trash", exact: true }).click();
+  await page.getByRole("button", { name: "Hidden notes options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Trash", exact: true }).click();
+  await page.getByRole("button", { name: "Delete Private reset fixture permanently", exact: true }).click();
+  await page.getByRole("button", { name: "Delete permanently", exact: true }).click();
+  await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
 });
 
 test("ambiguous hide acknowledgement keeps offline content excluded and retries safely", async ({
@@ -358,8 +409,68 @@ test("ambiguous hide acknowledgement keeps offline content excluded and retries 
   });
   expect(titles).not.toContain(title);
   await page.getByRole("button", { name: "Hide note", exact: true }).click();
-  await expect(page.locator(".vault-card")).toHaveCount(1);
-  await expect(page.locator(".vault-card").getByRole("heading")).toHaveText(
-    title,
-  );
+  await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
+  await expect(
+    page.locator(".vault-page .note-card").getByRole("heading"),
+  ).toHaveText(title);
+});
+
+test("unlock survives switching tabs and app routes, expires after fifteen idle minutes and resets on reload", async ({
+  page,
+  request,
+  context,
+}) => {
+  await request.post(base + "/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 850 });
+  await signIn(page);
+  await page.clock.install();
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  const other = await context.newPage();
+  await other.goto("about:blank");
+  await other.bringToFront();
+  await page.bringToFront();
+  await other.close();
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("blur"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new Event("focus"));
+  });
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+  await page.getByRole("dialog", { name: "NoteTatCa.", exact: true }).getByRole("link", { name: /^All notes/ }).click();
+  await expect(page).toHaveURL(/\/notes$/);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+  await page.mouse.move(2, 2);
+  await page.clock.fastForward(14 * 60 * 1000);
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+  await page.clock.fastForward(60001);
+  await expect(
+    page.getByRole("button", { name: "Unlock", exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Unlock", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Unlock", exact: true }),
+  ).toBeVisible();
 });

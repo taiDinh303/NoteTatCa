@@ -11,8 +11,17 @@ export const hiddenMessages: Record<string, readonly [string, string, string]> =
       "请从隐藏笔记中打开此笔记。",
       "このノートは非表示ノートから開いてください。",
     ],
-    "Save or discard this hidden draft before unhiding the note.": ["Lưu hoặc bỏ bản nháp ẩn này trước khi bỏ ẩn ghi chú.","取消隐藏前请保存或放弃此隐藏草稿。","非表示を解除する前に、この下書きを保存または破棄してください。"],
-    "An unsent hidden draft is kept in this tab. Unlock to save it before reloading or signing out.": ["Bản nháp ẩn chưa gửi đang được giữ trong tab này. Hãy mở khóa và lưu trước khi tải lại hoặc đăng xuất.","未发送的隐藏草稿保留在此标签页中。重新加载或退出前请解锁并保存。","未送信の非表示下書きはこのタブに保持されています。再読み込みやログアウト前に解除して保存してください。"],
+    "Save or discard this hidden draft before unhiding the note.": [
+      "Lưu hoặc bỏ bản nháp ẩn này trước khi bỏ ẩn ghi chú.",
+      "取消隐藏前请保存或放弃此隐藏草稿。",
+      "非表示を解除する前に、この下書きを保存または破棄してください。",
+    ],
+    "An unsent hidden draft is kept in this tab. Unlock to save it before reloading or signing out.":
+      [
+        "Bản nháp ẩn chưa gửi đang được giữ trong tab này. Hãy mở khóa và lưu trước khi tải lại hoặc đăng xuất.",
+        "未发送的隐藏草稿保留在此标签页中。重新加载或退出前请解锁并保存。",
+        "未送信の非表示下書きはこのタブに保持されています。再読み込みやログアウト前に解除して保存してください。",
+      ],
     "Hidden notes": ["Ghi chú ẩn", "隐藏笔记", "非表示のノート"],
     "Hide note": ["Ẩn ghi chú", "隐藏笔记", "ノートを非表示"],
     "Unhide note": ["Bỏ ẩn ghi chú", "取消隐藏", "非表示を解除"],
@@ -63,11 +72,16 @@ export const hiddenMessages: Record<string, readonly [string, string, string]> =
       "隐藏笔记需要联网。",
       "非表示ノートにはオンライン接続が必要です。",
     ],
-    "Hidden notes are online only. They lock when you leave the app or after five minutes without activity.":
+    "Hidden notes options": [
+      "Tùy chọn ghi chú ẩn",
+      "隐藏笔记选项",
+      "非表示ノートのオプション",
+    ],
+    "Hidden notes are online only. They lock after fifteen minutes without activity or when you close or reload the app.":
       [
-        "Ghi chú ẩn chỉ mở khi online, tự khóa khi rời app hoặc sau 5 phút không thao tác.",
-        "隐藏笔记仅在线可用，离开应用或5分钟无操作后锁定。",
-        "非表示ノートはオンライン専用です。アプリを離れるか5分間操作しないとロックされます。",
+        "Ghi chú ẩn chỉ mở khi có mạng. Tự khóa sau 15 phút không hoạt động hoặc khi đóng hay tải lại ứng dụng.",
+        "隐藏笔记仅在线可用。闲置15分钟或关闭、重新加载应用后会锁定。",
+        "非表示ノートはオンライン専用です。15分間操作がない場合、またはアプリを閉じたり再読み込みした場合にロックされます。",
       ],
     "Verify your email in Account settings before setting up hidden notes.": [
       "Hãy xác minh email trong cài đặt tài khoản trước khi thiết lập ghi chú ẩn.",

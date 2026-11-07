@@ -17,6 +17,56 @@ const drafts = new Map<
 let token: string | undefined;
 let owner: string | undefined;
 let requests = new AbortController();
+const idleLimit = 15 * 60 * 1000;
+let lastActivity = 0;
+const sessionListeners = new Set<() => void>();
+export const subscribeVault = (listener: () => void) => {
+  sessionListeners.add(listener);
+  return () => {
+    sessionListeners.delete(listener);
+  };
+};
+export const isVaultUnlocked = () =>
+  !!token &&
+  owner === auth.identity() &&
+  navigator.onLine &&
+  performance.now() - lastActivity < idleLimit;
+const changed = () => sessionListeners.forEach((listener) => listener());
+function checkExpiry() {
+  if (token && !isVaultUnlocked()) void lockVault();
+}
+function activity() {
+  checkExpiry();
+  if (token) lastActivity = performance.now();
+}
+for (const name of ["pointerdown", "keydown", "pointermove", "touchstart"])
+  window.addEventListener(name, activity, { passive: true });
+window.addEventListener("focus", checkExpiry);
+document.addEventListener("visibilitychange", checkExpiry);
+const leave = () => {
+  void lockVault();
+};
+window.addEventListener("pagehide", leave);
+window.addEventListener("offline", leave);
+let heartbeat = 0;
+const sessionTimer = window.setInterval(() => {
+  checkExpiry();
+  if (token && ++heartbeat % 30 === 0)
+    void vaultApi
+      .request("/hidden-notes/heartbeat", { method: "POST" })
+      .catch(() => lockVault());
+}, 1000);
+if (import.meta.hot)
+  import.meta.hot.dispose(() => {
+    clearInterval(sessionTimer);
+    for (const name of ["pointerdown", "keydown", "pointermove", "touchstart"])
+      window.removeEventListener(name, activity);
+    window.removeEventListener("focus", checkExpiry);
+    document.removeEventListener("visibilitychange", checkExpiry);
+    window.removeEventListener("pagehide", leave);
+    window.removeEventListener("offline", leave);
+    void lockVault();
+  });
 export const vaultCache = new QueryClient({
   defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } },
 });
@@ -24,6 +74,9 @@ export function setVaultToken(value: string) {
   token = value;
   owner = auth.identity();
   requests = new AbortController();
+  lastActivity = performance.now();
+  heartbeat = 0;
+  changed();
 }
 export async function lockVault() {
   const current = token;
@@ -31,6 +84,7 @@ export async function lockVault() {
   owner = undefined;
   requests.abort();
   vaultCache.clear();
+  if (current) changed();
   if (current)
     await api
       .request("/hidden-notes/lock", {
@@ -41,20 +95,31 @@ export async function lockVault() {
 }
 export class VaultApi extends ApiClient {
   override request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-    if (!token || owner !== auth.identity() || !navigator.onLine)
+    const current = token;
+    if (!current || !isVaultUnlocked())
       return Promise.reject(
         new ApiError(403, {
           code: "VAULT_LOCKED",
           message: "Unlock hidden notes again.",
         }),
       );
-    return api.request<T>(path, {
-      ...options,
-      signal: options.signal
-        ? AbortSignal.any([options.signal, requests.signal])
-        : requests.signal,
-      headers: { ...options.headers, "X-Note-Vault": token },
-    });
+    return api
+      .request<T>(path, {
+        ...options,
+        signal: options.signal
+          ? AbortSignal.any([options.signal, requests.signal])
+          : requests.signal,
+        headers: { ...options.headers, "X-Note-Vault": current },
+      })
+      .catch((error) => {
+        if (
+          error instanceof ApiError &&
+          error.status === 403 &&
+          error.code === "VAULT_LOCKED"
+        )
+          void lockVault();
+        throw error;
+      });
   }
 }
 export const vaultApi = new VaultApi(api.baseUrl);

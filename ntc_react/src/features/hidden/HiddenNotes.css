@@ -1,7 +1,9 @@
 .vault-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
 }
 .vault-lock-form {
   max-width: 360px;
@@ -57,45 +59,19 @@
   outline-offset: -4px;
   border-radius: 50%;
 }
-.vault-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: 16px;
-  margin-top: 20px;
+.vault-page > .notes-zoom-viewport {
+  flex: 1 1 0;
+  min-height: 0;
 }
-.vault-card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  min-width: 0;
-  background: var(--surface);
-}
-.vault-card h2,
-.vault-card p {
-  overflow-wrap: anywhere;
-}
-.vault-card .vault-open {
-  text-align: left;
-  width: 100%;
-  background: transparent;
-  color: inherit;
-  border: 0;
-  cursor: pointer;
-}
-.vault-card p {
-  white-space: pre-wrap;
-  max-height: 100px;
-  overflow: hidden;
-}
-.vault-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+.vault-toolbar {
   flex-wrap: wrap;
-  align-items: center;
+  flex-shrink: 0;
 }
-@media (max-width: 800px) {
-  .vault-page {
-    padding: 16px;
-  }
+.vault-controls {
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.vault-lock-form {
+  width: min(100%, 360px);
+  overflow-y: auto;
 }

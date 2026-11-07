@@ -51,6 +51,7 @@ function DesktopNotesZoomViewport({
       ?.classList.contains("sidebar-hidden");
     const shell = view.closest<HTMLElement>(".customer-shell");
     const main = shell?.querySelector<HTMLElement>(":scope > .main-column");
+    const workspace = view.closest<HTMLElement>(".workspace-main") ?? view.parentElement!;
     // A native scrollbar spans the whole window while the note viewport stays
     // below the fixed controls. Both represent the same scroll offset/range.
     function updateScrollbar() {
@@ -278,13 +279,13 @@ function DesktopNotesZoomViewport({
     function measure() {
       // Extend only the scrollport to the window edge. Keep the card canvas
       // inside the main column's existing responsive right inset.
-      const inset = getComputedStyle(view.parentElement!).paddingRight;
+      const inset = getComputedStyle(workspace).paddingRight;
       rightInset = parseFloat(inset);
       view.style.setProperty("--notes-edge-inset", inset);
       // Calibrate the fixed width across 50/100/150% and both sidebar states.
       // Card width and gap stay fixed; incomplete-column space remains on the right.
       const desktop = window.innerWidth > 800;
-      const mainStyle = getComputedStyle(view.parentElement!);
+      const mainStyle = getComputedStyle(workspace);
       const fullWidth =
         (shell?.clientWidth ?? window.innerWidth) -
         parseFloat(mainStyle.paddingLeft) -
@@ -338,7 +339,7 @@ function DesktopNotesZoomViewport({
       const sidebar = shell.querySelector<HTMLElement>(":scope > .sidebar");
       const target =
         hidden || !sidebar ? 0 : parseFloat(getComputedStyle(sidebar).width);
-      const mainStyle = getComputedStyle(view.parentElement!);
+      const mainStyle = getComputedStyle(workspace);
       sidebarMoving = Math.abs(currentMargin - target) > 0.1;
       // clientWidth rounds each intermediate transition width. Derive the exact
       // destination from the shell instead, so a subpixel cannot drop a column.

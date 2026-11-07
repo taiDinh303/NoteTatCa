@@ -269,7 +269,7 @@ export default function AppShell() {
   return (
     <div
       ref={shell}
-      data-workspace-list={/^\/(notes|reminders|trash|notifications|labels)(\/|$)/.test(location.pathname) ? "" : undefined}
+      data-workspace-list={/^\/(notes|hidden-notes|reminders|trash|notifications|labels)(\/|$)/.test(location.pathname) ? "" : undefined}
       className={`app-shell customer-shell ${sidebarHidden ? "sidebar-hidden" : ""} ${settingsTitle ? "settings-area" : ""}`}
     >
       <a href="#workspace-main" className="skip-link">

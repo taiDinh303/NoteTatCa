@@ -1,6 +1,6 @@
 ## DEC-032 — Ghi chú ẩn đã chốt 2026-11-07
 
-Q-036: khu vực có khóa trên PC/mobile, chỉ online, khóa khi rời app/5phút không thao tác. Q-037: user chọn PIN6số hoặc pattern3×3. Q-038: mã email verified để reset, giữ note; không E2EE. Nguồn: chủ dự án xác nhận trong chat 07/11. Chủ dự án yêu cầu phát hành 07/11; PostgreSQL migration và API đã triển khai, UI theo sau; [contract](HIDDEN-NOTES.md), evidence tại worklog.
+Q-036: khu vực có khóa trên PC/mobile, chỉ online, theo điều chỉnh sau phát hành của chủ dự án07/11: giữ mở khi đổi tab/trang trong app, khóa khi đóng/reload hoặc15phút không thao tác. Q-037: user chọn PIN6số hoặc pattern3×3. Q-038: mã email verified để reset, giữ note; không E2EE. Nguồn: chủ dự án xác nhận trong chat 07/11. Chủ dự án yêu cầu phát hành 07/11; PostgreSQL migration và API đã triển khai, UI theo sau; [contract](HIDDEN-NOTES.md), evidence tại worklog.
 
 > Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
 
