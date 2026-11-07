@@ -22,6 +22,7 @@ export interface PendingNote {
   attempted?: boolean;
 }
 export interface OfflineData {
+  hiddenIds?: string[];
   identity?: OfflineIdentity;
   notes: Note[];
   labels: Label[];
@@ -91,6 +92,7 @@ export class IndexedOfflineStore implements OfflineStore {
         try {
           const data: OfflineData = request.result ?? emptyOfflineData();
           result = update(data);
+          if (data.hiddenIds?.length) data.notes = data.notes.filter(note => !data.hiddenIds!.includes(note.id));
           table.put(data, owner);
         } catch (error) {
           transaction.abort();

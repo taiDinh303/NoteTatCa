@@ -1,5 +1,7 @@
 // English source keys; values are Vietnamese, Chinese and Japanese.
+import {hiddenMessages} from "./hiddenMessages";
 export const messages: Record<string, readonly [string, string, string]> = {
+  ...hiddenMessages,
   "Insert emoji or symbol": ["Chèn emoji hoặc ký tự","插入表情或符号","絵文字・記号を挿入"],
   "Emoji and symbols": ["Emoji và ký tự","表情与符号","絵文字と記号"],
   "Search emoji or symbols": ["Tìm emoji hoặc ký tự","搜索表情或符号","絵文字・記号を検索"],

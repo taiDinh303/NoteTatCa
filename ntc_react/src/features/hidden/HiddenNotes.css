@@ -1,0 +1,101 @@
+.vault-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.vault-lock-form {
+  max-width: 360px;
+  margin: 24px auto;
+  display: grid;
+  gap: 16px;
+}
+.vault-lock-form label {
+  display: grid;
+  gap: 8px;
+}
+.vault-lock-form input {
+  width: 100%;
+  min-width: 0;
+}
+.vault-pattern {
+  width: min(100%, 300px);
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  touch-action: none;
+  justify-self: center;
+  color: var(--accent);
+}
+.vault-pattern svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.vault-pattern button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+.vault-pattern button span {
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.vault-pattern button[aria-pressed="true"] span {
+  background: currentColor;
+}
+.vault-pattern button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -4px;
+  border-radius: 50%;
+}
+.vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.vault-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 0;
+  background: var(--surface);
+}
+.vault-card h2,
+.vault-card p {
+  overflow-wrap: anywhere;
+}
+.vault-card .vault-open {
+  text-align: left;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  border: 0;
+  cursor: pointer;
+}
+.vault-card p {
+  white-space: pre-wrap;
+  max-height: 100px;
+  overflow: hidden;
+}
+.vault-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .vault-page {
+    padding: 16px;
+  }
+}

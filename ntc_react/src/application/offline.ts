@@ -244,6 +244,7 @@ export class OfflineNotes {
     const owner = this.requireOwner();
     const result = await this.persistDraft(owner, (data) => {
       const resolved = id ? (data.aliases[id] ?? id) : "local-" + key;
+      if (data.hiddenIds?.includes(resolved)) throw new ApiError(403,{code:"VAULT_LOCKED",message:"Open this note from hidden notes."});
       const existing = data.notes.find((n) => n.id === resolved);
       if (id && !existing)
         throw new Error("Open this note online before editing offline.");

@@ -1,0 +1,365 @@
+import { test, expect } from "@playwright/test";
+const base = "http://127.0.0.1:5199";
+async function signIn(page: import("@playwright/test").Page) {
+  await page.goto("/login");
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("a@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("Synthetic-password-123!");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await expect(page).toHaveURL(/\/notes/);
+}
+for (const width of [320, 1440])
+  test(`hidden PIN notes stay out of normal lists and survive lock ${width}`, async ({
+    page,
+    request,
+  }) => {
+    await request.post(base + "/__fixture/reset");
+    await page.setViewportSize({ width, height: 900 });
+    await signIn(page);
+    const card = page.locator(".note-card").first();
+    const originalTitle = await card.getByRole("heading").innerText();
+    await card.getByRole("button", { name: /^Actions for / }).click();
+    await page
+      .getByRole("menuitem", { name: "Hide note", exact: true })
+      .click();
+    await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+    await page
+      .getByRole("button", { name: "Confirm lock", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Hide note", exact: true }).click();
+    await expect(page.locator(".vault-card")).toHaveCount(1);
+    const localTitles = await page.evaluate(async () => {
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const r = indexedDB.open("ntc.offline.v1", 1);
+        r.onsuccess = () => resolve(r.result);
+        r.onerror = reject;
+      });
+      return await new Promise<string[]>((resolve, reject) => {
+        const r = db.transaction("accounts").objectStore("accounts").getAll();
+        r.onsuccess = () =>
+          resolve(
+            r.result.flatMap((x: { notes: { title: string }[] }) =>
+              x.notes.map((n) => n.title),
+            ),
+          );
+        r.onerror = reject;
+      });
+    });
+    expect(localTitles).not.toContain(originalTitle);
+
+    await page.locator(".vault-open").click();
+    await page.getByRole("button", { name: "Edit", exact: true }).click();
+    await page
+      .getByRole("textbox", { name: "Note title", exact: true })
+      .fill("Hidden fixture title");
+    await page.getByRole("button", { name: "View", exact: true }).click();
+    await page.getByRole("button", { name: "Close", exact: true }).click();
+    await page.getByRole("button", { name: "Lock now", exact: true }).click();
+    await expect(
+      page.getByText("Hidden fixture title", { exact: true }),
+    ).toHaveCount(0);
+    await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+    await page.getByRole("button", { name: "Unlock", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Hidden fixture title", exact: true }),
+    ).toBeVisible();
+    await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+    await expect(page.locator(".vault-card")).toHaveCount(0);
+    await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+    await page.getByRole("button", { name: "Unlock", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Unhide note", exact: true })
+      .click();
+    await expect(page.locator(".vault-card")).toHaveCount(0);
+    await page.goto("/notes");
+    await expect(
+      page.getByText("Hidden fixture title", { exact: true }),
+    ).toBeVisible();
+  });
+test("pattern supports keyboard setup and unlock", async ({
+  page,
+  request,
+}) => {
+  await request.post(base + "/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 850 });
+  await signIn(page);
+  await page.goto("/hidden-notes");
+  await page.getByRole("button", { name: "Lock type", exact: true }).click();
+  await page
+    .getByRole("option", { name: "3 by 3 pattern", exact: true })
+    .click();
+  const draw = async () => {
+    for (const n of [1, 2, 3, 6]) {
+      await page
+        .getByRole("button", { name: `Point ${n}`, exact: true })
+        .focus();
+      await page.keyboard.press("Space");
+    }
+  };
+  await draw();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await draw();
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Lock now", exact: true }).click();
+  await draw();
+  await page.getByRole("button", { name: "Unlock", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Lock now", exact: true }),
+  ).toBeVisible();
+});
+
+test("hidden drafts resume after locking and never enter the offline cache", async ({
+  page,
+  request,
+}) => {
+  await request.post(base + "/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 850 });
+  await signIn(page);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  await page
+    .getByRole("button", { name: "New hidden note", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Note title", exact: true })
+    .fill("Unsaved private fixture");
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await expect(
+    page.getByRole("button", { name: "Close", exact: true }),
+  ).toBeHidden();
+  await expect(
+    page.getByText("Unsaved private fixture", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
+  await expect(page).toHaveURL(/\/notes/);
+  await expect(
+    page.getByText(
+      "Unlock hidden notes and save or discard your unsent draft before signing out.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Unlock", exact: true }).click();
+  await page.locator(".vault-open").first().click();
+  await expect(
+    page.getByText("Unsaved private fixture", { exact: true }).last(),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  const stored = await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const r = indexedDB.open("ntc.offline.v1", 1);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = reject;
+    });
+    return await new Promise<string>((resolve, reject) => {
+      const r = db.transaction("accounts").objectStore("accounts").getAll();
+      r.onsuccess = () => resolve(JSON.stringify(r.result));
+      r.onerror = reject;
+    });
+  });
+  expect(stored).not.toContain("Unsaved private fixture");
+  await page.clock.install();
+  await page.mouse.move(1,1);
+  await page.clock.fastForward(300001);
+  await expect(
+    page.getByRole("button", { name: "Unlock", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".vault-card")).toHaveCount(0);
+});
+
+test.describe("touch hidden notes", () => {
+  test.use({ hasTouch: true });
+  test("pull gesture opens vault and touch pattern inserts crossed points", async ({
+    page,
+    request,
+  }) => {
+    await request.post(base + "/__fixture/reset");
+    await page.setViewportSize({ width: 393, height: 850 });
+    await signIn(page);
+    const heading = page.getByRole("heading", { name: /^Pinned / }).first();
+    const box = (await heading.boundingBox())!;
+    const cdp = await page.context().newCDPSession(page);
+    const x = box.x + 10,
+      y = box.y + 5;
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x, y }],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x, y: y + 140 }],
+    });
+    await cdp.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect(page).toHaveURL(/\/hidden-notes/);
+    await page.getByRole("button", { name: "Lock type", exact: true }).click();
+    await page
+      .getByRole("option", { name: "3 by 3 pattern", exact: true })
+      .click();
+    const draw = async () => {
+      for (const [i, n] of [1, 3, 6].entries()) {
+        const b = (await page
+          .getByRole("button", { name: `Point ${n}`, exact: true })
+          .boundingBox())!;
+        await cdp.send("Input.dispatchTouchEvent", {
+          type: i === 0 ? "touchStart" : "touchMove",
+          touchPoints: [{ x: b.x + b.width / 2, y: b.y + b.height / 2 }],
+        });
+      }
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchEnd",
+        touchPoints: [],
+      });
+    };
+    await draw();
+    await expect(
+      page.getByRole("button", { name: "Point 2", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await draw();
+    await page.screenshot({ path: "artifacts/hidden-notes/pattern-393.png" });
+    await page
+      .getByRole("button", { name: "Confirm lock", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Lock now", exact: true }),
+    ).toBeVisible();
+  });
+});
+
+test("email reset keeps hidden notes and hidden trash restores privately", async ({
+  page,
+  request,
+}) => {
+  await request.post(base + "/__fixture/reset");
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await signIn(page);
+  await page.getByRole("button", { name: "Account menu", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Hidden notes", exact: true })
+    .click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  await page
+    .getByRole("button", { name: "New hidden note", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Note title", exact: true })
+    .fill("Private reset fixture");
+  await page.getByRole("button", { name: "View", exact: true }).click();
+  await page.getByRole("button", { name: "Close", exact: true }).click();
+  await page.getByRole("button", { name: "Lock now", exact: true }).click();
+  await page.getByRole("button", { name: "Forgot lock?", exact: true }).click();
+  await expect(page.getByText("A reset code was sent to your verified email.",{exact:true})).toBeVisible();
+  const messages = await (
+    await request.get(base + "/__fixture/mail?email=a%40example.test")
+  ).json();
+  const code = messages.at(-1).body.match(/\b\d{6}\b/)[0];
+  await page.getByLabel("Email reset code", { exact: true }).fill(code);
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("654321");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("654321");
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("654321");
+  await page.getByRole("button", { name: "Unlock", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Private reset fixture", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({ path: "artifacts/hidden-notes/vault-1440.png" });
+  await page.locator(".vault-open").first().click();
+  await page.getByRole("button", { name: "Edit", exact: true }).click();
+  await page.getByRole("button", { name: "Note options", exact: true }).click();
+  await page
+    .getByRole("menuitem", { name: "Move to trash", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Close", exact: true }),
+  ).toBeHidden();
+  await expect(page.locator(".vault-card")).toHaveCount(0);
+  await page.getByRole("button", { name: "Trash", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Private reset fixture", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Restore", exact: true }).click();
+  await expect(page.locator(".vault-card")).toHaveCount(0);
+  await page.getByRole("button", { name: "Hidden notes", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Private reset fixture", exact: true }),
+  ).toBeVisible();
+});
+
+test("ambiguous hide acknowledgement keeps offline content excluded and retries safely", async ({
+  page,
+  request,
+}) => {
+  await request.post(base + "/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 850 });
+  await signIn(page);
+  const card = page.locator(".note-card").first();
+  const title = await card.getByRole("heading").innerText();
+  await card.getByRole("button", { name: /^Actions for / }).click();
+  await page.getByRole("menuitem", { name: "Hide note", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
+  await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  let dropped = false;
+  await page.route("**/api/v1/hidden-notes/*/visibility", async (route) => {
+    if (!dropped) {
+      const response = await route.fetch();
+      expect(response.ok()).toBeTruthy();
+      dropped = true;
+      await route.abort("failed");
+    } else await route.continue();
+  });
+  await page.getByRole("button", { name: "Hide note", exact: true }).click();
+  await expect(page.getByRole("alert")).toBeVisible();
+  const titles = await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const r = indexedDB.open("ntc.offline.v1", 1);
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = reject;
+    });
+    return await new Promise<string[]>((resolve, reject) => {
+      const r = db.transaction("accounts").objectStore("accounts").getAll();
+      r.onsuccess = () =>
+        resolve(
+          r.result.flatMap((x: { notes: { title: string }[] }) =>
+            x.notes.map((n) => n.title),
+          ),
+        );
+      r.onerror = reject;
+    });
+  });
+  expect(titles).not.toContain(title);
+  await page.getByRole("button", { name: "Hide note", exact: true }).click();
+  await expect(page.locator(".vault-card")).toHaveCount(1);
+  await expect(page.locator(".vault-card").getByRole("heading")).toHaveText(
+    title,
+  );
+});

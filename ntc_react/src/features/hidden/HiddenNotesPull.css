@@ -1,0 +1,5 @@
+@media (max-width: 800px) {
+  html:has(.hidden-notes-pull[data-enabled="true"]) {
+    overscroll-behavior-y: contain;
+  }
+}

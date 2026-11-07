@@ -34,6 +34,7 @@ const SettingsIndex = lazy(() => import("../features/settings/SettingsIndex"));
 const PreferencesPage = lazy(
   () => import("../features/settings/PreferencesPage"),
 );
+const HiddenNotes = lazy(() => import("../features/hidden/HiddenNotes"));
 const AdminPage = lazy(() => import("../features/admin/AdminPage"));
 function Root() {
   useLanguage();
@@ -238,6 +239,7 @@ export const router = createBrowserRouter([
                 element: <AppShell />,
                 children: [
                   { path: "/notes", element: <NotesPage /> },
+                  { path: "/hidden-notes", element: <HiddenNotes /> },
                   { path: "/notes/:id", element: <NoteRoute /> },
                   { path: "/labels/:tagId", element: <NotesPage /> },
                   { path: "/trash", element: <NotesPage trash /> },

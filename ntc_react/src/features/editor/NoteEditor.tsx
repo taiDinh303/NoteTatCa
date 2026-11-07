@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { AutosaveCoordinator } from "../../application/autosave";
-import { api, notes, workspace, offline } from "../../app/runtime";
+import { useEditorScope } from "./EditorScope";
 import type { Note, NoteDraft } from "../../domain/models";
 import { draftFrom } from "../../domain/models";
 import { labelTint, notePalette } from "../../domain/color";
@@ -120,6 +120,7 @@ function NoteEditorSession({
   onClose,
   initialAction,
 }: NoteEditorProps) {
+  const { notes, workspace } = useEditorScope();
   useLanguage();
   const session = useAuth().session;
   const [editing, setEditing] = useState(() => !noteId || (!initialAction && noteEditingDefault()));
@@ -190,6 +191,7 @@ function NoteLabelsDialog({
   onClose: () => void;
 }) {
   useLanguage();
+  const { workspace } = useEditorScope();
   const mobile = useMobileLayout();
   const labels = useLabels();
   const [original] = useState(note);
@@ -287,6 +289,7 @@ function NoteLabelsDialog({
   );
 }
 function NoteInformation({ note, onRestored }: { note: Note; onRestored: () => void }) {
+  const { notes } = useEditorScope();
   useLanguage();
   const me = useMe();
   const auth = useAuth();
@@ -355,6 +358,7 @@ type NoteRevision = {
   content: string;
 };
 function NoteHistory({ note, onClose, onRestored }: { note: Note; onClose: () => void; onRestored: () => void }) {
+  const { api, workspace } = useEditorScope();
   useLanguage();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>();
@@ -413,9 +417,10 @@ function EditorSession({
 }) {
   useLanguage();
   const state = useAuth();
+  const { notes, workspace, offline, draftFor, rememberDraft, forgetDraft, hidden } = useEditorScope();
   const syncState = useSyncExternalStore(offline.subscribe, offline.getSnapshot);
   const me = useMe();
-  const [draft, setDraft] = useState(() => draftFrom(initial));
+  const [draft, setDraft] = useState(() => initial && draftFor?.(initial) || draftFrom(initial));
   const [initialDocument, setInitialDocument] = useState(() => draft.documentJson);
   const [editorPrepared, setEditorPrepared] = useState(editing);
   const [coordinator] = useState(
@@ -469,6 +474,7 @@ function EditorSession({
   }, [coordinator]);
   useEffect(() => {
     coordinator.resume();
+    coordinator.update(draftRef.current);
     return () => {
       coordinator.dispose();
       fork.current?.dispose();
@@ -480,8 +486,9 @@ function EditorSession({
     const next = { ...draftRef.current, ...patch };
     draftRef.current = next;
     setDraft(next);
+    rememberDraft?.(initial, next);
     coordinator.update(next);
-  }, [coordinator, initial]);
+  }, [coordinator, initial, rememberDraft]);
   const onDocumentChange = useCallback((documentJson: string) => update({ documentJson }), [update]);
   const insertCharacter = (text: string) => {
     if (!editingRef.current) return false;
@@ -541,6 +548,7 @@ function EditorSession({
     finishClose();
   }
   function discard() {
+    forgetDraft?.(initial);
     coordinator.dispose();
     finishClose();
   }
@@ -829,7 +837,7 @@ function EditorSession({
               icon={Bell}
               data-note-tool-trigger
               label={tr("Note reminders")}
-              disabled={state.status === "guest"}
+              disabled={state.status === "guest" || hidden}
               active={reminderOpen}
               onClick={() => {
                 if (reminderOpen) { setReminderOpen(false); return; }

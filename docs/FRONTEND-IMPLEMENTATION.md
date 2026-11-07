@@ -591,3 +591,7 @@ Card luôn hiện tên nhãn đầu với ellipsis khi thiếu chỗ, nhãn còn
 ## Mobile Back đóng note — 2026-11-07
 
 Trên màn hình mobile, mở note thêm một entry cùng route; nút Quay lại gọi luồng Close, giữ người dùng trong app. Chờ save hoặc giữ prompt/draft khi không thể lưu; desktop giữ hành vi cũ. Reader/handler gắn tại biên NoteEditor để loading cũng có entry. Four Chromium regressions và build độc lập PASS; native devices/WebKit chưa kiểm. Evidence và publication tại worklog.
+
+## Ghi chú ẩn trên nhánh review — 2026-11-07
+
+Menu account mở /hidden-notes; card menu Hide note; mobile có pull-down tại đầu danh sách và nút menu thay thế. PIN6/pattern3×3 có keyboard/touch/midpoint, email reset; unlock/lock, create/edit/history/trash/restore/unhide dùng scope/writer/QueryClient RAM riêng. Auto-lock rời app/5phút, hủy requests/xóa DOM và cache đọc; unsent drafts giữ RAM đúng account, có guard logout/reload và version conflict. Hide xóa cache của đúng user ID (khác identity stamp role), tombstone chặn late snapshot/outbox ghi lại hidden note. Quota/name/editor/autosave thường giữ nguyên. Contract và rollout chưa-live: [HIDDEN-NOTES](HIDDEN-NOTES.md); evidence/giới hạn tại worklog.

@@ -30,6 +30,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import {
+  LockKeyhole,
   Bell,
   FileText,
   LayoutGrid,
@@ -54,6 +55,7 @@ import {
   animateNoteLayout,
 } from "./noteMotion";
 import "./NoteMotion.css";
+import { HiddenNotesPull } from "../hidden/HiddenNotesPull";
 import { NotesZoomViewport } from "./NotesZoomViewport";
 import { NoteMascot } from "../mascot/NoteMascot";
 import { useListMascotPerch } from "../mascot/useListMascotPerch";
@@ -97,6 +99,7 @@ const NoteCard = memo(function NoteCard({
 }) {
   useLanguage();
   const guestMode = useAuth().status === "guest";
+  const navigateTo = useNavigate();
   const {
     setNodeRef,
     transform,
@@ -263,6 +266,7 @@ const NoteCard = memo(function NoteCard({
               label={tr("Actions for {0}", title)}
               align="start"
               items={[
+                ...(!guestMode ? [{label:tr("Hide note"),icon:LockKeyhole,action:()=>navigateTo("/hidden-notes",{state:{hideNoteId:note.id}}),disabled:busy}] : []),
                 {
                   label: tr("Add label"),
                   icon: Tag,
@@ -301,6 +305,7 @@ export default function NotesPage({
   reminderView?: boolean;
 }) {
   useLanguage();
+  const authState = useAuth();
   const { tagId } = useParams();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -625,6 +630,7 @@ export default function NotesPage({
         />
       ) : (
         <NotesZoomViewport mode={view}>
+          <HiddenNotesPull enabled={!trash && !editor && !selected && authState.status === "authenticated"} />
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

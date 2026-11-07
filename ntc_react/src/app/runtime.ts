@@ -9,6 +9,7 @@ import { GuestWorkspace, guestSession } from "../application/guest";
 import { IndexedGuestStore, GUEST_OWNER } from "../infrastructure/guestStore";
 import { GuestTransferService } from "../application/guestTransfer";
 import { t } from "../shared/i18n";
+import {hiddenDraftProtection} from "../application/hiddenDraftProtection";
 import { LogoutProtection } from "../application/logoutProtection";
 import { isAdministrator } from "../application/access";
 import type { Note } from "../domain/models";
@@ -144,6 +145,7 @@ export const auth: AuthService = new AuthService(
   () => navigator.onLine,
   async () => {
     if (!owner()) return true;
+    if(hiddenDraftProtection.has(auth.identity()??"")){toast.error(t("Unlock hidden notes and save or discard your unsent draft before signing out."));return false;}
     try {
       return (await offline.hasPending()) ? logoutProtection.request() : true;
     } catch {
