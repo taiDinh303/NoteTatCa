@@ -13,7 +13,8 @@ import { LogoutWarning } from "./OfflineControls";
 import { GuestEntry, GuestImportOffer } from "./GuestControls";
 import { homePath, isAdministrator } from "../application/access";
 import { useAuth } from "../shared/hooks";
-import { Spinner } from "../shared/ui";
+import { Logo, Spinner } from "../shared/ui";
+import "./Logout.css";
 import { Landing, NotFound, Privacy } from "../features/public/PublicPages";
 import {
   ConnectionFeedback,
@@ -170,7 +171,14 @@ function Logout() {
       .catch(() => {})
       .then((done) => navigate(done === false ? "/notes" : wasGuest.current ? "/Home" : "/login", { replace: true }));
   }, [navigate]);
-  return <Spinner label={tr("Signing out…")} />;
+  return (
+    <main className="logout-screen" aria-busy="true">
+      <div className="logout-card">
+        <Logo />
+        <Spinner label={tr("Signing out…")} />
+      </div>
+    </main>
+  );
 }
 const aliases: Record<string, string> = {
   "/Auth/Login": "/login",
