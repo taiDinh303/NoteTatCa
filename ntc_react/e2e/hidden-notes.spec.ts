@@ -571,6 +571,21 @@ for (const width of [320, 1440])
       page.getByRole("button", { name: "Unlock", exact: true }),
     ).toBeVisible();
     await expect(page.locator(".vault-pattern")).toHaveCount(1);
+    const positioning = await page.locator(".vault-lock-form").evaluate((form) => {
+      const bounds = form.getBoundingClientRect();
+      const area = form.closest(".vault-page")!.getBoundingClientRect();
+      return {
+        horizontalOffset: bounds.x + bounds.width / 2 - (area.x + area.width / 2),
+        verticalOffset: bounds.y + bounds.height / 2 - (area.y + area.height / 2),
+      };
+    });
+    expect(Math.abs(positioning.horizontalOffset)).toBeLessThan(2);
+    if (width > 800) {
+      expect(positioning.verticalOffset).toBeLessThan(-20);
+      expect(positioning.verticalOffset).toBeGreaterThan(-40);
+    } else {
+      expect(Math.abs(positioning.verticalOffset)).toBeLessThan(2);
+    }
     await page.screenshot({
       path: `artifacts/hidden-notes/clean-lock-${width}.png`,
     });

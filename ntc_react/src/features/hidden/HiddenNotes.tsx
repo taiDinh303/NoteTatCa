@@ -257,7 +257,9 @@ function VaultPage() {
       />
     );
   return (
-    <section className="vault-page">
+    <section
+      className={`vault-page${!unlocked || mode === "change" ? " vault-locked" : ""}`}
+    >
       <h1 className="sr-only">{tr("Hidden notes")}</h1>
       {unlocked && mode === "unlock" && notice ? (
         <p role="status">{notice}</p>

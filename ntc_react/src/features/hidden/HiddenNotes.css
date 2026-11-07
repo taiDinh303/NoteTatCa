@@ -75,6 +75,19 @@
   width: min(100%, 360px);
   overflow-y: auto;
 }
+.vault-locked {
+  justify-content: center;
+}
+.vault-locked > .vault-lock-form {
+  flex: 0 1 auto;
+  min-height: 0;
+  margin-block: 16px;
+}
+@media (min-width: 801px) {
+  .vault-locked {
+    padding-bottom: min(8vh, 64px);
+  }
+}
 
 .vault-recovery-link {
   text-align: center;
