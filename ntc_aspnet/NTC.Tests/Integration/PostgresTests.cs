@@ -5,6 +5,7 @@ using Npgsql;
 using NTC.Contract.Repositories.Entities;
 using NTC.Repositories.Context;
 using NTC.Tests.Infrastructure;
+using NTC.Core.Security;
 namespace NTC.Tests.Integration;
 public sealed class PostgresTests
 {
@@ -24,13 +25,25 @@ public sealed class PostgresTests
             await db.GetService<IMigrator>().MigrateAsync("20261017044034_InitialPostgreSql");
             var user=new ApplicationUser {Id=Guid.NewGuid(),UserName="fixture@example.test",Email="fixture@example.test",EmailConfirmed=true};
             db.Users.Add(user);var note=new Note {UserId=user.Id,Title="Unicode 📝",Content="Giữ nguyên nội dung",SortOrder=1000};
-            var tag=new Tag {UserId=user.Id,Name="Legacy label"};db.AddRange(note,tag);await db.SaveChangesAsync();
+            var tag=new Tag {UserId=user.Id,Name="Legacy label"};db.Add(tag);await db.SaveChangesAsync();
+            // Seed the historical schema explicitly; the current EF Note also maps IsHidden, which does not exist yet.
+            var now=DateTimeOffset.UtcNow;
+            await db.Database.ExecuteSqlInterpolatedAsync($"""
+                INSERT INTO ntc."Notes" ("Id","UserId","Title","Content","DocumentSchemaVersion","IsPinned","Priority","SortOrder","CreatedTime","LastUpdatedTime","Version")
+                VALUES ({note.Id},{user.Id},{note.Title},{note.Content},1,false,1,1000,{now},{now},{note.Version})
+                """);
             await db.Database.ExecuteSqlInterpolatedAsync($"INSERT INTO ntc.\"NoteTags\" (\"NoteId\",\"TagId\") VALUES ({note.Id},{tag.Id})");
             await db.Database.MigrateAsync();
             var id=note.Id;db.ChangeTracker.Clear();var saved=await db.Notes.SingleAsync(x=>x.Id==id);
-            Assert.Equal("Giữ nguyên nội dung",saved.Content);Assert.Equal(TimeSpan.Zero,saved.CreatedTime.Offset);Assert.Equal("ntc",db.Model.GetDefaultSchema());
+            Assert.False(saved.IsHidden);Assert.Equal("Giữ nguyên nội dung",saved.Content);Assert.Equal(TimeSpan.Zero,saved.CreatedTime.Offset);Assert.Equal("ntc",db.Model.GetDefaultSchema());
             Assert.Empty(await db.Database.GetPendingMigrationsAsync());
             Assert.Equal(user.Id,(await db.NoteTags.SingleAsync()).UserId);
+            saved.IsHidden=true;await db.SaveChangesAsync();db.ChangeTracker.Clear();
+            Assert.Empty(await db.Notes.AsNoTracking().ToListAsync());Assert.Empty(await db.NoteTags.AsNoTracking().ToListAsync());
+            var access=new NoteAccess {HiddenNotesUnlocked=true};
+            await using var opened=new PostgreSqlDatabaseContext(new DbContextOptionsBuilder<PostgreSqlDatabaseContext>().UseNpgsql(test.ConnectionString).Options,noteAccess:access);
+            Assert.Single(await opened.Notes.AsNoTracking().ToListAsync());Assert.Single(await opened.NoteTags.AsNoTracking().ToListAsync());
+            access.HiddenNotesUnlocked=false;Assert.Empty(await opened.Notes.AsNoTracking().ToListAsync());
         }
         finally
         {

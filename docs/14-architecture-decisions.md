@@ -1,3 +1,7 @@
+## ADR-020 — Secondary lock cho note ẩn (DEC-032, 2026-11-07)
+
+ACCEPTED từ phỏng vấn chủ dự án: PIN6/pattern3×3, verified-email recovery, PC/mobile, online-only và auto-lock. Không thay Identity hoặc hứa E2EE. Triển khai filter và grant server thay vì chỉ ẩn UI; editor dùng writer/cache RAM riêng, không đưa hidden content vào offline store/export thường. Migration/release chưa được apply live; [contract](HIDDEN-NOTES.md).
+
 # 14 — Quyết định kiến trúc
 
 > 2026-10-17 | WORKING ADR | Áp dụng: YES

@@ -16,7 +16,7 @@ using NTC.Services.Shared;
 
 namespace NTC.Services.Service;
 
-public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser, TimeProvider clock)
+public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser, TimeProvider clock, INoteAccess? noteAccess = null)
     : BaseService(unitOfWork, currentUser, clock), INoteService
 {
     private IQueryable<Note> Owned(bool trash = false) => Repository<Note>().Entities
@@ -29,10 +29,11 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
     public Task<BasePaginatedList<NoteResponseModelView>> GetByTagAsync(Guid? tag, int p, int s) => QueryAsync(p, s, tagId: tag);
     public Task<BasePaginatedList<NoteResponseModelView>> GetByReminderAsync(int p, int s) => QueryAsync(p, s, hasReminder: true);
     public async Task<BasePaginatedList<NoteResponseModelView>> QueryAsync(int page, int size, string? search = null,
-        Guid? tagId = null, bool trash = false, bool? pinned = null, bool hasReminder = false)
+        Guid? tagId = null, bool trash = false, bool? pinned = null, bool hasReminder = false, bool hidden = false)
     {
         _ = UserId; ValidatePage(page, size);
-        var query = Owned(trash).AsNoTracking();
+        if (hidden && noteAccess?.HiddenNotesUnlocked != true) throw DomainErrors.Forbidden();
+        var query = Owned(trash).AsNoTracking().Where(x => x.IsHidden == hidden);
         if (search?.Length > 200) throw DomainErrors.Invalid("Search must be at most 200 characters.");
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -94,11 +95,11 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
         });
     }
 
-    public async Task<Note> CreateAsync(CreateNoteModelView model)
+    public async Task<Note> CreateAsync(CreateNoteModelView model, bool hidden = false)
     {
-        _ = UserId; Validate(model.Title, model.Content, model.DocumentJson, model.IconEmoji, model.BackgroundColor);
+        _ = UserId; if (hidden && noteAccess?.HiddenNotesUnlocked != true) throw DomainErrors.Forbidden(); Validate(model.Title, model.Content, model.DocumentJson, model.IconEmoji, model.BackgroundColor);
         var fingerprint = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new
-        { model.Title, model.Content, model.DocumentJson, model.IconEmoji, model.BackgroundColor, model.IsPinned, model.TagIds }))));
+        { model.Title, model.Content, model.DocumentJson, model.IconEmoji, model.BackgroundColor, model.IsPinned, model.TagIds }) + (hidden ? ":hidden" : ""))));
         return await InTransactionAsync(async () =>
         {
             if (model.ClientRequestId is { } key)
@@ -107,13 +108,13 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
                 var existing = await Repository<Note>().Entities.FirstOrDefaultAsync(x => x.UserId == UserId && x.CreateRequestId == key);
                 if (existing != null)
                 {
-                    if (existing.CreateRequestHash != fingerprint || existing.DeletedTime != null) throw DomainErrors.Conflict("Idempotency key was already used.");
+                    if (existing.CreateRequestHash != fingerprint || existing.DeletedTime != null || existing.IsHidden != hidden) throw DomainErrors.Conflict("Idempotency key was already used.");
                     return existing;
                 }
             }
             var tags = await ValidateTags(model.TagIds);
             var min = await Owned().Where(x => x.IsPinned == model.IsPinned).Select(x => (double?)x.SortOrder).MinAsync() ?? 1000;
-            var note = new Note { UserId = UserId, Title = model.Title?.Trim() ?? "", Content = ContentRules.PlainText(model.DocumentJson, model.Content),
+            var note = new Note { UserId = UserId, IsHidden = hidden, Title = model.Title?.Trim() ?? "", Content = ContentRules.PlainText(model.DocumentJson, model.Content),
                 DocumentJson = model.DocumentJson, IconEmoji = ContentRules.Emoji(model.IconEmoji), BackgroundColor = ContentRules.Color(model.BackgroundColor),
                 IsPinned = model.IsPinned, PinnedAt = model.IsPinned ? UtcNow : null, Priority = model.Priority,
                 SortOrder = min - 1000, CreateRequestId = model.ClientRequestId, CreateRequestHash = model.ClientRequestId.HasValue ? fingerprint : null };

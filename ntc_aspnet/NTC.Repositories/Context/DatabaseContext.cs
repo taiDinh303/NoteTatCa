@@ -15,10 +15,12 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
 {
     private readonly TimeProvider _clock;
     private readonly ICurrentUser? _actor;
-    public DatabaseContext(DbContextOptions<DatabaseContext> options, TimeProvider? clock = null, ICurrentUser? actor = null)
-        : this((DbContextOptions)options, clock, actor) { }
-    protected DatabaseContext(DbContextOptions options, TimeProvider? clock = null, ICurrentUser? actor = null) : base(options)
-    { _clock = clock ?? TimeProvider.System; _actor = actor; }
+    private readonly INoteAccess? _noteAccess;
+    public bool HiddenNotesUnlocked => _noteAccess?.HiddenNotesUnlocked == true;
+    public DatabaseContext(DbContextOptions<DatabaseContext> options, TimeProvider? clock = null, ICurrentUser? actor = null, INoteAccess? noteAccess = null)
+        : this((DbContextOptions)options, clock, actor, noteAccess) { }
+    protected DatabaseContext(DbContextOptions options, TimeProvider? clock = null, ICurrentUser? actor = null, INoteAccess? noteAccess = null) : base(options)
+    { _clock = clock ?? TimeProvider.System; _actor = actor; _noteAccess = noteAccess; }
 
     public DbSet<ApplicationUser> ApplicationUser => Set<ApplicationUser>();
     public DbSet<ApplicationRole> ApplicationRole => Set<ApplicationRole>();
@@ -42,6 +44,22 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<Note>().HasQueryFilter(x => !x.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<NoteRevision>().HasQueryFilter(x => x.Note != null && !x.Note.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<NoteTag>().HasQueryFilter(x => x.Note != null && !x.Note.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<Reminder>().HasQueryFilter(x => x.Note != null && !x.Note.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<Notification>().HasQueryFilter(x => x.Note != null && !x.Note.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<ReminderDelivery>().HasQueryFilter(x => x.Note != null && !x.Note.IsHidden || HiddenNotesUnlocked);
+        builder.Entity<NoteVault>(e => {
+            e.HasKey(x => x.UserId); e.HasOne<ApplicationUser>().WithOne().HasForeignKey<NoteVault>(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.Property(x => x.Kind).HasMaxLength(16); e.Property(x => x.SecretHash).HasMaxLength(512);
+            e.Property(x => x.ResetHash).HasMaxLength(64); e.Property(x => x.Version).IsConcurrencyToken();
+        });
+        builder.Entity<NoteVaultGrant>(e => {
+            e.HasKey(x => x.TokenHash); e.Property(x => x.TokenHash).HasMaxLength(64);
+            e.HasOne<NoteVault>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(x => new { x.UserId, x.SessionId });
+        });
         if (Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL") builder.HasDefaultSchema("ntc");
         builder.Entity<ApplicationUser>().Property(x => x.TimeZoneId).HasMaxLength(100).HasDefaultValue("Asia/Ho_Chi_Minh");
         builder.Entity<ApplicationUser>().HasIndex(x => x.NormalizedEmail).HasDatabaseName("EmailIndex").IsUnique()
@@ -192,6 +210,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
             if (entry.Entity is BaseEntity entity) entity.Version = Guid.NewGuid();
             if (entry.Entity is AdministrativeAuditEvent audit) audit.OccurredAt = now;
             if (entry.Entity is RefreshSession session) session.Version = Guid.NewGuid();
+            if (entry.Entity is NoteVault vault) vault.Version = Guid.NewGuid();
             if (entry.Entity is EmailChallenge challenge) challenge.Version = Guid.NewGuid();
             foreach (var property in entry.Properties)
                 if (property.CurrentValue is DateTimeOffset value) property.CurrentValue = value.ToUniversalTime();

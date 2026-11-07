@@ -20,7 +20,7 @@ public sealed class WorkspaceArchiveService(IUnitOfWork unitOfWork, ICurrentUser
         var labels = await Repository<Tag>().Entities.AsNoTracking()
             .Where(x => x.UserId == owner && x.DeletedTime == null).OrderBy(x => x.Name).ToListAsync();
         var notes = await Repository<Note>().Entities.AsNoTracking()
-            .Where(x => x.UserId == owner)
+            .Where(x => x.UserId == owner && !x.IsHidden)
             .Include(x => x.NoteTags).Include(x => x.Reminders)
             .OrderBy(x => x.CreatedTime).ThenBy(x => x.Id).ToListAsync();
         var revisions = await Repository<NoteRevision>().Entities.AsNoTracking()

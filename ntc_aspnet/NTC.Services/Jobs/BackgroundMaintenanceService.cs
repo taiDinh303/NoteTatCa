@@ -102,14 +102,14 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
     public async Task<int> PurgeTrashAsync(CancellationToken cancellationToken = default)
     {
         var cutoff = clock.GetUtcNow().AddDays(-30); var count = 0;
-        var ids = await unitOfWork.GetRepository<Note>().Entities.AsNoTracking().Where(x => x.DeletedTime <= cutoff)
+        var ids = await unitOfWork.GetRepository<Note>().Entities.IgnoreQueryFilters().AsNoTracking().Where(x => x.DeletedTime <= cutoff)
             .OrderBy(x => x.DeletedTime).Select(x => x.Id).Take(100).ToListAsync(cancellationToken);
         foreach (var id in ids)
         {
             cancellationToken.ThrowIfCancellationRequested(); await unitOfWork.BeginTransactionAsync();
             try
             {
-                var note = await unitOfWork.GetRepository<Note>().Entities.FirstOrDefaultAsync(x => x.Id == id && x.DeletedTime <= cutoff, cancellationToken);
+                var note = await unitOfWork.GetRepository<Note>().Entities.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == id && x.DeletedTime <= cutoff, cancellationToken);
                 if (note != null) { await NoteGraph.DeleteAsync(unitOfWork, note); await unitOfWork.SaveAsync(); count++; }
                 await unitOfWork.CommitTransactionAsync();
             }
@@ -126,6 +126,8 @@ public sealed class BackgroundMaintenanceService(IUnitOfWork unitOfWork, TimePro
         var challenges = await unitOfWork.GetRepository<EmailChallenge>().Entities.Where(x => x.ExpiresAt < cutoff).OrderBy(x => x.ExpiresAt).Take(500).ToListAsync(cancellationToken);
         foreach (var session in sessions) await unitOfWork.GetRepository<RefreshSession>().DeleteAsync(session);
         foreach (var challenge in challenges) await unitOfWork.GetRepository<EmailChallenge>().DeleteAsync(challenge);
-        await unitOfWork.SaveAsync(); return sessions.Count + challenges.Count;
+        var grants = await unitOfWork.GetRepository<NoteVaultGrant>().Entities.Where(x => x.ExpiresAt <= clock.GetUtcNow()).Take(1000).ToListAsync();
+        foreach (var grant in grants) await unitOfWork.GetRepository<NoteVaultGrant>().DeleteAsync(grant);
+        await unitOfWork.SaveAsync(); return sessions.Count + challenges.Count + grants.Count;
     }
 }

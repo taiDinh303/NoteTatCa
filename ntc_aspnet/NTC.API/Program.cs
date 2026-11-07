@@ -87,6 +87,7 @@ app.UseStatusCodePages(async context =>
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing") || builder.Configuration.GetValue<bool>("Swagger:Enabled"))
 { app.UseSwagger(); app.UseSwaggerUI(); }
 app.UseRouting(); app.UseCors("Clients"); app.UseAuthentication(); app.UseAuthorization(); app.UseRateLimiter();
+app.UseMiddleware<NoteVaultMiddleware>();
 app.MapGet("/health/live", () => Results.Ok(new { status = "live" })).AllowAnonymous();
 app.MapGet("/health/ready", async (DatabaseContext db, CancellationToken token) =>
 {

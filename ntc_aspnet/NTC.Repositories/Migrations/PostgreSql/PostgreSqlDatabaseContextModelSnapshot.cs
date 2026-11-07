@@ -430,6 +430,77 @@ namespace NTC.Repositories.Migrations.PostgreSql
                         });
                 });
 
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.NoteVault", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CredentialVersion")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FailedAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset?>("LockedUntil")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ResetAttempts")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("ResetExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResetHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset?>("ResetSentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SecretHash")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("NoteVault", "ntc");
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.NoteVaultGrant", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SessionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VaultVersion")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("UserId", "SessionId");
+
+                    b.ToTable("NoteVaultGrant", "ntc");
+                });
+
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.RefreshSession", b =>
                 {
                     b.Property<Guid>("Id")
@@ -530,6 +601,9 @@ namespace NTC.Repositories.Migrations.PostgreSql
                     b.Property<string>("IconEmoji")
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsPinned")
                         .HasColumnType("boolean");
@@ -1162,6 +1236,24 @@ namespace NTC.Repositories.Migrations.PostgreSql
                         .WithMany()
                         .HasForeignKey("TargetUserId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.NoteVault", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("NTC.Contract.Repositories.Entities.Identity.NoteVault", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.NoteVaultGrant", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.Identity.NoteVault", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Identity.RefreshSession", b =>

@@ -15,6 +15,8 @@ public static class DependencyInjection
     public static void AddConfig(this IServiceCollection services, IConfiguration config)
     {
         services.AddHttpContextAccessor(); services.AddSingleton(TimeProvider.System);
+        services.AddScoped<NTC.Core.Security.INoteAccess, NTC.Core.Security.NoteAccess>();
+        services.AddScoped<NTC.Contract.Services.Interface.INoteVaultService, NTC.Services.Security.NoteVaultService>();
         services.AddScoped<ICurrentUser, HttpCurrentUser>(); services.AddDatabase(config); services.AddPersistence();
         services.AddIdentityAndBearer(); services.AddRequestPolicies(config);
         services.AddScoped<IAuthService, AuthService>(); services.AddScoped<IUserService, UserService>();

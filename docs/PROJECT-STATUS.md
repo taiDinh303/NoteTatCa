@@ -21,3 +21,7 @@
 ## Cách tiếp tục
 
 Đọc AGENTS.md, docs/00-README.md, PROJECT-INTAKE.md, 01-plan.md, BACKEND-IMPLEMENTATION.md, snapshot này và worklog mới nhất trước thay đổi. Trước hoàn tất ghi scope/kết quả/validation/limits/remaining; phân biệt local, commit, push và rollout. README sản phẩm không thay AGENTS.md. Giữ mọi config và working changes ngoài scope; không migrate/deploy DB từ code task.
+
+## Bổ sung 2026-11-07: Back và vault
+
+Mobile Back đóng note đã publish riêng commit68a8d1e; production verification xem worklog. Ghi chú ẩn DEC-032 đã được chủ dự án chốt và đang ở nhánh review codex/hidden-notes-vault; chưa apply schema hoặc deploy backend/UI live. Không coi feature là đã có trên website trước rollout theo HIDDEN-NOTES.

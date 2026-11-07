@@ -1,3 +1,7 @@
+## Ghi chú ẩn — DEC-032, 2026-11-07
+
+Nhánh codex/hidden-notes-vault bổ sung NoteVaultService/BaseService, INoteAccess ở Core, persistence filter cho Note và graph, session-bound grant/reset/attempt protection và migrations additive riêng mỗi provider. .NET Identity/owner/admin no-content giữ nguyên; không apply owner DB. [Contract và rollout](HIDDEN-NOTES.md); kết quả thực tế tại worklog.
+
 > Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
 
 # Backend implementation contract — 2026-10-17

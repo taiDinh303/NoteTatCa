@@ -27,6 +27,7 @@ namespace NTC.Contract.Repositories.Entities
 
         // UI / UX
         public bool IsPinned { get; set; }
+        public bool IsHidden { get; set; }
         public DateTimeOffset? PinnedAt { get; set; }
         public int Priority { get; set; } = 1;
 

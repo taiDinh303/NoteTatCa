@@ -51,7 +51,7 @@ public sealed class AdminService(IUnitOfWork work, ICurrentUser actor, TimeProvi
     {
         RequireAdmin(); // Aggregate only; never project title/content/document.
         return new(await Repository<ApplicationUser>().Entities.CountAsync(), await Repository<ApplicationUser>().Entities.CountAsync(x => x.IsLocked),
-            await Repository<Note>().Entities.CountAsync(x => x.DeletedTime == null), await Repository<Note>().Entities.CountAsync(x => x.DeletedTime != null),
+            await Repository<Note>().Entities.IgnoreQueryFilters().CountAsync(x => x.DeletedTime == null), await Repository<Note>().Entities.IgnoreQueryFilters().CountAsync(x => x.DeletedTime != null),
             await Repository<Reminder>().Entities.CountAsync(x => x.IsActive && x.DeletedTime == null),
             await Repository<ReminderDelivery>().Entities.CountAsync(x => x.SentAt == null && !x.Abandoned));
     }
