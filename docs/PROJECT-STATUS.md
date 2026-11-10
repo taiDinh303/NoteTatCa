@@ -1,31 +1,30 @@
-# Hiện trạng dự án — 2026-11-07
+# Hiện trạng dự án — 2026-11-10
 
-Đối chiếu source main 1b8ce84, working tree và evidence worklog; không phải kiểm toán production mới. Snapshot này thay các mô tả hiện trạng cũ tháng 10 trong README/intake/plan/backend/release/handover; giữ nguyên quyết định nghiệp vụ và lịch sử.
+Đối chiếu local HEAD 18d8708, working tree và worklog đến 10/11. Đây là nguồn CURRENT thay các snapshot tháng 10/đầu tháng 11; không phải kiểm toán production mới. Thứ tự và phỏng vấn hiện hành ở [CURRENT-PRIORITIES](CURRENT-PRIORITIES.md).
 
-## CURRENT
+## Đã có trong source và evidence phát hành
 
-- Repo hiện mở tại D:/My Projects/NoteTatCa; dùng đường dẫn tương đối từ Git root. Backend ntc_aspnet/ (.NET 8/Identity), frontend ntc_react/ (React/TypeScript/Vite), tài liệu duy nhất docs/. Razor đã gỡ, không tạo lại.
-- Production đã có Vercel React, Render API và Supabase PostgreSQL theo deploy/project.json. Rollout schema NoteRevisions/MascotGeneration và backend/UI ngày 02/11 có evidence trong worklog; không còn trạng thái chờ merge/apply như đoạn lịch sử 01/11.
-- Source có offline customer create/edit, auto/manual sync/conflict/logout protection, archive JSON export/import workspace và content revision/restore owner-bound. Archive không chứa credential hoặc backup toàn bộ hệ thống. Không khẳng định Markdown export đã có.
-- Có bốn mẫu cấu trúc và mục lục H1–H3; giao diện bốn ngôn ngữ, guest mode, mobile Grid/List, double tap Edit, manifest standalone và emoji local với giới hạn render 96 rồi Show more.
-- Admin riêng: account/role/lock/deactivate/restore/statistics/audit và gửi reset link; không được đọc nội dung note người khác. Xóa vĩnh viễn tài khoản chưa bật; announcement và console reminder errors chưa có.
-- Grid desktop: fix hiện tại thống nhất geometry lúc load/resize/sidebar toggle, giữ card width/gap và lề phải. Hai Chromium regressions PASS ở 1910–1920 và fractional shell; React build/.NET strict Release PASS. Xem worklog cho publication/rollout, không suy ra website đã cập nhật từ build local.
+- Git root hiện tại D:/My Projects/NoteTatCa; backend ntc_aspnet/ (.NET 8/Identity), frontend ntc_react/ (React/TypeScript/Vite), tài liệu duy nhất docs/. Razor đã gỡ theo DEC-020, không tạo lại.
+- Vercel React, Render API, Supabase PostgreSQL đã hoạt động theo evidence worklog. Archive JSON/import và content revisions/restore đã rollout02/11; không còn là nhánh chờ merge/apply. Giữ ownership; archive không phải backup DB/Identity/keyring.
+- Auth/password/Google, session rotation/revocation, notes/labels/trash30ngày, reminders/inbox/email/jobs; admin riêng không đọc nội dung note. Google/Brevo có evidence live lịch sử, không coi toàn bộ integration chưa chạy.
+- Offline customer xem/tạo/sửa note đã tải, outbox auto/manual sync/conflict/logout protection; mở rộng offline pin/order/label/trash còn roadmap. Reorder hiện ở RAM qua SPA, không hứa giữ qua reload trước ACK.
+- JSON export/import workspace và revision restore owner-bound; editor có import/export Markdown với cảnh báo formatting có thể mất. Bản archive thường loại note ẩn, không backup vault.
+- Bốn mẫu cấu trúc, mục lục H1–H3, bốn ngôn ngữ, guest, Grid/List, mobile editor/fullscreen/Back, zoom và manifest. Mẫu checklist/cá nhân và note links còn thiếu.
+- Hidden notes đã có additive PG migration, API/UI phát hành07/11; PIN6/pattern3×3/reset email, private trash, RAM-only grant/cache/drafts. Policy mới nhất giữ unlock qua tab/SPA, khóa khi đóng/reload/pagehide/offline hoặc15phút idle. Lock controls tối giản, recovery route riêng, lock/sign-out đã được căn giữa. Không E2EE.
+- Admin có accounts/roles/lock/deactivate/restore/statistics/audit/reset link. Permanent account deletion chưa bật. Console delivery TASK-046 đã hoàn thiện local ngày10/11 (HTTP/production-bundle browser regression), xem evidence worklog; không coi đã live. Announcement TASK-047 chưa triển khai.
 
-## Còn lại
+## Đã xác nhận ưu tiên ngày 10/11
 
-- Ưu tiên đã chọn: announcement trong app trước/email sau; console reminder delivery errors bước đầu chỉ đọc. Quy tắc recipient snapshot/thu hồi và thao tác retry cần chốt theo ADMIN-REVIEW-2026-11-04.md.
-- Backup DB/Identity/keyring đầy đủ, restore drill biệt lập, retention audit/backup, RPO/RTO và alert worker; snapshot DPAPI trước migration không thay thế full restore drill.
-- Account deletion 30 ngày/admin immediate deletion; mở rộng offline mutations/order; checklist/mẫu cá nhân và note links. Media/bảng/vẽ/sharing/comment/realtime/AI chat còn roadmap, không coi việc duyệt kế hoạch là đã code.
-- Thiết bị Android/iOS/WebKit thật, native install/display và một số Google/email-client/deliverability flows chưa được nghiệm thu đầy đủ. CI cũ có PG thật/Docker và test PASS theo worklog; không dùng số test cũ làm kết quả của commit hôm nay.
+Docs/kiểm thử → console reminder deliveries chỉ đọc → announcement trong app → backup/restore miễn phí. Chụp recipient lúc gửi; user mới không nhận announcement cũ; thu hồi ẩn phía user và giữ lịch sử admin. Không có ngân sách dịch vụ trả phí; backup local dự kiến D:/backup, máy thường bật từ19:00. Chi tiết Q-039–044 tại [ưu tiên](CURRENT-PRIORITIES.md).
+
+## Giới hạn còn mở
+
+- Full frontend evidence07/11 có10lỗi baseline tái hiện ở bản trước vault; các lần focused sau không chứng minh fullsuite xanh. Ghi kết quả lệnh mới tại worklog, không dùng số test cũ cho commit hôm nay.
+- Browser dùng published assets07/11 đã redirect API vào SQLite/captured-mail fixture và block service worker. Không chứng minh authenticated owner production, real vault mailbox delivery, native Android/iOS/WebKit/PWA hoặc OS background/process lifetime.
+- Backup ngoài failure domain gồm DB/Identity/keyring, restore drill biệt lập, retention/RPO/RTO và cảnh báo vận hành chưa có bằng chứng hoàn tất. Snapshot20bảng cùngDB trước vault không thay backup độc lập. Hai advisor warnings cũ public.rls_auto_enable được ghi ở worklog, chưa kiểm lại hôm nay.
+- Chủ dự án10/11 đã mô tả mobile Q-044: pull mở một hàng và đẩy note xuống, nút Back/điều hướng mobile. Đã hoàn thiện local và kiểm production-bundle Chromium320/393, giữ note Back/draft regressions; chưa native/published. Không tự thêm sidebar/nhãn riêng từ tên pending cũ.
+- Account deletion30ngày/admin immediate deletion chờ thiết kế lifecycle/audit/backup. Admin invariant cuối cùng/concurrency và audit reset link cần rà thêm. Media/bảng/vẽ/sharing/comment/realtime/AI chat là roadmap.
 
 ## Cách tiếp tục
 
-Đọc AGENTS.md, docs/00-README.md, PROJECT-INTAKE.md, 01-plan.md, BACKEND-IMPLEMENTATION.md, snapshot này và worklog mới nhất trước thay đổi. Trước hoàn tất ghi scope/kết quả/validation/limits/remaining; phân biệt local, commit, push và rollout. README sản phẩm không thay AGENTS.md. Giữ mọi config và working changes ngoài scope; không migrate/deploy DB từ code task.
-
-## Bổ sung 2026-11-07: Back và vault
-
-Mobile Back đóng note đã publish riêng commit68a8d1e; production verification xem worklog. Ghi chú ẩn DEC-032 đã được chủ dự án chốt và yêu cầu triển khai. PostgreSQL migration20261106223452 đã apply; snapshot20bảng cùngDB, dữ liệu cũ giữ nguyên trongtransaction,48notes/6users tại thời điểmapply. API20f721d live Render và smoke health/auth/CORS PASS. UI commitd694ee4 phát hành sau API và CI; kết quả remote/Vercel/public browser cuối xem worklog và HIDDEN-NOTES. Chưa nghiệm thu thiết bị thật/real email/full external restore drill.
-
-## Điều chỉnh ghi chú ẩn sau phát hành — 2026-11-07
-
-Theo phản hồi chủ dự án: bỏ tiêu đề trang nhìn thấy, dùng chung card và bố cục danh sách thường; giữ mở khóa khi chuyển tab/trang trong app, đổi timeout idle/server grant từ5thành15phút. Grant RAM không được lưu persistent; đóng/reload/pagehide, offline hoặc Lock now vẫn khóa. Trạng thái kiểm thử và publication của thay đổi xem worklog, không suy ra live từ working tree.
+Đọc AGENTS và tài liệu đầu vào bắt buộc; dùng trang này cho CURRENT, CURRENT-PRIORITIES cho thứ tự/decision, worklog cho evidence. Không hỏi lại quyết định đã chốt. Giữ local config và working changes ngoài scope; không migrate/deploy DB từ code task. Trước hoàn tất ghi outcome/actual validation/remaining, phân biệt local/commit/push/rollout.

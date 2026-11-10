@@ -1,0 +1,50 @@
+import { test, expect } from "@playwright/test";
+
+const fixture = "http://127.0.0.1:5199";
+for (const width of [1440, 320]) {
+  test(`admin reads delivery metadata, filters and recovers from failure at ${width}`, async ({ page, request }) => {
+    await request.post(fixture + "/__fixture/reset");
+    const login = await (await request.post(fixture + "/api/v1/auth/login", { data: { email: "a@example.test", password: "Synthetic-password-123!" } })).json();
+    const headers = { Authorization: `Bearer ${login.data.token}` };
+    const note = await (await request.post(fixture + "/api/v1/notes", { headers, data: { title: "Private console sentinel", content: "Secret text never shown to admin" } })).json();
+    const reminder = await request.post(fixture + `/api/v1/notes/${note.data.id}/reminders`, { headers, data: { reminderAt: new Date(Date.now() + 60_000).toISOString(), timeZoneId: "UTC", sendEmail: true } });
+    expect(reminder.ok()).toBeTruthy();
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/login");
+    await page.getByLabel("Email address", { exact: true }).fill("admin@example.test");
+    await page.getByLabel("Password", { exact: true }).fill("Synthetic-password-123!");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/overview$/);
+    await expect(page.getByRole("heading", { name: "System overview", exact: true })).toBeVisible();
+    await request.post(fixture + "/__fixture/advance?minutes=2");
+    await request.post(fixture + "/__fixture/dispatch");
+    if (width <= 800) await page.getByRole("button", { name: "Open navigation", exact: true }).click();
+    await page.getByRole("link", { name: "Reminder deliveries", exact: true }).filter({ visible: true }).click();
+    await expect(page.getByRole("heading", { name: "Reminder deliveries", exact: true })).toBeVisible();
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText("Pending");
+    await expect(page.locator("main")).not.toContainText("Private console sentinel");
+    await expect(page.locator("main")).not.toContainText("Secret text never shown to admin");
+    await expect(page.getByRole("button", { name: /retry|cancel/i })).toHaveCount(0);
+    const userId = await rows.first().locator("td").nth(1).innerText();
+    await page.getByLabel("Delivery status", { exact: true }).selectOption("abandoned");
+    await page.getByRole("button", { name: "Apply filters", exact: true }).click();
+    await expect(page.getByText("No matching deliveries", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Clear filters", exact: true }).click();
+    await expect(rows).toHaveCount(1);
+    await page.getByLabel("Target account ID", { exact: true }).fill(userId);
+    await page.getByRole("button", { name: "Apply filters", exact: true }).click();
+    await expect(rows).toHaveCount(1);
+    await page.route("**/api/v1/admin/reminder-deliveries*", (route) => route.fulfill({ status: 503, json: { message: "Synthetic diagnostics unavailable" } }));
+    await page.getByRole("button", { name: "Refresh", exact: true }).click();
+    await expect(page.getByText("Synthetic diagnostics unavailable", { exact: true })).toBeVisible();
+    await page.unroute("**/api/v1/admin/reminder-deliveries*");
+    await page.getByRole("button", { name: "Try again", exact: true }).click();
+    await expect(rows).toHaveCount(1);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+    await page.screenshot({ path: `../artifacts/admin-deliveries-${width}.png`, fullPage: true });
+    await rows.first().getByRole("link").click();
+    await expect(page).toHaveURL(new RegExp(`/admin/audit\\?targetUserId=${userId}`));
+  });
+}

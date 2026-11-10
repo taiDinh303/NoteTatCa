@@ -1,3 +1,5 @@
+> CURRENT 2026-11-10: [Hiện trạng](PROJECT-STATUS.md), [ưu tiên và phỏng vấn](CURRENT-PRIORITIES.md). Các số test/trạng thái cloud theo ngày bên dưới là lịch sử; không dùng để kết luận hiện trạng.
+
 ## DEC-032 — Khu vực ghi chú ẩn, 2026-11-07
 
 Đã chốt PIN6/pattern3×3, reset qua email, cả PC/mobile, online-only và auto-lock15phút idle/đóng/reload, giữ mở khi chuyển tab/trang theo yêu cầu mới07/11. TASK-045 triển khai API authorization, isolation khỏi offline/export, UI và migrations additive. Chủ dự án đã yêu cầu phát hành; PostgreSQL migration và API20f721d đã live, UI theo sau kiểm tra CI. [Thiết kế/rollout](HIDDEN-NOTES.md), actual evidence tại worklog.
@@ -113,6 +115,8 @@ Login/Google/refresh kiểm tra GET health trước khi gửi credentials/token:
 Bổ sung cùng ngày theo ảnh user: hiện dòng nhỏ cho từng tác vụ notes/labels/account/reminders/trash/inbox, với trạng thái waiting/loading/ready/error lấy từ preparation thực tế. Progress dữ liệu có phần trăm theo số collection hoàn tất; chờ server/session dùng thanh indeterminate, không phần trăm giả. Icon xoay bằng wrapper animation trong cả kết nối lần đầu và reconnect; reduced-motion vẫn được tôn trọng. Banner login đặt phía trên để không đè heading/form.
 
 ## Backlog theo thứ tự
+
+Thứ tự hiện hành10/11 đã được chủ dự án xác nhận tại [CURRENT-PRIORITIES](CURRENT-PRIORITIES.md). TASK-007 React đã phát hành, TASK-009 CI/Docker/cloud đã có evidence; phần còn mở là recovery/observability và kiểm chứng cụ thể, không triển khai lại cloud. TASK-008 chỉ cần SQL→PG transfer nếu còn nhu cầu dữ liệu nguồn, không tự chuyển dữ liệu. Bảng gốc dưới đây giữ mốc lịch sử17/10.
 
 | ID | Ưu tiên | Kết quả | REQ / phụ thuộc | Tiêu chí chấp nhận | Trạng thái |
 | --- | --- | --- | --- | --- | --- |

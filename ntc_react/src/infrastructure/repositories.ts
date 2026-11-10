@@ -13,6 +13,8 @@ import type {
   Profile,
   Reminder,
   ReminderInput,
+  ReminderDelivery,
+  DeliveryStatus,
   Role,
   Statistics,
 } from "../domain/models";
@@ -255,6 +257,9 @@ export class AdminRepository {
   }
   stats() {
     return this.api.request<Statistics>("/admin/statistics");
+  }
+  deliveries(pageNumber = 1, filters: { userId?: string; status?: DeliveryStatus; from?: string; to?: string } = {}) {
+    return this.api.request<Page<ReminderDelivery>>("/admin/reminder-deliveries" + query({ pageNumber, pageSize: 30, ...filters }));
   }
   roles(pageNumber = 1) {
     return this.api.request<Page<Role>>(

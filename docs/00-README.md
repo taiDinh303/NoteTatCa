@@ -1,4 +1,4 @@
-> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+> CURRENT 2026-11-10: [Hiện trạng](PROJECT-STATUS.md), [ưu tiên và phỏng vấn](CURRENT-PRIORITIES.md). Các số test/trạng thái cloud theo ngày bên dưới là lịch sử; không dùng để kết luận hiện trạng.
 
 # NoteTatCa — Tài liệu dự án
 
@@ -10,6 +10,8 @@ NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa t�
 
 ## Bắt đầu
 
+Đọc [PROJECT-STATUS](PROJECT-STATUS.md) để biết chức năng hiện có và [CURRENT-PRIORITIES](CURRENT-PRIORITIES.md) để biết thứ tự đã chốt, phỏng vấn10/11 và việc đang thực hiện. Các snapshot theo ngày phía dưới giữ làm lịch sử.
+
 1. Đọc [hồ sơ và câu hỏi lựa chọn](PROJECT-INTAKE.md).
 2. Xem [kế hoạch](01-plan.md), [nghiệp vụ](02-business-analysis.md) và [luồng](05-workflow.md).
 3. Khi làm API, đọc [contract](15-api-contract.md), [bảo mật](16-security-privacy.md), [dữ liệu](04-database-design.md) và [kiểm thử](06-testing.md).
@@ -19,9 +21,9 @@ NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa t�
 
 ## Ràng buộc đã xác nhận
 
-- Workspace và Git root: `D:\My Project\NTC`; backend: `ntc_aspnet/`.
-- Docs duy nhất: `D:\My Project\NTC\docs`, chính là `docs/` trong Git. Bản trùng trong backend đã chuyển vào recovery backup của Git; không tạo lại bản sync thứ hai.
-- React + TypeScript + Vite đặt ở `NTC/ntc_react`; UI mặc định tiếng Anh, hỗ trợ Việt/Anh/Trung/Nhật theo yêu cầu bổ sung 2026-10-23 (DEC-024); hướng public nhỏ. Đã xác nhận Q-008/025.
+- Workspace và Git root: `D:\My Projects\NoteTatCa`; backend: `ntc_aspnet/`.
+- Docs duy nhất: `D:\My Projects\NoteTatCa\docs`, chính là `docs/` trong Git. Bản trùng trong backend đã chuyển vào recovery backup của Git; không tạo lại bản sync thứ hai.
+- React + TypeScript + Vite đặt ở `ntc_react/`; UI mặc định tiếng Anh, hỗ trợ Việt/Anh/Trung/Nhật theo yêu cầu bổ sung 2026-10-23 (DEC-024); hướng public nhỏ. Đã xác nhận Q-008/025.
 - Cloud tương lai: Supabase PostgreSQL, giữ .NET Identity; Render API, Vercel React. Giữ tài khoản/note cũ, chưa migrate/deploy trong phiên docs.
 - Đã chốt editor unified rich text/checklist/Markdown shortcuts, màu chữ/emoji, autosave (bỏ Save thường theo DEC-018/2026-10-20; có Retry save khi lỗi), nhắc in-app/email có lặp và gửi bù 24 giờ theo timezone user, trash 30 ngày; admin không đọc nội dung note người khác.
 - `ntc_aspnet/NTC.VIEW` đã được gỡ theo yêu cầu chủ dự án ngày 2026-10-21 (DEC-020). Frontend hiện hành là `ntc_react`; source Razor lịch sử còn trong Git, không tạo lại thư mục cũ.

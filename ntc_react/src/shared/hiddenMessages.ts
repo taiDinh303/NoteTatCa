@@ -1,5 +1,6 @@
 export const hiddenMessages: Record<string, readonly [string, string, string]> =
   {
+    "Release to open hidden notes": ["Thả tay để mở ghi chú ẩn", "松开以打开隐藏笔记", "指を離して非表示ノートを開く"],
     "Back to unlock": ["Quay lại mở khóa", "返回解锁", "ロック解除に戻る"],
     "Reset hidden notes lock": [
       "Đặt lại khóa ghi chú ẩn",

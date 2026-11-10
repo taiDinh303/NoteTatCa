@@ -4,6 +4,8 @@
 
 ## Hiện trạng và hướng dẫn hiện hành
 
+10/11: TASK-046 bổ sung console chỉ đọc và endpoint admin/reminder-deliveries cho pending/retrying/leased/sent/abandoned, lọc account/occurrence và phân trang, lỗi allowlist. Đây là metadata delivery, không phải heartbeat worker/alert và không chứng minh email đến mailbox. Xem [contract và ưu tiên](CURRENT-PRIORITIES.md), trạng thái kiểm chứng/phát hành ở worklog. Alert collector vẫn còn mở.
+
 CURRENT RequestTelemetryMiddleware ghi tên endpoint/status/elapsed/correlation; API no-store/nosniff, lỗi envelope traceId. Worker ghi batch exception type và deliveryID/attempt, không notecontent/token/OTP. Health live/ready hiện có (ready chỉ CanConnect); chưa dashboard/alert collector/metrics backend chuyên dụng. Cần alert worker lag/abandoned delivery/DB failure khi vận hành.
 
 | Luồng | Tín hiệu cần có | Dữ liệu không ghi | Ngưỡng ban đầu đề xuất |

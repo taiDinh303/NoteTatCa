@@ -1,0 +1,4 @@
+.mobile-workspace-back { display: none; }
+@media (max-width: 800px) {
+  .mobile-workspace-back { display: inline-flex; flex-shrink: 0; }
+}

@@ -1,5 +1,7 @@
 ## API ghi chú ẩn — 2026-11-07
 
+Console admin chỉ đọc ngày10/11: `GET /api/v1/admin/reminder-deliveries`, Admin-only; query userId/status/from/to/pageNumber/pageSize, response metadata paginated, không nội dung/NoteId/raw provider error. Contract và trạng thái local/published tại [TASK-046](CURRENT-PRIORITIES.md#contract-task-046), evidence tại [worklog](worklog.md). Không có retry/cancel hoặc schema mới.
+
 Bổ sung /api/v1/hidden-notes: status/configure/unlock/lock/heartbeat/reset-code/reset, list/create và {id}/visibility. CustomerWorkspace + Bearer; grant X-Note-Vault kiểm owner/session/expiry; list thường và archive không xuất note ẩn. Contract đầy đủ và lỗi tại [HIDDEN-NOTES](HIDDEN-NOTES.md). Schema/API20f721d đã triển khai 07/11; smoke public kiểm health/auth/CORS, không kiểm authenticated owner flow trên live.
 
 # 15 — Contract API NoteTatCa

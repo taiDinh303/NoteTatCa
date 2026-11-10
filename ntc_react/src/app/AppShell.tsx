@@ -1,4 +1,6 @@
 import { SidebarLabels } from "../features/labels/SidebarLabels";
+import { MobileBack } from "./MobileBack";
+import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
 import { RouteContent } from "./RouteContent";
 import { warmSettings } from "../features/settings/warmSettings";
 import { t as tr, useLanguage } from "../shared/i18n";
@@ -24,7 +26,6 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
-  ArrowLeft,
   Bell,
   CalendarDays,
   FileText,
@@ -174,6 +175,7 @@ const Sidebar = memo(function Sidebar({
 export default function AppShell() {
   useLanguage();
   const state = useAuth();
+  useMobileWorkspaceEntry("/notes");
   useEffect(() => {
     if (state.status !== "authenticated") return;
     const timer = window.setTimeout(warmSettings, 500);
@@ -278,17 +280,12 @@ export default function AppShell() {
       <header className="topbar">
         {settingsTitle ? (
           <div className="preferences-mobile-header">
-            <Link
-              className="icon-button"
-              to={settingsBack}
-              aria-label={tr("Back")}
-            >
-              <ArrowLeft size={20} aria-hidden="true" />
-            </Link>
+            <MobileBack fallback={settingsBack} className="icon-button" />
             <h1>{tr(settingsTitle)}</h1>
           </div>
         ) : null}
         <div className="topbar-brand">
+          {!settingsTitle ? <MobileBack fallback="/notes" /> : null}
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}

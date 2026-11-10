@@ -1,3 +1,5 @@
+> CURRENT 2026-11-10: [Hiện trạng](PROJECT-STATUS.md), [ưu tiên và phỏng vấn](CURRENT-PRIORITIES.md). Các số test/trạng thái cloud theo ngày bên dưới là lịch sử; không dùng để kết luận hiện trạng.
+
 ## Ghi chú ẩn — DEC-032, 2026-11-07
 
 Nhánh codex/hidden-notes-vault bổ sung NoteVaultService/BaseService, INoteAccess ở Core, persistence filter cho Note và graph, session-bound grant/reset/attempt protection và migrations additive riêng mỗi provider. .NET Identity/owner/admin no-content giữ nguyên; PostgreSQL migration đã apply theo yêu cầu triển khai riêng của chủ dự án 07/11, API20f721d đã live. [Contract và rollout](HIDDEN-NOTES.md); kết quả thực tế tại worklog.

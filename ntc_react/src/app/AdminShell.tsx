@@ -1,4 +1,6 @@
 import { t as tr, useLanguage } from "../shared/i18n";
+import { MobileBack } from "./MobileBack";
+import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
 import "./SidebarMotion.css";
 import "./AdminShell.css";
 import { useEffect, useState } from "react";
@@ -6,7 +8,7 @@ import { RouteContent } from "./RouteContent";
 import { warmSettings } from "../features/settings/warmSettings";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  ArrowLeft,
+  Activity,
   FileText,
   LayoutDashboard,
   Menu,
@@ -42,6 +44,10 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
           <FileText size={19} />
           {tr("Audit trail")}
         </NavLink>
+        <NavLink to="/admin/reminder-deliveries" onClick={onNavigate}>
+          <Activity size={19} />
+          {tr("Reminder deliveries")}
+        </NavLink>
       </nav>
       <div className="sidebar-bottom">
         <NavLink
@@ -64,6 +70,7 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
 }
 
 export default function AdminShell() {
+  useMobileWorkspaceEntry("/admin/overview");
   useEffect(() => {
     const timer = window.setTimeout(warmSettings, 500);
     return () => window.clearTimeout(timer);
@@ -110,22 +117,18 @@ export default function AdminShell() {
       <header className="topbar admin-topbar">
         {preferenceTitle ? (
           <div className="preferences-mobile-header">
-            <Link
-              className="icon-button"
-              to={
+            <MobileBack className="icon-button" fallback={
                 location.pathname === "/admin/preferences" ||
                 location.pathname === "/admin/settings"
                   ? "/admin/overview"
                   : "/admin/preferences"
               }
-              aria-label={tr("Back")}
-            >
-              <ArrowLeft size={20} aria-hidden="true" />
-            </Link>
+            />
             <h1>{tr(preferenceTitle)}</h1>
           </div>
         ) : null}
         <div className="topbar-brand">
+          {!preferenceTitle ? <MobileBack fallback="/admin/overview" /> : null}
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}

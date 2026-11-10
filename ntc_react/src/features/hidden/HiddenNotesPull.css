@@ -3,3 +3,19 @@
     overscroll-behavior-y: contain;
   }
 }
+.hidden-notes-pull {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  transition: height 160ms ease-out;
+}
+.hidden-notes-pull[data-pulling="true"] { transition: none; }
+.hidden-notes-pull > span { white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) {
+  .hidden-notes-pull { transition: none; }
+}

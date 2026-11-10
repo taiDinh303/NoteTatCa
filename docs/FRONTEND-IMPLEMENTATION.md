@@ -1,3 +1,13 @@
+> CURRENT 2026-11-10: xem [hiện trạng](PROJECT-STATUS.md) và [ưu tiên](CURRENT-PRIORITIES.md); các evidence theo ngày bên dưới giữ nguyên phạm vi.
+
+## Mobile pull và Back — 2026-11-10
+
+Theo phỏng vấn Q-044: pull tại đầu danh sách note thường mở một hàng tối đa44px trong flow, đẩy cả nhóm/card xuống cùng độ cao (không overlay chữ lên card). Từ120px gesture hiển thị Release to open hidden notes; thả mới điều hướng. Kéo ngắn/hủy/ngang không mở vault. Không chiếm khoảng trống khi chưa kéo, giữ ngưỡng và accessible account entry hiện có; không thay grant15phút/offline/privacy.
+
+Header mobile customer/admin có Back, dùng history nội bộ khi có và fallback workspace khi không có. Settings dùng cùng hành vi. Khi mở workspace trực tiếp ở entry đầu, chuẩn bị một entry home đứng trước trang đang mở để Back lần đầu đi về trong app thay vì thoát ngay. Không tạo sentinel lặp cho mọi lần Back hoặc chặn thoát trình duyệt vô hạn; tại home gốc, Back hệ điều hành tiếp theo vẫn theo nền tảng. Note editor giữ useNoteBack/autosave/draft guard trước điều hướng.
+
+Console admin mới tại /admin/reminder-deliveries tải module riêng, cache key theo identity/page/filter, không preload note của user hoặc mutation gửi mail. UI lọc account UUID/status/from/to, phân trang, refresh/error/empty/retry, liên kết audit metadata theo account. Nội dung mới có bốn ngôn ngữ; thời gian local được gửi ISO UTC. [Contract](CURRENT-PRIORITIES.md#contract-task-046), actual evidence tại worklog. Source local chưa đồng nghĩa live; API phải có endpoint trước khi phát hành UI phụ thuộc.
+
 ## Mobile Grid/List và double tap — 2026-11-06
 
 Mobile dùng savedView chung với desktop: Grid hai cột/preview3dòng; List một dòng tiêu đề/một dòng preview và giữ label/footer. Chạm hai lần nội dung View trên mobile gọi Edit hiện hữu, bỏ qua tương tác link/control. Production Chromium6/6PASS ở320/393/430/800; buildReact/.NETstrict/lintPASS. Chưa thiết bị thật/WebKit/fullsuite; xem worklog.
@@ -298,7 +308,7 @@ CURRENT source theo yêu cầu mới DEC-025/026: customer chỉ chờ active no
 - Xem/tạo/sửa note hoạt động offline; trạng thái riêng “Saved on this device; waiting to sync”, khác ACK server. Autosave chỉ báo local-saved sau COMMIT IndexedDB; storage/quota lỗi giữ editor dirty/error và bảo vệ unload. Card pin/labels/order/trash/delete riêng cần online và note đã sync; editor note draft vẫn có metadata đi kèm. Settings, inbox, lịch reminder và admin không có offline snapshot. Không hứa gửi reminder từ máy đang offline.
 - Queue giữ create key/payload gốc, local-ID→server-ID, expected version và ACK mappings. Chỉ coalesce các patch chưa từng gửi; payload đã thử/in-flight giữ nguyên để replay an toàn. Web Locks khóa sync theo account giữa các tab; readwrite transaction bảo vệ edits local. Local version phát hiện editor tab khác đã cũ và giữ draft qua conflict. 409 chỉ ACK nếu draft server đúng payload đã gửi; ngược lại giữ bản local, cho lưu bản sao mới hoặc xác nhận dùng bản online. Replayed create trả note đã đổi cũng không được đè follow-up patch lên nó.
 - Auto-sync khi online/focus và mỗi30giây khi app đang mở, còn pending; Sync now hỗ trợ thao tác chủ động. Không có daemon/service-worker background sync khi app đóng. Toolbar kết nối/sync nằm trong flow workspace, thay banner phủ các nút trên mobile; startup/auth/admin giữ ConnectionFeedback. BroadcastChannel báo tab khác refresh, không gửi nội dung note qua channel.
-- Logout hỏi khi có pending: ở lại hoặc download JSON chứa nội dung/queue; xác nhận file đã lưu mới xóa cache account trên máy, queue đổi thì cần backup mới. File backup không có token; hiện chưa có UI import JSON/restore tự phục vụ, giữ như backlog. Logout offline chỉ xóa phiên trên thiết bị, không thể khẳng định đã revoke server khi mất mạng. Draft chưa COMMIT vẫn dùng guard editor hiện có; browser force-close, xóa site data hoặc tab khác logout đúng lúc draft chưa persist không được coi là đã bảo vệ tuyệt đối.
+- Logout hỏi khi có pending: ở lại hoặc download JSON chứa nội dung/queue; xác nhận file đã lưu mới xóa cache account trên máy, queue đổi thì cần backup mới. File backup không có token; Archive workspace JSON/import và content revision restore đã bổ sung và rollout02/11; JSON bảo vệ logout/outbox là định dạng riêng, không mặc định archive importer đọc được queue backup. Logout offline chỉ xóa phiên trên thiết bị, không thể khẳng định đã revoke server khi mất mạng. Draft chưa COMMIT vẫn dùng guard editor hiện có; browser force-close, xóa site data hoặc tab khác logout đúng lúc draft chưa persist không được coi là đã bảo vệ tuyệt đối.
 
 Giới hạn: phải mở online và hoàn tất cache shell trước khi đóng/mở lại không mạng. Browser có thể xóa storage; đây không phải backup/mã hóa đầu cuối. Không thể revoke ngay dữ liệu đã tải trên thiết bị offline. Chưa stress account rất lớn (state IndexedDB hiện theo account), đo production, Safari/Firefox/thiết bị thật hoặc PWA install. Tham khảo cơ chế chuẩn: [service workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers), [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB), [Web Locks](https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API). Bằng chứng kiểm thử và phạm vi publication xem worklog.
 
@@ -562,7 +572,7 @@ Pinned và normal dùng chung SortableContext theo đúng thứ tự render. Str
 
 ### Chuyển vào thùng rác không xác nhận — 2026-10-24
 
-Theo yêu cầu chủ dự án, Move to trash ở card/editor chạy ngay, không mở modal xác nhận. Editor vẫn flush autosave trước, khóa action lúc đang xử lý, giữ editor và ErrorBanner nếu save/trash lỗi; chỉ đóng khi thành công. Card dùng pending và toast lỗi hiện có. Khôi phục/retention7ngày/API giữ nguyên; Delete permanently trong Trash vẫn cần xác nhận và hỗ trợ Cancel.
+Theo yêu cầu chủ dự án, Move to trash ở card/editor chạy ngay, không mở modal xác nhận. Editor vẫn flush autosave trước, khóa action lúc đang xử lý, giữ editor và ErrorBanner nếu save/trash lỗi; chỉ đóng khi thành công. Card dùng pending và toast lỗi hiện có. Khôi phục/retention30ngày/API giữ nguyên; Delete permanently trong Trash vẫn cần xác nhận và hỗ trợ Cancel.
 
 ### Thứ tự label trên sidebar — 2026-10-24
 

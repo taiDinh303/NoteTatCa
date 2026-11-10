@@ -1,3 +1,5 @@
+> CURRENT 2026-11-10: [Hiện trạng](PROJECT-STATUS.md), [ưu tiên và phỏng vấn](CURRENT-PRIORITIES.md). Các số test/trạng thái cloud theo ngày bên dưới là lịch sử; không dùng để kết luận hiện trạng.
+
 ## DEC-032 — Ghi chú ẩn đã chốt 2026-11-07
 
 Q-036: khu vực có khóa trên PC/mobile, chỉ online, theo điều chỉnh sau phát hành của chủ dự án07/11: giữ mở khi đổi tab/trang trong app, khóa khi đóng/reload hoặc15phút không thao tác. Q-037: user chọn PIN6số hoặc pattern3×3. Q-038: mã email verified để reset, giữ note; không E2EE. Nguồn: chủ dự án xác nhận trong chat 07/11. Chủ dự án yêu cầu phát hành 07/11; PostgreSQL migration và API đã triển khai, UI theo sau; [contract](HIDDEN-NOTES.md), evidence tại worklog.
@@ -56,8 +58,8 @@ DEC-031 cập nhật theo yêu cầu mới nhất của chủ dự án2026-10-26
 | Giá trị | Lưu, tìm lại và tổ chức note riêng cho nhiều tài khoản; không chia sẻ bản đầu |
 | Chủ dự án | Người dùng cuộc trò chuyện; tài khoản repo taiDinh303; chưa suy ra đội ngũ |
 | Hiện trạng | Tiếp quản code .NET 8, EF Core/SQL Server và Razor Pages |
-| Workspace | `D:\My Project\NTC` |
-| Repo | `D:\My Project\NTC`, main; backend trong ntc_aspnet; mốc khảo sát cũ `d8f854b` |
+| Workspace | `D:\My Projects\NoteTatCa` |
+| Repo | `D:\My Projects\NoteTatCa`, main; backend trong ntc_aspnet; mốc khảo sát cũ `d8f854b` |
 | GitHub | https://github.com/taiDinh303/NoteTatCa |
 | Nhiệm vụ phiên này | Hoàn thiện docs theo Marixa, sau đó backend; đã triển khai và kiểm thử |
 | Nhiệm vụ sau | React được giao triển khai 2026-10-18 tại ntc_react; cloud còn giai đoạn sau |
@@ -146,6 +148,8 @@ Số câu hiển thị trong UI là 9–15; ID tài liệu là Q-019–025 để
 | Q-029 | Nhãn trùng tên và note không tiêu đề | **Cho nhãn trùng tên**, note không tiêu đề | Validation/index/title migration | ĐÃ CHỐT C, chủ dự án 2026-10-17 |
 
 ## Ma trận áp dụng và nguồn còn thiếu
+
+Phỏng vấn10/11 đã chốt Q-039 recipient snapshot, Q-040 thu hồi, Q-041 không ngân sách và Q-042 thứ tự; xem [biên bản/ưu tiên](CURRENT-PRIORITIES.md#phỏng-vấn-đã-trả-lời-ngày-1011). Các quyết định offline/export/client session đã được triển khai ở các đợt sau17/10; không hỏi lại chỉ vì đoạn lịch sử dưới đây còn ghi chưa rõ.
 
 Đủ 39 file gốc được giữ tên; ma trận cho từng file nằm tại [00-README](00-README.md#danh-mục), là nguồn chuẩn duy nhất.
 

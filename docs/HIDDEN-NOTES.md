@@ -1,5 +1,7 @@
 # Ghi chú ẩn — hợp đồng triển khai 2026-11-07
 
+Q-044 bổ sung10/11: mobile kéo xuống mở một hàng trong flow, đẩy danh sách note xuống nhẹ; đủ ngưỡng rồi thả mở vault. Header mobile có Back và direct-entry history fallback; editor vẫn có draft guard. Source local có regression Chromium, xem [frontend](FRONTEND-IMPLEMENTATION.md#mobile-pull-và-back--2026-11-10) và [worklog](worklog.md); chưa nghiệm thu native Android/iOS/PWA hoặc công bố rollout mới.
+
 ## Đã chốt bởi chủ dự án
 
 Khu vực riêng có khóa trên PC/mobile. Người dùng chọn PIN6số hoặc hình nối điểm3×3; quên khóa nhận mã email đã xác minh để đặt lại, giữ note. Chỉ mở online, không cache nội dung ẩn offline; giữ mở khóa khi đổi tab/trang trong app; khóa khi đóng/tải lại app hoặc15phút không thao tác. Đây là kiểm soát truy cập bổ sung, không mã hóa đầu cuối. Bản export/cache đã tải trước đó không thể thu hồi từ thiết bị offline.

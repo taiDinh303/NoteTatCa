@@ -16,6 +16,14 @@ MaintenanceWorker ghi completed/ElapsedMs/dispatched/delivered, không ghi title
 
 ## Hiện trạng và hướng dẫn hiện hành
 
+Quyết định10/11: chỉ free/không ngân sách. Mục tiêu thiết kế daily/14ngày, RPO24giờ/RTO4giờ; chưa có evidence đạt mục tiêu. Theo [Supabase backups](https://supabase.com/docs/guides/platform/backups) kiểm ngày10/11, Free được hướng dẫn export thường xuyên và giữ bản ngoài hệ thống; không dựa vào paid daily backups/PITR. Không tự nâng plan.
+
+Phương án miễn phí đề xuất: máy cá nhân chạy logical export schema ứng dụng ntc (bao gồm Identity, vault và EF history) bằng công cụ PostgreSQL tương thích, đối soát manifest/checksum rồi mã hóa và chép sang nơi lưu độc lập do chủ dự án chọn. Có cả schema/data/FK/index/constraints, danh sách role/grant/extension cần tái tạo; .NET Identity không phải Supabase Auth. Không dump tùy tiện toàn bộ internal schemas của Supabase. Data Protection keyring và khóa bảo vệ keyring cần backup riêng có thể khôi phục; không suy ra DB dump chứa chúng. Secrets/runtime config giữ ngoài Git và dump chia sẻ.
+
+Chủ dự án đã chọn D:/backup, thường bật Windows từ19:00 (Q-043,10/11). Đề xuất lịch19:15 Asia/Bangkok + catch-up khi bật máy, chưa cài scheduler/chạy dump thật. D:/backup cùng máy chưa bảo vệ khỏi mất/hỏng máy; cần bản sao mã hóa độc lập khi có nơi lưu phù hợp. Key recovery/vị trí keyring Production chưa rõ. Windows Task Scheduler có thể là lựa chọn sau khi chốt: ghi thành công/thất bại, catch-up khi máy bật, báo bản cuối quá24giờ; máy tắt lâu thì không bảo đảm daily. Không xóa bản cũ tự động trước khi bản mới kiểm được và retention đã xác nhận. Trước kết nối thật cần kiểm pg_dump --help/version và đúng manifest project; giữ backup trên máy cùng ổ chỉ là bản local, cần bản độc lập để tránh mất cùng máy.
+
+Restore drill: tạo DB PostgreSQL biệt lập tương thích, jobs/email off, restore toàn graph/Identity/vault/history; đối soát count/FK/owner/hash/UTC, login fixture/admin, hidden boundary và keyring phục hồi; đo thời gian. Không chạy restore lên production, không đổi migration history hoặc thử mail thật. Bản thử có dữ liệu thật phải được bảo vệ như production; local fixture test không thay restore drill. Tham khảo [backup/restore Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore); changelog CLIv3 đã kiểm10/11, chưa chọn/cài CLI hay chạy hosted command.
+
 Nguồn thật chưa backup/restore trong phiên. Test SQL migration fixture chứng minh compatibility dữ liệu giả, không thay recovery drill. Giữ ID/hash/content/UTC instant, Identity token keyring backup bảo vệ riêng; mã hóa/retention/RPO/RTO cần operator chốt. Purge30 ngày không xóa backup. Restore trước tiên DB biệt lập, jobs off tránh gửi/purge khi smoke.
 
 ## Chính sách đề xuất

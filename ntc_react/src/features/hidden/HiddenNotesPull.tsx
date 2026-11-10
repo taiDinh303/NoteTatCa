@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import "./HiddenNotesPull.css";
 import { useNavigate } from "react-router-dom";
-import { t as tr } from "../../shared/i18n";
+import { t as tr, useLanguage } from "../../shared/i18n";
 import { useMobileLayout } from "../../shared/useMobileLayout";
 export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
-  const marker = useRef<HTMLSpanElement>(null);
+  useLanguage();
+  const marker = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  const [reveal, setReveal] = useState(0);
   const mobile = useMobileLayout();
   const navigate = useNavigate();
   useEffect(() => {
@@ -30,12 +32,16 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
         return;
       start = { x: e.touches[0].clientX, y: e.touches[0].clientY };
       distance = 0;
+      setReveal(0);
     };
     const move = (e: TouchEvent) => {
-      if (!start || e.touches.length !== 1) return;
+      if (!start) return;
+      if (e.touches.length !== 1) { cancel(); return; }
       const dx = Math.abs(e.touches[0].clientX - start.x),
         dy = e.touches[0].clientY - start.y;
       distance = dy > dx * 2 ? dy : 0;
+      if (distance > 8 && e.cancelable) e.preventDefault();
+      setReveal(Math.min(44, Math.max(0, distance * 0.4)));
       setReady(distance >= 120);
     };
     const end = () => {
@@ -44,14 +50,16 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
       start = undefined;
       distance = 0;
       setReady(false);
+      setReveal(0);
     };
     const cancel = () => {
       start = undefined;
       distance = 0;
       setReady(false);
+      setReveal(0);
     };
     view.addEventListener("touchstart", begin, { passive: true });
-    view.addEventListener("touchmove", move, { passive: true });
+    view.addEventListener("touchmove", move, { passive: false });
     view.addEventListener("touchend", end);
     view.addEventListener("touchcancel", cancel);
     return () => {
@@ -62,21 +70,18 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
     };
   }, [enabled, mobile, navigate]);
   return (
-    <span
+    <div
       ref={marker}
       role="status"
       className="hidden-notes-pull"
       data-enabled={enabled && mobile}
+      data-pulling={enabled && mobile && reveal > 0}
       style={{
-        position: "absolute",
-        insetInline: 0,
-        top: 0,
-        pointerEvents: "none",
-        textAlign: "center",
-        visibility: ready ? "visible" : "hidden",
+        height: enabled && mobile ? reveal : 0,
+        visibility: enabled && mobile && reveal > 0 ? "visible" : "hidden",
       }}
     >
-      {tr("Pull down to open hidden notes")}
-    </span>
+      <span>{tr(ready ? "Release to open hidden notes" : "Pull down to open hidden notes")}</span>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-> Hiện trạng đối chiếu 2026-11-07: xem [PROJECT-STATUS](PROJECT-STATUS.md). Các snapshot/test/cloud TODO cũ bên dưới là lịch sử; đọc worklog mới nhất trước khi tiếp tục.
+> CURRENT 2026-11-10: [Hiện trạng](PROJECT-STATUS.md), [ưu tiên và phỏng vấn](CURRENT-PRIORITIES.md). Các số test/trạng thái cloud theo ngày bên dưới là lịch sử; không dùng để kết luận hiện trạng.
 
 # 31 — Bàn giao và bảo trì
 
@@ -8,9 +8,9 @@
 
 | Tài sản | Vị trí / trạng thái |
 | --- | --- |
-| Git root | D:\My Project\NTC; .git giữ history/remote cũ |
-| Docs duy nhất | D:\My Project\NTC\docs;44 Markdown trong cùng repo |
-| Backend | D:\My Project\NTC\ntc_aspnet; HEAD 176a968 + thay đổi đợt backend chưa commit/push |
+| Git root | D:\My Projects\NoteTatCa; .git giữ history/remote cũ |
+| Docs duy nhất | D:\My Projects\NoteTatCa\docs;44 Markdown trong cùng repo |
+| Backend | D:\My Projects\NoteTatCa\ntc_aspnet; HEAD 176a968 + thay đổi đợt backend chưa commit/push |
 | API | Legacy adapters + /api/v1, [131 operations](api-inventory.md) và health |
 | Tests | NTC.Tests; evidence [06](06-testing.md), lệnh [10](10-setup-local.md) |
 | Deploy assets | Dockerfile,.env.example,render.yaml,GitHub workflow; chưa deploy |

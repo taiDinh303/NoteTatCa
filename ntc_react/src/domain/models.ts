@@ -205,6 +205,12 @@ export const WEEKDAYS = [
   ["Sat", 32],
   ["Sun", 64],
 ] as const;
+export type DeliveryStatus = "pending" | "retrying" | "leased" | "sent" | "abandoned";
+export interface ReminderDelivery {
+  id: string; userId: string; status: DeliveryStatus; attempts: number;
+  occurrenceAt: string; nextAttemptAt: string; lastAttemptAt: string | null;
+  sentAt: string | null; abandonedAt: string | null; leaseUntil: string | null; errorCode: string | null;
+}
 export function plainDocument(text: string): RichNode {
   return {
     type: "doc",

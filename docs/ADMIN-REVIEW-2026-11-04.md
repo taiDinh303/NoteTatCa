@@ -1,5 +1,7 @@
 # Rà soát admin — 2026-11-04
 
+> CURRENT10/11: console reminder deliveries đã có source local và đang kiểm chứng; bảng hiện trạng04/11 bên dưới là baseline. [Ưu tiên/contract/phỏng vấn](CURRENT-PRIORITIES.md) điều phối TASK-046/047. Announcement recipient snapshot và thu hồi đã chốt Q-039/040, không còn câu hỏi chưa trả lời; implementation/rollout announcement vẫn chưa hoàn tất. Không suy ra có retry/cancel hoặc worker-health telemetry từ console.
+
 ## Yêu cầu và lựa chọn đã chốt
 
 - Đồng nhất phong cách admin với workspace user, giữ khu quản trị riêng và có đủ công cụ xử lý bất tiện vận hành.

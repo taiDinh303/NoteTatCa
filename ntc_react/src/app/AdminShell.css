@@ -181,3 +181,18 @@ html:has(.admin-shell) {
     flex-wrap: wrap;
   }
 }
+.admin-shell .delivery-filters {
+  align-items: end;
+}
+.admin-shell .delivery-filters .field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.admin-shell .delivery-filters > .button {
+  margin-left: 0;
+}
+.admin-shell .delivery-table code {
+  font-size: 11px;
+  white-space: nowrap;
+  max-width: none;
+}
