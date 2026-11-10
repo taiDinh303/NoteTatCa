@@ -4,7 +4,7 @@
 
 > CURRENT from exported OpenAPI, 2026-11-10. OpenAPI exported by ContractTests; new delivery row/count synchronized from the export using Node (Python unavailable).
 
-154 controller operations. Health probes `/health/live` and `/health/ready` are public and listed separately in the [API contract](15-api-contract.md).
+166 controller operations. Health probes `/health/live` and `/health/ready` are public and listed separately in the [API contract](15-api-contract.md).
 
 Access metadata describes HTTP authorization; ownership and self-account checks also run inside services. A role never grants another user's note content. Each operation declares its success schema and shared error envelopes in OpenAPI. Common errors and compatibility limits are in the [contract](15-api-contract.md).
 
@@ -12,6 +12,18 @@ Access metadata describes HTTP authorization; ownership and self-account checks 
 
 | Method / path | Access | JSON body schema | Query / headers | Success schema |
 | --- | --- | --- | --- | --- |
+| GET `/api/v1/admin/announcements` | Admin | — | pageNumber (query), pageSize (query) | 200: AnnouncementResponseBasePaginatedListBaseResponse |
+| POST `/api/v1/admin/announcements` | Admin | AnnouncementDraftRequest | — | 200: AnnouncementDetailBaseResponse |
+| GET `/api/v1/admin/announcements/recipients` | Admin | — | pageNumber (query), pageSize (query), q (query) | 200: AnnouncementCandidateBasePaginatedListBaseResponse |
+| GET `/api/v1/admin/announcements/{id}` | Admin | — | — | 200: AnnouncementDetailBaseResponse |
+| PATCH `/api/v1/admin/announcements/{id}` | Admin | AnnouncementDraftRequest | — | 200: AnnouncementDetailBaseResponse |
+| POST `/api/v1/admin/announcements/{id}/preview` | Admin | AnnouncementVersionRequest | — | 200: AnnouncementPreviewBaseResponse |
+| POST `/api/v1/admin/announcements/{id}/publish` | Admin | AnnouncementPublishRequest | — | 200: AnnouncementDetailBaseResponse |
+| POST `/api/v1/admin/announcements/{id}/revoke` | Admin | AnnouncementVersionRequest | — | 200: AnnouncementDetailBaseResponse |
+| GET `/api/v1/notifications/feed` | authenticated non-Admin; server ownership rules apply | — | pageNumber (query), pageSize (query), unreadOnly (query) | 200: InboxMessageResponseBasePaginatedListBaseResponse |
+| GET `/api/v1/notifications/feed/unread-count` | authenticated non-Admin; server ownership rules apply | — | — | 200: Int32BaseResponse |
+| PATCH `/api/v1/notifications/feed/{id}/read` | authenticated non-Admin; server ownership rules apply | — | — | 200: BooleanBaseResponse |
+| PATCH `/api/v1/notifications/feed/read-all` | authenticated non-Admin; server ownership rules apply | — | — | 200: Int32BaseResponse |
 | GET `/api/v1/admin/audit-events` | Admin | — | pageNumber (query), pageSize (query), targetUserId (query), action (query) | 200: AdministrativeAuditResponseBasePaginatedListBaseResponse |
 | GET `/api/v1/admin/reminder-deliveries` | Admin | — | pageNumber (query), pageSize (query), userId (query), status (query), from (query), to (query) | 200: ReminderDeliveryResponseBasePaginatedListBaseResponse |
 | GET `/api/v1/admin/roles` | Admin | — | pageNumber (query), pageSize (query) | 200: RoleResponseModelViewBasePaginatedListBaseResponse |

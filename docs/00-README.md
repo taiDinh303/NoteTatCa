@@ -91,6 +91,7 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [ENTITY-REVIEW](ENTITY-REVIEW.md) | YES | Rà17 entities, quan hệ owner/parent, check/audit/migration |
 | [SERVICE-CONTROLLER-REVIEW](SERVICE-CONTROLLER-REVIEW.md) | YES | PATCH/session/admin/inbox/email và evidence hoàn thiện services/controllers |
 | [api-inventory](api-inventory.md) | YES |131 operations từ OpenAPI export |
+| [ANNOUNCEMENTS](ANNOUNCEMENTS.md) | YES | Thông báo admin, recipient snapshots, inbox chung; code local/chưa rollout |
 | [worklog](worklog.md) | YES | Snapshot, evidence và tồn đọng |
 
 Ma trận này là nguồn chuẩn về phạm vi áp dụng; hồ sơ dẫn lại để tránh lệch trạng thái. NO chỉ có nghĩa ngoài phạm vi đang được giao, không phải quyết định cấm lâu dài.

@@ -1,8 +1,10 @@
+import { announcementMessages } from "./announcementMessages";
 // English source keys; values are Vietnamese, Chinese and Japanese.
 import {hiddenMessages} from "./hiddenMessages";
 import { adminDeliveryMessages } from "./adminDeliveryMessages";
 export const messages: Record<string, readonly [string, string, string]> = {
   ...hiddenMessages,
+  ...announcementMessages,
   ...adminDeliveryMessages,
   "Insert emoji or symbol": ["Chèn emoji hoặc ký tự","插入表情或符号","絵文字・記号を挿入"],
   "Emoji and symbols": ["Emoji và ký tự","表情与符号","絵文字と記号"],

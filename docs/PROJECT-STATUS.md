@@ -11,7 +11,7 @@
 - JSON export/import workspace và revision restore owner-bound; editor có import/export Markdown với cảnh báo formatting có thể mất. Bản archive thường loại note ẩn, không backup vault.
 - Bốn mẫu cấu trúc, mục lục H1–H3, bốn ngôn ngữ, guest, Grid/List, mobile editor/fullscreen/Back, zoom và manifest. Mẫu checklist/cá nhân và note links còn thiếu.
 - Hidden notes đã có additive PG migration, API/UI phát hành07/11; PIN6/pattern3×3/reset email, private trash, RAM-only grant/cache/drafts. Policy mới nhất giữ unlock qua tab/SPA, khóa khi đóng/reload/pagehide/offline hoặc15phút idle. Lock controls tối giản, recovery route riêng, lock/sign-out đã được căn giữa. Không E2EE.
-- Admin có accounts/roles/lock/deactivate/restore/statistics/audit/reset link. Permanent account deletion chưa bật. Console delivery TASK-046 đã hoàn thiện local ngày10/11 (HTTP/production-bundle browser regression), xem evidence worklog; không coi đã live. Announcement TASK-047 chưa triển khai.
+- Admin có accounts/roles/lock/deactivate/restore/statistics/audit/reset link. Permanent account deletion chưa bật. Console delivery TASK-046 đã hoàn thiện local ngày10/11 (HTTP/production-bundle browser regression), xem evidence worklog; không coi đã live. Announcement TASK-047 đã có code/schema/UI local10/11, xem [contract](ANNOUNCEMENTS.md); chưa apply migration/deploy.
 
 ## Đã xác nhận ưu tiên ngày 10/11
 

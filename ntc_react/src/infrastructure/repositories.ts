@@ -1,5 +1,9 @@
 import type {
   Account,
+  Announcement,
+  AnnouncementDetail,
+  AnnouncementDraft,
+  AnnouncementPreview,
   AuditEvent,
   DeviceSession,
   InboxItem,
@@ -210,26 +214,33 @@ export class InboxRepository {
   constructor(readonly api: ApiClient) {}
   list(pageNumber = 1, unreadOnly = false, signal?: AbortSignal) {
     return this.api.request<Page<InboxItem>>(
-      "/notifications" + query({ pageNumber, pageSize: 50, unreadOnly }),
+      "/notifications/feed" + query({ pageNumber, pageSize: 50, unreadOnly }),
       { signal },
     );
   }
   count() {
-    return this.api.request<number>("/notifications/unread-count");
+    return this.api.request<number>("/notifications/feed/unread-count");
   }
   read(id: string) {
-    return this.api.request<boolean>(`/notifications/${id}/read`, {
+    return this.api.request<boolean>(`/notifications/feed/${id}/read`, {
       method: "PATCH",
     });
   }
   readAll() {
-    return this.api.request<number>("/notifications/read-all", {
+    return this.api.request<number>("/notifications/feed/read-all", {
       method: "PATCH",
     });
   }
 }
 export class AdminRepository {
   constructor(readonly api: ApiClient) {}
+  announcements(pageNumber = 1) { return this.api.request<Page<Announcement>>("/admin/announcements" + query({ pageNumber, pageSize: 20 })); }
+  announcement(id: string) { return this.api.request<AnnouncementDetail>(`/admin/announcements/${id}`); }
+  announcementRecipients(pageNumber = 1, q = "") { return this.api.request<Page<{id: string; email: string}>>("/admin/announcements/recipients" + query({pageNumber, pageSize: 20, q})); }
+  saveAnnouncement(body: AnnouncementDraft, id?: string) { return this.api.request<AnnouncementDetail>(id ? `/admin/announcements/${id}` : "/admin/announcements", {method: id ? "PATCH" : "POST", body}); }
+  previewAnnouncement(id: string, expectedVersion: string) { return this.api.request<AnnouncementPreview>(`/admin/announcements/${id}/preview`, {method: "POST", body: {expectedVersion}}); }
+  publishAnnouncement(id: string, expectedVersion: string, requestId: string) { return this.api.request<AnnouncementDetail>(`/admin/announcements/${id}/publish`, {method: "POST", body: {expectedVersion, requestId}}); }
+  revokeAnnouncement(id: string, expectedVersion: string) { return this.api.request<AnnouncementDetail>(`/admin/announcements/${id}/revoke`, {method: "POST", body: {expectedVersion}}); }
   sendPasswordReset(id: string) {
     return this.api.request<boolean>(`/admin/users/${id}/password-reset`, { method: "POST" });
   }

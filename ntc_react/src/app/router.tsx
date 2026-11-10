@@ -38,6 +38,7 @@ const PreferencesPage = lazy(
 const HiddenNotes = lazy(() => import("../features/hidden/HiddenNotes"));
 const AdminPage = lazy(() => import("../features/admin/AdminPage"));
 const ReminderDeliveries = lazy(() => import("../features/admin/ReminderDeliveries"));
+const AnnouncementsPage = lazy(() => import("../features/admin/AnnouncementsPage"));
 function Root() {
   useLanguage();
   useEffect(() => {
@@ -320,6 +321,7 @@ export const router = createBrowserRouter([
                     element: <AdminPage section="audit" />,
                   },
                   { path: "/admin/reminder-deliveries", element: <ReminderDeliveries /> },
+                  { path: "/admin/announcements", element: <AnnouncementsPage /> },
                   {
                     path: "/admin/settings",
                     element: <SettingsIndex administration />,

@@ -9,6 +9,7 @@ import { warmSettings } from "../features/settings/warmSettings";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   Activity,
+  Bell,
   FileText,
   LayoutDashboard,
   Menu,
@@ -48,6 +49,7 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
           <Activity size={19} />
           {tr("Reminder deliveries")}
         </NavLink>
+        <NavLink to="/admin/announcements" onClick={onNavigate}><Bell size={19}/>{tr("System announcements")}</NavLink>
       </nav>
       <div className="sidebar-bottom">
         <NavLink

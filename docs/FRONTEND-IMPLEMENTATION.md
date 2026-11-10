@@ -1,3 +1,7 @@
+## Thông báo hệ thống — source local10/11
+
+/admin/announcements cho Admin: draft/recipient selection/preview/send/revoke/history, giữ form khi lỗi và draft guard. Notifications dùng feed mới cho reminder+announcement, body text an toàn, đánh dấu đọc/count/read-all chung. [Contract](ANNOUNCEMENTS.md) và evidence worklog; API/schema phải được rollout trước UI, chưa phát hành trong code task này.
+
 > CURRENT 2026-11-10: xem [hiện trạng](PROJECT-STATUS.md) và [ưu tiên](CURRENT-PRIORITIES.md); các evidence theo ngày bên dưới giữ nguyên phạm vi.
 
 ## Mobile pull và Back — 2026-11-10

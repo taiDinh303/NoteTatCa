@@ -8,7 +8,7 @@ Nguồn hiện trạng: [PROJECT-STATUS](PROJECT-STATUS.md). Nguồn evidence th
 | --- | --- | --- | --- |
 | 1 | Docs hiện trạng và kiểm thử | Gỡ mô tả CURRENT sai; phân biệt lịch sử/local/published; ghi lỗi và giới hạn thực tế, không nâng ngân sách timing hoặc skip để báo xanh | Docs đã chuẩn hóa10/11, focused regressions/build/lint/unit có evidence mới; full frontend10lỗi baseline07/11 chưa xử lý trong đợt console/mobile, không claim fullsuite xanh |
 | 2 — TASK-046 | Console reminder deliveries chỉ đọc | Admin-only; lọc owner/status/occurrence, phân trang; không note title/content/NoteId/raw provider error; không gửi lại/cancel hoặc thay worker | Hoàn thiện local10/11: HTTP8/8, E2E desktop/mobile trong production bundle18/18; chưa phát hành |
-| 3 — TASK-047 | Announcement trong app | Soạn/xem trước/gửi, snapshot người nhận, chống trùng, đọc/unread/thu hồi, audit metadata; test ownership và concurrency | Quy tắc recipient/thu hồi đã chốt; cần code/migration/test riêng, chưa phát hành |
+| 3 — TASK-047 | Announcement trong app | Soạn/xem trước/gửi, snapshot người nhận, chống trùng, đọc/unread/thu hồi, audit metadata; test ownership và concurrency | Đã có code API/schema/UI local10/11, HTTP và browser regression; xem ANNOUNCEMENTS/worklog. Chưa apply DB thật hoặc phát hành |
 | 4 — TASK-020 | Backup/restore miễn phí | Bản backup ngoài DB chính gồm DB/Identity/keyring; restore vào DB biệt lập, đối soát và đo RPO/RTO | Chốt không có ngân sách; chưa có backup job hoặc restore evidence mới |
 | Sau | TASK-019 và roadmap | Xóa tài khoản sau khi chính sách dữ liệu/audit/restore hoàn thiện; note links, templates, offline/media/cộng tác theo roadmap | Không bật hard delete hoặc mở tính năng roadmap trong đợt dọn docs |
 

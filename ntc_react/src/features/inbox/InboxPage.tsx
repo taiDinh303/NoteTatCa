@@ -1,4 +1,5 @@
 import { t as tr, useLanguage } from "../../shared/i18n";
+import "../admin/AnnouncementsPage.css";
 import { Suspense, useState } from "react";
 import { useInfiniteQuery, type InfiniteData } from "@tanstack/react-query";
 import { ArrowUpRight, Bell, CheckCheck, Inbox } from "lucide-react";
@@ -133,6 +134,19 @@ export default function InboxPage() {
       ) : (
         <div className="inbox-list">
           {items.map((item) => (
+            item.kind === "announcement" ? (
+              <article key={item.id} className={`inbox-row ${!item.readAt ? "unread" : ""}`}>
+                <div className="inbox-symbol"><Bell size={19} /></div>
+                <div className="inbox-announcement">
+                  <span>{tr("System announcement")} · {dateTime(item.occurrenceAt)}</span>
+                  <strong>{item.title}</strong><p>{item.body}</p>
+                  {!item.readAt ? <Button variant="secondary" onClick={() => {
+                    void inbox.read(item.id).then(refresh).catch((error) => { refresh(); toast.error(errorMessage(error)); });
+                  }}>{tr("Mark announcement as read")}</Button> : <span>{tr("Read")}</span>}
+                </div>
+                {!item.readAt ? <span className="unread-dot" aria-label={tr("Unread")} /> : null}
+              </article>
+            ) : (
             <article
               key={item.id}
               className={`inbox-row ${!item.readAt ? "unread" : ""}`}
@@ -146,7 +160,7 @@ export default function InboxPage() {
                 onFocus={warmNoteEditor}
                 onTouchStart={warmNoteEditor}
                 onClick={() => {
-                  setOpenedNote(item.noteId);
+                  if (item.noteId) setOpenedNote(item.noteId);
                   if (!item.readAt) {
                     void inbox
                       .read(item.id)
@@ -166,6 +180,7 @@ export default function InboxPage() {
               ) : null}
               <ArrowUpRight size={16} />
             </article>
+            )
           ))}
         </div>
       )}

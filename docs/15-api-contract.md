@@ -1,3 +1,7 @@
+## API thông báo hệ thống — source local10/11
+
+Admin /api/v1/admin/announcements có draft CRUD (không delete), recipients/preview/publish/revoke; create và publish có requestId/idempotency, version/concurrency. Customer /api/v1/notifications/feed, /feed/unread-count, /feed/{id}/read, /feed/read-all ghép announcement/reminder. Routes notifications cũ giữ reminder-only. [Contract/schema/rollout](ANNOUNCEMENTS.md); chưa apply schema thật hoặc phát hành.
+
 ## API ghi chú ẩn — 2026-11-07
 
 Console admin chỉ đọc ngày10/11: `GET /api/v1/admin/reminder-deliveries`, Admin-only; query userId/status/from/to/pageNumber/pageSize, response metadata paginated, không nội dung/NoteId/raw provider error. Contract và trạng thái local/published tại [TASK-046](CURRENT-PRIORITIES.md#contract-task-046), evidence tại [worklog](worklog.md). Không có retry/cancel hoặc schema mới.

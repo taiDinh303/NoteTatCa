@@ -1,0 +1,93 @@
+.announcement-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr);
+  gap: 24px;
+  align-items: start;
+}
+.announcement-history {
+  display: grid;
+  gap: 8px;
+}
+.announcement-history-item {
+  display: grid;
+  gap: 6px;
+  text-align: start;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 14px;
+  border-radius: 10px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.announcement-history-item[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+.announcement-history-item span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.announcement-editor {
+  min-width: 0;
+  background: var(--surface);
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.announcement-editor fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+}
+.announcement-editor > .button {
+  margin: 12px 8px 0 0;
+}
+.announcement-recipients {
+  min-width: 0;
+}
+.announcement-recipient {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  overflow-wrap: anywhere;
+}
+.announcement-recipient input {
+  width: auto;
+  flex-shrink: 0;
+}
+.announcement-preview p,
+.inbox-announcement p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.announcement-preview h2 {
+  overflow-wrap: anywhere;
+}
+.announcement-events {
+  margin-top: 20px;
+  font-size: 12px;
+}
+.announcement-events code,
+.announcement-recipients code {
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+.inbox-announcement {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+.inbox-announcement > span {
+  color: var(--muted);
+  font-size: 11px;
+}
+@media (max-width: 800px) {
+  .announcement-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

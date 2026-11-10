@@ -122,11 +122,27 @@ export interface LinkedLogin {
 }
 export interface InboxItem {
   id: string;
-  noteId: string;
-  reminderId: string;
+  noteId: string | null;
+  reminderId: string | null;
+  kind?: "reminder" | "announcement";
+  title?: string;
+  body?: string;
   occurrenceAt: string;
   readAt: string | null;
 }
+export interface Announcement {
+  id: string; title: string; body: string; allActiveUsers: boolean; version: string;
+  authorId: string; createdAt: string; publishedAt: string | null; publishedBy: string | null;
+  recipientCount: number; revokedAt: string | null; revokedBy: string | null;
+}
+export interface AnnouncementDetail {
+  announcement: Announcement; userIds: string[]; recipientIds: string[];
+  events: { id: string; actorId: string; action: string; occurredAt: string }[];
+}
+export interface AnnouncementDraft {
+  title: string; body: string; allActiveUsers: boolean; userIds: string[]; expectedVersion?: string; requestId?: string;
+}
+export interface AnnouncementPreview { announcement: Announcement; recipientCount: number; }
 export interface Role {
   id: string;
   name: string;
