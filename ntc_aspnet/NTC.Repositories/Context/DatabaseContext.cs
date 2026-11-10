@@ -153,6 +153,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
         });
         NTC.Repositories.Mascots.MascotModel.ConfigureMascots(builder, Database.ProviderName!);
         builder.ConfigureEntityIntegrity(Database.ProviderName!);
+        builder.ConfigureAnnouncements(Database.IsSqlServer());
         foreach (var entity in builder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entity.ClrType))
@@ -171,7 +172,7 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
     {
         var now = _clock.GetUtcNow();
         var entries = ChangeTracker.Entries().ToArray();
-        if (entries.Any(x => x.Entity is AdministrativeAuditEvent && x.State is EntityState.Modified or EntityState.Deleted))
+        if (entries.Any(x => x.Entity is AdministrativeAuditEvent or AnnouncementEvent && x.State is EntityState.Modified or EntityState.Deleted))
             throw DomainErrors.Invalid("Administrative audit events are append-only.");
         if (entries.Any(x => x.Entity is NoteRevision && x.State is EntityState.Modified or EntityState.Deleted))
             throw DomainErrors.Invalid("Note revisions are append-only.");
@@ -185,6 +186,8 @@ public class DatabaseContext : IdentityDbContext<ApplicationUser, ApplicationRol
                     NoteRevision => ["UserId", "NoteId", "SourceVersion", "SavedAt"],
                     NoteTag => ["UserId", "NoteId", "TagId"],
                     Notification or ReminderDelivery => ["UserId", "NoteId", "ReminderId", "OccurrenceAt"],
+                    AnnouncementReceipt => ["UserId", "AnnouncementId"],
+                    Announcement => ["AuthorId", "CreateRequestId", "CreateRequestHash"],
                     Reminder => ["NoteId"],
                     RefreshSession => ["UserId", "FamilyId", "CreatedAt", "ExpiresAt"],
                     _ => []

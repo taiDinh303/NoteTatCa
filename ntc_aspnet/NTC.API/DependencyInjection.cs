@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<INoteService, NoteService>(); services.AddScoped<IWorkspaceArchiveService, WorkspaceArchiveService>(); services.AddScoped<ITagService, TagService>();
         services.AddScoped<INoteTagService, NoteTagService>(); services.AddScoped<IReminderService, ReminderService>();
         services.AddScoped<IAdminService, AdminService>(); services.AddScoped<IInboxService, InboxService>();
+        services.AddScoped<IAnnouncementService, AnnouncementService>();
         services.AddScoped<ISessionService, SessionService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<Operations.DemoAccountSeeder>();

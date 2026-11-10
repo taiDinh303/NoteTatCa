@@ -6,6 +6,9 @@ using NTC.Contract.Repositories.Entities;
 using NTC.Repositories.Context;
 using NTC.Tests.Infrastructure;
 using NTC.Core.Security;
+using NTC.Contract.Repositories.Entities.Tasks;
+using NTC.Repositories.UOW;
+using NTC.Services.Service;
 namespace NTC.Tests.Integration;
 public sealed class PostgresTests
 {
@@ -38,6 +41,19 @@ public sealed class PostgresTests
             Assert.False(saved.IsHidden);Assert.Equal("Giữ nguyên nội dung",saved.Content);Assert.Equal(TimeSpan.Zero,saved.CreatedTime.Offset);Assert.Equal("ntc",db.Model.GetDefaultSchema());
             Assert.Empty(await db.Database.GetPendingMigrationsAsync());
             Assert.Equal(user.Id,(await db.NoteTags.SingleAsync()).UserId);
+            var announcement = new Announcement { AuthorId = user.Id, Title = "System notice", Body = "Plain <script> text", AllActiveUsers = true,
+                CreateRequestId = Guid.NewGuid(), CreateRequestHash = new string('A', 64), PublishedAt = now,
+                PublishedBy = user.Id, PublishRequestId = Guid.NewGuid(), PublishedVersion = Guid.NewGuid(), RecipientCount = 1 };
+            announcement.Receipts.Add(new() { UserId = user.Id, AnnouncementId = announcement.Id });
+            db.Add(announcement); await db.SaveChangesAsync();
+            using (var work = new UnitOfWork(db)) {
+                var service = new AnnouncementService(work, new RecipientActor(user.Id), TimeProvider.System);
+                var feed = await service.FeedAsync(1, 20, false);
+                Assert.Equal("announcement", Assert.Single(feed.Items).Kind); Assert.Equal(1, await service.CountUnreadAsync());
+                await service.ReadAsync(Assert.Single(feed.Items).Id); Assert.Equal(0, await service.CountUnreadAsync());
+                announcement.RevokedAt = DateTimeOffset.UtcNow; announcement.RevokedBy = user.Id; await db.SaveChangesAsync();
+                Assert.Empty((await service.FeedAsync(1, 20, false)).Items);
+            }
             saved.IsHidden=true;await db.SaveChangesAsync();db.ChangeTracker.Clear();
             Assert.Empty(await db.Notes.AsNoTracking().ToListAsync());Assert.Empty(await db.NoteTags.AsNoTracking().ToListAsync());
             var access=new NoteAccess {HiddenNotesUnlocked=true};
@@ -50,5 +66,13 @@ public sealed class PostgresTests
             Assert.Matches("^ntc_test_[0-9a-f]{32}$",name);
             await using var drop=new NpgsqlCommand($"DROP DATABASE \"{name}\" WITH (FORCE)",admin);await drop.ExecuteNonQueryAsync();
         }
+    }
+    private sealed class RecipientActor(Guid id) : ICurrentUser
+    {
+        public bool IsAuthenticated => true;
+        public Guid? UserId => id;
+        public Guid? SessionId => null;
+        public string Name => "Synthetic recipient";
+        public bool IsInRole(string role) => role == "User";
     }
 }

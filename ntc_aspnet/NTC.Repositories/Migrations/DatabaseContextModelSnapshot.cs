@@ -721,6 +721,193 @@ namespace NTC.Repositories.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.Announcement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AllActiveUsers")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(10000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreateRequestHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("CreateRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PublishRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PublishedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PublishedVersion")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("RecipientCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("RevokedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RevokedBy");
+
+                    b.HasIndex("AuthorId", "CreateRequestId")
+                        .IsUnique();
+
+                    b.HasIndex("CreatedTime", "Id");
+
+                    b.HasIndex("PublishedBy", "PublishRequestId")
+                        .IsUnique()
+                        .HasFilter("[PublishRequestId] IS NOT NULL");
+
+                    b.ToTable("Announcements", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Announcements_Count", "[RecipientCount] >= 0");
+
+                            t.HasCheckConstraint("CK_Announcements_Publish", "([PublishedAt] IS NULL AND [PublishedBy] IS NULL AND [PublishRequestId] IS NULL AND [PublishedVersion] IS NULL) OR ([PublishedAt] IS NOT NULL AND [PublishedBy] IS NOT NULL AND [PublishRequestId] IS NOT NULL AND [PublishedVersion] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Announcements_Revoke", "([RevokedAt] IS NULL AND [RevokedBy] IS NULL) OR ([RevokedAt] IS NOT NULL AND [RevokedBy] IS NOT NULL AND [PublishedAt] IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<Guid>("ActorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AnnouncementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("OccurredAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("AnnouncementId", "OccurredAt", "Id");
+
+                    b.ToTable("AnnouncementEvents", (string)null);
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementReceipt", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AnnouncementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("LastUpdatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("LastUpdatedTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ReadAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnouncementId", "UserId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "ReadAt");
+
+                    b.ToTable("AnnouncementReceipts", (string)null);
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementTarget", b =>
+                {
+                    b.Property<Guid>("AnnouncementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("AnnouncementId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AnnouncementTargets", (string)null);
+                });
+
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.MascotGeneration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1309,6 +1496,72 @@ namespace NTC.Repositories.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.Announcement", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("PublishedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("RevokedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementEvent", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NTC.Contract.Repositories.Entities.Tasks.Announcement", null)
+                        .WithMany()
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementReceipt", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.Tasks.Announcement", "Announcement")
+                        .WithMany("Receipts")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Announcement");
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.AnnouncementTarget", b =>
+                {
+                    b.HasOne("NTC.Contract.Repositories.Entities.Tasks.Announcement", null)
+                        .WithMany("Targets")
+                        .HasForeignKey("AnnouncementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.MascotGeneration", b =>
                 {
                     b.HasOne("NTC.Contract.Repositories.Entities.ApplicationUser", null)
@@ -1413,6 +1666,13 @@ namespace NTC.Repositories.Migrations
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tag", b =>
                 {
                     b.Navigation("NoteTags");
+                });
+
+            modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.Announcement", b =>
+                {
+                    b.Navigation("Receipts");
+
+                    b.Navigation("Targets");
                 });
 
             modelBuilder.Entity("NTC.Contract.Repositories.Entities.Tasks.Reminder", b =>

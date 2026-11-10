@@ -19,12 +19,12 @@ public sealed class ProviderTests
         Assert.Equal(new[] {
             "20260731153548_InitialCreate", "20261017044024_CompleteNoteBackend",
             "20261017122802_EnforceEntityIntegrity", "20261017160312_SupportAccountReactivation",
-            "20261026181013_AddNoteRevisions", "20261027152708_AddMascotGenerations", "20261106223103_AddHiddenNoteVault"
+            "20261026181013_AddNoteRevisions", "20261027152708_AddMascotGenerations", "20261106223103_AddHiddenNoteVault", "20261110152419_AddAnnouncements"
         }, sql.Database.GetMigrations());
         Assert.Equal(new[] {
             "20261017044034_InitialPostgreSql", "20261017122809_EnforceEntityIntegrity",
             "20261017160333_SupportAccountReactivation", "20261027030859_AddNoteRevisions",
-            "20261027152721_AddMascotGenerations", "20261106223452_AddHiddenNoteVault"
+            "20261027152721_AddMascotGenerations", "20261106223452_AddHiddenNoteVault", "20261110152426_AddAnnouncements"
         }, pg.Database.GetMigrations());
         Assert.DoesNotContain("uniqueidentifier",pgScript,StringComparison.OrdinalIgnoreCase);
         Assert.False(sql.Database.HasPendingModelChanges());Assert.False(pg.Database.HasPendingModelChanges());
