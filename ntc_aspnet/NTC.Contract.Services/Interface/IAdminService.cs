@@ -8,4 +8,6 @@ public interface IAdminService
     Task SendPasswordResetLinkAsync(Guid userId);
     Task<AdminStatistics> GetStatisticsAsync();
     Task<BasePaginatedList<AdministrativeAuditResponse>> GetAuditEventsAsync(int page, int size, Guid? targetUserId, AdministrativeAction? action);
+    Task<BasePaginatedList<ReminderDeliveryResponse>> GetReminderDeliveriesAsync(int page, int size,
+        Guid? userId, string? status, DateTimeOffset? from, DateTimeOffset? to);
 }

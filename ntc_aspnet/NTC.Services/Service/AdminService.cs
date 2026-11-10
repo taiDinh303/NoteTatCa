@@ -68,4 +68,40 @@ public sealed class AdminService(IUnitOfWork work, ICurrentUser actor, TimeProvi
             .Select(x => new AdministrativeAuditResponse(x.Id, x.ActorUserId, x.TargetUserId, x.RoleId, x.Action, x.OccurredAt)).ToListAsync();
         return new(items, count, page, size);
     }
+
+    public async Task<BasePaginatedList<ReminderDeliveryResponse>> GetReminderDeliveriesAsync(int page, int size,
+        Guid? userId, string? status, DateTimeOffset? from, DateTimeOffset? to)
+    {
+        RequireAdmin(); ValidatePage(page, size);
+        status = string.IsNullOrWhiteSpace(status) ? null : status.Trim().ToLowerInvariant();
+        if (status is not (null or "pending" or "retrying" or "leased" or "sent" or "abandoned"))
+            throw DomainErrors.Invalid("Unknown delivery status.");
+        if (from > to) throw DomainErrors.Invalid("from must not be after to.");
+        var now = UtcNow;
+        // Explicit metadata-only projection across owners/hidden notes. Never include a note or raw provider response.
+        var query = Repository<ReminderDelivery>().Entities.IgnoreQueryFilters().AsNoTracking();
+        if (userId.HasValue) query = query.Where(x => x.UserId == userId);
+        if (from.HasValue) query = query.Where(x => x.OccurrenceAt >= from.Value);
+        if (to.HasValue) query = query.Where(x => x.OccurrenceAt < to.Value);
+        query = status switch
+        {
+            "sent" => query.Where(x => x.SentAt != null),
+            "abandoned" => query.Where(x => x.SentAt == null && x.Abandoned),
+            "leased" => query.Where(x => x.SentAt == null && !x.Abandoned && x.LeaseUntil > now),
+            "retrying" => query.Where(x => x.SentAt == null && !x.Abandoned && (x.LeaseUntil == null || x.LeaseUntil <= now) && x.Attempts > 0),
+            "pending" => query.Where(x => x.SentAt == null && !x.Abandoned && (x.LeaseUntil == null || x.LeaseUntil <= now) && x.Attempts == 0),
+            _ => query
+        };
+        var count = await query.CountAsync();
+        var items = await query.OrderByDescending(x => x.OccurrenceAt).ThenByDescending(x => x.Id)
+            .Skip((page - 1) * size).Take(size)
+            .Select(x => new ReminderDeliveryResponse(x.Id, x.UserId,
+                x.SentAt != null ? "sent" : x.Abandoned ? "abandoned" : x.LeaseUntil > now ? "leased" : x.Attempts > 0 ? "retrying" : "pending",
+                x.Attempts, x.OccurrenceAt, x.NextAttemptAt, x.LastAttemptAt, x.SentAt, x.AbandonedAt, x.LeaseUntil,
+                x.LastErrorCode == null ? null :
+                x.LastErrorCode == "PARENT_UNAVAILABLE" || x.LastErrorCode == "RETRY_LIMIT_REACHED" ||
+                x.LastErrorCode == "EMAIL_TIMEOUT" || x.LastErrorCode == "EMAIL_SEND_FAILED" ? x.LastErrorCode : "UNKNOWN_ERROR"))
+            .ToListAsync();
+        return new(items, count, page, size);
+    }
 }

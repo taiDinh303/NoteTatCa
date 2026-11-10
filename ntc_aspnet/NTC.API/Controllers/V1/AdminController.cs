@@ -30,6 +30,11 @@ public sealed class AdminController(IUserService users, IAdminService admin) : B
         public async Task<IActionResult> Lock(Guid id, LockUserRequest request) { await admin.SetLockedAsync(id, request.IsLocked); return Success(true); }
     [HttpGet("statistics")] [ProducesResponseType(typeof(BaseResponse<AdminStatistics>), 200)]
     public async Task<IActionResult> Statistics() => Success(await admin.GetStatisticsAsync());
+    [HttpGet("reminder-deliveries")]
+    [ProducesResponseType(typeof(BaseResponse<BasePaginatedList<ReminderDeliveryResponse>>), 200)]
+    public async Task<IActionResult> ReminderDeliveries(int pageNumber = 1, int pageSize = 30,
+        Guid? userId = null, string? status = null, DateTimeOffset? from = null, DateTimeOffset? to = null)
+        => Success(await admin.GetReminderDeliveriesAsync(pageNumber, pageSize, userId, status, from, to));
     [HttpGet("audit-events")]
     [ProducesResponseType(typeof(BaseResponse<BasePaginatedList<AdministrativeAuditResponse>>), 200)]
     public async Task<IActionResult> AuditEvents(int pageNumber = 1, int pageSize = 20, Guid? targetUserId = null, AdministrativeAction? action = null)
