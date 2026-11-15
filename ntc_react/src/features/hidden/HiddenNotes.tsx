@@ -66,7 +66,7 @@ export default function HiddenNotes() {
   const location = useLocation();
   const session = useAuth();
   if (session.status !== "authenticated")
-    return <p>{tr("Hidden notes need an online connection.")}</p>;
+    return <section className="vault-page vault-waiting"><Spinner /></section>;
   return (
     <QueryClientProvider client={vaultCache}>
       <VaultPage key={`${auth.identity()}:${location.pathname}`} />
@@ -260,7 +260,7 @@ function VaultPage() {
     <section
       className={`vault-page${!unlocked || mode === "change" ? " vault-locked" : ""}`}
     >
-      {!unlocked || mode === "change" ? <LockKeyhole className="vault-lock-watermark" aria-hidden="true" strokeWidth={1} /> : <h1 className="sr-only">{tr("Hidden notes")}</h1>}
+      {(!unlocked || mode === "change") && kind !== "pattern" ? <LockKeyhole className="vault-lock-watermark" aria-hidden="true" strokeWidth={1} /> : unlocked && mode === "unlock" ? <h1 className="sr-only">{tr("Hidden notes")}</h1> : null}
       {unlocked && mode === "unlock" && notice ? (
         <p role="status">{notice}</p>
       ) : null}
@@ -334,11 +334,10 @@ function VaultPage() {
             </label>
           ) : (
             <>
-              <PatternLock
-                value={secret}
-                onChange={setSecret}
-                disabled={busy}
-              />
+              <div className="vault-pattern-stage">
+                <LockKeyhole className="vault-lock-watermark vault-pattern-watermark" aria-hidden="true" strokeWidth={1} />
+                <PatternLock value={secret} onChange={setSecret} disabled={busy} />
+              </div>
             </>
           )}
           <Button type="submit" busy={busy} disabled={!status.emailVerified}>
