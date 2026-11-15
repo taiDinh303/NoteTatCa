@@ -260,7 +260,7 @@ function VaultPage() {
     <section
       className={`vault-page${!unlocked || mode === "change" ? " vault-locked" : ""}`}
     >
-      <h1 className="sr-only">{tr("Hidden notes")}</h1>
+      {!unlocked || mode === "change" ? <LockKeyhole className="vault-lock-watermark" aria-hidden="true" strokeWidth={1} /> : <h1 className="sr-only">{tr("Hidden notes")}</h1>}
       {unlocked && mode === "unlock" && notice ? (
         <p role="status">{notice}</p>
       ) : null}
@@ -308,7 +308,8 @@ function VaultPage() {
               </Select>
             </label>
           ) : null}
-          <h1 className="vault-lock-title">
+          <h1 className="vault-lock-title">Hidden Notes</h1>
+          <span className="sr-only">
             {tr(
               configure
                 ? step === "confirm"
@@ -316,7 +317,7 @@ function VaultPage() {
                   : "Choose your new lock"
                 : "Unlock hidden notes",
             )}
-          </h1>
+          </span>
           {kind === "pin" ? (
             <label>
               <span className="sr-only">{tr("Six-digit PIN")}</span>

@@ -545,12 +545,23 @@ for (const width of [320, 1440])
     await expect(
       page.getByText("Hidden notes are online only.", { exact: false }),
     ).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Unlock hidden notes", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Hidden Notes", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Clear pattern", exact: true })).toHaveCount(0);
     expect(await page.locator(".vault-lock-title").evaluate(el => getComputedStyle(el).textAlign)).toBe("center");
     await expect(page.locator(".vault-lock-form > p")).toHaveCount(0);
+    await expect(page.locator(".vault-lock-watermark")).toBeVisible();
+    await page.screenshot({ path: `artifacts/vault-centered-unlock-${width}.png` });
+    const region = (await page.locator(".vault-page").boundingBox())!;
+    const form = (await page.locator(".vault-lock-form").boundingBox())!;
+    expect(Math.abs(form.y + form.height / 2 - region.y - region.height / 2)).toBeLessThan(3);
     await page.getByRole("link", { name: "Forgot lock?", exact: true }).click();
     await expect(page).toHaveURL(/hidden-notes\/recover$/);
+    await expect(page.getByRole("heading", { name: "Hidden Notes", exact: true })).toBeVisible();
+    await expect(page.locator(".vault-lock-watermark")).toBeVisible();
+    await page.screenshot({ path: `artifacts/vault-centered-recovery-${width}.png` });
+    const recoveryRegion = (await page.locator(".vault-page").boundingBox())!;
+    const recoveryForm = (await page.locator(".vault-lock-form").boundingBox())!;
+    expect(Math.abs(recoveryForm.y + recoveryForm.height / 2 - recoveryRegion.y - recoveryRegion.height / 2)).toBeLessThan(3);
     await expect(
       page.getByRole("button", { name: "Send reset code", exact: true }),
     ).toBeVisible();
@@ -580,12 +591,7 @@ for (const width of [320, 1440])
       };
     });
     expect(Math.abs(positioning.horizontalOffset)).toBeLessThan(2);
-    if (width > 800) {
-      expect(positioning.verticalOffset).toBeLessThan(-20);
-      expect(positioning.verticalOffset).toBeGreaterThan(-40);
-    } else {
-      expect(Math.abs(positioning.verticalOffset)).toBeLessThan(2);
-    }
+    expect(Math.abs(positioning.verticalOffset)).toBeLessThan(2);
     await page.screenshot({
       path: `artifacts/hidden-notes/clean-lock-${width}.png`,
     });

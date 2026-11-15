@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LockKeyhole } from "lucide-react";
 import { api } from "../../app/runtime";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { Button, ErrorBanner, Select } from "../../shared/ui";
@@ -78,13 +78,15 @@ export function VaultRecovery({
     });
   }
   return (
-    <section className="vault-page">
+    <section className="vault-page vault-locked">
+      <LockKeyhole className="vault-lock-watermark" aria-hidden="true" strokeWidth={1} />
       <div className="vault-lock-form vault-recovery">
+        <h1 className="vault-lock-title">Hidden Notes</h1>
         <Link to="/hidden-notes" replace className="button ghost vault-recovery-back">
           <ArrowLeft size={16} />
           {tr("Back to unlock")}
         </Link>
-        <h1 className="sr-only">{tr("Reset hidden notes lock")}</h1>
+        <span className="sr-only">{tr("Reset hidden notes lock")}</span>
         {error ? <ErrorBanner error={new Error(error)} /> : null}
         {stage === "email" ? (
           <>
