@@ -308,7 +308,7 @@ function VaultPage() {
               </Select>
             </label>
           ) : null}
-          <strong className="sr-only">
+          <h1 className="vault-lock-title">
             {tr(
               configure
                 ? step === "confirm"
@@ -316,7 +316,7 @@ function VaultPage() {
                   : "Choose your new lock"
                 : "Unlock hidden notes",
             )}
-          </strong>
+          </h1>
           {kind === "pin" ? (
             <label>
               <span className="sr-only">{tr("Six-digit PIN")}</span>
@@ -338,13 +338,6 @@ function VaultPage() {
                 onChange={setSecret}
                 disabled={busy}
               />
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setSecret("")}
-              >
-                {tr("Clear pattern")}
-              </Button>
             </>
           )}
           <Button type="submit" busy={busy} disabled={!status.emailVerified}>

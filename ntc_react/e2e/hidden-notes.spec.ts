@@ -245,7 +245,7 @@ test.describe("touch hidden notes", () => {
     });
     await cdp.send("Input.dispatchTouchEvent", {
       type: "touchMove",
-      touchPoints: [{ x, y: y + 140 }],
+      touchPoints: [{ x, y: y + 200 }],
     });
     await cdp.send("Input.dispatchTouchEvent", {
       type: "touchEnd",
@@ -508,7 +508,7 @@ test("unlock survives switching tabs and app routes, expires after fifteen idle 
 });
 
 for (const width of [320, 1440])
-  test(`lock screen is controls-only and recovery is a separate screen ${width}`, async ({
+  test(`lock screen has a centered title without Clear pattern and separate recovery ${width}`, async ({
     page,
     request,
   }) => {
@@ -545,9 +545,9 @@ for (const width of [320, 1440])
     await expect(
       page.getByText("Hidden notes are online only.", { exact: false }),
     ).toHaveCount(0);
-    await expect(page.locator(".vault-lock-form > strong")).toHaveClass(
-      "sr-only",
-    );
+    await expect(page.getByRole("heading", { name: "Unlock hidden notes", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Clear pattern", exact: true })).toHaveCount(0);
+    expect(await page.locator(".vault-lock-title").evaluate(el => getComputedStyle(el).textAlign)).toBe("center");
     await expect(page.locator(".vault-lock-form > p")).toHaveCount(0);
     await page.getByRole("link", { name: "Forgot lock?", exact: true }).click();
     await expect(page).toHaveURL(/hidden-notes\/recover$/);
