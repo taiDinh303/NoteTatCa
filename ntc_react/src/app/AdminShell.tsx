@@ -1,3 +1,4 @@
+import { useBackgroundPages } from "./useBackgroundPages";
 import { MobileBack } from "./MobileBack";
 import { t as tr, useLanguage } from "../shared/i18n";
 import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
@@ -72,6 +73,7 @@ function AdminNavigation({ onNavigate }: { onNavigate: () => void }) {
 }
 
 export default function AdminShell() {
+  useBackgroundPages();
   useMobileWorkspaceEntry("/admin/overview");
   useEffect(() => {
     const timer = window.setTimeout(warmSettings, 500);

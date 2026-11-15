@@ -1,3 +1,4 @@
+import { useBackgroundPages } from "./useBackgroundPages";
 import { isVaultUnlocked, subscribeVault } from "../features/hidden/vaultRuntime";
 import { MobileBack } from "./MobileBack";
 import { SidebarLabels } from "../features/labels/SidebarLabels";
@@ -176,6 +177,7 @@ const Sidebar = memo(function Sidebar({
   );
 });
 export default function AppShell() {
+  useBackgroundPages();
   useLanguage();
   const state = useAuth();
   useMobileWorkspaceEntry("/notes");

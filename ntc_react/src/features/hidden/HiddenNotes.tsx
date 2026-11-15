@@ -44,6 +44,7 @@ import { EditorScopeContext } from "../editor/EditorScope";
 import { VaultRecovery } from "./VaultRecovery";
 import { PatternLock } from "./PatternLock";
 import {
+  cachedVaultStatus, loadVaultStatus, saveVaultStatus, vaultListKey,
   vaultApi,
   vaultNotes,
   isVaultUnlocked,
@@ -82,8 +83,8 @@ function VaultPage() {
     typeof location.state?.hideNoteId === "string"
       ? location.state.hideNoteId
       : undefined;
-  const [status, setStatus] = useState<Status>();
-  const [kind, setKind] = useState<"pin" | "pattern">("pin");
+  const [status, setStatus] = useState<Status | undefined>(cachedVaultStatus);
+  const [kind, setKind] = useState<"pin" | "pattern">((cachedVaultStatus()?.kind) ?? "pin");
   const [secret, setSecret] = useState("");
   const [confirm, setConfirm] = useState("");
   const [step, setStep] = useState<"enter" | "confirm">("enter");
@@ -96,10 +97,12 @@ function VaultPage() {
   const [selectedAction, setSelectedAction] = useState<NoteOpenAction>();
   const [deleting, setDeleting] = useState<Note>();
   const [trashPreview, setTrashPreview] = useState<Note>();
-  const [items, setItems] = useState<Note[]>([]);
+  const initialList = () => isVaultUnlocked() ? vaultCache.getQueryData<Page<Note>>(vaultListKey(false, searchQuery)) : undefined;
+  const [items, setItems] = useState<Note[]>(() => initialList()?.items ?? []);
+  const [listLoading, setListLoading] = useState(() => !initialList());
   const [page, setPage] = useState(1);
   const [trash, setTrash] = useState(false);
-  const [hasNext, setHasNext] = useState(false);
+  const [hasNext, setHasNext] = useState(() => initialList()?.hasNextPage ?? false);
   const [selected, setSelected] = useState<string>();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
@@ -108,7 +111,7 @@ function VaultPage() {
       ? tr("Your lock was reset. Hidden notes were kept.")
       : undefined,
   );
-  const configuredKind = useRef<"pin" | "pattern">("pin");
+  const configuredKind = useRef<"pin" | "pattern">((cachedVaultStatus()?.kind) ?? "pin");
   const epoch = useRef(0);
   const listRequest = useRef(0);
   const newRequest = useRef<string | undefined>(undefined);
@@ -131,8 +134,7 @@ function VaultPage() {
   }, []);
   useEffect(() => {
     let live = true;
-    void api
-      .request<Status>("/hidden-notes/status")
+    void loadVaultStatus()
       .then((s) => {
         if (live) {
           setStatus(s);
@@ -159,10 +161,16 @@ function VaultPage() {
     async (next = 1, inTrash = trash) => {
       const generation = epoch.current;
       const request = ++listRequest.current;
-      const result = await vaultApi.request<Page<Note>>(
-        `/hidden-notes?pageNumber=${next}&pageSize=100&trash=${inTrash}&q=${encodeURIComponent(searchQuery)}`,
-      );
+      const cached = next === 1 ? vaultCache.getQueryData<Page<Note>>(vaultListKey(inTrash, searchQuery)) : undefined;
+      if (next === 1) { setItems(cached?.items ?? []); setListLoading(!cached); }
+      const result = await vaultCache.fetchQuery({
+        queryKey: vaultListKey(inTrash, searchQuery, next), staleTime: 0, retry: false,
+        queryFn: ({signal}) => vaultApi.request<Page<Note>>(
+          `/hidden-notes?pageNumber=${next}&pageSize=100&trash=${inTrash}&q=${encodeURIComponent(searchQuery)}`, {signal}),
+      });
       if (generation !== epoch.current || request !== listRequest.current || !active.current) return;
+      vaultCache.setQueryData(vaultListKey(inTrash, searchQuery, next), result);
+      setListLoading(false);
       setItems((old) =>
         next === 1 ? result.items : [...old, ...result.items],
       );
@@ -173,11 +181,13 @@ function VaultPage() {
   );
   useEffect(() => {
     active.current = unlocked;
-    if (unlocked) void load().catch((e) => setError(errorMessage(e)));
+    // Keep the cached first render intact; schedule revalidation after the effect.
+    if (unlocked) void Promise.resolve().then(() => { if (active.current) return load(); }).catch((e) => { if (active.current) { setError(errorMessage(e)); setListLoading(false); } });
   }, [unlocked, load]);
   async function action(run: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
+    vaultCache.removeQueries({ queryKey: ["vault-list"] });
     setError(undefined);
     try {
       await run();
@@ -185,6 +195,7 @@ function VaultPage() {
       setError(errorMessage(e));
     } finally {
       setBusy(false);
+      setListLoading(false);
     }
   }
   const configure = !status?.configured || mode === "change";
@@ -212,7 +223,11 @@ function VaultPage() {
           body: { kind, secret: submittedSecret },
         });
         configuredKind.current = kind;
-        setStatus((s) => (s ? { ...s, configured: true, kind } : s));
+        if (status) {
+          const updated = { ...status, configured: true, kind };
+          saveVaultStatus(updated);
+          setStatus(updated);
+        }
         if (mode === "change") {
           lock();
           return;
@@ -250,8 +265,9 @@ function VaultPage() {
   if (location.pathname === "/hidden-notes/recover")
     return (
       <VaultRecovery
-        onReset={() => {
+        onReset={(kind) => {
           lock();
+          if (status) saveVaultStatus({ ...status, kind });
           navigate("/hidden-notes", {
             replace: true,
             state: { vaultReset: true },
@@ -343,7 +359,7 @@ function VaultPage() {
               </div>
             </>
           )}
-          {configure || kind === "pin" ? <Button type="submit" busy={busy} disabled={!status.emailVerified}>
+          {configure || kind === "pin" ? <Button type="submit" busy={busy} disabled={!status.emailVerified || (!configure && kind === "pin" && secret.length !== 6)}>
             {tr(
               configure
                 ? step === "enter"
@@ -492,7 +508,7 @@ function VaultPage() {
               </Button>
             </div>
           ) : null}
-          {!items.length ? (
+          {listLoading ? <Spinner /> : !items.length ? (
             <EmptyState
               icon={FileText}
               title={tr(trash ? "A clean slate" : "Your next idea starts here")}

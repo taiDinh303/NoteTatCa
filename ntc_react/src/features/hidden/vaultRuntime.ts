@@ -68,9 +68,11 @@ if (import.meta.hot)
     void lockVault();
   });
 export const vaultCache = new QueryClient({
-  defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } },
+  defaultOptions: { queries: { retry: false, gcTime: 15 * 60_000, staleTime: 0 } },
 });
 export function setVaultToken(value: string) {
+  requests.abort();
+  vaultCache.clear();
   token = value;
   owner = auth.identity();
   requests = new AbortController();
@@ -110,6 +112,10 @@ export class VaultApi extends ApiClient {
           ? AbortSignal.any([options.signal, requests.signal])
           : requests.signal,
         headers: { ...options.headers, "X-Note-Vault": current },
+      })
+      .then((data) => {
+        if (token !== current || !isVaultUnlocked()) throw new DOMException("Vault session changed", "AbortError");
+        return data;
       })
       .catch((error) => {
         if (
@@ -259,3 +265,20 @@ export async function requireSavedVaultDraft(id: string) {
     );
   return note;
 }
+
+export interface VaultStatus { configured: boolean; kind: "pin" | "pattern" | null; emailVerified: boolean; }
+const statusKey = () => ["private", auth.getSnapshot().session?.userId, "vault-status"];
+export const cachedVaultStatus = () => cache.getQueryData<VaultStatus>(statusKey());
+export function saveVaultStatus(value: VaultStatus) { cache.setQueryData(statusKey(), value); }
+export function loadVaultStatus() {
+  const user = auth.getSnapshot().session?.userId;
+  return cache.fetchQuery({ queryKey: statusKey(), staleTime: 300_000, retry: false,
+    queryFn: async () => {
+      if (!user || auth.getSnapshot().status !== "authenticated") throw new Error("Session changed");
+      const data = await api.request<VaultStatus>("/hidden-notes/status");
+      if (auth.getSnapshot().session?.userId !== user || auth.getSnapshot().status !== "authenticated") throw new Error("Session changed");
+      return data;
+    },
+  });
+}
+export const vaultListKey = (trash = false, q = "", page = 1) => ["vault-list", trash, q, page];

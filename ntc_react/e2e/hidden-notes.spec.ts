@@ -200,6 +200,7 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
   await expect(
     page.getByText("Unsaved private fixture", { exact: true }),
   ).toHaveCount(0);
+  await page.locator("header").getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Account menu", exact: true }).click();
   await page.getByRole("menuitem", { name: "Sign out", exact: true }).click();
   await expect(page).toHaveURL(/\/notes/);
@@ -347,6 +348,8 @@ test("email reset keeps hidden notes and hidden trash restores privately", async
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("654321");
   await page.getByRole("button", { name: "Confirm lock", exact: true }).click();
+  await expect(page).toHaveURL(/\/hidden-notes$/);
+  await expect(page.locator(".vault-recovery")).toHaveCount(0);
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("654321");
   await page.getByRole("button", { name: "Unlock", exact: true }).click();
   await expect(
