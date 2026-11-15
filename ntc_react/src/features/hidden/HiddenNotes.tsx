@@ -77,6 +77,7 @@ function VaultPage() {
   useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
+  const searchQuery = new URLSearchParams(location.search).get("q") ?? "";
   const hideId =
     typeof location.state?.hideNoteId === "string"
       ? location.state.hideNoteId
@@ -109,6 +110,7 @@ function VaultPage() {
   );
   const configuredKind = useRef<"pin" | "pattern">("pin");
   const epoch = useRef(0);
+  const listRequest = useRef(0);
   const newRequest = useRef<string | undefined>(undefined);
   const active = useRef(isVaultUnlocked());
   const lock = useCallback(() => {
@@ -156,17 +158,18 @@ function VaultPage() {
   const load = useCallback(
     async (next = 1, inTrash = trash) => {
       const generation = epoch.current;
+      const request = ++listRequest.current;
       const result = await vaultApi.request<Page<Note>>(
-        `/hidden-notes?pageNumber=${next}&pageSize=100&trash=${inTrash}`,
+        `/hidden-notes?pageNumber=${next}&pageSize=100&trash=${inTrash}&q=${encodeURIComponent(searchQuery)}`,
       );
-      if (generation !== epoch.current || !active.current) return;
+      if (generation !== epoch.current || request !== listRequest.current || !active.current) return;
       setItems((old) =>
         next === 1 ? result.items : [...old, ...result.items],
       );
       setPage(next);
       setHasNext(result.hasNextPage);
     },
-    [trash],
+    [trash, searchQuery],
   );
   useEffect(() => {
     active.current = unlocked;
@@ -185,28 +188,28 @@ function VaultPage() {
     }
   }
   const configure = !status?.configured || mode === "change";
-  async function submit() {
+  async function submit(submittedSecret = secret) {
     await action(async () => {
       if (configure && step === "enter") {
         if (
-          (kind === "pin" && !/^\d{6}$/.test(secret)) ||
-          (kind === "pattern" && secret.length < 4)
+          (kind === "pin" && !/^\d{6}$/.test(submittedSecret)) ||
+          (kind === "pattern" && submittedSecret.length < 4)
         )
           throw new Error(
             tr("Use a six-digit PIN or at least four pattern points."),
           );
-        setConfirm(secret);
+        setConfirm(submittedSecret);
         setSecret("");
         setStep("confirm");
         return;
       }
-      if (configure && secret !== confirm)
+      if (configure && submittedSecret !== confirm)
         throw new Error(tr("The locks do not match. Try again."));
       if (configure) {
         const client = mode === "change" ? vaultApi : api;
         await client.request("/hidden-notes/configure", {
           method: "POST",
-          body: { kind, secret },
+          body: { kind, secret: submittedSecret },
         });
         configuredKind.current = kind;
         setStatus((s) => (s ? { ...s, configured: true, kind } : s));
@@ -217,7 +220,7 @@ function VaultPage() {
       }
       const result = await api.request<{ token: string }>(
         "/hidden-notes/unlock",
-        { method: "POST", body: { kind, secret } },
+        { method: "POST", body: { kind, secret: submittedSecret } },
       );
       setVaultToken(result.token);
       active.current = true;
@@ -336,11 +339,11 @@ function VaultPage() {
             <>
               <div className="vault-pattern-stage">
                 <LockKeyhole className="vault-lock-watermark vault-pattern-watermark" aria-hidden="true" strokeWidth={1} />
-                <PatternLock value={secret} onChange={setSecret} disabled={busy} />
+                <PatternLock value={secret} onChange={setSecret} disabled={busy} onComplete={!configure && status.emailVerified ? (value) => { if (value.length >= 4) void submit(value); } : undefined} />
               </div>
             </>
           )}
-          <Button type="submit" busy={busy} disabled={!status.emailVerified}>
+          {configure || kind === "pin" ? <Button type="submit" busy={busy} disabled={!status.emailVerified}>
             {tr(
               configure
                 ? step === "enter"
@@ -348,9 +351,9 @@ function VaultPage() {
                   : "Confirm lock"
                 : "Unlock",
             )}
-          </Button>
+          </Button> : null}
           {status.configured && mode === "unlock" ? (
-            <Link className="button ghost vault-recovery-link" to="/hidden-notes/recover">
+            <Link className="button secondary vault-recovery-link" to="/hidden-notes/recover">
               {tr("Forgot lock?")}
             </Link>
           ) : null}

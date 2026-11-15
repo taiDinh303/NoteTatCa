@@ -48,6 +48,14 @@ for (const width of [320, 1440])
       ),
     ).toBeLessThanOrEqual(1);
     await expect(page.locator(".vault-page > h1")).toHaveClass("sr-only");
+    await expect(page.getByRole("textbox", { name: "Search your notes", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Account menu", exact: true })).toBeVisible();
+    await expect(page.locator(".vault-header")).toHaveCount(0);
+    await page.getByRole("textbox", { name: "Search your notes", exact: true }).fill("nomatch-vault-query");
+    await expect(page.locator(".vault-page .note-card")).toHaveCount(0);
+    await expect(page).toHaveURL(/hidden-notes\?q=/);
+    await page.getByRole("button", { name: "Clear search", exact: true }).click();
+    await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
     await page.getByRole("button", { name: "list view", exact: true }).click();
     await expect(page.locator(".vault-page .notes-zoom-layer")).toHaveAttribute(
       "data-layout",
@@ -148,10 +156,19 @@ test("pattern supports keyboard setup and unlock", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: "Lock now", exact: true }).click();
   await draw();
-  await page.getByRole("button", { name: "Unlock", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Unlock", exact: true })).toHaveCount(0);
+  await page.keyboard.press("Enter");
   await expect(
     page.getByRole("button", { name: "Lock now", exact: true }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Lock now", exact: true }).click();
+  for (const n of [1, 2, 3, 6]) {
+    const b = (await page.getByRole("button", { name: `Point ${n}`, exact: true }).boundingBox())!;
+    if (n === 1) { await page.mouse.move(b.x+b.width/2,b.y+b.height/2); await page.mouse.down(); }
+    else await page.mouse.move(b.x+b.width/2,b.y+b.height/2);
+  }
+  await page.mouse.up();
+  await expect(page.getByRole("button", { name: "Lock now", exact: true })).toBeVisible();
 });
 
 test("hidden drafts resume after locking and never enter the offline cache", async ({
@@ -583,7 +600,7 @@ for (const width of [320, 1440])
       .click();
     await expect(page).toHaveURL(/hidden-notes$/);
     await expect(
-      page.getByRole("button", { name: "Unlock", exact: true }),
+      page.locator(".vault-pattern"),
     ).toBeVisible();
     await expect(page.locator(".vault-pattern")).toHaveCount(1);
     const positioning = await page.locator(".vault-lock-form").evaluate((form) => {

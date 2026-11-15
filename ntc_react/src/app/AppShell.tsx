@@ -1,3 +1,4 @@
+import { isVaultUnlocked, subscribeVault } from "../features/hidden/vaultRuntime";
 import { MobileBack } from "./MobileBack";
 import { SidebarLabels } from "../features/labels/SidebarLabels";
 import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
@@ -15,6 +16,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
 import {
   Link,
@@ -194,7 +196,9 @@ export default function AppShell() {
     "/settings/sessions": "Active sessions",
     "/help": "Help & feedback",
   };
-  const vaultPage = location.pathname === "/hidden-notes" || location.pathname === "/hidden-notes/recover";
+  const vaultUnlocked = useSyncExternalStore(subscribeVault, isVaultUnlocked);
+  const hiddenList = location.pathname === "/hidden-notes" && vaultUnlocked;
+  const vaultPage = (location.pathname === "/hidden-notes" && !vaultUnlocked) || location.pathname === "/hidden-notes/recover";
   const settingsTitle = vaultPage ? "Hidden notes" : settingsTitles[location.pathname];
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
@@ -265,7 +269,7 @@ export default function AppShell() {
     return () => window.removeEventListener("keydown", key);
   }, []);
   const displaySearch =
-    location.pathname === "/notes" ? (params.get("q") ?? "") : search;
+    location.pathname === "/notes" || hiddenList ? (params.get("q") ?? "") : search;
   return (
     <div
       ref={shell}
@@ -327,7 +331,7 @@ export default function AppShell() {
           onSubmit={(e) => {
             e.preventDefault();
             navigate(
-              "/notes" +
+              (hiddenList ? "/hidden-notes" : "/notes") +
                 (displaySearch
                   ? "?q=" + encodeURIComponent(displaySearch)
                   : ""),
@@ -342,7 +346,7 @@ export default function AppShell() {
             placeholder={tr("Search your notes")}
             onChange={(e) => {
               setSearch(e.target.value);
-              if (location.pathname === "/notes") {
+              if (location.pathname === "/notes" || hiddenList) {
                 const next = new URLSearchParams(params);
                 if (e.target.value) next.set("q", e.target.value);
                 else next.delete("q");
@@ -356,7 +360,7 @@ export default function AppShell() {
               label={tr("Clear search")}
               onClick={() => {
                 setSearch("");
-                if (location.pathname === "/notes") {
+                if (location.pathname === "/notes" || hiddenList) {
                   const next = new URLSearchParams(params);
                   next.delete("q");
                   setParams(next, { replace: true });

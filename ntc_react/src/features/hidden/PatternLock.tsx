@@ -4,10 +4,12 @@ export function PatternLock({
   value,
   onChange,
   disabled = false,
+  onComplete,
 }: {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  onComplete?: (value: string) => void;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const drawing = useRef(false);
@@ -41,6 +43,12 @@ export function PatternLock({
       role="group"
       aria-label={tr("3 by 3 pattern")}
       ref={root}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && onComplete && !disabled) {
+          event.preventDefault();
+          onComplete(current.current);
+        }
+      }}
       onPointerDown={(e) => {
         if (disabled) return;
         const target = (e.target as HTMLElement).closest<HTMLButtonElement>(
@@ -61,7 +69,9 @@ export function PatternLock({
           add(Number(target.dataset.point));
       }}
       onPointerUp={() => {
+        const completed = drawing.current;
         drawing.current = false;
+        if (completed && !disabled) onComplete?.(current.current);
       }}
       onPointerCancel={() => {
         drawing.current = false;
