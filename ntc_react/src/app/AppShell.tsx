@@ -195,7 +195,7 @@ export default function AppShell() {
     "/help": "Help & feedback",
   };
   const vaultPage = location.pathname === "/hidden-notes" || location.pathname === "/hidden-notes/recover";
-  const settingsTitle = vaultPage ? "Hidden Notes" : settingsTitles[location.pathname];
+  const settingsTitle = vaultPage ? "Hidden notes" : settingsTitles[location.pathname];
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
@@ -279,7 +279,7 @@ export default function AppShell() {
         {settingsTitle ? (
           <div className="preferences-mobile-header">
             {vaultPage ? <IconButton className="icon-button" icon={ArrowLeft} label={tr("Back")} onClick={() => navigate(location.pathname.endsWith("/recover") ? "/hidden-notes" : "/notes", { replace: true })} /> : <MobileBack className="icon-button" fallback={location.pathname === "/settings" || location.pathname === "/help" ? "/notes" : "/settings"} />}
-            {!vaultPage ? <h1>{tr(settingsTitle)}</h1> : null}
+            <h1>{tr(settingsTitle)}</h1>
           </div>
         ) : null}
         <div className="topbar-brand">

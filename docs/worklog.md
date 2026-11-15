@@ -2599,3 +2599,10 @@ Bắt đầu 2026-10-17: Git HEAD 176a968, chỉ hai appsettings có thay đổi
 - Shared VaultEmail reads current-user me query and renders only first half local-part plus****and domain; one-character local-part fully masked. No full email title/aria/log output. Shared240px maximum/80% lock sizing, same stroke/theme/opacity in both screens; pattern alignment retained. Removed recovery Clear pattern too, keeping redraw to replace. No API/auth/email delivery/data/schema change.
 - TypeScript/Vite production build and lint0warnings PASS; final typecheck PASS after recovery reset-control removal. Focused Chromium3/3PASS includes reset flow and320/1440 centered unlock/recovery, masked synthetic email text, header Back click returns recovery to unlock, watermark present, no visible title/no Clear pattern. Updated intentional UI assertions; fixture captured mail only.320 recovery screenshot inspected. Physical PWA remains owner acceptance.
 - Publication scope6React/CSS/E2E files plus this entry; preserve unrelated mascot/assets/config/flows/local worklog changes. Remote/deployment status recorded after push.
+
+
+## Recovery-only email card and vault header title — 2026-11-15
+
+- Owner refinement: masked email appears only in Forgot lock/recovery,16px normal readable text in padded theme-surface card with border/radius. Removed VaultEmail from unlock/setup. Restored translated Hidden notes title beside header Back on both vault routes; form content title remains visually hidden. Existing backgrounds, navigation destinations, masking and lock behavior preserved.
+- TypeScript/Vite production build and ESLint0warnings PASS. Focused Chromium2/2PASS at320/1440: unlock email absent, header title/Back present, recovery masked email exact and16px, centered content, back to unlock.320 recovery screenshot inspected for card and header. Synthetic fixture only, no live user data/mail/API/schema changes.
+- Publication scope4React/CSS/E2E files plus this worklog entry; preserve unrelated mascot/assets/config/flows/local logs. Push main authorized; remote/deployment evidence follows.

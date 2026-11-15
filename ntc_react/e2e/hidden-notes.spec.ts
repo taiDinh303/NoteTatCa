@@ -546,7 +546,8 @@ for (const width of [320, 1440])
       page.getByText("Hidden notes are online only.", { exact: false }),
     ).toHaveCount(0);
     await expect(page.locator(".vault-lock-title")).toHaveCount(0);
-    await expect(page.locator(".vault-email")).toHaveText("****@example.test");
+    await expect(page.locator(".vault-email")).toHaveCount(0);
+    await expect(page.locator("header").getByRole("heading", { name: "Hidden notes", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Clear pattern", exact: true })).toHaveCount(0);
     await expect(page.locator("header .icon-button[aria-label=Back]")).toBeVisible();
     await expect(page.locator(".vault-lock-form > p:not(.vault-email)")).toHaveCount(0);
@@ -560,6 +561,8 @@ for (const width of [320, 1440])
     await expect(page.locator(".vault-lock-title")).toHaveCount(0);
     await expect(page.locator(".vault-lock-watermark")).toBeVisible();
     await page.screenshot({ path: `artifacts/vault-centered-recovery-${width}.png` });
+    await expect(page.locator(".vault-email")).toHaveText("****@example.test");
+    expect(await page.locator(".vault-email").evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBe(16);
     const recoveryRegion = (await page.locator(".vault-page").boundingBox())!;
     const recoveryForm = (await page.locator(".vault-lock-form").boundingBox())!;
     expect(Math.abs(recoveryForm.y + recoveryForm.height / 2 - recoveryRegion.y - recoveryRegion.height / 2)).toBeLessThan(3);
