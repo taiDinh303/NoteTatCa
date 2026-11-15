@@ -26,6 +26,7 @@ import {
 } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArrowLeft,
   Bell,
   CalendarDays,
   FileText,
@@ -193,7 +194,8 @@ export default function AppShell() {
     "/settings/sessions": "Active sessions",
     "/help": "Help & feedback",
   };
-  const settingsTitle = settingsTitles[location.pathname];
+  const vaultPage = location.pathname === "/hidden-notes" || location.pathname === "/hidden-notes/recover";
+  const settingsTitle = vaultPage ? "Hidden Notes" : settingsTitles[location.pathname];
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
@@ -273,11 +275,11 @@ export default function AppShell() {
       <a href="#workspace-main" className="skip-link">
         {tr("Skip to content")}
       </a>
-      <header className="topbar">
+      <header className={`topbar${vaultPage ? " vault-header" : ""}`}>
         {settingsTitle ? (
           <div className="preferences-mobile-header">
-            <MobileBack className="icon-button" fallback={location.pathname === "/settings" || location.pathname === "/help" ? "/notes" : "/settings"} />
-            <h1>{tr(settingsTitle)}</h1>
+            {vaultPage ? <IconButton className="icon-button" icon={ArrowLeft} label={tr("Back")} onClick={() => navigate(location.pathname.endsWith("/recover") ? "/hidden-notes" : "/notes", { replace: true })} /> : <MobileBack className="icon-button" fallback={location.pathname === "/settings" || location.pathname === "/help" ? "/notes" : "/settings"} />}
+            {!vaultPage ? <h1>{tr(settingsTitle)}</h1> : null}
           </div>
         ) : null}
         <div className="topbar-brand">

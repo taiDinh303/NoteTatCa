@@ -116,9 +116,14 @@
 
 .vault-locked { position: relative; isolation: isolate; padding-block: 16px; }
 .vault-locked > .vault-lock-form { position: relative; z-index: 1; margin-block: auto; }
-.vault-lock-watermark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(80%, 360px); height: auto; color: var(--accent); opacity: 0.055; pointer-events: none; z-index: 0; }
+.vault-lock-watermark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(80%, 240px); height: auto; color: var(--accent); opacity: 0.055; pointer-events: none; z-index: 0; }
 
 .vault-waiting { align-items: center; justify-content: center; }
 .vault-pattern-stage { position: relative; width: min(100%, 300px); justify-self: center; }
 .vault-pattern-stage > .vault-pattern { width: 100%; }
-.vault-pattern-watermark { top: auto; bottom: 10%; width: 80%; transform: translateX(-50%); }
+.vault-pattern-watermark { top: auto; bottom: 10%; width: min(80%, 240px); transform: translateX(-50%); }
+
+.vault-email { margin: 0; text-align: center; color: var(--muted); overflow-wrap: anywhere; font-size: 13px; }
+.vault-header > .topbar-brand, .vault-header > .global-search, .vault-header > .topbar-actions, .vault-header > .mobile-menu-button { display: none; }
+.vault-header .preferences-mobile-header { display: flex; align-items: center; gap: 12px; width: 100%; }
+.vault-header .preferences-mobile-header h1 { margin: 0; font-size: 18px; font-weight: 700; }

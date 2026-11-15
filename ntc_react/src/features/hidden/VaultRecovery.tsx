@@ -1,6 +1,6 @@
+import { VaultEmail } from "./VaultEmail";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft, LockKeyhole } from "lucide-react";
+import { LockKeyhole } from "lucide-react";
 import { api } from "../../app/runtime";
 import { t as tr, useLanguage } from "../../shared/i18n";
 import { Button, ErrorBanner, Select } from "../../shared/ui";
@@ -81,11 +81,8 @@ export function VaultRecovery({
     <section className="vault-page vault-locked">
       <LockKeyhole className="vault-lock-watermark" aria-hidden="true" strokeWidth={1} />
       <div className="vault-lock-form vault-recovery">
-        <h1 className="vault-lock-title">Hidden Notes</h1>
-        <Link to="/hidden-notes" replace className="button ghost vault-recovery-back">
-          <ArrowLeft size={16} />
-          {tr("Back to unlock")}
-        </Link>
+        <h1 className="sr-only">Hidden Notes</h1>
+        <VaultEmail />
         <span className="sr-only">{tr("Reset hidden notes lock")}</span>
         {error ? <ErrorBanner error={new Error(error)} /> : null}
         {stage === "email" ? (
@@ -169,13 +166,6 @@ export function VaultRecovery({
                       onChange={setSecret}
                       disabled={busy}
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => setSecret("")}
-                    >
-                      {tr("Clear pattern")}
-                    </Button>
                   </>
                 )}
               </>

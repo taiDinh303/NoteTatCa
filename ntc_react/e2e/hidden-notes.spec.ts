@@ -545,10 +545,11 @@ for (const width of [320, 1440])
     await expect(
       page.getByText("Hidden notes are online only.", { exact: false }),
     ).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "Hidden Notes", exact: true })).toBeVisible();
+    await expect(page.locator(".vault-lock-title")).toHaveCount(0);
+    await expect(page.locator(".vault-email")).toHaveText("****@example.test");
     await expect(page.getByRole("button", { name: "Clear pattern", exact: true })).toHaveCount(0);
-    expect(await page.locator(".vault-lock-title").evaluate(el => getComputedStyle(el).textAlign)).toBe("center");
-    await expect(page.locator(".vault-lock-form > p")).toHaveCount(0);
+    await expect(page.locator("header .icon-button[aria-label=Back]")).toBeVisible();
+    await expect(page.locator(".vault-lock-form > p:not(.vault-email)")).toHaveCount(0);
     await expect(page.locator(".vault-lock-watermark")).toBeVisible();
     await page.screenshot({ path: `artifacts/vault-centered-unlock-${width}.png` });
     const region = (await page.locator(".vault-page").boundingBox())!;
@@ -556,7 +557,7 @@ for (const width of [320, 1440])
     expect(Math.abs(form.y + form.height / 2 - region.y - region.height / 2)).toBeLessThan(3);
     await page.getByRole("link", { name: "Forgot lock?", exact: true }).click();
     await expect(page).toHaveURL(/hidden-notes\/recover$/);
-    await expect(page.getByRole("heading", { name: "Hidden Notes", exact: true })).toBeVisible();
+    await expect(page.locator(".vault-lock-title")).toHaveCount(0);
     await expect(page.locator(".vault-lock-watermark")).toBeVisible();
     await page.screenshot({ path: `artifacts/vault-centered-recovery-${width}.png` });
     const recoveryRegion = (await page.locator(".vault-page").boundingBox())!;
@@ -575,7 +576,7 @@ for (const width of [320, 1440])
       ).json(),
     ).toHaveLength(0);
     await page
-      .getByRole("link", { name: "Back to unlock", exact: true })
+      .getByRole("button", { name: "Back", exact: true })
       .click();
     await expect(page).toHaveURL(/hidden-notes$/);
     await expect(

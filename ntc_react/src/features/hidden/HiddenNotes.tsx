@@ -1,3 +1,4 @@
+import { VaultEmail } from "./VaultEmail";
 import {
   useCallback,
   useEffect,
@@ -308,7 +309,8 @@ function VaultPage() {
               </Select>
             </label>
           ) : null}
-          <h1 className="vault-lock-title">Hidden Notes</h1>
+          <h1 className="sr-only">Hidden Notes</h1>
+          <VaultEmail />
           <span className="sr-only">
             {tr(
               configure
