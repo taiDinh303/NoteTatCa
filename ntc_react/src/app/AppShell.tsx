@@ -1,5 +1,4 @@
 import { SidebarLabels } from "../features/labels/SidebarLabels";
-import { MobileBack } from "./MobileBack";
 import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
 import { RouteContent } from "./RouteContent";
 import { warmSettings } from "../features/settings/warmSettings";
@@ -194,10 +193,6 @@ export default function AppShell() {
     "/help": "Help & feedback",
   };
   const settingsTitle = settingsTitles[location.pathname];
-  const settingsBack =
-    location.pathname === "/settings" || location.pathname === "/help"
-      ? "/notes"
-      : "/settings";
   const [params, setParams] = useSearchParams();
   const [mobile, setMobile] = useState(false);
   const [sidebarHidden, setSidebarHidden] = useState(() => {
@@ -280,12 +275,10 @@ export default function AppShell() {
       <header className="topbar">
         {settingsTitle ? (
           <div className="preferences-mobile-header">
-            <MobileBack fallback={settingsBack} className="icon-button" />
             <h1>{tr(settingsTitle)}</h1>
           </div>
         ) : null}
         <div className="topbar-brand">
-          {!settingsTitle ? <MobileBack fallback="/notes" /> : null}
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}

@@ -11,14 +11,14 @@ for (const width of [320, 393]) {
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     const card = page.locator(".note-card").first();
     await expect(card).toBeVisible();
-    await expect(page.getByRole("button", { name: "Back", exact: true }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Back", exact: true }).filter({ visible: true })).toHaveCount(0);
     await page.goBack();
     await expect(card).toBeVisible();
     await expect(page).toHaveURL(/\/notes$/);
-    const view = page.locator("[data-notes-zoom]");
+    const view = card.locator(".note-card-identity");
     const marker = page.locator(".hidden-notes-pull");
     const top = (await card.boundingBox())!.y;
-    await view.dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
+    await card.locator(".note-card-identity").dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
     await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 180 }] });
     await expect(marker).toBeVisible();
     expect((await marker.boundingBox())!.height).toBeCloseTo(32, 0);
@@ -38,16 +38,35 @@ for (const width of [320, 393]) {
     await page.screenshot({ path: `../artifacts/hidden-pull-row-${width}.png`, fullPage: true });
     await view.dispatchEvent("touchend");
     await expect(page).toHaveURL(/\/hidden-notes$/);
-    await page.getByRole("button", { name: "Back", exact: true }).filter({ visible: true }).click();
+    await page.goBack();
     await expect(page).toHaveURL(/\/notes$/);
     await expect(card).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+
+    // Browser touch input on the preview exercises native event targeting and scrolling.
+    const cdp = await page.context().newCDPSession(page);
+    const box = (await card.locator(".note-open").boundingBox())!;
+    const x = box.x + box.width / 2, y = box.y + 12;
+    await cdp.send("Input.dispatchTouchEvent", {type:"touchStart", touchPoints:[{x,y}]});
+    for (const delta of [20, 50, 90, 145])
+      await cdp.send("Input.dispatchTouchEvent", {type:"touchMove", touchPoints:[{x,y:y+delta}]});
+    await expect(marker).toBeVisible();
+    await expect(marker).toHaveText("Release to open hidden notes");
+    await cdp.send("Input.dispatchTouchEvent", {type:"touchEnd",touchPoints:[]});
+    await expect(page).toHaveURL(/\/hidden-notes$/);
+    await page.goBack();
+    await expect(card).toBeVisible();
+    await card.locator(".note-open").click();
+    await expect(page.getByRole("button", {name:"Close",exact:true})).toBeVisible();
+    await page.goBack();
+    await expect(page.getByRole("button", {name:"Close",exact:true})).toBeHidden();
+    await expect(card).toBeVisible();
 
     // A fresh tab at a child route has no previous app entry: create a safe workspace destination.
     const direct = await page.context().newPage();
     await direct.setViewportSize({ width, height: 850 });
     await direct.goto("/settings/account");
-    await expect(direct.getByRole("button", { name: "Back", exact: true }).filter({ visible: true })).toBeVisible();
+    await expect(direct.locator(".preferences-mobile-header h1")).toBeVisible();
     await direct.goBack();
     await expect(direct).toHaveURL(/\/notes$/);
     await expect(direct.locator(".note-card").first()).toBeVisible();

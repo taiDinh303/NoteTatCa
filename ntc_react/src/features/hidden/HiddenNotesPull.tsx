@@ -26,7 +26,7 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
         e.touches.length !== 1 ||
         view.scrollTop > 0 ||
         (e.target as HTMLElement).closest(
-          "button,input,a,textarea,select,[contenteditable=true]",
+          "button:not(.note-card-identity):not(.note-open),input,a,textarea,select,[contenteditable=true]",
         )
       )
         return;

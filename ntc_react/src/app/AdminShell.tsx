@@ -1,5 +1,4 @@
 import { t as tr, useLanguage } from "../shared/i18n";
-import { MobileBack } from "./MobileBack";
 import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
 import "./SidebarMotion.css";
 import "./AdminShell.css";
@@ -119,18 +118,10 @@ export default function AdminShell() {
       <header className="topbar admin-topbar">
         {preferenceTitle ? (
           <div className="preferences-mobile-header">
-            <MobileBack className="icon-button" fallback={
-                location.pathname === "/admin/preferences" ||
-                location.pathname === "/admin/settings"
-                  ? "/admin/overview"
-                  : "/admin/preferences"
-              }
-            />
             <h1>{tr(preferenceTitle)}</h1>
           </div>
         ) : null}
         <div className="topbar-brand">
-          {!preferenceTitle ? <MobileBack fallback="/admin/overview" /> : null}
           <IconButton
             className="desktop-sidebar-toggle"
             icon={Menu}
