@@ -1,21 +1,25 @@
 @media (max-width: 800px) {
-  html:has(.hidden-notes-pull[data-enabled="true"]) {
-    overscroll-behavior-y: contain;
-  }
+  html:has(.hidden-notes-pull[data-enabled="true"]) { overscroll-behavior-y: contain; }
 }
 .hidden-notes-pull {
   overflow: hidden;
+  box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 10px;
   pointer-events: none;
   text-align: center;
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--muted);
-  transition: height 160ms ease-out;
+  transition: height 180ms ease-out;
 }
+.hidden-notes-pull[data-ready="true"] { color: #3478f6; }
 .hidden-notes-pull[data-pulling="true"] { transition: none; }
-.hidden-notes-pull > span { white-space: nowrap; }
+.hidden-notes-pull > svg { flex: 0 0 40px; }
+.hidden-notes-pull > span { flex: 0 0 auto; padding-bottom: 18px; white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
   .hidden-notes-pull { transition: none; }
 }

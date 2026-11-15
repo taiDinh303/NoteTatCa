@@ -21,8 +21,8 @@ for (const width of [320, 393]) {
     await card.locator(".note-card-identity").dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
     await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 180 }] });
     await expect(marker).toBeVisible();
-    expect((await marker.boundingBox())!.height).toBeCloseTo(32, 0);
-    expect((await card.boundingBox())!.y - top).toBeCloseTo(32, 0);
+    expect((await marker.boundingBox())!.height).toBeCloseTo(68, 0);
+    expect((await card.boundingBox())!.y - top).toBeCloseTo(68, 0);
     await view.dispatchEvent("touchcancel");
     await expect(marker).toBeHidden();
     await expect.poll(async () => (await card.boundingBox())!.y).toBeCloseTo(top, 0);
@@ -32,9 +32,9 @@ for (const width of [320, 393]) {
     await view.dispatchEvent("touchend");
     await expect(page).toHaveURL(/\/notes$/);
     await view.dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
-    await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 245 }] });
+    await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 300 }] });
     await expect(marker).toHaveText("Release to open hidden notes");
-    expect((await card.boundingBox())!.y - top).toBeCloseTo(44, 0);
+    expect((await card.boundingBox())!.y - top).toBeCloseTo(170, 0);
     await page.screenshot({ path: `../artifacts/hidden-pull-row-${width}.png`, fullPage: true });
     await view.dispatchEvent("touchend");
     await expect(page).toHaveURL(/\/hidden-notes$/);
@@ -48,7 +48,7 @@ for (const width of [320, 393]) {
     const box = (await card.locator(".note-open").boundingBox())!;
     const x = box.x + box.width / 2, y = box.y + 12;
     await cdp.send("Input.dispatchTouchEvent", {type:"touchStart", touchPoints:[{x,y}]});
-    for (const delta of [20, 50, 90, 145])
+    for (const delta of [20, 50, 110, 200])
       await cdp.send("Input.dispatchTouchEvent", {type:"touchMove", touchPoints:[{x,y:y+delta}]});
     await expect(marker).toBeVisible();
     await expect(marker).toHaveText("Release to open hidden notes");
@@ -67,6 +67,7 @@ for (const width of [320, 393]) {
     await direct.setViewportSize({ width, height: 850 });
     await direct.goto("/settings/account");
     await expect(direct.locator(".preferences-mobile-header h1")).toBeVisible();
+    await expect(direct.getByRole("button", { name: "Back", exact: true }).filter({ visible: true })).toBeVisible();
     await direct.goBack();
     await expect(direct).toHaveURL(/\/notes$/);
     await expect(direct.locator(".note-card").first()).toBeVisible();

@@ -1,3 +1,4 @@
+import { MobileBack } from "./MobileBack";
 import { SidebarLabels } from "../features/labels/SidebarLabels";
 import { useMobileWorkspaceEntry } from "./useMobileWorkspaceEntry";
 import { RouteContent } from "./RouteContent";
@@ -275,6 +276,7 @@ export default function AppShell() {
       <header className="topbar">
         {settingsTitle ? (
           <div className="preferences-mobile-header">
+            <MobileBack className="icon-button" fallback={location.pathname === "/settings" || location.pathname === "/help" ? "/notes" : "/settings"} />
             <h1>{tr(settingsTitle)}</h1>
           </div>
         ) : null}

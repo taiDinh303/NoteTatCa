@@ -1,3 +1,4 @@
+import { LockKeyhole } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import "./HiddenNotesPull.css";
 import { useNavigate } from "react-router-dom";
@@ -41,11 +42,11 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
         dy = e.touches[0].clientY - start.y;
       distance = dy > dx * 2 ? dy : 0;
       if (distance > 8 && e.cancelable) e.preventDefault();
-      setReveal(Math.min(44, Math.max(0, distance * 0.4)));
-      setReady(distance >= 120);
+      setReveal(Math.min(window.innerHeight * 0.34, 280, Math.max(0, distance * 0.85)));
+      setReady(distance >= 160);
     };
     const end = () => {
-      if (start && distance >= 120 && !view.querySelector(".dragging"))
+      if (start && distance >= 160 && !view.querySelector(".dragging"))
         navigate("/hidden-notes");
       start = undefined;
       distance = 0;
@@ -74,6 +75,7 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
       ref={marker}
       role="status"
       className="hidden-notes-pull"
+      data-ready={ready}
       data-enabled={enabled && mobile}
       data-pulling={enabled && mobile && reveal > 0}
       style={{
@@ -81,6 +83,7 @@ export function HiddenNotesPull({ enabled }: { enabled: boolean }) {
         visibility: enabled && mobile && reveal > 0 ? "visible" : "hidden",
       }}
     >
+      <LockKeyhole aria-hidden="true" size={40} strokeWidth={1.7} />
       <span>{tr(ready ? "Release to open hidden notes" : "Pull down to open hidden notes")}</span>
     </div>
   );
