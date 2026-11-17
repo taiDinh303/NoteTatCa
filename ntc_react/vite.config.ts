@@ -18,7 +18,9 @@ export default defineConfig(({ mode }) => {
       {
         name: "offline-app-shell",
         apply: "build",
-        closeBundle() {
+        // writeBundle (not closeBundle): Vite 8/rolldown fires closeBundle
+        // before dist/assets is flushed to disk, which breaks readdirSync.
+        writeBundle() {
           const files = readdirSync("dist/assets").map(
             (name) => "/assets/" + name,
           );

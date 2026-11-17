@@ -30,7 +30,7 @@ export function useNoteBack(
     return dirty() || back.current;
   });
   useEffect(() => {
-    if (pushed.current || !window.matchMedia("(max-width: 800px) or (orientation: landscape and max-height: 500px)").matches)
+    if (pushed.current || !window.matchMedia("(max-width: 800px) or (orientation: landscape) and (max-height: 500px)").matches)
       return;
     pushed.current = true;
     navigate(location.pathname + location.search + location.hash, {

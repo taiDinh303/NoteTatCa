@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-const query = "(max-width: 800px) or (orientation: landscape and max-height: 500px)";
+const query = "(max-width: 800px) or (orientation: landscape) and (max-height: 500px)";
 function subscribe(changed: () => void) {
   const media = window.matchMedia(query);
   media.addEventListener("change", changed);
