@@ -1,4 +1,4 @@
 .mobile-workspace-back { display: none; }
-@media (max-width: 800px) {
+@media (max-width: 800px), (orientation: landscape and max-height: 500px) {
   .mobile-workspace-back { display: inline-flex; flex-shrink: 0; }
 }

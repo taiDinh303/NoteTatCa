@@ -5186,6 +5186,41 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   .modal.note-tool-sheet { z-index: 91; }
 }
 
+/* Landscape phone (e.g. 852×393): width > 800px so @container max-width:800
+   mobile rules are bypassed. This media query restores the full-screen note
+   surface and mobile tool-sheet behaviour that a portrait phone would get. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .modal.note-editor-modal {
+    inset: 0;
+    top: var(--note-viewport-top, 0px);
+    transform: none;
+    width: 100%;
+    height: var(--note-viewport-height, 100dvh);
+    max-height: var(--note-viewport-height, 100dvh);
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+  }
+  .note-editor-modal .editor-footer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .note-editor-modal .editor-size-toggle { display: none; }
+  .modal.note-tool-sheet {
+    inset: auto 0 var(--note-bottom-gap, 0px);
+    transform: none;
+    width: 100%;
+    max-width: none;
+    max-height: calc(var(--note-viewport-height, 100dvh) * .85);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 18px 18px 0 0;
+    animation: none;
+  }
+  .modal-overlay:has(+ .note-tool-sheet) { z-index: 90; backdrop-filter: none; }
+  .modal.note-tool-sheet { z-index: 91; }
+}
+
 /* Note tools stay above their icon bar on every screen size. */
 .note-tool-popover {
   position: absolute; z-index: 5; left: 16px; bottom: 64px;
