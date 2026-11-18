@@ -1000,18 +1000,16 @@ strong {
 }
 .notes-section {
   margin-bottom: 31px;
-  /* Remounts when the view/tag/pin key changes (DndContext key), so this
-     fade replays on every grid<->list or sidebar-label toggle: the cards
-     dissolve out (old tree unmounts) and dissolve in (new tree mounts)
-     instead of snapping between layouts. 200ms ease-out, 6px rise. */
-  animation: notes-section-appear 0.2s ease-out both;
 }
-@keyframes notes-section-appear {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
+/* Two-phase dissolve on view/sidebar change: the parent wrapper toggles
+   --out (opacity 0, 180ms) while the layout swaps underneath; when --out
+   is removed the same 180ms transition brings the new layout back in.
+   No remount, so content (scroll, zoom) survives the toggle. */
+.notes-fade {
+  transition: opacity 0.18s ease-out;
 }
-@media (prefers-reduced-motion: reduce) {
-  .notes-section { animation: none; }
+.notes-fade.notes-fade--out {
+  opacity: 0;
 }
 .section-heading {
   display: flex;
@@ -1057,10 +1055,14 @@ strong {
      The card's own inner content (title, preview, footer) never overflows
      the card's box, so nothing else needs overflow:hidden. */
   overflow: visible;
+  /* width animates on view toggle: grid cards are ~320px, list cards are the
+     full 1fr. The 0.2s ease makes the card stretch/shrink frame by frame
+     instead of snapping when the user switches view. */
   transition:
     box-shadow 0.2s,
     border-color 0.2s,
-    transform 0.2s;
+    transform 0.2s,
+    width 0.2s ease;
   min-height: 180px;
   display: flex;
   flex-direction: column;
@@ -1068,7 +1070,8 @@ strong {
   transition:
     box-shadow 0.2s,
     border-color 0.2s,
-    transform 0.2s;
+    transform 0.2s,
+    width 0.2s ease;
 }
 .note-card:hover {
   box-shadow: 0 7px 20px #2734440c;
@@ -1240,6 +1243,12 @@ strong {
 .list-view .note-open h3 {
   margin-bottom: 4px;
   font-size: 14px;
+}
+/* Right-align the pin + 3-dot to the same column as the title row. The base
+   footer uses 11px right padding while .note-card-top uses 18px, so in list
+   view the 3-dot sat 7px left of the pin. Match it to 18px. */
+.list-view .note-card-footer {
+  padding-right: 18px;
 }
 .load-more {
   display: flex;

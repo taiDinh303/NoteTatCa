@@ -110,6 +110,22 @@ export default function NotesPage({
     }
   });
   const view = savedView;
+  // Two-phase dissolve on any view/sidebar/filter change: the list fades to 0,
+  // the layout (grid<->list width, sidebar data) swaps while invisible, then
+  // the new layout fades back in. useLayoutEffect runs before paint so the
+  // new layout is already mounted at opacity 0 (no width snap visible).
+  const fadeKey = `${view}:${tagId ?? ""}:${pinFilter}`;
+  const [fading, setFading] = useState(false);
+  const firstFade = useRef(true);
+  useLayoutEffect(() => {
+    if (firstFade.current) {
+      firstFade.current = false;
+      return;
+    }
+    setFading(true);
+    const t = window.setTimeout(() => setFading(false), 180);
+    return () => window.clearTimeout(t);
+  }, [fadeKey]);
   const [confirm, setConfirm] = useState<{
     note: Note;
     action: "delete";
@@ -407,8 +423,8 @@ export default function NotesPage({
       ) : (
         <NotesZoomViewport mode={view}>
           <HiddenNotesPull enabled={!trash && !editor && !selected && authState.status === "authenticated"} />
+          <div className={`notes-fade${fading ? " notes-fade--out" : ""}`}>
           <DndContext
-            key={`fade:${view}:${tagId ?? ""}:${pinFilter}`}
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragStart={({ active }) => cancelNoteDrop(active.id)}
@@ -437,6 +453,7 @@ export default function NotesPage({
               )}
             </SortableContext>
           </DndContext>
+          </div>
         </NotesZoomViewport>
       )}
       {query.hasNextPage ? (
