@@ -408,6 +408,7 @@ export default function NotesPage({
         <NotesZoomViewport mode={view}>
           <HiddenNotesPull enabled={!trash && !editor && !selected && authState.status === "authenticated"} />
           <DndContext
+            key={`fade:${view}:${tagId ?? ""}:${pinFilter}`}
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragStart={({ active }) => cancelNoteDrop(active.id)}

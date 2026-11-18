@@ -1000,6 +1000,18 @@ strong {
 }
 .notes-section {
   margin-bottom: 31px;
+  /* Remounts when the view/tag/pin key changes (DndContext key), so this
+     fade replays on every grid<->list or sidebar-label toggle: the cards
+     dissolve out (old tree unmounts) and dissolve in (new tree mounts)
+     instead of snapping between layouts. 200ms ease-out, 6px rise. */
+  animation: notes-section-appear 0.2s ease-out both;
+}
+@keyframes notes-section-appear {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .notes-section { animation: none; }
 }
 .section-heading {
   display: flex;
@@ -1053,18 +1065,10 @@ strong {
   display: flex;
   flex-direction: column;
   color: var(--text);
-  /* Smooth view (grid<->list) and sidebar-filter toggles: the box resizes and
-     settles instead of snapping. Drag disables this on .note-card.dragging. */
   transition:
     box-shadow 0.2s,
     border-color 0.2s,
-    transform 0.2s,
-    width 0.2s ease,
-    min-height 0.2s ease,
-    border-radius 0.2s ease;
-}
-.note-card .note-open h3 {
-  transition: font-size 0.2s ease, margin 0.2s ease;
+    transform 0.2s;
 }
 .note-card:hover {
   box-shadow: 0 7px 20px #2734440c;
@@ -1224,8 +1228,10 @@ strong {
   padding: 14px 18px 0;
   min-height: 0;
 }
+/* Match the grid's 9px top so the preview text starts at the same y in
+   both views (only the card's bottom whitespace differs, by design). */
 .list-view .note-open {
-  padding: 8px 18px 0;
+  padding: 9px 18px 0;
 }
 .list-view .note-preview {
   -webkit-line-clamp: 2;
