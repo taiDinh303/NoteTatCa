@@ -4738,10 +4738,14 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
 
 .note-editor-modal { --note-chrome-inset: 32px; }
 .note-editor-modal .rich-editor { padding-inline: var(--note-chrome-inset); }
-/* note-editor-modal and note-viewer are the SAME panel element, so a
-   descendant chain between them never matches. Target the panel's own
-   .note-viewer class to zero the rich-editor top padding in view mode. */
-.note-viewer .rich-editor { padding-top: 0; }
+/* note-editor-modal and note-viewer are the SAME panel element. In view
+   mode the first/last line sits a small, symmetric 5px from the title
+   above and the footer below. The doubled class beats the .content-zoom-layer
+   and .note-editor-modal single-class rules regardless of source order. */
+.note-editor-modal.note-viewer .rich-editor {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
 @container viewport (max-width: 800px) {
   .note-editor-modal { --note-chrome-inset: 24px; }
 }
