@@ -1001,16 +1001,6 @@ strong {
 .notes-section {
   margin-bottom: 31px;
 }
-/* Two-phase dissolve on view/sidebar change: the parent wrapper toggles
-   --out (opacity 0, 180ms) while the layout swaps underneath; when --out
-   is removed the same 180ms transition brings the new layout back in.
-   No remount, so content (scroll, zoom) survives the toggle. */
-.notes-fade {
-  transition: opacity 0.18s ease-out;
-}
-.notes-fade.notes-fade--out {
-  opacity: 0;
-}
 .section-heading {
   display: flex;
   align-items: center;
@@ -1055,14 +1045,10 @@ strong {
      The card's own inner content (title, preview, footer) never overflows
      the card's box, so nothing else needs overflow:hidden. */
   overflow: visible;
-  /* width animates on view toggle: grid cards are ~320px, list cards are the
-     full 1fr. The 0.2s ease makes the card stretch/shrink frame by frame
-     instead of snapping when the user switches view. */
   transition:
     box-shadow 0.2s,
     border-color 0.2s,
-    transform 0.2s,
-    width 0.2s ease;
+    transform 0.2s;
   min-height: 180px;
   display: flex;
   flex-direction: column;

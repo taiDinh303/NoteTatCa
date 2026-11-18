@@ -31,17 +31,30 @@ export function animateNoteLayout(
       parseFloat(getComputedStyle(node).getPropertyValue("--notes-scale")) || 1;
     const x = (from.x - to.x) / scale,
       y = (from.y - to.y) / scale;
-    if (Math.hypot(x, y) < 1) continue;
+    const resized =
+      Math.abs(from.width - to.width) > 1 ||
+      Math.abs(from.height - to.height) > 1;
+    if (Math.hypot(x, y) < 1 && !resized) continue;
     const animation = node.animate(
       [
-        { transform: `translate3d(${x}px, ${y}px, 0)` },
-        { transform: "translate3d(0, 0, 0)" },
+        {
+          transform: `translate3d(${x}px, ${y}px, 0)`,
+          ...(resized
+            ? { width: `${from.width / scale}px`, height: `${from.height / scale}px` }
+            : {}),
+        },
+        {
+          transform: "translate3d(0, 0, 0)",
+          ...(resized
+            ? { width: `${to.width / scale}px`, height: `${to.height / scale}px` }
+            : {}),
+        },
       ],
       {
         duration: matchMedia("(prefers-reduced-motion: reduce)").matches
           ? 0
-          : 220,
-        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+          : 240,
+        easing: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
     );
     animation.id = "note-drop";

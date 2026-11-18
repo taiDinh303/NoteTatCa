@@ -110,22 +110,6 @@ export default function NotesPage({
     }
   });
   const view = savedView;
-  // Two-phase dissolve on any view/sidebar/filter change: the list fades to 0,
-  // the layout (grid<->list width, sidebar data) swaps while invisible, then
-  // the new layout fades back in. useLayoutEffect runs before paint so the
-  // new layout is already mounted at opacity 0 (no width snap visible).
-  const fadeKey = `${view}:${tagId ?? ""}:${pinFilter}`;
-  const [fading, setFading] = useState(false);
-  const firstFade = useRef(true);
-  useLayoutEffect(() => {
-    if (firstFade.current) {
-      firstFade.current = false;
-      return;
-    }
-    setFading(true);
-    const t = window.setTimeout(() => setFading(false), 180);
-    return () => window.clearTimeout(t);
-  }, [fadeKey]);
   const [confirm, setConfirm] = useState<{
     note: Note;
     action: "delete";
@@ -172,12 +156,25 @@ export default function NotesPage({
     null,
   );
   const layoutKey = all.map((note) => `${note.id}:${note.isPinned}`).join();
+  const prevView = useRef(view);
   useLayoutEffect(() => {
     if (motionLayout.current) {
       animateNoteLayout(motionLayout.current);
       motionLayout.current = null;
     }
   }, [layoutKey]);
+  // On view toggle (grid<->list), animate card width/position FLIP so the
+  // cards stretch/shrink smoothly instead of snapping.
+  useLayoutEffect(() => {
+    if (prevView.current === view) return;
+    prevView.current = view;
+    // Layout has already committed (useLayoutEffect runs after DOM update);
+    // animate from the pre-toggle captured positions.
+    if (motionLayout.current) {
+      animateNoteLayout(motionLayout.current);
+      motionLayout.current = null;
+    }
+  }, [view]);
   const label = labels.data?.pages
     .flatMap((p) => p.items)
     .find((l) => l.id === tagId);
@@ -381,6 +378,9 @@ export default function NotesPage({
                   )}
                   active={view === name}
                   onClick={() => {
+                    if (String(name) !== view) {
+                      motionLayout.current = captureNoteLayout();
+                    }
                     setView(String(name));
                     try {
                       localStorage.setItem("ntc.view.v1", String(name));
@@ -423,7 +423,6 @@ export default function NotesPage({
       ) : (
         <NotesZoomViewport mode={view}>
           <HiddenNotesPull enabled={!trash && !editor && !selected && authState.status === "authenticated"} />
-          <div className={`notes-fade${fading ? " notes-fade--out" : ""}`}>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -453,7 +452,6 @@ export default function NotesPage({
               )}
             </SortableContext>
           </DndContext>
-          </div>
         </NotesZoomViewport>
       )}
       {query.hasNextPage ? (
