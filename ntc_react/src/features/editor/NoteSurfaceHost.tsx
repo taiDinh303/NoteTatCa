@@ -1,9 +1,5 @@
 import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import * as Dialog from "@radix-ui/react-dialog";
-import { FocusScope } from "@radix-ui/react-focus-scope";
-import { hideOthers } from "aria-hidden";
-import { RemoveScroll } from "react-remove-scroll";
 import { Modal } from "../../shared/ui";
 import { t as tr } from "../../shared/i18n";
 import "./NoteSurfaceHost.css";
@@ -19,8 +15,10 @@ const Surface = createContext<{
   release: (token: symbol) => void;
 } | null>(null);
 
-// One empty, inaccessible frame is prepared on workspace entry. Only the
-// selected note's content/session is mounted; no editor per list card.
+// One persistent panel that all note sessions render into. No backdrop, no
+// focus trap, no scroll lock — the notes list stays visible and interactive.
+// The panel is always in the DOM (hidden when no note is open), so editor
+// chunks are warm by the time the user taps a card.
 export function NoteSurfaceHost({ open, session, onClose, children }: {
   open: boolean; session: string; onClose: () => void; children: ReactNode;
 }) {
@@ -28,49 +26,38 @@ export function NoteSurfaceHost({ open, session, onClose, children }: {
   const [registration, setFrame] = useState<Registration>();
   const frame = registration?.session === session ? registration : undefined;
   const visible = open && !!frame;
-  const dialog = useRef<HTMLDivElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const configure = useCallback((value: Registration) => setFrame(value), []);
   const release = useCallback((token: symbol) => setFrame(current => current?.token === token ? undefined : current), []);
   const context = useMemo(() => ({ container, session, configure, release }), [container, session, configure, release]);
   useLayoutEffect(() => {
-    if (!visible || !dialog.current) return;
-    dialog.current.scrollTop = 0;
-    const previous = document.activeElement as HTMLElement | null;
-    const restore = hideOthers(dialog.current);
-    dialog.current.focus({ preventScroll: true });
-    return () => { restore(); if (previous?.isConnected) previous.focus({ preventScroll: true }); };
+    if (!visible || !panel.current) return;
+    panel.current.scrollTop = 0;
+    panel.current.focus({ preventScroll: true });
   }, [visible]);
   return <Surface.Provider value={context}>
     <NoteSurfaceVisibility.Provider value={visible}>
     {children}
-    <Dialog.Root open={visible} modal={false} onOpenChange={value => { if (!value) (frame?.onClose ?? onClose)(); }}>
-      <Dialog.Portal forceMount>
-        <div className="modal-overlay note-surface-backdrop" hidden={!visible} aria-hidden="true" />
-        <RemoveScroll enabled={visible} forwardProps>
-          <FocusScope asChild trapped={visible} loop={visible} onMountAutoFocus={event => event.preventDefault()} onUnmountAutoFocus={event => event.preventDefault()}>
-            <Dialog.Content forceMount ref={dialog}
-              aria-label={typeof frame?.title === "string" ? frame.title : tr("Open note")}
-              hidden={!visible} aria-hidden={!visible || undefined} aria-modal={visible || undefined}
-              className={`modal wide note-surface-ready ${frame?.className ?? "note-editor-modal"}`}
-              style={frame?.style}
-              onOpenAutoFocus={event => event.preventDefault()}
-              onCloseAutoFocus={event => event.preventDefault()}
-              onInteractOutside={event => event.preventDefault()}
-              onEscapeKeyDown={event => {
-                if (event.defaultPrevented) return;
-                event.preventDefault();
-                // This persistent listener predates tool-panel listeners.
-                // Let Escape dismiss the tool first, never the note beneath it.
-                if (dialog.current?.querySelector(".note-tool-popover")) return;
-                if (visible) (frame?.onClose ?? onClose)();
-              }}>
-              <div className="modal-title-hidden"><Dialog.Title>{frame?.title ?? tr("Open note")}</Dialog.Title><Dialog.Description>{frame?.title ?? tr("Open note")}</Dialog.Description></div>
-              <div ref={setContainer} className="note-surface-slot" />
-            </Dialog.Content>
-          </FocusScope>
-        </RemoveScroll>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <div
+      ref={panel}
+      className={`modal wide note-surface-ready ${frame?.className ?? "note-editor-modal"}`}
+      style={frame?.style}
+      hidden={!visible}
+      aria-hidden={!visible || undefined}
+      aria-label={typeof frame?.title === "string" ? frame.title : tr("Open note")}
+      role="dialog"
+      tabIndex={-1}
+      onKeyDown={event => {
+        if (event.key !== "Escape" || event.defaultPrevented) return;
+        // Let Escape dismiss an open tool popover first, never the note
+        // beneath it.
+        if (panel.current?.querySelector(".note-tool-popover")) return;
+        event.preventDefault();
+        if (visible) (frame?.onClose ?? onClose)();
+      }}
+    >
+      <div ref={setContainer} className="note-surface-slot" />
+    </div>
     </NoteSurfaceVisibility.Provider>
   </Surface.Provider>;
 }

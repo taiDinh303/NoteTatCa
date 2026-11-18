@@ -484,17 +484,12 @@ for (const [width, theme] of [
           const start = performance.now();
           const sample = () => {
             const note = document.querySelector(".note-editor-modal");
-            const overlay = document.querySelector(".modal-overlay");
-            if (!note || !overlay) result.missing++;
+            if (!note) result.missing++;
             else {
-              const css = getComputedStyle(note),
-                backdrop = getComputedStyle(overlay);
-              result.opacity.push(
-                Number(css.opacity),
-                Number(backdrop.opacity),
-              );
+              const css = getComputedStyle(note);
+              result.opacity.push(Number(css.opacity));
               result.colors.push(css.backgroundColor);
-              result.animations.push(css.animationName, backdrop.animationName);
+              result.animations.push(css.animationName);
               result.widths.push(note.getBoundingClientRect().width);
               if (
                 !note

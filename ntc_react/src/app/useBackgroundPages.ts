@@ -45,9 +45,11 @@ export function useBackgroundPages() {
       () => import("../features/hidden/VaultRecovery"),
     );
     tasks.push(() => import("../features/settings/SettingsPage"), () => import("../features/settings/PrivacySettings"), () => import("../features/help/HelpPage"));
-    // Preload the two heaviest note-open chunks (NoteEditor ~680 KB, RichEditor ~497 KB)
-    // so the first note open renders instantly from the module cache.
-    tasks.push(() => loadNoteEditor(), () => loadRichEditor());
+    // The note panel is now a persistent, always-mounted surface, so its two
+    // heaviest chunks (NoteEditor ~680 KB, RichEditor ~497 KB) must be warm
+    // before the user taps a card. Preload them first, ahead of every page,
+    // so the first and every subsequent note open renders instantly.
+    tasks.unshift(() => loadNoteEditor(), () => loadRichEditor());
     let next = 0;
     const worker = async () => {
       while (!cancelled && next < tasks.length) { const task = tasks[next++]; try { guard(); await task(); } catch { /* Own page handles errors and retry. */ } }

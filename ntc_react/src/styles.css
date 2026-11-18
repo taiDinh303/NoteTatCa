@@ -4574,11 +4574,27 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+/* Persistent note panel: a right-side editor pane on desktop so the notes
+   list stays visible alongside it (Joplin/Notion split view). No backdrop —
+   the Radix dialog was removed. */
 .modal.note-editor-modal {
-  height: calc(100dvh / var(--interface-scale) - 176px);
+  top: calc(77px / var(--interface-scale));
+  right: 0;
+  bottom: 0;
+  left: auto;
+  transform: none;
+  width: calc(min(560px, 46vw) / var(--interface-scale));
+  max-width: none;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  border-radius: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-top: 0;
+  box-shadow: -12px 0 40px #17242c18;
   animation: none;
 }
-.modal.note-editor-modal { overflow: visible; }
 .note-editor-modal > .editor-heading {
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
@@ -4631,11 +4647,18 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+  /* On phones the panel becomes a full-screen slide-over (Keep mobile), not
+     a side strip. It sits above the list; no backdrop dims anything. */
   .modal.note-editor-modal:not(.fullscreen) {
-    width: calc(100vw / var(--interface-scale) - 18px);
+    inset: 0;
+    top: var(--note-viewport-top, 0px);
+    transform: none;
+    width: 100%;
+    height: var(--note-viewport-height, 100dvh);
+    max-height: var(--note-viewport-height, 100dvh);
     max-width: none;
-    max-height: calc(100dvh / var(--interface-scale) - 176px);
-    border-radius: 12px;
+    border: 0;
+    border-radius: 0;
   }
   .note-editor-modal .editor-size-toggle {
     display: none;
