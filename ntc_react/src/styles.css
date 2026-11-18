@@ -4574,17 +4574,18 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* Persistent note panel: a centered card on desktop, floating with room
-   above (mascot strip under the header) and below (breathing gap). No
-   backdrop — the Radix dialog was removed. A little wider than the list
-   card so it reads as the "expanded" card. */
+/* Persistent note panel: spans the note-list content area under the header,
+   with a strip on top for the mascot and a small gap at the bottom. No
+   backdrop — the Radix dialog was removed. Width follows the list (sidebar
+   open: viewport - 242px sidebar; closed: viewport - 32px padding), so the
+   panel always sits in the same rectangle as the cards.
+   (Measured content insets at the 2026-11-18 reference screen.) */
 .modal.note-editor-modal {
-  top: calc((77px + 88px) / var(--interface-scale));
-  right: auto;
-  bottom: calc(44px / var(--interface-scale));
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(min(700px, 58vw) / var(--interface-scale));
+  top: calc(165px / var(--interface-scale));
+  bottom: calc(24px / var(--interface-scale));
+  left: calc(258px / var(--interface-scale));
+  transform: none;
+  width: calc((100vw - 258px) / var(--interface-scale));
   max-width: none;
   height: auto;
   max-height: none;
@@ -4593,6 +4594,15 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   border: 1px solid var(--border);
   box-shadow: 0 18px 60px #17242c22;
   animation: none;
+}
+/* Sidebar closed: the panel centers on the full window instead. Desktop
+   only — phones use the full-screen container rules that follow. */
+@media (min-width: 801px) {
+  .customer-shell.sidebar-hidden .modal.note-editor-modal {
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc((100vw - 32px) / var(--interface-scale));
+  }
 }
 .note-editor-modal > .editor-heading {
   border-top-left-radius: inherit;
