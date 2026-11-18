@@ -1,0 +1,287 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-022 · Tạo, sửa, tắt và xóa lịch nhắc",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/22-tao-sua-reminder/22-tao-sua-reminder.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "backend",
+      "label": "Chọn note self",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 16,
+          "end_line": 29
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Kiểm lịch",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 31,
+          "end_line": 42
+        },
+        {
+          "path": "ntc_aspnet/NTC.Services/Notes/ReminderSchedule.cs",
+          "line": 14,
+          "end_line": 53
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "Tạo occurrence đầu",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 38,
+          "end_line": 44
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "Sửa có version",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 57,
+          "end_line": 79
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "backend",
+      "label": "Hủy delivery cũ",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 82,
+          "end_line": 104
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s5",
+      "lane": "main",
+      "col": 5,
+      "type": "backend",
+      "label": "Xóa chính chủ",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 115,
+          "end_line": 125
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "x0",
+      "lane": "exception",
+      "col": 0,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "404",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 16,
+          "end_line": 29
+        }
+      ]
+    },
+    {
+      "id": "x1",
+      "lane": "exception",
+      "col": 1,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "400",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 31,
+          "end_line": 42
+        },
+        {
+          "path": "ntc_aspnet/NTC.Services/Notes/ReminderSchedule.cs",
+          "line": 14,
+          "end_line": 53
+        }
+      ]
+    },
+    {
+      "id": "x3",
+      "lane": "exception",
+      "col": 3,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "409",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/ReminderService.cs",
+          "line": 57,
+          "end_line": 79
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e4",
+      "from": "s4",
+      "to": "s5",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error0",
+      "from": "s0",
+      "to": "x0",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error1",
+      "from": "s1",
+      "to": "x1",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error3",
+      "from": "s3",
+      "to": "x3",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Guest và Admin không được gọi workspace reminders.",
+        "Xóa/tắt không thể thu hồi email provider đã nhận trước đó.",
+        "Lịch tháng/năm giữ anchor; ngày thiếu clamp cuối tháng. DST gap tiến tới phút hợp lệ; giờ lặp chọn offset lớn hơn."
+      ]
+    }
+  ]
+}

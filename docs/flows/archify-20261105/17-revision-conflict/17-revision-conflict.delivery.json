@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "b7f01e39-6782-4f8e-8f28-3aa7e5f4f191",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\17-revision-conflict\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\17-revision-conflict\\17-revision-conflict.html",
+  "specification": {
+    "sha256": "d86207dbdfac90c1a768d4da8bd9498e9d98170121b878447fd06971ff7a7055",
+    "bytes": 6574
+  },
+  "artifact": {
+    "sha256": "09ea13697179be85af0ea2910ee95098442dbf711a3b4162884fe6b515f75153",
+    "bytes": 821417
+  }
+}

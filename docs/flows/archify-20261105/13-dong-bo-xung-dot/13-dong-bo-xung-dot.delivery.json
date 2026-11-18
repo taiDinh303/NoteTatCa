@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6babcb1f-7b68-49ef-82f5-d7cb9b919725",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\13-dong-bo-xung-dot\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\13-dong-bo-xung-dot\\13-dong-bo-xung-dot.html",
+  "specification": {
+    "sha256": "10e475690d22357260625766be5d253668810b53ae32306af79e7bb8abf3f642",
+    "bytes": 6364
+  },
+  "artifact": {
+    "sha256": "a3abeb7d6fcf9d4a8bccbecebfd891790a76527fab9af58ebb75d2b93ca8d030",
+    "bytes": 821045
+  }
+}

@@ -13,7 +13,7 @@ NoteTatCa là web app ghi chú. Bộ tài liệu này được cá nhân hóa t�
 Đọc [PROJECT-STATUS](PROJECT-STATUS.md) để biết chức năng hiện có và [CURRENT-PRIORITIES](CURRENT-PRIORITIES.md) để biết thứ tự đã chốt, phỏng vấn10/11 và việc đang thực hiện. Các snapshot theo ngày phía dưới giữ làm lịch sử.
 
 1. Đọc [hồ sơ và câu hỏi lựa chọn](PROJECT-INTAKE.md).
-2. Xem [kế hoạch](01-plan.md), [nghiệp vụ](02-business-analysis.md) và [luồng](05-workflow.md).
+2. Xem [kế hoạch](01-plan.md), [nghiệp vụ](02-business-analysis.md) và [luồng](05-workflow.md). Đặc tả chi tiết từng luồng và sơ đồ Archify ở [Flow specifications](flows/README.md).
 3. Khi làm API, đọc [contract](15-api-contract.md), [bảo mật](16-security-privacy.md), [dữ liệu](04-database-design.md) và [kiểm thử](06-testing.md).
 4. Đọc [worklog](worklog.md) để biết việc đã làm và phần chưa chạy.
 5. Đọc [React implementation](FRONTEND-IMPLEMENTATION.md) cho module/frontend, setup, kiểm thử và giới hạn.
@@ -58,6 +58,7 @@ Tài liệu đang ở DRAFT; yêu cầu người dùng đã xác nhận vẫn c�
 | [RENDER-VERCEL-SETUP](RENDER-VERCEL-SETUP.md) | YES | Dashboard NTC, Docker/CA, env Production và giới hạn trước rollout |
 | [04-database-design](04-database-design.md) | YES | Identity, Note, Tag, NoteTag, Reminder |
 | [05-workflow](05-workflow.md) | YES | Auth, ghi chú, thùng rác, nhắc lịch |
+| [Flow specifications](flows/README.md) | YES | 37 đặc tả luồng, sơ đồ Archify, coverage controller và giới hạn theo source 2026-11-05 |
 | [06-testing](06-testing.md) | YES | Kịch bản nghiệm thu và bằng chứng |
 | [07-deploy-overview](07-deploy-overview.md) | YES | Supabase/Render/Vercel đã chọn; plan/region chưa chọn |
 | [08-deploy-detail](08-deploy-detail.md) | YES | Runbook dự thảo, chưa thực thi |

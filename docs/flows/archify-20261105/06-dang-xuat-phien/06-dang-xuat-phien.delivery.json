@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "dfcf928b-e6f8-4bd3-990a-7fdd0a3ad5e7",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\06-dang-xuat-phien\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\06-dang-xuat-phien\\06-dang-xuat-phien.html",
+  "specification": {
+    "sha256": "841fdc8948d941830243ef50e9f9d021a3fd87f1a2aefd96b2012ee5f639045a",
+    "bytes": 6049
+  },
+  "artifact": {
+    "sha256": "630b828edf77b2ec609912111cfabc3a90bf9d137ba47b8a1f1602bbdb0dfe0b",
+    "bytes": 819524
+  }
+}

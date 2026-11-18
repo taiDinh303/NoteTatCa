@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "a366af46-3e6a-4f8a-a3bf-6153df01fd58",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\01-dang-ky-xac-minh\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\01-dang-ky-xac-minh\\01-dang-ky-xac-minh.html",
+  "specification": {
+    "sha256": "85a32d084c0f36763889b5641f5e0204e0d26803d022405be2ca05bb8042273f",
+    "bytes": 6038
+  },
+  "artifact": {
+    "sha256": "faff9053f540c985c95c9cd543f0c9dbceb25e2956c9c1c9419487f54f1b31de",
+    "bytes": 818457
+  }
+}

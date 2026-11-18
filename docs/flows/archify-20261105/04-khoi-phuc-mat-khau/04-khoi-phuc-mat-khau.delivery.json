@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6b694dbb-2bed-4362-881d-019c653c66f8",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\04-khoi-phuc-mat-khau\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\04-khoi-phuc-mat-khau\\04-khoi-phuc-mat-khau.html",
+  "specification": {
+    "sha256": "0c41be195fb078dcd6242c12cd2c2b1e0c05489ba6b4ca81a71cffcf14e7b7cc",
+    "bytes": 5998
+  },
+  "artifact": {
+    "sha256": "26a1f764951aaccffc60e2a9c0647e713a78d22b4be885439b346cfb069727a5",
+    "bytes": 818501
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "88d1774c-b463-4aa6-a1bf-819b4008756e",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\30-ai-mascot-tao\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\30-ai-mascot-tao\\30-ai-mascot-tao.html",
+  "specification": {
+    "sha256": "4b4e9dd8ebcc6025269813e936e8a9e0b3d69a4bf43044207cc8e7cbae0b00aa",
+    "bytes": 6721
+  },
+  "artifact": {
+    "sha256": "e6dd87f47b4a512dbafc4b73cc26184d1d47be2d030199104382d9fbacaa76fb",
+    "bytes": 819796
+  }
+}

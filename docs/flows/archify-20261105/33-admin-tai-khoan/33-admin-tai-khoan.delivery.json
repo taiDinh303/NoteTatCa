@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "eee55bf7-e876-4a7e-bbb9-b98327c8e951",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\33-admin-tai-khoan\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\33-admin-tai-khoan\\33-admin-tai-khoan.html",
+  "specification": {
+    "sha256": "02ed0a3e9d1a2b46f793620e82368f1811affb70ecbf2f07d65409a802fb4755",
+    "bytes": 6226
+  },
+  "artifact": {
+    "sha256": "6496535a95d8e464eadb99f67029a448622b44eeb38ebc9bb06c5262bdcbdcc7",
+    "bytes": 818838
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "3530c2d7-fdf2-461c-a626-7aeb8c8a7190",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\36-phan-quyen-adapter\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\36-phan-quyen-adapter\\36-phan-quyen-adapter.html",
+  "specification": {
+    "sha256": "844d36395107ae423493065d11a65d893c7d9592803cac3f98d59e4187e2bde1",
+    "bytes": 6301
+  },
+  "artifact": {
+    "sha256": "7fcf1616fdfabc46fcb9ec9894503ea6650e2ce01ddcd802b199e5c7ece4b7b0",
+    "bytes": 818921
+  }
+}

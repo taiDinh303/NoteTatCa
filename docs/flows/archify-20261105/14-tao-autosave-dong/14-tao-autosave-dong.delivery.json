@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "8faa8840-08e6-42b2-a798-0aa5a7fe1237",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\14-tao-autosave-dong\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\14-tao-autosave-dong\\14-tao-autosave-dong.html",
+  "specification": {
+    "sha256": "3afa8691da36fa2a6f37392961f7f07d401c2913b85f3ec93b063c452f2f3034",
+    "bytes": 6199
+  },
+  "artifact": {
+    "sha256": "25b5f51c8c1c00fb6110127907c31a86432d04ac2326fbe65474cda9c01f18a1",
+    "bytes": 819428
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "870ce452-bc31-4c2f-a2d5-721fd555207c",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\05-khoi-phuc-refresh\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\05-khoi-phuc-refresh\\05-khoi-phuc-refresh.html",
+  "specification": {
+    "sha256": "5559d497ce4952b672eb052920cca51ef7821296c75930010088775dfd58a416",
+    "bytes": 5966
+  },
+  "artifact": {
+    "sha256": "6422511082c00b793b4ab00fb82d85faf5df74e4bb02a75a497842a9f2bf5faa",
+    "bytes": 819568
+  }
+}

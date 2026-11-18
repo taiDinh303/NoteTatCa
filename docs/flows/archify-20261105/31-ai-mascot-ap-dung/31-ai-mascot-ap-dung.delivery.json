@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "91615ab5-9925-4e26-8813-b7ce78874034",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\31-ai-mascot-ap-dung\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\31-ai-mascot-ap-dung\\31-ai-mascot-ap-dung.html",
+  "specification": {
+    "sha256": "d4e5adb79097d00e2d3fc9576d1de283b4b4dc621b90ab6b396cfc1b7aa1e525",
+    "bytes": 6263
+  },
+  "artifact": {
+    "sha256": "9d1254a049ab24482a4d0748259b6b184097e3fa20449bba81d2b98a28a540a3",
+    "bytes": 819506
+  }
+}

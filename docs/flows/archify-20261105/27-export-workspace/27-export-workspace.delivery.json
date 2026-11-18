@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "693a15e1-b585-4886-a6c3-8a645d3b74a9",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\27-export-workspace\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\27-export-workspace\\27-export-workspace.html",
+  "specification": {
+    "sha256": "7f3d8445fae44dbaada294ce8b7019526dec9add38574986392bb2c3f3f6e7d6",
+    "bytes": 5592
+  },
+  "artifact": {
+    "sha256": "48cee4e5dc075b82f18e8cb72044941a2ac8b1816907674f53597c9d12f9da08",
+    "bytes": 817739
+  }
+}

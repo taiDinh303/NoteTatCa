@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "2132f85f-55e0-4080-b70e-9666d9ae5cc6",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\21-trash-khoi-phuc\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\21-trash-khoi-phuc\\21-trash-khoi-phuc.html",
+  "specification": {
+    "sha256": "485c7ce4b4d4da106ef31163cc6b989f841fabc39bd7b69b4a2c05651eeba1d3",
+    "bytes": 5638
+  },
+  "artifact": {
+    "sha256": "63d834045b3177e826539ab8eafd19578518402d038ac68341643be16bf84d29",
+    "bytes": 816560
+  }
+}

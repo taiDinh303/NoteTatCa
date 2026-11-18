@@ -48,3 +48,11 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+
+# Agent / local tooling outputs (never committed)
+.agnes/
+.archify/
+
+# Mascot source scratch (revision history + drafts, not shipped)
+assets/mascots/ntc-v6/revisions/
+assets/mascots/fox-standard-draft/

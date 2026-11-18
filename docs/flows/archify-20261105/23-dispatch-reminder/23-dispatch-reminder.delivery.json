@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "33b3a4a3-6b4d-44ed-a8e0-213e1e6d8ab9",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\23-dispatch-reminder\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\23-dispatch-reminder\\23-dispatch-reminder.html",
+  "specification": {
+    "sha256": "8d94a6b2af19b581bdad87afbcd90dc9639d6dbd6da51805c0f3bba50489f748",
+    "bytes": 5618
+  },
+  "artifact": {
+    "sha256": "d392a2becf0dad1290bb0cb1aeb2974ccaea334b118b7865ed5039da0ed52de8",
+    "bytes": 816542
+  }
+}

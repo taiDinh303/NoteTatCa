@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "193905f2-f827-46b8-a3dd-49d4fe7424fe",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\19-gan-label\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\19-gan-label\\19-gan-label.html",
+  "specification": {
+    "sha256": "a3b20f89c2b47ace95a3707d101b628b465553310160ea5aa7272a2086f3b668",
+    "bytes": 6318
+  },
+  "artifact": {
+    "sha256": "6049de45b207dd6cfe6a53bc93121abd077489ec1e07b2eb90a0efeabf4b2852",
+    "bytes": 819044
+  }
+}

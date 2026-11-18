@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6081a7d6-11af-40a2-94c2-43fae59a3374",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\29-tuy-chon-hien-thi\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\29-tuy-chon-hien-thi\\29-tuy-chon-hien-thi.html",
+  "specification": {
+    "sha256": "6e5cad1caa5ea6f32460e83b09e86893cfe72db25ef210784ed42dee4b4180f5",
+    "bytes": 6042
+  },
+  "artifact": {
+    "sha256": "95773bed12e8a608c7d0665ceb17bad50a68d254f99c8eed3efbcb2d17ffbc5c",
+    "bytes": 819518
+  }
+}

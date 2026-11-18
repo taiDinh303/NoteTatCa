@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e9300660-884b-46f6-854b-465e2ea6eb9c",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\15-mo-view-edit-zoom\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\15-mo-view-edit-zoom\\15-mo-view-edit-zoom.html",
+  "specification": {
+    "sha256": "8cf2c00cbfec880097361e82ba0b1c2267b1a7589d52b4cc70829fb0efbb496c",
+    "bytes": 6397
+  },
+  "artifact": {
+    "sha256": "00317038d8cc367c68d189d75170c1a6ce88390df34aef28cdd9361f9e054827",
+    "bytes": 819916
+  }
+}

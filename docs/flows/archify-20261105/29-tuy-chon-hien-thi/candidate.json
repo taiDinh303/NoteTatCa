@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-029 · Ngôn ngữ, theme, zoom và mascot có sẵn",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/29-tuy-chon-hien-thi/29-tuy-chon-hien-thi.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "frontend",
+      "label": "Chọn ngôn ngữ",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PreferencesPage.tsx",
+          "line": 41,
+          "end_line": 55
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "frontend",
+      "label": "Theme và mặc định note",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PreferencesPage.tsx",
+          "line": 59,
+          "end_line": 84
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "frontend",
+      "label": "Zoom riêng workspace",
+      "sources": [
+        {
+          "path": "ntc_react/src/shared/DisplayPreferences.tsx",
+          "line": 8,
+          "end_line": 48
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "frontend",
+      "label": "Giữ nội dung note",
+      "sources": [
+        {
+          "path": "ntc_react/src/shared/DisplayPreferences.tsx",
+          "line": 58,
+          "end_line": 64
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "frontend",
+      "label": "Dùng lại preference",
+      "sources": [
+        {
+          "path": "ntc_react/src/shared/DisplayPreferences.tsx",
+          "line": 65,
+          "end_line": 72
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "x4",
+      "lane": "exception",
+      "col": 4,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Storage bị chặn",
+      "sources": [
+        {
+          "path": "ntc_react/src/shared/DisplayPreferences.tsx",
+          "line": 65,
+          "end_line": 72
+        }
+      ]
+    },
+    {
+      "id": "x2",
+      "lane": "exception",
+      "col": 2,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Zoom ngoài range",
+      "sources": [
+        {
+          "path": "ntc_react/src/shared/DisplayPreferences.tsx",
+          "line": 8,
+          "end_line": 48
+        }
+      ]
+    },
+    {
+      "id": "x1",
+      "lane": "exception",
+      "col": 1,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Không hỗ trợ mobile",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PreferencesPage.tsx",
+          "line": 59,
+          "end_line": 84
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error4",
+      "from": "s4",
+      "to": "x4",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error2",
+      "from": "s2",
+      "to": "x2",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error1",
+      "from": "s1",
+      "to": "x1",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Preference không phải setting bảo mật hay dữ liệu được sync đa thiết bị.",
+        "Preset mascot không đồng nghĩa tác vụ AI; AI có consent và quota riêng."
+      ]
+    }
+  ]
+}

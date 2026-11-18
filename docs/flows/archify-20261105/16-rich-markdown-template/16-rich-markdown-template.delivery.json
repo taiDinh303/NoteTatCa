@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5103b388-1e8a-4c15-b8ca-ea37fb001014",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\16-rich-markdown-template\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\16-rich-markdown-template\\16-rich-markdown-template.html",
+  "specification": {
+    "sha256": "dc5c79833902694980f873f27996246b895ab162456d74fc65dd3c4a69cafe41",
+    "bytes": 6014
+  },
+  "artifact": {
+    "sha256": "2ffd95f50bd6a571cadce6555c91a78f65601e77171433f2a188c830d4f955a3",
+    "bytes": 819192
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "60f8d400-d7d0-4e51-8c2a-0b6bc985f5cc",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\32-gui-phan-hoi\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\32-gui-phan-hoi\\32-gui-phan-hoi.html",
+  "specification": {
+    "sha256": "c4d58e265f4251b9507dee07a646973a7201b72bb853f7c9df7a5e627c089ce3",
+    "bytes": 5573
+  },
+  "artifact": {
+    "sha256": "80c4aa8cbbcf2e5896cfca99692d7f9d96551853f4fb3c779fae5d0a996f6187",
+    "bytes": 816843
+  }
+}

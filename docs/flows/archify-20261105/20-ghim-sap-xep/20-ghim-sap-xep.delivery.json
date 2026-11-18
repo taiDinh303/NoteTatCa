@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "b1dc7dde-809f-4a6a-a09a-1491ea604a65",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\20-ghim-sap-xep\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\20-ghim-sap-xep\\20-ghim-sap-xep.html",
+  "specification": {
+    "sha256": "eff772a4e5dbff76cd06a753a799ea7ec0e9994eb66f0b0cae5c65360edd2b1a",
+    "bytes": 7029
+  },
+  "artifact": {
+    "sha256": "bf1db1c7fe408bd19aa7ba34670b37aba37a4360565d1c29b0a84604858cd6b1",
+    "bytes": 821619
+  }
+}

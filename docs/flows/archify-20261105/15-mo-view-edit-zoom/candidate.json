@@ -1,0 +1,268 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-015 · Mở note, chuyển View/Edit, fullscreen và zoom",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/15-mo-view-edit-zoom/15-mo-view-edit-zoom.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "frontend",
+      "label": "Lấy note hiện tại",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 113,
+          "end_line": 145
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "frontend",
+      "label": "Đăng ký đúng phiên",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteSurfaceHost.tsx",
+          "line": 28,
+          "end_line": 42
+        },
+        {
+          "path": "ntc_react/src/features/editor/NoteSurfaceHost.tsx",
+          "line": 81,
+          "end_line": 90
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "frontend",
+      "label": "Bố cục trước paint",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/ContentZoom.tsx",
+          "line": 126,
+          "end_line": 149
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "frontend",
+      "label": "View chỉ đọc",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 727,
+          "end_line": 739
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "frontend",
+      "label": "Bật Edit / trở View",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 520,
+          "end_line": 529
+        },
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 926,
+          "end_line": 947
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s5",
+      "lane": "main",
+      "col": 5,
+      "type": "frontend",
+      "label": "Giữ zoom và cuộn",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/ContentZoom.tsx",
+          "line": 34,
+          "end_line": 103
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "x0",
+      "lane": "exception",
+      "col": 0,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "404 • Lỗi đọc",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 113,
+          "end_line": 145
+        }
+      ]
+    },
+    {
+      "id": "x4",
+      "lane": "exception",
+      "col": 4,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Lỗi flush/409",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 520,
+          "end_line": 529
+        },
+        {
+          "path": "ntc_react/src/features/editor/NoteEditor.tsx",
+          "line": 926,
+          "end_line": 947
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e4",
+      "from": "s4",
+      "to": "s5",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error0",
+      "from": "s0",
+      "to": "x0",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error4",
+      "from": "s4",
+      "to": "x4",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Không tự thay read-only document bằng editor sau một vài frame.",
+        "Fullscreen/zoom là hiển thị; không đổi ownership hoặc dữ liệu note."
+      ]
+    }
+  ]
+}

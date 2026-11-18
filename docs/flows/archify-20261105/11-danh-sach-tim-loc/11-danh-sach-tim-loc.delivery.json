@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "2bffefd5-59d6-4546-946b-55d0ad7aaa9c",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\11-danh-sach-tim-loc\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\11-danh-sach-tim-loc\\11-danh-sach-tim-loc.html",
+  "specification": {
+    "sha256": "ae1690f37a6fee50f5ff7911ea6960c2fac6f62f3bee5d94f3d86cc0424a1594",
+    "bytes": 6085
+  },
+  "artifact": {
+    "sha256": "7f45a6f6021b4cb526810625ee4577780362f112f5defbd299b95f538d56b547",
+    "bytes": 818669
+  }
+}

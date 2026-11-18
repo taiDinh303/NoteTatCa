@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-023 · Worker tạo occurrence, nhắc bù và inbox",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/23-dispatch-reminder/23-dispatch-reminder.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "backend",
+      "label": "Chọn due batch",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 16,
+          "end_line": 21
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Tính occurrence",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 25,
+          "end_line": 33
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "Kiểm parent & hạn",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 34,
+          "end_line": 36
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "Tạo thông báo",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 37,
+          "end_line": 43
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "backend",
+      "label": "Advance lịch",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 45,
+          "end_line": 50
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "x2",
+      "lane": "exception",
+      "col": 2,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Parent không active • Ngoài24giờ",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 34,
+          "end_line": 36
+        }
+      ]
+    },
+    {
+      "id": "x4",
+      "lane": "exception",
+      "col": 4,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Concurrency",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 45,
+          "end_line": 50
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error2",
+      "from": "s2",
+      "to": "x2",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error4",
+      "from": "s4",
+      "to": "x4",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Catch-up chỉ một lần gần nhất trong24giờ, không replay toàn bộ lịch.",
+        "Month/DST theo ReminderSchedule; không lấy timezone hệ điều hành làm timezone user."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "97b83bcc-5054-4256-96be-2765a7bee362",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\12-luu-offline\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\12-luu-offline\\12-luu-offline.html",
+  "specification": {
+    "sha256": "98a961fff86b6874303eacf4b4825dcdd684a95286128ec615ef6d04462447c6",
+    "bytes": 5915
+  },
+  "artifact": {
+    "sha256": "4f6eebd3fdab15b2a9be36cb42c89b798f5e8964a3cae51938988babd548b71a",
+    "bytes": 819243
+  }
+}

@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-016 · Định dạng rich text, checklist, mẫu, mục lục và Markdown",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/16-rich-markdown-template/16-rich-markdown-template.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4",
+    "s5"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "frontend",
+      "label": "Soạn có cấu trúc",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 78,
+          "end_line": 128
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "frontend",
+      "label": "Chèn mẫu",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/NoteTemplates.tsx",
+          "line": 51,
+          "end_line": 80
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "frontend",
+      "label": "Điều hướng heading",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/ReadOnlyContent.tsx",
+          "line": 210,
+          "end_line": 255
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "frontend",
+      "label": "Import có cảnh báo",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 600,
+          "end_line": 649
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "frontend",
+      "label": "Export có giới hạn",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 655,
+          "end_line": 680
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s5",
+      "lane": "main",
+      "col": 5,
+      "type": "frontend",
+      "label": "Lưu canonical",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 170,
+          "end_line": 188
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "x5",
+      "lane": "exception",
+      "col": 5,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Validation",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 170,
+          "end_line": 188
+        }
+      ]
+    },
+    {
+      "id": "x3",
+      "lane": "exception",
+      "col": 3,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Import lỗi • Hủy xác nhận",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/editor/RichEditor.tsx",
+          "line": 600,
+          "end_line": 649
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e4",
+      "from": "s4",
+      "to": "s5",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error5",
+      "from": "s5",
+      "to": "x5",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error3",
+      "from": "s3",
+      "to": "x3",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Export Markdown không bảo toàn mọi màu, font size, highlight, căn lề.",
+        "Đây không phải luồng upload attachments hoặc trình soạn công thức."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "57d1e33d-ff61-4ee3-b485-83c97c5f3f8e",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\24-delivery-email\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\24-delivery-email\\24-delivery-email.html",
+  "specification": {
+    "sha256": "d0eb1fc7f9363cbce34f4cc7cf6a3ea560404591fb04be8af463ded2d0fd4586",
+    "bytes": 5853
+  },
+  "artifact": {
+    "sha256": "ba440658994d2d3a36db50417d64635ac76e7c6c8af8af8d282d63d9e2bd2a4d",
+    "bytes": 816873
+  }
+}

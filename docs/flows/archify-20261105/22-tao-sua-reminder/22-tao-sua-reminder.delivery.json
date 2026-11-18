@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "34de3e42-cc83-4afa-89ab-264ac3abd18a",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\22-tao-sua-reminder\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\22-tao-sua-reminder\\22-tao-sua-reminder.html",
+  "specification": {
+    "sha256": "af0c48677aab6f9faec1f55681d71811e3201fde752ea107a02a67c702253ac0",
+    "bytes": 6836
+  },
+  "artifact": {
+    "sha256": "8e5a3ddc76eb632f01c802b542ac01549a01c0243bc2393ec0e3fb2edd127621",
+    "bytes": 820632
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "15dfa89f-c8d7-4f2e-ba4a-2b32760bb52b",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\07-lien-ket-google\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\07-lien-ket-google\\07-lien-ket-google.html",
+  "specification": {
+    "sha256": "febe5c096756fe89aa7b35dc30c7ff926742ea3fb1fd254018de3a4f98ac359a",
+    "bytes": 5470
+  },
+  "artifact": {
+    "sha256": "5ce2ce2ddc8baf982cadfd311071a699c906ad80b7f6175ae5bf3197b46e0404",
+    "bytes": 816255
+  }
+}

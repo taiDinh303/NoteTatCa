@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-003 · Đăng nhập Google",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/03-google-dang-nhap/03-google-dang-nhap.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "frontend",
+      "label": "Nhận ID token",
+      "sources": [
+        {
+          "path": "ntc_react/src/application/auth.ts",
+          "line": 292,
+          "end_line": 304
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Xác minh Google",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 93,
+          "end_line": 98
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "Đối chiếu email",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 99,
+          "end_line": 102
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "Tạo hoặc dùng user",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 103,
+          "end_line": 109
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "backend",
+      "label": "Cấp phiên",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 110,
+          "end_line": 111
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "x1",
+      "lane": "exception",
+      "col": 1,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Token không hợp lệ",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 93,
+          "end_line": 98
+        }
+      ]
+    },
+    {
+      "id": "x2",
+      "lane": "exception",
+      "col": 2,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "409 GOOGLE_LINK_REQUIRED",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 99,
+          "end_line": 102
+        }
+      ]
+    },
+    {
+      "id": "x4",
+      "lane": "exception",
+      "col": 4,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "403",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/AuthService.cs",
+          "line": 110,
+          "end_line": 111
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error1",
+      "from": "s1",
+      "to": "x1",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error2",
+      "from": "s2",
+      "to": "x2",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error4",
+      "from": "s4",
+      "to": "x4",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Không tự nối tài khoản chỉ vì cùng email.",
+        "Tài khoản Google mới không đồng nghĩa đã có mật khẩu cục bộ."
+      ]
+    }
+  ]
+}

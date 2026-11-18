@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5533cde5-62d2-4af2-a6b2-24face43ba64",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\10-chuan-bi-workspace\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\10-chuan-bi-workspace\\10-chuan-bi-workspace.html",
+  "specification": {
+    "sha256": "c6a818262d5cb839bdc8a6f93e9442eb5cba8f1cddec228d7b1d6dad24d9d8d8",
+    "bytes": 6006
+  },
+  "artifact": {
+    "sha256": "f0082edfda0c544024527093ad5484786aa9f0e260a58c34ef7d1e952bf6643a",
+    "bytes": 819418
+  }
+}

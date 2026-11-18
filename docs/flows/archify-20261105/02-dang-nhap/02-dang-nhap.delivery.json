@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "b5da7a4a-f0fc-4afc-9056-be0ca695f355",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\02-dang-nhap\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\02-dang-nhap\\02-dang-nhap.html",
+  "specification": {
+    "sha256": "b732a2ef1fdc8e058802f6c04bb674cd9ced0bb121ed1024caf762c6808bfc9a",
+    "bytes": 6083
+  },
+  "artifact": {
+    "sha256": "aa7773986baf498738856f7d0b8b76d23fd36a810bf68e6e4b201725bc726c0a",
+    "bytes": 819409
+  }
+}

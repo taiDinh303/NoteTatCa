@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "349629a3-0dc9-4065-b628-4d119ffe955f",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\37-maintenance-health\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\37-maintenance-health\\37-maintenance-health.html",
+  "specification": {
+    "sha256": "181d425ca3c58183dcb4f5d90ace63c3702a1952365bc5ff82b50a021f69981f",
+    "bytes": 6023
+  },
+  "artifact": {
+    "sha256": "58bc6d02aaac28992f94900f2e94835e6f999a8f8986c2a792607bfea73498c1",
+    "bytes": 818518
+  }
+}

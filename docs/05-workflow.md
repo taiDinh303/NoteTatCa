@@ -1,6 +1,6 @@
 # 05 — Luồng nghiệp vụ
 
-> 2026-10-17 | Backend CURRENT; trạng thái UX React vẫn TARGET.
+> Bổ sung 2026-11-05: [37 đặc tả chi tiết và sơ đồ Archify](flows/README.md) đối chiếu source commit46e8341. Các phần WF dưới đây giữ nhóm và lịch sử quyết định, không dùng riêng làm snapshot React hiện hành. CURRENT của bộ mới nghĩa là quan sát source, không phải xác nhận production.
 
 ## WF-001 — Đăng ký, đăng nhập và phiên
 

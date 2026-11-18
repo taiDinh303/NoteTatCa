@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "8c7f1930-c741-444f-ad6b-7089102fc840",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\18-quan-ly-label\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\18-quan-ly-label\\18-quan-ly-label.html",
+  "specification": {
+    "sha256": "983fac533a5d9f068a28abf8012184734667593736dbce0f9e672d55d2290a95",
+    "bytes": 5390
+  },
+  "artifact": {
+    "sha256": "ccb9eee656460fbd9dfadf9cc697dfbfb77ebf9da981707e791d8f3583ad80cb",
+    "bytes": 816090
+  }
+}

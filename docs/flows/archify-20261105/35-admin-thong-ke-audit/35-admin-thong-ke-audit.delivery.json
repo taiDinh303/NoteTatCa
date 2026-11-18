@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "d3dc6080-7e88-4dce-b4c4-55da9f44766a",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\35-admin-thong-ke-audit\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\35-admin-thong-ke-audit\\35-admin-thong-ke-audit.html",
+  "specification": {
+    "sha256": "4c8de89e9b0fd2b4f29951dc02a56cf2efaa9ac91ea5026065e7526ab0366a52",
+    "bytes": 5510
+  },
+  "artifact": {
+    "sha256": "65dda71bd3da04271ac9132f009b7f4524415d46c3f52b9439145c54db7daf3a",
+    "bytes": 816743
+  }
+}

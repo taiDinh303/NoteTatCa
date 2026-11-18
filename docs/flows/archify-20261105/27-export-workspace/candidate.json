@@ -1,0 +1,230 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-027 · Xuất bản sao lưu workspace JSON",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/27-export-workspace/27-export-workspace.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "frontend",
+      "label": "Kiểm pending",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PrivacySettings.tsx",
+          "line": 20,
+          "end_line": 24
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Đọc graph self",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/WorkspaceArchiveService.cs",
+          "line": 17,
+          "end_line": 29
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "Dựng archive schema1",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/WorkspaceArchiveService.cs",
+          "line": 31,
+          "end_line": 49
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "frontend",
+      "label": "Tải JSON",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PrivacySettings.tsx",
+          "line": 24,
+          "end_line": 33
+        }
+      ],
+      "tag": "CLIENT"
+    },
+    {
+      "id": "x0",
+      "lane": "exception",
+      "col": 0,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Pending edits",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PrivacySettings.tsx",
+          "line": 20,
+          "end_line": 24
+        }
+      ]
+    },
+    {
+      "id": "x1",
+      "lane": "exception",
+      "col": 1,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "401/403",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Service/WorkspaceArchiveService.cs",
+          "line": 17,
+          "end_line": 29
+        }
+      ]
+    },
+    {
+      "id": "x3",
+      "lane": "exception",
+      "col": 3,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Mạng hoặc download lỗi",
+      "sources": [
+        {
+          "path": "ntc_react/src/features/settings/PrivacySettings.tsx",
+          "line": 24,
+          "end_line": 33
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error0",
+      "from": "s0",
+      "to": "x0",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error1",
+      "from": "s1",
+      "to": "x1",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error3",
+      "from": "s3",
+      "to": "x3",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Archive không chứa credential, auth session hoặc toàn bộ inbox đã gửi.",
+        "Đây là logical export, không thay backup database và restore drill vận hành."
+      ]
+    }
+  ]
+}

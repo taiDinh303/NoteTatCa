@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "0e6d9e15-c899-4937-b51b-8860998914e8",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\08-guest-local\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\08-guest-local\\08-guest-local.html",
+  "specification": {
+    "sha256": "9e4c44e99316cc20ca82a50b00aa0480d045f2d662ab18467036d0dac373d82d",
+    "bytes": 5435
+  },
+  "artifact": {
+    "sha256": "ddff919876b1eb9aa342622a74d2eee87feed90578e1473c9bfc5bd27da1d6ea",
+    "bytes": 817142
+  }
+}

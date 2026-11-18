@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "c4b28524-b538-4205-8c37-04bdcb6f8c2f",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\34-admin-role\\candidate.json",
+  "output": "D:\\My Projects\\NoteTatCa\\docs\\flows\\archify-20261105\\34-admin-role\\34-admin-role.html",
+  "specification": {
+    "sha256": "9992e49c08e83cbf6ce4cb0dd73239b13b90965df1f304b350a886d06ed7794b",
+    "bytes": 6116
+  },
+  "artifact": {
+    "sha256": "ff269574481003c7c522eb98419b0a87954ba124acd455af2e0b429f73bd28c5",
+    "bytes": 818659
+  }
+}

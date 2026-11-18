@@ -1,0 +1,253 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FLOW-037 · Khởi động API, health và bảo trì định kỳ",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.workflow": "Sơ đồ luồng NoteTatCa được tạo bằng Archify.",
+      "node.focus": "Xem {label}",
+      "node.focus.detail": "Xem {label}, {detail}",
+      "node.context.workflow": "Bước xử lý",
+      "legend.title": "Chú giải",
+      "legend.workflow.frontend": "Giao diện / client",
+      "legend.workflow.backend": "Xử lý nghiệp vụ",
+      "legend.workflow.security": "Kiểm tra / ngoại lệ",
+      "legend.workflow.external": "Tác nhân / sự kiện",
+      "viewer.toolbar.actions": "Công cụ sơ đồ",
+      "viewer.theme.toggle.title": "Đổi giao diện (T)",
+      "viewer.theme.toggle": "Đổi sáng/tối",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.motion.live": "Chuyển động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.kind.frontend": "Client",
+      "viewer.kind.backend": "Xử lý",
+      "viewer.kind.security": "Kiểm tra",
+      "viewer.kind.external": "Tác nhân"
+    },
+    "output": "docs/flows/archify-20261105/37-maintenance-health/37-maintenance-health.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/taiDinh303/NoteTatCa",
+      "revision": "46e8341d2ea6b4ff13eca36a61cc19a0095f0b2e",
+      "provider": "github",
+      "link_mode": "web"
+    }
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Luồng chính"
+    },
+    {
+      "id": "exception",
+      "label": "Ngoại lệ",
+      "variant": "exception"
+    }
+  ],
+  "mainPath": [
+    "s0",
+    "s1",
+    "s2",
+    "s3",
+    "s4"
+  ],
+  "nodes": [
+    {
+      "id": "s0",
+      "lane": "main",
+      "col": 0,
+      "type": "backend",
+      "label": "Đăng ký worker có điều kiện",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.API/DependencyInjection.cs",
+          "line": 47,
+          "end_line": 47
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s1",
+      "lane": "main",
+      "col": 1,
+      "type": "backend",
+      "label": "Health độc lập",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.API/Program.cs",
+          "line": 90,
+          "end_line": 95
+        }
+      ],
+      "tag": "SERVER"
+    },
+    {
+      "id": "s2",
+      "lane": "main",
+      "col": 2,
+      "type": "backend",
+      "label": "Tick có scope mới",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.API/Jobs/MaintenanceWorker.cs",
+          "line": 5,
+          "end_line": 21
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s3",
+      "lane": "main",
+      "col": 3,
+      "type": "backend",
+      "label": "Purge note quá hạn",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 102,
+          "end_line": 119
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "s4",
+      "lane": "main",
+      "col": 4,
+      "type": "backend",
+      "label": "Dọn identity state",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 121,
+          "end_line": 129
+        }
+      ],
+      "tag": "JOB"
+    },
+    {
+      "id": "x1",
+      "lane": "exception",
+      "col": 1,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "503 ready",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.API/Program.cs",
+          "line": 90,
+          "end_line": 95
+        }
+      ]
+    },
+    {
+      "id": "x3",
+      "lane": "exception",
+      "col": 3,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Concurrency",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.Services/Jobs/BackgroundMaintenanceService.cs",
+          "line": 102,
+          "end_line": 119
+        }
+      ]
+    },
+    {
+      "id": "x2",
+      "lane": "exception",
+      "col": 2,
+      "type": "security",
+      "label": "Dừng / khôi phục",
+      "sublabel": "Batch lỗi",
+      "sources": [
+        {
+          "path": "ntc_aspnet/NTC.API/Jobs/MaintenanceWorker.cs",
+          "line": 5,
+          "end_line": 21
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e0",
+      "from": "s0",
+      "to": "s1",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e1",
+      "from": "s1",
+      "to": "s2",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e2",
+      "from": "s2",
+      "to": "s3",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e3",
+      "from": "s3",
+      "to": "s4",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "error1",
+      "from": "s1",
+      "to": "x1",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error3",
+      "from": "s3",
+      "to": "x3",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "error2",
+      "from": "s2",
+      "to": "x2",
+      "label": "Lỗi",
+      "role": "error",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Phạm vi & bằng chứng",
+      "items": [
+        "CURRENT · source tại 46e8341",
+        "Mã nguồn không thay thế kiểm thử runtime."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Quy tắc",
+      "items": [
+        "Mô tả đường chạy khi enabled, không khẳng định jobs production hiện đang bật.",
+        "Không chạy purge, migration hay email thật trong đợt tạo đặc tả."
+      ]
+    }
+  ]
+}
