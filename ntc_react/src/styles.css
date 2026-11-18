@@ -4738,6 +4738,7 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
 
 .note-editor-modal { --note-chrome-inset: 32px; }
 .note-editor-modal .rich-editor { padding-inline: var(--note-chrome-inset); }
+.note-editor-modal .note-viewer .rich-editor { padding-top: 0; }
 @container viewport (max-width: 800px) {
   .note-editor-modal { --note-chrome-inset: 24px; }
 }
