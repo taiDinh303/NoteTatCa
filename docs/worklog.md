@@ -2789,3 +2789,11 @@ Persistent note panel (remove modal) 2026-11-18: owner asked for the best note-o
 - useBackgroundPages.ts: moved `loadNoteEditor()` + `loadRichEditor()` to the front of the background queue (`tasks.unshift`) so the two heaviest chunks (680 KB + 497 KB) warm before every page; with the panel always in the DOM the editor modules are ready by the time a card is tapped, so first and subsequent opens render instantly with no spinner.
 - e2e/content-zoom.spec.ts: the View/Edit geometry sampler read `.modal-overlay` next to the note; updated to sample the panel itself (no overlay any more).
 - Validation: `tsc --noEmit` 0; Vite 8 production build PASS (NoteEditor ~697 KB / RichEditor ~509 KB chunks unchanged, no new top-level bundle); scoped ESLint on changed files PASS; unit suite 21 files / 164 tests PASS, 1 skipped. Physical PWA acceptance (panel geometry on device, landscape full-screen) and E2E landscape run still pending a live 5199 fixture / hard-refresh. No API/data/model/ownership change.
+
+Panel geometry + Keep-style backdrop refinements 2026-11-18: owner iterated on the desktop panel look in the same session.
+- 93c829a: panel centered horizontally (`left:50%` + `translateX(-50%)`) instead of a right-aligned side pane.
+- 3f7d6f1: shorter panel with an 88px mascot strip above and 24px gap below (`top:165px/bottom:24px`), wider card look `min(700px,58vw)`, radius 14px + border.
+- a6293dd: panel spans the content area (left 258px = 242px sidebar + 16px), centered on full window when `.customer-shell.sidebar-hidden` (desktop media ≥801px).
+- 1b07865: per owner, fixed centered Keep-style regardless of sidebar (no more sidebar-dependent rule); width `min(1160px,100vw−96px)`.
+- 1694064: panel top raised to 124px; re-added a Keep-style backdrop `.note-surface-backdrop` (z-70, `#0f141a14` tint + 2px blur) rendered from NoteSurfaceHost when the panel is visible; clicking it closes the note through the same close path (autosave, mobile first-close). Panel z-index 71 stays above the backdrop. Mobile/landscape rules unaffected (`inset:0; width:100%` overrides).
+- Validation: after 1694064 — `tsc --noEmit` PASS, scoped ESLint PASS, Vite build PASS. content-zoom/landscape E2E not re-run this session (no live 5199 fixture); content-zoom sampler was already fixed to the panel in 6d1f3ae.
