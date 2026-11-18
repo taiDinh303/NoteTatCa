@@ -17,7 +17,7 @@ import { t as tr, useLanguage } from "../../shared/i18n";
 import { ActionMenu, IconButton } from "../../shared/ui";
 import { CardLabels } from "./CardLabels";
 import { NoteMascot } from "../mascot/NoteMascot";
-import { warmNoteEditor } from "../editor/loadNoteEditor";
+import { warmNoteWorkspace } from "../editor/loadNoteEditor";
 import type { NoteOpenAction } from "../editor/NoteEditor";
 export const NoteCard = memo(function NoteCard({
   note,
@@ -95,8 +95,8 @@ export const NoteCard = memo(function NoteCard({
       }}
       className={`note-card ${draggable ? "draggable" : ""} ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}
-      onPointerEnter={warmNoteEditor}
-      onFocus={warmNoteEditor}
+      onPointerEnter={warmNoteWorkspace}
+      onFocus={warmNoteWorkspace}
       onClick={(event) => {
         // Title/preview and action controls handle their own clicks. Let the
         // rest of the card open the note without nesting interactive elements.
@@ -118,7 +118,7 @@ export const NoteCard = memo(function NoteCard({
         if (canStartDrag(event.target)) listeners?.onMouseDown?.(event);
       }}
       onTouchStart={(event) => {
-        warmNoteEditor();
+        warmNoteWorkspace();
         if (canStartDrag(event.target)) listeners?.onTouchStart?.(event);
       }}
     >

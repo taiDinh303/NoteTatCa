@@ -63,7 +63,7 @@ import {
   Spinner,
 } from "../../shared/ui";
 import { errorMessage } from "../../shared/utils";
-import { warmNoteEditor } from "../editor/loadNoteEditor";
+import { scheduleWarmNoteWorkspace, warmNoteWorkspace } from "../editor/loadNoteEditor";
 import NoteEditor from "../editor/NoteEditorLoader";
 import { NoteSurfaceHost } from "../editor/NoteSurfaceHost";
 import type { NoteOpenAction } from "../editor/NoteEditor";
@@ -129,6 +129,11 @@ export default function NotesPage({
     });
     return () => { toast.dismiss(id); };
   }, [orderNotSaved]);
+  // Preload the heavy editor + rich editor chunks during idle so the first
+  // note open renders instantly instead of blocking on ~1.2 MB of JS.
+  useEffect(() => {
+    scheduleWarmNoteWorkspace();
+  }, []);
   const all = useMemo(() => {
     const stored = sortNotes(query.data?.pages.flatMap((p) => p.items) ?? []);
     return [true, false].flatMap((pinned) => {
@@ -317,9 +322,9 @@ export default function NotesPage({
           <button
             className="quick-capture"
             aria-label={tr("Take a note")}
-            onPointerEnter={warmNoteEditor}
-            onFocus={warmNoteEditor}
-            onTouchStart={warmNoteEditor}
+            onPointerEnter={warmNoteWorkspace}
+            onFocus={warmNoteWorkspace}
+            onTouchStart={warmNoteWorkspace}
             onClick={() => setEditor({})}
           >
             <span className="quick-capture-icon">

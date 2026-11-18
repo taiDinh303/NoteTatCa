@@ -9,7 +9,7 @@ import type { InboxItem, Page } from "../../domain/models";
 import { useAuth } from "../../shared/hooks";
 import { Button, EmptyState, ErrorPanel, Spinner } from "../../shared/ui";
 import { dateTime, errorMessage } from "../../shared/utils";
-import { warmNoteEditor } from "../editor/loadNoteEditor";
+import { warmNoteWorkspace } from "../editor/loadNoteEditor";
 import NoteEditor from "../editor/NoteEditorLoader";
 export default function InboxPage() {
   useLanguage();
@@ -156,9 +156,9 @@ export default function InboxPage() {
               </div>
               <button
                 className="inbox-item-open"
-                onPointerEnter={warmNoteEditor}
-                onFocus={warmNoteEditor}
-                onTouchStart={warmNoteEditor}
+                onPointerEnter={warmNoteWorkspace}
+                onFocus={warmNoteWorkspace}
+                onTouchStart={warmNoteWorkspace}
                 onClick={() => {
                   if (item.noteId) setOpenedNote(item.noteId);
                   if (!item.readAt) {

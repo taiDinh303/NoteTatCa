@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useAuth } from "../shared/hooks";
 import { account, admin, auth, cache } from "./runtime";
 import { isAdministrator } from "../application/access";
+import { loadNoteEditor } from "../features/editor/loadNoteEditor";
+import { loadRichEditor } from "../features/editor/loadRichEditor";
 
 /** Shells mount after priority notes preparation; secondary reads never gate navigation. */
 export function useBackgroundPages() {
@@ -43,6 +45,9 @@ export function useBackgroundPages() {
       () => import("../features/hidden/VaultRecovery"),
     );
     tasks.push(() => import("../features/settings/SettingsPage"), () => import("../features/settings/PrivacySettings"), () => import("../features/help/HelpPage"));
+    // Preload the two heaviest note-open chunks (NoteEditor ~680 KB, RichEditor ~497 KB)
+    // so the first note open renders instantly from the module cache.
+    tasks.push(() => loadNoteEditor(), () => loadRichEditor());
     let next = 0;
     const worker = async () => {
       while (!cancelled && next < tasks.length) { const task = tasks[next++]; try { guard(); await task(); } catch { /* Own page handles errors and retry. */ } }
