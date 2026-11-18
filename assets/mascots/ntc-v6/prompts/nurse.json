@@ -1,0 +1,14 @@
+{
+  "name": "nurse",
+  "prompt": "Precise anatomy/proportion EDIT of first image, an18-frame character atlas. Keep THIS character's identity, species, colors, textures, facial features and polished illustration style. Second image is ONLY a numerical size guide, NOT a character or clothing design. Do NOT copy another species or any human torso into an animal/robot. Redraw coherent whole characters, never pasted head/body parts or seams. Rebuild all18cells consistently: exactly6columns3rows, wide2:1atlas with generous clear gutters and square cells. All18torsos/bases have EXACT SAME front-facing silhouette,width,height,center,baseline; no body turning/leaning when eyes/headturn. Numerical standard in a conceptual448squarecell (scale uniformly with output): bodywidth140,height54,centerx224,bodytop330,flatbase384. Core head chin at330, centerx224. Its target W/H is given below. Ears/antlers/hats/antennas/projecting hair extend into headroom WITHOUT shrinking the face or body. Keep natural head shape; the target core-head bounding area is approximately22560 squarepixels, matching Fox188x120, not counting appendages. This equalizes OPTICAL HEAD SIZE across naturally round and long heads. Do not keep old wrong sizes. Head neither oversized relative to this body nor tiny. Preserve18mapping: LEFT3columns9gazes row1upleft/up/upright,row2left/center/right,row3downleft/straightdown/downright. All9eyes OPEN, neutral pleasant mouth, gentle gaze turn; downcenter both eyes open symmetric pupilsDOWN, not sad/sleepy/sideways. RIGHT3columns9reactions blink/heart/sparkle;surprise/wink/bashful;sleepy/dizzy/delighted. Draw same head and body scale through poses, head pivots around same attachment. True transparent alpha outside sprites, no backdrop/glow/gradient/shadow/checkerboard or neighboring fragments. NO reference boxes/text/lines/numbers. Whole bust inside eachcell with ample empty margins.\nSUBJECT: a friendly light-skinned NURSE with a short black bob, white nurse cap with a small RED PLUS symbol, pale mint scrub top.\nTARGET CORE HEAD: 158px WIDE x143px HIGH, chin/attachmenty330, preserve its natural aspect/character; adapt the coherent drawing to this target. BODY:140W x54H. These are separate ANATOMICAL SIZE targets inside ONE coherent drawing, not a request to cut/paste parts.\nHUMAN BODY: retain this person's natural human neck and same original clothing, fitted to140x54 including neck; don't make shoulders/chest huge and head small. Human anatomy is allowed ONLY because this subject is a person.",
+  "head": [
+    158,
+    143
+  ],
+  "body": [
+    140,
+    54
+  ],
+  "generatedFile": "C:\\Users\\ADMIN\\.codex\\generated_images\\01a18152-8b34-7ea2-8ab4-6d08585ab486\\exec-ef1c6e1f-f076-4d89-814b-3be2be8039c4.png",
+  "mode": "built-in image_gen"
+}

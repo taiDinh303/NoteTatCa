@@ -1,0 +1,118 @@
+{
+  "method": "Manual anatomical landmarks on neutral frame; no automatic facial recognition",
+  "targetHeadArea": 22560,
+  "targetBody": [
+    140,
+    54
+  ],
+  "entries": {
+    "bear": {
+      "sha256": "f71a3586fc3922b94de940c75c1a35aebe1ad99adc74d89d5ebee0dd2565d21d",
+      "headBounds": [
+        140,
+        202,
+        308,
+        332
+      ],
+      "bodyTop": 332,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "bunny": {
+      "sha256": "c65d8c1d7d8d85645342626400fffefd7f3e1289a3ed56858306cb9d1e7749c8",
+      "headBounds": [
+        134,
+        210,
+        314,
+        333
+      ],
+      "bodyTop": 333,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "cat": {
+      "sha256": "3789088a352334ac8a6ee01ec116ffadb1d1cd93fa5b905e0fd052915230e6c4",
+      "headBounds": [
+        126,
+        224,
+        322,
+        333
+      ],
+      "bodyTop": 333,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "dino": {
+      "sha256": "eac2ddfec0af854b7d7584ed4f2b8642db79306e876a08c342c7964c02aaab91",
+      "headBounds": [
+        138,
+        210,
+        307,
+        334
+      ],
+      "bodyTop": 334,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "fox": {
+      "sha256": "dec58a1e5f7d4da40761577ad2c0ee7fc62ed5223853656819af59ec7fd902ee",
+      "headBounds": [
+        130,
+        210,
+        318,
+        330
+      ],
+      "bodyTop": 330,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "frog": {
+      "sha256": "5c77a22b86dbcf84253a585835059bb0d29170c3dd19403301163f1bfc966d28",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    },
+    "hamster": {
+      "sha256": "ff95fbfcc451b022185252c00d32e8c6c60bd51c4bfc439c01011052845d1aba",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    },
+    "hedgehog": {
+      "sha256": "4c6181d8eba012b19fd4aa073ceade99e3c74c53697b152c163a711a1d01eca5",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    },
+    "notebook": {
+      "sha256": "20529755573c0d36fbe4304a08cfdd222a703fb99fffde544e6d9b29e1534441",
+      "headBounds": [
+        128,
+        209,
+        322,
+        321
+      ],
+      "bodyTop": 330,
+      "approved": true,
+      "reviewNote": "Visually measured on grid worksheet; appendages excluded from core head"
+    },
+    "otter": {
+      "sha256": "5ff985a10fc1c01cdc6a4b710ab09418893031ce11bec45a3ada4275ea33b594",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    },
+    "owl": {
+      "sha256": "c02d24b9bd50f86f6a6c66e43bb94133685a80fdf676731c9a62ba28d69a31c4",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    },
+    "paper": {
+      "sha256": "585f053e941b7d1fc0c1433bb0e7a75b0f2f52efad84b0939471ea9fbe58ad15",
+      "headBounds": null,
+      "bodyTop": null,
+      "approved": false
+    }
+  }
+}
