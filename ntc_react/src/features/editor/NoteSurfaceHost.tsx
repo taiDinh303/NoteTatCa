@@ -38,6 +38,15 @@ export function NoteSurfaceHost({ open, session, onClose, children }: {
   return <Surface.Provider value={context}>
     <NoteSurfaceVisibility.Provider value={visible}>
     {children}
+    {visible ? (
+      /* Keep-style backdrop: a light blur over the list. Clicking it
+         dismisses the note through the same close path as the Close
+         button (autosave, mobile first-close). */
+      <div
+        className="note-surface-backdrop"
+        onClick={() => (frame?.onClose ?? onClose)()}
+      />
+    ) : null}
     <div
       ref={panel}
       className={`modal wide note-surface-ready ${frame?.className ?? "note-editor-modal"}`}

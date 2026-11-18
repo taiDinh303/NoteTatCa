@@ -4579,7 +4579,7 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
    removed. A wide, floating card with room above (mascot strip) and below.
    (Measured insets at the 2026-11-18 reference screen.) */
 .modal.note-editor-modal {
-  top: calc(165px / var(--interface-scale));
+  top: calc(124px / var(--interface-scale));
   bottom: calc(24px / var(--interface-scale));
   left: 50%;
   transform: translateX(-50%);
@@ -4592,6 +4592,17 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   border: 1px solid var(--border);
   box-shadow: 0 18px 60px #17242c22;
   animation: none;
+  z-index: 71;
+}
+/* Keep-style backdrop: a very light blur + tint. Blocks the list behind and
+   clicking it closes the note (handler on the element in NoteSurfaceHost). */
+.note-surface-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: #0f141a14;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 .note-editor-modal > .editor-heading {
   border-top-left-radius: inherit;
