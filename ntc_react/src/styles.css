@@ -4574,23 +4574,24 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* Persistent note panel: a centered editor pane on desktop so the notes
-   list stays visible around it. No backdrop — the Radix dialog was
-   removed. Centered horizontally, full height under the topbar. */
+/* Persistent note panel: a centered card on desktop, floating with room
+   above (mascot strip under the header) and below (breathing gap). No
+   backdrop — the Radix dialog was removed. A little wider than the list
+   card so it reads as the "expanded" card. */
 .modal.note-editor-modal {
-  top: calc(77px / var(--interface-scale));
+  top: calc((77px + 88px) / var(--interface-scale));
   right: auto;
-  bottom: 0;
+  bottom: calc(44px / var(--interface-scale));
   left: 50%;
   transform: translateX(-50%);
-  width: calc(min(560px, 46vw) / var(--interface-scale));
+  width: calc(min(700px, 58vw) / var(--interface-scale));
   max-width: none;
   height: auto;
   max-height: none;
   overflow: visible;
-  border-radius: 0;
-  border: 0;
-  box-shadow: 0 0 40px #17242c18;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 60px #17242c22;
   animation: none;
 }
 .note-editor-modal > .editor-heading {
