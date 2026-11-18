@@ -4579,8 +4579,8 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
    removed. A wide, floating card with room above (mascot strip) and below.
    (Measured insets at the 2026-11-18 reference screen.) */
 .modal.note-editor-modal {
-  top: calc(58px / var(--interface-scale));
-  bottom: calc(58px / var(--interface-scale));
+  top: calc(150px / var(--interface-scale));
+  bottom: calc(80px / var(--interface-scale));
   left: 50%;
   transform: translateX(-50%);
   width: calc(min(1160px, 100vw - 96px) / var(--interface-scale));
