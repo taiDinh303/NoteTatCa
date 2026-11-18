@@ -38,15 +38,13 @@ export function NoteSurfaceHost({ open, session, onClose, children }: {
   return <Surface.Provider value={context}>
     <NoteSurfaceVisibility.Provider value={visible}>
     {children}
-    {visible ? (
-      /* Keep-style backdrop: a light blur over the list. Clicking it
-         dismisses the note through the same close path as the Close
-         button (autosave, mobile first-close). */
-      <div
-        className="note-surface-backdrop"
-        onClick={() => (frame?.onClose ?? onClose)()}
-      />
-    ) : null}
+    {/* Backdrop persists in the DOM so the GPU filter layer is already
+       composited; opening a note toggles `is-open` (opacity 0 → 1, 0.15s
+       ease-out) which never blocks the panel's visibility switch. */}
+    <div
+      className={`note-surface-backdrop${visible ? " is-open" : ""}`}
+      onClick={() => { if (visible) (frame?.onClose ?? onClose)(); }}
+    />
     <div
       ref={panel}
       className={`modal wide note-surface-ready ${frame?.className ?? "note-editor-modal"}`}

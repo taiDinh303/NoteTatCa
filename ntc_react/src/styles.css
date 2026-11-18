@@ -4594,13 +4594,27 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   animation: none;
   z-index: 71;
 }
-/* Keep-style backdrop: a very light tint. No backdrop-filter (janks on
-   scroll/zoom under the panel). Clicking it closes the note. */
+/* Keep-style backdrop: a very light blur + tint. The backdrop stays in the
+   DOM at all times; opening a note only animates its opacity (a cheap
+   compositor step). `will-change: filter` keeps the 2px blur cached on the
+   GPU so note-open is never blocked by a first-time filter paint. The
+   remaining cost is re-sampling the list while it actually moves behind
+   the panel — acceptable for a 2px blur. */
 .note-surface-backdrop {
   position: fixed;
   inset: 0;
   z-index: 70;
-  background: #0f141a18;
+  background: #0f141a14;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  will-change: filter, opacity;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+.note-surface-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
 }
 .note-editor-modal > .editor-heading {
   border-top-left-radius: inherit;
