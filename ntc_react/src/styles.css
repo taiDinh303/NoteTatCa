@@ -4594,15 +4594,13 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   animation: none;
   z-index: 71;
 }
-/* Keep-style backdrop: a very light blur + tint. Blocks the list behind and
-   clicking it closes the note (handler on the element in NoteSurfaceHost). */
+/* Keep-style backdrop: a very light tint. No backdrop-filter (janks on
+   scroll/zoom under the panel). Clicking it closes the note. */
 .note-surface-backdrop {
   position: fixed;
   inset: 0;
   z-index: 70;
-  background: #0f141a14;
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
+  background: #0f141a18;
 }
 .note-editor-modal > .editor-heading {
   border-top-left-radius: inherit;
@@ -4623,6 +4621,19 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   border: 0;
   border-radius: 0;
 }
+/* Smooth fullscreen enter/exit: the panel animates between its resting
+   rectangle and the full window instead of jumping. */
+@media (min-width: 801px) {
+  .modal.note-editor-modal {
+    transition:
+      top 0.2s ease-out,
+      bottom 0.2s ease-out,
+      width 0.2s ease-out,
+      height 0.2s ease-out,
+      border-radius 0.2s ease-out,
+      box-shadow 0.2s ease-out;
+  }
+}
 .note-editor-modal .editor-scroll {
   display: flex;
   flex-direction: column;
@@ -4632,7 +4643,7 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 24px 0;
+  padding: 12px 24px 0;
   overflow-wrap: anywhere;
 }
 .note-view-heading h2 { margin: 0; font-size: 20px; }
@@ -5099,8 +5110,8 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
 .note-editor-modal .editor-heading {
   gap: 12px;
   flex-wrap: nowrap;
-  min-height: 67px;
-  padding: 15px var(--note-chrome-inset);
+  min-height: 52px;
+  padding: 10px var(--note-chrome-inset);
 }
 .note-editor-modal .note-view-heading {
   border-bottom-color: transparent;
