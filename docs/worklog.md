@@ -2797,3 +2797,10 @@ Panel geometry + Keep-style backdrop refinements 2026-11-18: owner iterated on t
 - 1b07865: per owner, fixed centered Keep-style regardless of sidebar (no more sidebar-dependent rule); width `min(1160px,100vw−96px)`.
 - 1694064: panel top raised to 124px; re-added a Keep-style backdrop `.note-surface-backdrop` (z-70, `#0f141a14` tint + 2px blur) rendered from NoteSurfaceHost when the panel is visible; clicking it closes the note through the same close path (autosave, mobile first-close). Panel z-index 71 stays above the backdrop. Mobile/landscape rules unaffected (`inset:0; width:100%` overrides).
 - Validation: after 1694064 — `tsc --noEmit` PASS, scoped ESLint PASS, Vite build PASS. content-zoom/landscape E2E not re-run this session (no live 5199 fixture); content-zoom sampler was already fixed to the panel in 6d1f3ae.
+
+Panel polish refinements 2026-11-18 (continued same session):
+- 2ad5bc7: top/bottom gaps equalized to 48px (panel vertically centered, no header offset per owner).
+- c0a3309: 58px gaps (−20px panel height); 68px overshoot (e95bb80) reverted to 58px by e818eae.
+- 2157657: top raised to 150px to clear the rabbit mascot + headroom, bottom 80px.
+- c2d6623: (a) heading padding/min-height reduced (67→52px, 15→10px) so title sits closer to body; (b) `backdrop-filter: blur(2px)` removed from `.note-surface-backdrop` — the blur re-paints the transformed notes list on every scroll/zoom frame and was the measured jank; kept a subtle `#0f141a18` tint instead; (c) 0.2s ease-out transition on `top/bottom/width/height/border-radius/box-shadow` scoped to `min-width: 801px` so fullscreen enter/exit animates smoothly rather than jumping.
+- Vite build PASS after c2d6623. Physical PWA acceptance (full-screen transition on device) still pending owner hard-refresh.
