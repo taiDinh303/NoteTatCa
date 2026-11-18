@@ -4574,25 +4574,23 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
-/* Persistent note panel: a right-side editor pane on desktop so the notes
-   list stays visible alongside it (Joplin/Notion split view). No backdrop —
-   the Radix dialog was removed. */
+/* Persistent note panel: a centered editor pane on desktop so the notes
+   list stays visible around it. No backdrop — the Radix dialog was
+   removed. Centered horizontally, full height under the topbar. */
 .modal.note-editor-modal {
   top: calc(77px / var(--interface-scale));
-  right: 0;
+  right: auto;
   bottom: 0;
-  left: auto;
-  transform: none;
+  left: 50%;
+  transform: translateX(-50%);
   width: calc(min(560px, 46vw) / var(--interface-scale));
   max-width: none;
   height: auto;
   max-height: none;
   overflow: visible;
   border-radius: 0;
-  border-right: 0;
-  border-bottom: 0;
-  border-top: 0;
-  box-shadow: -12px 0 40px #17242c18;
+  border: 0;
+  box-shadow: 0 0 40px #17242c18;
   animation: none;
 }
 .note-editor-modal > .editor-heading {
