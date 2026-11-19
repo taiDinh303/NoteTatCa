@@ -37,7 +37,7 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
             registration.waiting.postMessage({ type: "SKIP_WAITING" });
           }
           registration.addEventListener("updatefound", () => {
-            const next = registration.newWorker;
+            const next = registration.installing;
             if (!next) return;
             next.addEventListener("statechange", () => {
               // A newer worker is installed while an older one still controls

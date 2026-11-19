@@ -1,3 +1,8 @@
+## Sửa build Vercel: ServiceWorkerRegistration.newWorker → installing — 2026-11-19
+
+- Vercel build commit `9bb7e77` FAIL tại `tsc -b`: `main.tsx(40,39) error TS2339: Property 'newWorker' does not exist on type 'ServiceWorkerRegistration'`. `newWorker` không phải thuộc tính chuẩn trong lib.dom; worker mới phát qua sự kiện `updatefound` là `registration.installing`. Đổi `registration.newWorker` → `registration.installing` (logic skipWaiting/controllerchange không đổi).
+- Validation: `tsc -b` PASS (đúng buildCommand Vercel); `vite build` PASS, `dist/offline-worker.js` có `SKIP_WAITING`; vitest scoped `src/shared src/app` 14/14 PASS. Build Vercel trước đó (1c20052) chưa chạy do lỗi này.
+
 ## PWA tự cập nhật shell + chặn pinch trên phone — 2026-11-19
 
 - Chủ dự án báo: production Vercel đã là build mới (`a193806`) mà điện thoại vẫn (a) phóng to nhỏ bằng ngón tay, (b) nhấn back trong note thì văng app. Screenshot DevTools 393px cho thấy `.notes-zoom-layer` (class desktop, không phải `.notes-mobile-layer`) có `--notes-scale: 0.5; transform: scale(0.5)` kèm menu account hiện zoom desktop ở "50" — tổ hợp này **không thể có trong build mới ở 393px** (mobile phải render `.notes-mobile-layer`, không có transform, không có zoom desktop). Chẩn đoán: điện thoại đang chạy **shell PWA cũ** do service worker (`offline-worker.js`) + `index.html` cache; trình duyệt cache script worker và không re-validate nên build mới (meta tag, back logic) chưa bao giờ tới được điện thoại. Root cause duy nhất giải thích cả hai triệu chứng.
