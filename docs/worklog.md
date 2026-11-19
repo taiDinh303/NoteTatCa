@@ -1,3 +1,9 @@
+## Sửa pinch-zoom điện thoại + regression back văng app — 2026-11-19
+
+- Pinch-zoom bằng hai ngón (whole-page browser zoom) vẫn còn dù đã ẩn UI zoom: nguyên nhân `index.html` thiếu `maximum-scale`/`user-scalable`, nên browser vẫn tự cho pinch. Thêm `maximum-scale=1.0, user-scalable=no, viewport-fit=cover` vào viewport meta (desktop không ảnh hưởng). Các vùng editor/list vốn đã có `touch-action: pan-y`/`none`, meta tag chặn pinch ở mức document.
+- Back "đang trong note thì văng app" là **regression tôi gây ra ở commit trước**: bản `550a349` thêm `if (current === home) return;` khiến khi điện thoại mở ở `/notes` (đúng home) KHÔNG tạo entry buffer history. Kết quả stack quá mỏng: back đóng note rồi back tiếp là thoát app. Đã hồi về logic `8aff5d5` (buffer tạo đúng một lần khi mobile, kể cả khi đang ở home) để giữ ít nhất một tầng in-app dưới cùng.
+- Validation: tsc --noEmit PASS; eslint PASS; vite build PASS (dist/index.html có user-scalable=no). Chưa chạy thiết bị thật; cần xác nhận lại trên điện thoại: pinch không còn phóng, back trong note đóng note trước rồi back tiếp mới tới tầng home.
+
 ## Back hệ thống toàn trang, grid mobile 2–3 cột, tắt zoom mobile — 2026-11-19
 
 - Back điện thoại toàn app theo yêu cầu chủ dự án: `useMobileWorkspaceEntry` đổi thành guard bền — mỗi khi history index rớt về 0 (đầu phiên, deep-link, hoặc stack đã xả cạn), entry sâu nhất được thay bằng URL home của shell rồi push trang hiện tại lên trên. Kết quả nút back hệ thống luôn hạ cánh trong app (notes, settings, notifications, …) thay vì thoát; khi note panel đang mở, entry back riêng của `useNoteBack` đóng note trước. Không thêm nút UI; desktop không đổi (effect no-op ngoài mobile layout).
