@@ -41,6 +41,11 @@ export default defineConfig(({ mode }) => {
 const NAME = "ntc-shell-${version}";
 const SOURCES = ${sources};
 self.addEventListener("install", event => event.waitUntil(caches.open(NAME).then(cache => cache.addAll(SOURCES))));
+// The page asks a newly installed worker to take control now instead of on the
+// next load, so a phone picks up a new shell without manual intervention.
+self.addEventListener("message", event => {
+  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
 self.addEventListener("activate", event => event.waitUntil(Promise.all([
   caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith("ntc-shell-") && key !== NAME).map(key => caches.delete(key)))),
   self.clients.claim()

@@ -52,6 +52,16 @@ html body[data-scroll-locked] {
   margin: 0 !important;
   padding: 0 !important;
 }
+/* Phones must stay at 100%: iOS standalone PWAs can ignore the
+   user-scalable viewport meta, so block document-level pinch/double-tap zoom
+   with touch-action (pan only, no zoom gesture). Same scope as the JS
+   mobile detection; desktop is untouched. */
+@media (max-width: 800px), (orientation: landscape) and (max-height: 500px) {
+  html,
+  body {
+    touch-action: pan-x pan-y;
+  }
+}
 button,
 input,
 select,

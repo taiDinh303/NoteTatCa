@@ -13,12 +13,51 @@ import "./styles.css";
 import { initializeLanguage } from "./shared/i18n";
 initializeLanguage();
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  // A phone can stay pinned to an old shell (old meta tag, old back logic) for
+  // days because the browser caches the service-worker script. Detect a newer
+  // worker, ask it to activate immediately, and reload once it takes control.
+  let sawUpdate = false;
+  let reloading = false;
   const stop = preparation.subscribe(() => {
     if (preparation.getSnapshot().status !== "ready") return;
     stop();
-    const install = () => { void navigator.serviceWorker.register("/offline-worker.js").catch(() => {}); };
-    if ("requestIdleCallback" in window) window.requestIdleCallback(install, { timeout: 10_000 });
-    else setTimeout(install, 1000);
+    const register = () => {
+      navigator.serviceWorker
+        .register("/offline-worker.js")
+        .then((registration) => {
+          const onControllerChange = () => {
+            if (sawUpdate && !reloading) {
+              reloading = true;
+              window.location.reload();
+            }
+          };
+          // A waiting worker from a previous load already means an update exists.
+          if (registration.waiting) {
+            sawUpdate = true;
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          }
+          registration.addEventListener("updatefound", () => {
+            const next = registration.newWorker;
+            if (!next) return;
+            next.addEventListener("statechange", () => {
+              // A newer worker is installed while an older one still controls
+              // this page → it is waiting; activate it now instead of next load.
+              if (
+                next.state === "installed" &&
+                navigator.serviceWorker.controller &&
+                navigator.serviceWorker.controller !== next
+              ) {
+                sawUpdate = true;
+                next.postMessage({ type: "SKIP_WAITING" });
+              }
+            });
+          });
+          registration.addEventListener("controllerchange", onControllerChange);
+        })
+        .catch(() => {});
+    };
+    if ("requestIdleCallback" in window) window.requestIdleCallback(register, { timeout: 10_000 });
+    else setTimeout(register, 1000);
   });
 }
 createRoot(document.getElementById("root")!).render(
