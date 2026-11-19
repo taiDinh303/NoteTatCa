@@ -72,7 +72,7 @@ export default function PreferencesPage({
               <span />
             </button>
           </div>
-          <AppearanceZoomRow />
+          {!mobile ? <AppearanceZoomRow /> : null}
           {!administration ? <div className="preferences-row">
             <label htmlFor="note-edit-on-open">{tr("Open notes for editing")}</label>
             <button id="note-edit-on-open" type="button" className="theme-switch" role="switch" aria-label={tr("Open notes for editing")} aria-checked={noteEditing} onClick={toggleNoteEditing}><span /></button>

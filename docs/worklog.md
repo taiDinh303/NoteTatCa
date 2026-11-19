@@ -1,3 +1,11 @@
+## Back hệ thống toàn trang, grid mobile 2–3 cột, tắt zoom mobile — 2026-11-19
+
+- Back điện thoại toàn app theo yêu cầu chủ dự án: `useMobileWorkspaceEntry` đổi thành guard bền — mỗi khi history index rớt về 0 (đầu phiên, deep-link, hoặc stack đã xả cạn), entry sâu nhất được thay bằng URL home của shell rồi push trang hiện tại lên trên. Kết quả nút back hệ thống luôn hạ cánh trong app (notes, settings, notifications, …) thay vì thoát; khi note panel đang mở, entry back riêng của `useNoteBack` đóng note trước. Không thêm nút UI; desktop không đổi (effect no-op ngoài mobile layout).
+- Grid mobile từ 1 cột thành 2 cột trên phone (NotesZoomViewport.css `.notes-mobile-layer[data-layout="grid"]`), thêm cột thứ 3 khi `@container viewport (min-width: 560px)` (phone ngang/tablet nhỏ). List mobile giữ 1 cột; desktop grid/zoom không đổi.
+- Tắt phóng to nhỏ trên phone: mobile vốn đã luôn 100% (`--interface-scale` chỉ đọc trong CSS, hiệu ứng zoom bị skip khi mobile), giờ ẩn hẳn UI — dòng "Notes zoom" trong Appearance không render trên mobile. Zoom indicator, wheel/pinch desktop, dropdown account desktop giữ nguyên.
+- Validation: tsc --noEmit PASS; eslint trên 3 file sửa PASS (0 lỗi); vite build production PASS (NoteEditor ~697kB/RichEditor ~509kB, 23s); vitest scoped `src/app` 88/88 PASS. Chưa chạy .NET/Playwright/thiết bị thật; mobile back cần xác nhận trên điện thoại thật (back khi panel note mở ở mọi trang).
+- Phạm vị commit: 3 file ntc_react (useMobileWorkspaceEntry.ts, NotesZoomViewport.css, PreferencesPage.tsx) + entry worklog này. Dọn 3 file rác 0-byte (Canceled/Found/vercel) tạo nhầm từ lệnh shell trước, không phải source repo.
+
 ## Mobile Grid/List và chạm hai lần để Edit — 2026-11-06
 
 - Theo yêu cầu chủ dự án, giữ label trong List. Mobile hiện nút Grid/List và dùng savedView/ntc.view.v1 như desktop; Grid hai cột, preview tối đa3dòng; List một cột, tiêu đề và preview một dòng ellipsis, footer label/menu vẫn giữ. Không đổi desktop grid/zoom hoặc dữ liệu note.
