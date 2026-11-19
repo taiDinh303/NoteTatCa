@@ -33,7 +33,7 @@ test("landscape phone: note modal fills full screen height", async ({ page, requ
   // Height should be at least 85% of the viewport height (no desktop 176px offset)
   expect(box!.height).toBeGreaterThan(H * 0.85);
   // Top should be near 0
-  expect(box!.top).toBeLessThan(20);
+  expect(box!.y).toBeLessThan(20);
   // Full width
   expect(box!.width).toBeGreaterThanOrEqual(W - 4);
 });
@@ -46,7 +46,7 @@ test("landscape phone: Edit mode also fills full screen", async ({ page, request
   const box = await editor.boundingBox();
   expect(box).not.toBeNull();
   expect(box!.height).toBeGreaterThan(H * 0.85);
-  expect(box!.top).toBeLessThan(20);
+  expect(box!.y).toBeLessThan(20);
 });
 
 test("landscape phone: Close returns to notes list", async ({ page, request }) => {

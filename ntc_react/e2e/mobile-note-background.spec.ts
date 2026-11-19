@@ -71,10 +71,12 @@ for (const engine of engines) {
           const viewer = page.getByRole("dialog", { name: "View note", exact: true });
           await expect(viewer).toBeVisible();
           await unchanged();
-          const overlay = page.locator(".modal-overlay");
-          // Note sessions intentionally avoid resampling the workspace at all
-          // widths; the note-specific stylesheet already disables this blur.
-          await expect(overlay).toHaveCSS("backdrop-filter", "none");
+          const overlay = page.locator(".note-surface-backdrop");
+          // The persistent note panel always renders a full-window backdrop.
+          // Mobile is a full-screen slide-over (nothing sits behind it) so the
+          // blur is disabled; desktop keeps a light 2px dim.
+          await expect(overlay).toHaveCSS("backdrop-filter", width < 800 ? "none" : "blur(2px)");
+          await expect(overlay).toHaveClass(/is-open/);
           expect(await overlay.boundingBox()).toEqual({ x: 0, y: 0, width, height: 860 });
           if (engine === "webkit" && width < 800) {
             // Mobile WebKit does not support Playwright mouse.wheel.

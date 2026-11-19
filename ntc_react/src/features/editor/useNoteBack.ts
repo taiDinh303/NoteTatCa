@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useBlocker, useLocation, useNavigate } from "react-router-dom";
+import { MOBILE_LAYOUT_QUERY } from "../../shared/useMobileLayout";
 
 /** A same-route entry lets the first mobile Back close the note, even on direct entry. */
 export function useNoteBack(
@@ -30,7 +31,7 @@ export function useNoteBack(
     return dirty() || back.current;
   });
   useEffect(() => {
-    if (pushed.current || !window.matchMedia("(max-width: 800px) or (orientation: landscape) and (max-height: 500px)").matches)
+    if (pushed.current || !window.matchMedia(MOBILE_LAYOUT_QUERY).matches)
       return;
     pushed.current = true;
     navigate(location.pathname + location.search + location.hash, {

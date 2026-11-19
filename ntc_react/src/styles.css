@@ -4692,9 +4692,10 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
 @container viewport (max-width: 480px) { .note-view-timestamp { font-size: 10px; } }
 .note-viewer .rich-editor { cursor: text; }
 @container viewport (max-width: 800px) {
-  /* Dim the mobile workspace without resampling the transformed note list
-     into a backdrop blur while the dialog opens or changes mode. */
-  .modal-overlay:has(~ .note-editor-modal) {
+  /* The note panel is a full-screen slide-over on phones, so nothing sits
+     behind the backdrop: disable its blur to avoid resampling the scrolled
+     list. Desktop keeps the light 2px dim. */
+  .note-surface-backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -5152,10 +5153,12 @@ html:has(.customer-shell) { scrollbar-gutter: auto; }
   min-height: 52px;
   padding: 10px var(--note-chrome-inset);
 }
-/* View mode: title sits very close to the first paragraph (newline + 4px). */
+/* View mode: title sits very close to the first paragraph (newline + 4px).
+   Top padding matches the edit heading (10px) so the title line does not
+   shift when toggling View<->Edit; only the bottom gap stays tighter. */
 .note-editor-modal .note-view-heading {
   min-height: 0;
-  padding: 8px var(--note-chrome-inset) 4px;
+  padding: 10px var(--note-chrome-inset) 4px;
 }
 .note-editor-modal .note-view-heading .editor-title-wrap { padding-bottom: 0; }
 .note-editor-modal .note-view-heading {

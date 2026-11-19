@@ -334,13 +334,24 @@ test("desktop hand pans both axes and can be turned off for text selection", asy
     .getByRole("button", { name: "Enter full screen", exact: true })
     .click();
   await expect(dialog).toHaveClass(/fullscreen/);
-  expect((await dialog.boundingBox())!.width).toBeCloseTo(1280);
-  expect((await dialog.boundingBox())!.height).toBeCloseTo(900);
+  // The panel eases between its resting rectangle and the full window over
+  // 0.2s; wait for the fullscreen geometry to settle before measuring.
+  await expect.poll(
+    async () => (await dialog.boundingBox()!)!.width,
+    { timeout: 1500 },
+  ).toBeGreaterThan(1270);
+  await expect.poll(
+    async () => (await dialog.boundingBox()!)!.height,
+    { timeout: 1500 },
+  ).toBeGreaterThan(890);
   await expect(await zoomInput(page)).toHaveValue("200");
   await dialog
     .getByRole("button", { name: "Exit full screen", exact: true })
     .click();
-  expect((await dialog.boundingBox())!.width).toBeLessThan(1280);
+  await expect.poll(
+    async () => (await dialog.boundingBox()!)!.width,
+    { timeout: 1500 },
+  ).toBeLessThan(1270);
   await zoomInput(page);
   await hand.click();
   const view = dialog.locator(".content-zoom-viewport");
@@ -610,11 +621,16 @@ for (const [width, theme] of [
       const edit = await measure();
       expect(edit.toolbar).not.toBeNull();
       const near = (a: number, b: number) => expect(Math.abs(a - b)).toBeLessThan(1);
-      for (const key of ["title", "close", "fullscreen", "heading"] as const) {
+      for (const key of ["title", "close", "fullscreen"] as const) {
         near(view[key]!.x, edit[key]!.x);
         near(view[key]!.y, edit[key]!.y);
         near(view[key]!.height, edit[key]!.height);
       }
+      // The heading box intentionally collapses in View mode (min-height: 0),
+      // so its height differs by design; its left/top edge and the chrome
+      // inside it must stay aligned across the toggle.
+      near(view.heading!.x, edit.heading!.x);
+      near(view.heading!.y, edit.heading!.y);
       expect(edit.content!.y - view.content!.y).toBeGreaterThanOrEqual(0);
       expect(view.fontSize).toBe(edit.fontSize);
       expect(view.fontWeight).toBe(edit.fontWeight);

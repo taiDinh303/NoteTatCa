@@ -8,6 +8,9 @@ for(const width of [320,393,430]) test(`mobile views and double tap ${width}`,as
  expect(bounds[1].width).toBeLessThan(width/2);expect(Math.abs(bounds[1].y-bounds[2].y)).toBeLessThan(2);
  await list.click();await expect(page.locator('.notes-mobile-layer')).toHaveAttribute('data-layout','list');
  await expect(cards.first().locator('.label-chip').filter({visible:true}).first()).toBeVisible();
+ // The grid<->list toggle runs a 240ms FLIP width/height animation; wait for it to
+ // settle so the height assertion measures the final layout, not a mid-animation frame.
+ await page.waitForFunction(() => ![...document.querySelectorAll<HTMLElement>('.note-card')].some(node => node.getAnimations().some(a => a.id === 'note-drop' && a.playState === 'running')));
  expect((await cards.first().boundingBox())!.height).toBeLessThan(160);
  await page.reload();await expect(page.locator('.notes-mobile-layer')).toHaveAttribute('data-layout','list');
  await page.screenshot({path:info.outputPath('list.png')});
