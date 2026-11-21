@@ -35,25 +35,33 @@ export function animateNoteLayout(
       Math.abs(from.width - to.width) > 1 ||
       Math.abs(from.height - to.height) > 1;
     if (Math.hypot(x, y) < 1 && !resized) continue;
+    // FLIP with a GPU-composited transform only. After React's commit the card
+    // already has its new size (grid <-> list), so the text reflows exactly
+    // once; animating width/height would instead rewrap the text on every
+    // frame and read as "chảy chữ". A brief opacity hold on resized cards
+    // keeps the reflowed text hidden until the size/position has essentially
+    // settled (≈60% of the 220ms), then fades it back in — the card morphs
+    // smoothly without the user seeing text reflow mid-move.
     const animation = node.animate(
       [
         {
           transform: `translate3d(${x}px, ${y}px, 0)`,
-          ...(resized
-            ? { width: `${from.width / scale}px`, height: `${from.height / scale}px` }
-            : {}),
+          opacity: resized ? 0.5 : 1,
+          offset: 0,
+        },
+        {
+          opacity: resized ? 0.5 : 1,
+          offset: 0.6,
         },
         {
           transform: "translate3d(0, 0, 0)",
-          ...(resized
-            ? { width: `${to.width / scale}px`, height: `${to.height / scale}px` }
-            : {}),
+          opacity: 1,
         },
       ],
       {
         duration: matchMedia("(prefers-reduced-motion: reduce)").matches
           ? 0
-          : 240,
+          : 220,
         easing: "cubic-bezier(0.4, 0, 0.2, 1)",
       },
     );

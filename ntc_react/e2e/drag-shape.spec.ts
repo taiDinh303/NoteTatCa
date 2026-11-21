@@ -95,7 +95,12 @@ for (const [width, zoom, touch] of [
       ),
     ).toBeLessThanOrEqual(1);
     const before = [(await short.boundingBox())!, (await tall.boundingBox())!];
-    expect(before[1].height - before[0].height).toBeGreaterThan(20);
+    // Only the desktop layout lets a long note grow its card: the mobile
+    // container forces every card to a uniform 175px floor (min-height) and
+    // clamps the preview to 3 lines, so unequal heights can't be asserted
+    // there.
+    if (width > 800)
+      expect(before[1].height - before[0].height).toBeGreaterThan(20);
     const source = (await tall
       .getByRole("button", { name: "Open Tall card", exact: true })
       .boundingBox())!;

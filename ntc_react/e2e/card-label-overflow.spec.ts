@@ -30,7 +30,22 @@ for (const width of [320, 393, 1440]) {
     await expect(card).toBeVisible();
     let gridCount = 0;
     for (const view of (width <= 800 ? ["grid"] : ["grid", "list", "grid"])) {
-      if (width > 800) await page.getByRole("button", { name: `${view} view`, exact: true }).click();
+      if (width > 800) {
+        await page.getByRole("button", { name: `${view} view`, exact: true }).click();
+        // The view toggle fires a ~220ms FLIP (id "note-drop") that GPU-translates
+        // each card to its new slot. Settle any in-flight FLIP before measuring the
+        // chip-vs-action overlap below, so the assertion sees the at-rest layout
+        // rather than a card still mid-translate.
+        await page.evaluate(async () => {
+          const noteCards = [...document.querySelectorAll(".note-card")];
+          const inFlight = noteCards.flatMap((node) =>
+            (node as HTMLElement)
+              .getAnimations()
+              .filter((animation) => animation.id === "note-drop"),
+          );
+          await Promise.all(inFlight.map((animation) => animation.finished.catch(() => {})));
+        });
+      }
       await page.evaluate(() => document.fonts.ready);
       const labels = card.locator(".card-labels");
       await expect.poll(async () => labels.locator(":scope > .label-chip").count()).toBeGreaterThan(0);

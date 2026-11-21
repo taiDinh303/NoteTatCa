@@ -10,7 +10,6 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { flushSync } from "react-dom";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DndContext,
@@ -152,13 +151,6 @@ export default function NotesPage({
     if (trash) navigate(`/trash?note=${id}`);
     setEditor({ id });
   }, [navigate, trash]);
-  // Grid<->list toggle: prefer the native View Transitions API (the browser
-  // morphs each named card, so text never reflows mid-animation); on browsers
-  // without it, fall back to the existing FLIP/WAAPI capture + animateNoteLayout.
-  // Kept inline in the onClick arrow (not a named handler) so the React Compiler
-  // accepts the motionLayout ref-bridge mutation, as it did before this feature.
-  const supportsViewTransitions =
-    typeof document !== "undefined" && Boolean(document.startViewTransition);
   const organizeNote = useCallback((id: string, action: NoteOpenAction) => setEditor({ id, action }), []);
   const motionLayout = useRef<ReturnType<typeof captureNoteLayout> | null>(
     null,
@@ -386,35 +378,15 @@ export default function NotesPage({
                   )}
                   active={view === name}
                   onClick={() => {
-                    const next = String(name);
-                    if (next === view) return;
-                    const persist = () => {
-                      try {
-                        localStorage.setItem("ntc.view.v1", next);
-                      } catch {
-                        /* Preference persistence is optional. */
-                      }
-                    };
-                    if (supportsViewTransitions) {
-                      // No capture: the browser animates the morph; the
-                      // useLayoutEffect below sees motionLayout.current === null
-                      // and does not double-animate.
-                      try {
-                        document.startViewTransition(() => {
-                          flushSync(() => setView(next));
-                        }).finished.catch(() => {});
-                      } catch {
-                        // startViewTransition throws when a transition is
-                        // already in flight (rapid double-click) — commit the
-                        // change plainly in that case.
-                        setView(next);
-                      }
-                      persist();
-                      return;
+                    if (String(name) !== view) {
+                      motionLayout.current = captureNoteLayout();
                     }
-                    motionLayout.current = captureNoteLayout();
-                    setView(next);
-                    persist();
+                    setView(String(name));
+                    try {
+                      localStorage.setItem("ntc.view.v1", String(name));
+                    } catch {
+                      /* Preference persistence is optional. */
+                    }
                   }}
                 />
               );
