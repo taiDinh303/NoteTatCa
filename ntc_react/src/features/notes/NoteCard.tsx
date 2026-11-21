@@ -92,6 +92,11 @@ export const NoteCard = memo(function NoteCard({
         transition: !isDragging && isSorting ? transition : "none",
         backgroundColor: note.backgroundColor || undefined,
         opacity: isDragging ? 0.95 : 1,
+        // Names the card's View Transition group so grid<->list toggles morph
+        // the whole card (browser-side, no text reflow mid-animation). Used by
+        // document.startViewTransition in NotesPage; inert on older browsers.
+        viewTransitionName: `note-${note.id}`,
+        viewTransitionClass: "note-card",
       }}
       className={`note-card ${draggable ? "draggable" : ""} ${isDragging ? "dragging" : ""} ${note.backgroundColor ? "colored" : ""}`}
       data-testid={`note-${note.id}`}

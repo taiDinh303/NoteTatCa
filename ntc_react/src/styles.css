@@ -5335,3 +5335,27 @@ body:has(.note-tool-popover) .note-editor-modal .content-zoom-viewport { overflo
 .landing header .landing-language:hover, .landing header .landing-language[data-state="open"] { background: color-mix(in srgb, var(--text) 8%, transparent); }
 
 @media (max-width:480px){.landing > header{padding-inline:12px;gap:8px}.landing > header .brand{font-size:14px;gap:6px}.landing > header .brand-mark{width:34px;height:34px}.landing > header nav{gap:6px}.landing > header nav .button{padding-inline:8px}.landing > header nav .button > svg{display:none}.landing > header .landing-language{width:36px;flex-basis:36px;height:40px}.landing > header nav .icon-button{width:32px;min-width:32px}}
+
+/* --- Grid <-> List view toggle (View Transitions API) ----------------------
+   NoteCard sets view-transition-name = `note-<id>` + view-transition-class =
+   "note-card". When NotesPage runs the toggle through
+   document.startViewTransition, the browser morphs each card's box from the old
+   to the new layout (size + position) instead of the app animating width/height
+   via FLIP, so the text never reflows mid-animation ("chảy chữ"). Older
+   browsers without the API fall back to the FLIP path in NotesPage.
+   Inert (no effect) where these pseudo-elements don't exist. */
+/* Suppress the default whole-page crossfade on the root group: only the named
+   cards should animate, the background snaps instantly. */
+::view-transition-group(root) {
+  animation: none;
+}
+/* Morph each card with the same 240ms material curve the old FLIP used. */
+::view-transition-group(.note-card) {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 0.24s;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.note-card) {
+    animation-duration: 0s;
+  }
+}
