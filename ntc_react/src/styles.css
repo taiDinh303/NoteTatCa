@@ -3944,11 +3944,11 @@ td {
   .list-view .note-card-footer {
     padding: 10px 14px;
   }
-  .list-view .note-open h3 {
-    font-size: 14px;
-  }
+  /* List preview must keep grid's 12px so the toggle never re-sizes the text.
+     (No h3 inside .note-open — the title lives in .note-card-identity h3,
+     which is 14px in both views already.) */
   .list-view .note-preview {
-    font-size: 11px;
+    font-size: 12px;
   }
   .empty-state {
     padding: 45px 15px;

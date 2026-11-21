@@ -13,10 +13,18 @@ for(const width of [320,393,430]) test(`mobile views and double tap ${width}`,as
    cards.first().locator(sel).evaluate(el => getComputedStyle(el).paddingLeft);
  const padTop = (sel: string) =>
    cards.first().locator(sel).evaluate(el => getComputedStyle(el).paddingTop);
+ const fontSize = (sel: string) =>
+   cards.first().locator(sel).evaluate(el => getComputedStyle(el).fontSize);
  const gridPads: Record<string, string> = {};
  for (const sel of [".note-card-top", ".note-open", ".note-card-footer"])
    gridPads[sel + "L"] = await padLeft(sel);
  gridPads.openT = await padTop(".note-open");
+ // Text must not be re-sized by the toggle: title and preview font sizes are
+ // identical in grid and list ("chữ to nhỏ khác nhau giữa list và grid").
+ const gridFonts: Record<string, string> = {
+   title: await fontSize(".note-card-identity h3"),
+   preview: await fontSize(".note-preview"),
+ };
  await list.click();await expect(page.locator('.notes-mobile-layer')).toHaveAttribute('data-layout','list');
  await expect(cards.first().locator('.label-chip').filter({visible:true}).first()).toBeVisible();
  // The grid<->list toggle runs a 240ms FLIP width/height animation; wait for it to
@@ -26,6 +34,8 @@ for(const width of [320,393,430]) test(`mobile views and double tap ${width}`,as
  for (const sel of [".note-card-top", ".note-open", ".note-card-footer"])
    expect(await padLeft(sel), `${sel} left inset must be identical in list and grid`).toBe(gridPads[sel + "L"]);
  expect(await padTop(".note-open"), ".note-open top gap must be identical in list and grid").toBe(gridPads.openT);
+ expect(await fontSize(".note-card-identity h3"), "title font must be identical in list and grid").toBe(gridFonts.title);
+ expect(await fontSize(".note-preview"), "preview font must be identical in list and grid").toBe(gridFonts.preview);
  await page.reload();await expect(page.locator('.notes-mobile-layer')).toHaveAttribute('data-layout','list');
  await page.screenshot({path:info.outputPath('list.png')});
  await cards.first().getByRole('button',{name:/^Open /}).click();
