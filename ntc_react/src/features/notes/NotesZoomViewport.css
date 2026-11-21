@@ -114,7 +114,10 @@ html:has([data-notes-zoom]) {
 .notes-mobile-layer[data-layout="list"] .note-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .notes-mobile-layer[data-layout="list"] .note-card { min-height: 0; display: flex; flex-direction: column; }
 .notes-mobile-layer[data-layout="list"] .note-card-top { padding: 12px 14px 0; }
-.notes-mobile-layer[data-layout="list"] .note-open { padding: 4px 14px; }
+/* Top 9px = grid's .note-open top, so the title->content gap is identical in
+   both views (desktop standard: list matches grid's 9px top); bottom stays 4px
+   to keep the single-line list card compact. */
+.notes-mobile-layer[data-layout="list"] .note-open { padding: 9px 14px 4px; }
 .notes-mobile-layer[data-layout="list"] .note-preview { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
 .notes-mobile-layer[data-layout="list"] .note-card-footer { padding: 4px 14px 8px; }
 .notes-mobile-layer[data-layout="list"] .note-tags { display: flex; min-width: 0; }

@@ -1,4 +1,4 @@
-## Mobile grid/list: căn lại left padding để chữ không nhảy khi chuyển view — 2026-11-21
+## Mobile grid/list: đồng bộ left padding + khoảng cách tiêu đề↔nội dung để chữ không nhảy khi chuyển view — 2026-11-21
 
 - Chủ dự án báo (2 ảnh chụp 393px): chuyển giữa grid và list trên điện thoại thì chữ (title/nội dung/footer) nhảy về bên phải — vì `.notes-mobile-layer[data-layout="grid"]` không có rule left padding riêng, card grid rơi vào container rules của `styles.css` (`@container viewport max-width:480px` → `.note-card-top { padding-left: 20px }`, `.note-open/.note-card-footer { padding-left: 21px }`; 481–800px → 17px), trong khi list có 14px (đã set trong `NotesZoomViewport.css`). Chênh 6–7px left giữa hai view.
 - Fix (chỉ `NotesZoomViewport.css`, scope `.notes-mobile-layer[data-layout="grid"]` nên desktop + container rules không bị ảnh hưởng): thêm override left padding grid = 14px khớp list:
@@ -7,7 +7,8 @@
   - `.note-card-footer { padding: 4px 14px 8px }` (4/8 vertical = list, left 14)
   - Tags (`.card-labels`) nằm trong footer nên inherit 14px, tự khớp cả hai view.
 - E2E regression: `mobile-views.spec.ts` đo `paddingLeft` computed của `.note-card-top/.note-open/.note-card-footer` khi ở grid, đổi sang list rồi assert ba selector bằng giá trị grid — bất kỳ drift left-inset nào sau này sẽ fail spec này.
-- Validation: `tsc --noEmit` PASS; `eslint .` PASS (0); `vite build` PASS (2262 modules, chunk sizes không đổi); E2E 28/28 PASS (6 spec mobile: mobile-views, mobile-layout, mobile-note-background, mobile-workspace-back, landscape-note-fullscreen, content-zoom) trên fixture 5199 + vite 5173. Chờ Vercel deploy build mới; trên điện thoại thật cần 1 lần xóa site data / hard-refresh để PWA shell cũ nhường chỗ (hoặc auto-reload từ `a193806`+).
+- Cú 2 (cùng session, sau khi chủ dự án yêu cầu đồng bộ cả khoảng cách tiêu đề↔nội dung): mobile list `.note-open` top=4px trong khi grid top=9px → tiêu đề cách preview lệch 5px giữa hai view. Sửa `[data-layout="list"] .note-open` thành `padding: 9px 14px 4px` (top 9px = chuẩn grid, bottom 4px giữ compact card 1 dòng). E2E mở rộng: thêm assertion `paddingTop` của `.note-open` grid ≡ list.
+- Validation: `tsc --noEmit` PASS; `eslint .` PASS (0); `vite build` PASS (2262 modules, chunk sizes không đổi); E2E 25/25 PASS (mobile-views 3 + mobile-layout 3 + mobile-note-background 4 + mobile-workspace-back 2 + content-zoom 13) + landscape-note-fullscreen 3 (cú chạy trước đó 28/28) trên fixture 5199 + vite 5173. Chờ Vercel deploy build mới; trên điện thoại thật cần 1 lần xóa site data / hard-refresh để PWA shell cũ nhường chỗ (hoặc auto-reload từ `a193806`+).
 
 ## Root cause: media query mobile bị Chromium reject — fix back + pinch + E2E — 2026-11-19
 
