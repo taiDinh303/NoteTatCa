@@ -23,6 +23,15 @@ namespace NTC.ModelViews.NoteModelView
 
         public double SortOrder { get; set; }
 
+        // When true this item came from a list projection: the rich document is
+        // intentionally omitted (DocumentJson is null) to keep list payloads small.
+        // The full document is fetched on demand via GET /notes/{id} (detail-on-open).
+        public bool Preview { get; set; }
+
+        // Cheap derived flag so list cards can keep the checklist preview styling
+        // without shipping the full rich document.
+        public bool HasTaskList { get; set; }
+
 
         // Navigation
         public List<TagResponseModelView> Tags { get; set; } = new();

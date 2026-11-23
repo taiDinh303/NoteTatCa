@@ -125,6 +125,53 @@ public sealed class NoteTests
         Assert.Equal(HttpStatusCode.NotFound,(await c.GetAsync($"/api/v1/notes/{Guid.NewGuid()}?trash=true")).StatusCode);
     }
     [Fact]
+    public async Task List_projection_omits_the_rich_document_and_caps_the_preview()
+    {
+        using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;
+        var document=System.Text.Json.JsonSerializer.Serialize(new
+        {
+            type = "doc",
+            content = new[]
+            {
+                new
+                {
+                    type = "taskList",
+                    content = new[]
+                    {
+                        new
+                        {
+                            type = "taskItem",
+                            attrs = new { @checked = false },
+                            content = new[] { new { type = "text", text = "A checklist item." } }
+                        }
+                    }
+                }
+            }
+        });
+        var rich=await ApiFactory.Note(c,"Checklist note");
+        var id=rich.GetProperty("id").GetGuid();
+        await ApiFactory.Data(await c.PatchAsJsonAsync($"/api/v1/notes/{id}",new{documentJson=document,version=rich.GetProperty("version").GetGuid()}));
+        var list=await ApiFactory.Data(await c.GetAsync("/api/v1/notes?pageSize=100"));
+        var item=list.GetProperty("items").EnumerateArray().Single(x=>x.GetProperty("id").GetGuid()==id);
+        Assert.True(item.GetProperty("preview").GetBoolean());
+        Assert.Equal(System.Text.Json.JsonValueKind.Null,item.GetProperty("documentJson").ValueKind);
+        Assert.True(item.GetProperty("hasTaskList").GetBoolean());
+        Assert.Equal("A checklist item.",item.GetProperty("content").GetString());
+        var detail=await ApiFactory.Data(await c.GetAsync($"/api/v1/notes/{id}"));
+        Assert.False(detail.GetProperty("preview").GetBoolean());
+        Assert.Equal(document,detail.GetProperty("documentJson").GetString());
+    }
+    [Fact]
+    public async Task List_projection_caps_long_plain_content_but_detail_keeps_it_full()
+    {
+        using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;
+        var created=await ApiFactory.Note(c,new string('x',5000)); var id=created.GetProperty("id").GetGuid();
+        var item=(await ApiFactory.Data(await c.GetAsync("/api/v1/notes?pageSize=100"))).GetProperty("items").EnumerateArray().Single(x=>x.GetProperty("id").GetGuid()==id);
+        Assert.Equal(2000,item.GetProperty("content").GetString()!.Length);
+        Assert.Null(item.GetProperty("documentJson").GetString());
+        Assert.Equal(5000,(await ApiFactory.Data(await c.GetAsync($"/api/v1/notes/{id}"))).GetProperty("content").GetString()!.Length);
+    }
+    [Fact]
     public async Task Invalid_color_icon_and_oversized_content_are_rejected()
     {
         using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;

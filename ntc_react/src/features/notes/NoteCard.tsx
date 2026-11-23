@@ -169,7 +169,7 @@ export const NoteCard = memo(function NoteCard({
       >
         {note.content ? (
           <p
-            className={`note-preview ${note.documentJson?.includes("taskList") ? "checklist-preview" : ""}`}
+            className={`note-preview ${(note.hasTaskList ?? note.documentJson?.includes("taskList")) ? "checklist-preview" : ""}`}
           >
             {note.content.slice(0, 600)}
           </p>

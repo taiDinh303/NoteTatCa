@@ -45,6 +45,8 @@ export interface Note {
   pinnedAt: string | null;
   backgroundColor: string | null;
   sortOrder: number;
+  preview?: boolean;
+  hasTaskList?: boolean;
   tags: Label[];
   reminders: Reminder[];
   createdTime: string;

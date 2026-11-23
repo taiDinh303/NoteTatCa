@@ -59,6 +59,26 @@ namespace NTC.Services.Mappings
         }
 
         // 🔹 Mapping List<Note> -> List<NoteResponseModelView>
+        // The rich document (DocumentJson) is the dominant cost of a list payload:
+        // for rich notes it can be 5-20x the plain text. A list item only needs the
+        // card preview, labels and the reminder badge, so the projection drops the
+        // document and caps the plain-text preview. The full document is fetched on
+        // demand via GET /notes/{id} (detail-on-open), which the editor already does.
+        public const int NoteListContentPreviewLength = 2000;
+
+        // ?? Mapping Note -> lightweight list projection (NoteResponseModelView)
+        public static NoteResponseModelView ToListViewModel(this Note note)
+        {
+            var model = note.ToViewModel();
+            model.Preview = true;
+            model.HasTaskList = note.DocumentJson?.Contains("taskList", StringComparison.Ordinal) == true;
+            model.DocumentJson = null;
+            if (model.Content.Length > NoteListContentPreviewLength)
+                model.Content = model.Content[..NoteListContentPreviewLength];
+            return model;
+        }
+
+        // ?? Mapping List<Note> -> List<NoteResponseModelView>
         public static List<NoteResponseModelView> ToViewModelList(this IEnumerable<Note> notes)
         {
             if (notes == null)

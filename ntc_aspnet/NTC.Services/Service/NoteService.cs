@@ -47,7 +47,10 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
         var ordered = trash ? query.OrderByDescending(x => x.DeletedTime).ThenBy(x => x.Id)
             : query.OrderByDescending(x => x.IsPinned).ThenBy(x => x.SortOrder).ThenBy(x => x.Id);
         var notes = await WithDetails(ordered).Skip((page - 1) * size).Take(size).ToListAsync();
-        return new(notes.Select(x => x.ToViewModel()).ToArray(), count, page, size);
+        // List path returns a lightweight projection: no rich document, capped
+        // preview. The full note (incl. DocumentJson) is served by GetByIdAsync,
+        // which the editor detail-on-open already calls.
+        return new(notes.Select(x => x.ToListViewModel()).ToArray(), count, page, size);
     }
     public Task<NoteResponseModelView> GetByIdAsync(Guid id) => GetByIdAsync(id, trash: false);
     public async Task<NoteResponseModelView> GetByIdAsync(Guid id, bool trash) => (await WithDetails(Owned(trash))

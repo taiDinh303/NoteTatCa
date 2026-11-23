@@ -128,17 +128,24 @@ function NoteEditorSession({
   const [fullscreen, setFullscreen] = useState(noteFullscreenDefault);
   const resolvedId = noteId ?? createdId;
   const listSnapshot = resolvedId ? workspace.cachedNote(resolvedId) : undefined;
+  // A list projection ships a lightweight preview (no rich document). When the
+  // cached item is only a preview, the editor must fetch the full note on open
+  // instead of seeding the flat preview, so rich formatting always renders.
+  const previewOnly = listSnapshot?.note.preview === true;
   const query = useQuery({
     networkMode: "always",
     queryKey: workspace.key("note", resolvedId),
     queryFn: () => notes.find(resolvedId!),
     enabled: !!resolvedId,
-    staleTime: 30_000,
-    initialData: () => listSnapshot?.note,
+    staleTime: previewOnly ? 0 : 30_000,
+    initialData: () => (previewOnly ? undefined : listSnapshot?.note),
     initialDataUpdatedAt: () => listSnapshot?.updatedAt,
   });
-  const currentNote = listSnapshot && (listSnapshot.updatedAt ?? 0) > query.dataUpdatedAt
-    ? listSnapshot.note : query.data;
+  const currentNote = previewOnly
+    ? query.data
+    : listSnapshot && (listSnapshot.updatedAt ?? 0) > query.dataUpdatedAt
+      ? listSnapshot.note
+      : query.data;
   if (resolvedId && !currentNote)
     return (
       <NoteSurfaceFrame
