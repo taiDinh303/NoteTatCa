@@ -21,7 +21,7 @@ public sealed class NotesController(INoteService notes, INoteTagService labels) 
     public async Task<IActionResult> List(int pageNumber = 1, int pageSize = 20, string? q = null, Guid? tagId = null, bool trash = false, bool? pinned = null, bool hasReminder = false) =>
         Success(await notes.QueryAsync(pageNumber, pageSize, q, tagId, trash, pinned, hasReminder));
     [HttpGet("{id:guid}")] [ProducesResponseType(typeof(BaseResponse<NoteResponseModelView>), 200)]
-    public async Task<IActionResult> Get(Guid id) => Success(await notes.GetByIdAsync(id));
+    public async Task<IActionResult> Get(Guid id, bool trash = false) => Success(await notes.GetByIdAsync(id, trash));
     [HttpGet("{id:guid}/revisions")]
     [ProducesResponseType(typeof(BaseResponse<BasePaginatedList<NoteRevisionModel>>), 200)]
     public async Task<IActionResult> Revisions(Guid id, int pageNumber = 1, int pageSize = 20) =>

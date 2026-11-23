@@ -49,7 +49,8 @@ public sealed class NoteService(IUnitOfWork unitOfWork, ICurrentUser currentUser
         var notes = await WithDetails(ordered).Skip((page - 1) * size).Take(size).ToListAsync();
         return new(notes.Select(x => x.ToViewModel()).ToArray(), count, page, size);
     }
-    public async Task<NoteResponseModelView> GetByIdAsync(Guid id) => (await WithDetails(Owned())
+    public Task<NoteResponseModelView> GetByIdAsync(Guid id) => GetByIdAsync(id, trash: false);
+    public async Task<NoteResponseModelView> GetByIdAsync(Guid id, bool trash) => (await WithDetails(Owned(trash))
         .AsNoTracking().FirstOrDefaultAsync(x => x.Id == id) ?? throw DomainErrors.NotFound("Note")).ToViewModel();
 
     private static NoteRevision Snapshot(Note note) => new()

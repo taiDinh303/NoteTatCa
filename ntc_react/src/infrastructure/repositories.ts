@@ -22,7 +22,7 @@ import type {
   Role,
   Statistics,
 } from "../domain/models";
-import { ApiClient, ApiError, query } from "./http";
+import { ApiClient, query } from "./http";
 import { validateDocument } from "../domain/document";
 export class NotesRepository {
   constructor(readonly api: ApiClient) {}
@@ -38,17 +38,13 @@ export class NotesRepository {
   readyForRemote(id: string) {
     return this.find(id);
   }
-  async findTrashed(id: string, signal?: AbortSignal): Promise<Note> {
-    let pageNumber = 1;
-    while (true) {
-      const page = await this.list({ trash: true }, pageNumber++, signal);
-      const note = page.items.find((n) => n.id === id);
-      if (note) return note;
-      if (!page.hasNextPage)
-        throw new ApiError(404, {
-          message: "This note is no longer in the trash.",
-        });
-    }
+  findTrashed(id: string, signal?: AbortSignal) {
+    // One O(1) lookup against the trash scope instead of paging the whole
+    // trash until the note is found (previously O(n/100) list requests).
+    return this.api.request<Note>(
+      `/notes/${id}` + query({ trash: true }),
+      { signal },
+    );
   }
   create(draft: NoteDraft, key: string) {
     validateDocument(draft.documentJson);

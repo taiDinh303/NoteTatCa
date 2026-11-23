@@ -114,6 +114,17 @@ public sealed class NoteTests
         Assert.True((await c.DeleteAsync($"/api/v1/notes/{first}")).IsSuccessStatusCode);
     }
     [Fact]
+    public async Task Trashed_note_is_resolved_by_a_single_id_lookup_instead_of_paging()
+    {
+        using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;
+        var created=await ApiFactory.Note(c,"single-lookup"); var id=created.GetProperty("id").GetGuid();
+        Assert.True((await c.PostAsync($"/api/v1/notes/{id}/trash",null)).IsSuccessStatusCode);
+        var found=await ApiFactory.Data(await c.GetAsync($"/api/v1/notes/{id}?trash=true"));
+        Assert.Equal(id,found.GetProperty("id").GetGuid());
+        Assert.Equal(HttpStatusCode.NotFound,(await c.GetAsync($"/api/v1/notes/{id}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound,(await c.GetAsync($"/api/v1/notes/{Guid.NewGuid()}?trash=true")).StatusCode);
+    }
+    [Fact]
     public async Task Invalid_color_icon_and_oversized_content_are_rejected()
     {
         using var f=new ApiFactory(); await f.InitializeAsync(); var (c,_)=await f.LoginAsync(); using var client=c;

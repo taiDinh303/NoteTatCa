@@ -67,6 +67,26 @@ function DesktopNotesZoomViewport({
       if (Math.abs(view.scrollTop - rail.scrollTop) > 0.5)
         view.scrollTop = rail.scrollTop;
     }
+    // Scroll events fire per frame while the user is actually scrolling;
+    // updateScrollbar reads layout (scrollHeight/clientHeight) and writes
+    // sibling styles, so batching both handlers into one rAF each avoids a
+    // forced layout on every intermediate scroll event.
+    let scrollbarFrame = 0;
+    function scheduleScrollbar() {
+      if (scrollbarFrame) return;
+      scrollbarFrame = requestAnimationFrame(() => {
+        scrollbarFrame = 0;
+        updateScrollbar();
+      });
+    }
+    let notesFrame = 0;
+    function scheduleNotesScroll() {
+      if (notesFrame) return;
+      notesFrame = requestAnimationFrame(() => {
+        notesFrame = 0;
+        scrollNotes();
+      });
+    }
     function cards() {
       return Array.from(content.querySelectorAll<HTMLElement>(".note-card"));
     }
@@ -376,8 +396,8 @@ function DesktopNotesZoomViewport({
       });
     main?.addEventListener("transitionend", sidebarFinished);
     initialized = true;
-    view.addEventListener("scroll", updateScrollbar, { passive: true });
-    rail.addEventListener("scroll", scrollNotes, { passive: true });
+    view.addEventListener("scroll", scheduleScrollbar, { passive: true });
+    rail.addEventListener("scroll", scheduleNotesScroll, { passive: true });
     // Release presentation transforms before sortable's interaction sensors run.
     view.addEventListener("pointerdown", cancelReflow, true);
     view.addEventListener("keydown", cancelReflow, true);
@@ -391,8 +411,10 @@ function DesktopNotesZoomViewport({
       content.style.removeProperty("transition");
       cancelReflow();
       unsubscribe();
-      view.removeEventListener("scroll", updateScrollbar);
-      rail.removeEventListener("scroll", scrollNotes);
+      view.removeEventListener("scroll", scheduleScrollbar);
+      rail.removeEventListener("scroll", scheduleNotesScroll);
+      cancelAnimationFrame(scrollbarFrame);
+      cancelAnimationFrame(notesFrame);
       view.removeEventListener("pointerdown", cancelReflow, true);
       view.removeEventListener("keydown", cancelReflow, true);
     };

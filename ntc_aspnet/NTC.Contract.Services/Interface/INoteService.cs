@@ -12,6 +12,7 @@ namespace NTC.Contract.Services.Interface
         Task<BasePaginatedList<NoteResponseModelView>> GetTrashAsync(int pageNumber, int pageSize);
         Task<BasePaginatedList<NoteResponseModelView>> GetByReminderAsync(int pageNumber, int pageSize);
         Task<NoteResponseModelView> GetByIdAsync(Guid id);
+        Task<NoteResponseModelView> GetByIdAsync(Guid id, bool trash);
         Task <Note>CreateAsync(CreateNoteModelView model, bool hidden = false);
         Task UpdateAsync(UpdateNoteModelView model);
         Task SoftDeleteAsync(Guid id);
