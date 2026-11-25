@@ -368,6 +368,19 @@ function DesktopContentZoom({
         disabled={percent >= 300}
         onClick={() => change.current(percent + 10)}
       />
+      {percent !== 100 ? (
+        <IconButton
+          icon={Hand}
+          className="content-zoom-pan"
+          label={tr("Pan content")}
+          aria-pressed={handEnabled}
+          active={handEnabled}
+          onClick={() => {
+            hand.current = !hand.current;
+            setHandEnabled(hand.current);
+          }}
+        />
+      ) : null}
       <IconButton
         icon={RotateCcw}
         className="content-zoom-reset"
@@ -393,21 +406,6 @@ function DesktopContentZoom({
       </div>
       {!mobile && session?.target
         ? createPortal(controls, session.target)
-        : null}
-      {!mobile && percent !== 100 && session?.handTarget
-        ? createPortal(
-            <IconButton
-              icon={Hand}
-              label={tr("Pan content")}
-              aria-pressed={handEnabled}
-              active={handEnabled}
-              onClick={() => {
-                hand.current = !hand.current;
-                setHandEnabled(hand.current);
-              }}
-            />,
-            session.handTarget,
-          )
         : null}
     </div>
   );

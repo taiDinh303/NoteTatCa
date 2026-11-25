@@ -31,7 +31,6 @@ import {
   Code2,
   Highlighter,
   Italic,
-  Link2,
   List,
   ListOrdered,
   Minus,
@@ -148,7 +147,6 @@ export default memo(function RichEditor({
   onCharacterCount: (count: number) => void;
 }) {
   const language = useLanguage();
-  const [link, setLink] = useState(false);
   const [fontInput, setFontInput] = useState<string | null>(null);
   const [markdown, setMarkdown] = useState<"import" | "export" | null>(null);
   const [error, setError] = useState<unknown>();
@@ -476,12 +474,6 @@ export default memo(function RichEditor({
           active={state?.code}
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         />
-        <span className="toolbar-divider" />
-        <IconButton
-          icon={Link2}
-          label={tr("Insert link")}
-          onClick={() => setLink(true)}
-        />
         <Popover.Root open={textColorOpen} onOpenChange={setTextColorOpen}>
           <Popover.Trigger asChild>
             <button
@@ -570,47 +562,6 @@ export default memo(function RichEditor({
         <NoteOutline editor={editor} />
         <EditorContent className="editor-content" editor={editor} />
       </ContentZoom>
-      {link ? (
-        <Modal open onClose={() => setLink(false)} title={tr("Add a link")}>
-          <form
-            className="modal-body"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const href = String(
-                new FormData(e.currentTarget).get("url"),
-              ).trim();
-              if (href && !/^(https?:\/\/|mailto:)/i.test(href)) {
-                setError(
-                  new Error(tr("Use an https://, http:// or mailto: link.")),
-                );
-                return;
-              }
-              if (href)
-                editor
-                  .chain()
-                  .focus()
-                  .extendMarkRange("link")
-                  .setLink({ href })
-                  .run();
-              else editor.chain().focus().unsetLink().run();
-              setLink(false);
-            }}
-          >
-            <ErrorBanner error={error} />
-            <Field
-              label={tr("Link URL")}
-              hint={tr("Leave empty to remove the link.")}
-            >
-              <input
-                name="url"
-                placeholder="https://"
-                defaultValue={editor.getAttributes("link").href ?? ""}
-              />
-            </Field>
-            <Button type="submit">{tr("Apply link")}</Button>
-          </form>
-        </Modal>
-      ) : null}
       {markdown === "import" ? (
         <Modal
           open

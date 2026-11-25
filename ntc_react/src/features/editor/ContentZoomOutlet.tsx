@@ -18,11 +18,6 @@ export default function ContentZoomOutlet({
   const mobile = useMobileLayout();
   const session = useContext(ContentZoomSession);
   const setTarget = session?.setTarget;
-  const setHandTarget = session?.setHandTarget;
-  const attachHand = useCallback(
-    (node: HTMLDivElement | null) => setHandTarget?.(node),
-    [setHandTarget],
-  );
   const attach = useCallback(
     (node: HTMLDivElement | null) => setTarget?.(node),
     [setTarget],
@@ -45,7 +40,6 @@ export default function ContentZoomOutlet({
               active={expanded}
             />
           </Popover.Trigger>
-          <div className="content-pan-toggle" ref={attachHand} />
         </div>
         <Popover.Portal>
           <Popover.Content
@@ -76,7 +70,6 @@ export default function ContentZoomOutlet({
     );
   return (
     <div className="content-zoom-inline">
-      <div className="content-pan-toggle" ref={attachHand} />
       <IconButton
         icon={ZoomIn}
         label={tr("Content zoom")}

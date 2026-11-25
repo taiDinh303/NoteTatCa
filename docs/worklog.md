@@ -1,3 +1,13 @@
+## Toolbar editor: gộp bullet list+style, pan vào nhóm zoom, bỏ add-link (frontend) — 2026-11-25
+
+- Chủ dự án yêu cầu (theo 5 ảnh tham chiếu): (1) gộp nút bullet list + bullet style thành 1 control; (2) nút bàn tay pan content đưa sang bên phải nhóm zoom (kính lúp − % +) thành 1 cụm như ảnh 4; (3) bỏ "Add a link" (nút + modal, ảnh 5).
+- **Gộp bullet (ảnh 2/4)**: markup `RichEditor` đã nhóm sẵn List + chevron trong `.bullet-list-control`; thêm CSS pill (border + border-radius + overflow hidden, button con bỏ radius) để icon list + chevron đọc như MỘT nút — chevron vẫn mở dropdown Dot/Dash/Circle/Square, List vẫn toggle, giữ nguyên hành vi/aria.
+- **Pan vào nhóm zoom (ảnh 3→4)**: nút Hand ("Pan content", chỉ hiện khi zoom ≠ 100%) trước là portal riêng bên trái nút kính lúp (`.content-pan-toggle` + `handTarget` session). Nay render thẳng trong `.content-zoom-controls` ngay sau nút "+": cụm `[−][%][+][hand][reset]`. Bỏ hẳn `handTarget`/`setHandTarget` khỏi `contentZoomSession.ts` + `NoteEditor` (ZoomSession) + `ContentZoomOutlet` (2 chỗ) — ít 1 portal, ít 1 state. Hành vi pan (grab/grabbing khi zoom) và "tự tắt khi về 100%" giữ nguyên.
+- **Bỏ add-link (ảnh 5)**: xóa nút "Insert link" + modal "Add a link" + state `link` + import `Link2` trong `RichEditor`. GIỮ Tiptap `link` extension (`openOnClick:false, autolink`) để link import từ markdown / content cũ vẫn render + click được; không còn UI chèn link.
+- E2E không chạy tại chỗ (cần fixture server 5199): đã kiểm tra label aria các spec liên quan vẫn khớp — `list-formatting` dùng "Bullet style" (chevron vẫn giữ label), `content-zoom` dùng "Pan content" + điều kiện zoom (giữ nguyên).
+- Validation: `npm --prefix ntc_react run build` PASS (EXIT=0, tsc -b + vite, chunk không đổi ~NoteEditor 697 kB); `npm test --run` = 164 passed, 1 skipped. Chưa chạy E2E Playwright (môi trường thiếu fixture); UI cần Vercel deploy + 1 hard-refresh PWA.
+- Phạm vi: `ntc_react/src/features/editor/{RichEditor,ContentZoom,ContentZoomOutlet,NoteEditor,contentZoomSession.tsx/.ts}`, `ntc_react/src/features/editor/ContentZoom.css`, `ntc_react/src/styles.css` + entry worklog này.
+
 ## Tối ưu load/tốc độ truy vấn: list projection nhẹ + detail-on-open + cap preview (backend/frontend) — 2026-11-23
 
 - Chủ dự án cấp quyền "triển khai đề xuất của bạn" để tối ưu tốc độ luồng/load/truy vấn, thuật toán hiện đại/chuyên nghiệp. Thực thi phần an-toàn & giá trị cao nhất (không đổi ownership/dữ liệu/contract paging):
