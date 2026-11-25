@@ -1,3 +1,11 @@
+## Hidden notes trong dropdown tài khoản: giữ trên PC, bỏ trên mobile — 2026-11-25
+
+- Chủ dự án làm rõ mong đợi sau release trước: PC vẫn phải có mục Hidden notes trong dropdown tài khoản (lối vào vault khi không có pull-down), mobile thì không hiện vì đã có thao tác kéo xuống ở đầu danh sách note; mục Hide note trong dropdown ba chấm của thẻ note tiếp tục bỏ ở cả hai.
+- Thay đổi: `ShellAccountMenu` (`ntc_react/src/app/ShellControls.tsx`) thêm lại item `Hidden notes` (icon LockKeyhole → `/hidden-notes`) nhưng chỉ khi `!mobile` (cùng `useMobileLayout` với các phần responsive khác), vẫn loại admin và guest. `NoteCard` giữ nguyên: không còn `Hide note`, chỉ còn `Unhide note` cho note đang ẩn trong vault.
+- Không đổi route `/hidden-notes`, quyền, grant 15 phút, cache RAM, API/backend, dữ liệu hay luồng hide/unhide; mobile vẫn mở vault bằng pull-down và PC bằng menu tài khoản như trước 07/11.
+- Validation: `npm run typecheck` PASS; `npm run lint` PASS (0 warning); `npx vitest run` 21 file / 164 pass / 1 skip. E2E Playwright thật chưa chạy được (môi trường không có `dotnet` cho fixture 5199); spec `hidden-notes` hiện mở vault bằng pull-down hoặc `page.goto("/hidden-notes")` nên không phụ thuộc item menu và vẫn hợp lệ. Chưa kiểm bằng mắt trên PC/mobile.
+- Phạm vi: `ntc_react/src/app/ShellControls.tsx`, `docs/HIDDEN-NOTES.md`, `docs/FRONTEND-IMPLEMENTATION.md` + entry này. Publish để Vercel build lại; PC cần hard-refresh một lần.
+
 ## Toolbar editor: gộp bullet list+style, pan vào nhóm zoom, bỏ add-link (frontend) — 2026-11-25
 
 - Chủ dự án yêu cầu (theo 5 ảnh tham chiếu): (1) gộp nút bullet list + bullet style thành 1 control; (2) nút bàn tay pan content đưa sang bên phải nhóm zoom (kính lúp − % +) thành 1 cụm như ảnh 4; (3) bỏ "Add a link" (nút + modal, ảnh 5).

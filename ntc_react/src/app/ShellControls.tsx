@@ -6,6 +6,7 @@ import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  LockKeyhole,
   LogOut,
   Settings,
   RefreshCw,
@@ -97,6 +98,15 @@ export function ShellAccountMenu({
                   label: tr("Copy guest notes"),
                   icon: Copy,
                   action: () => guest.requestImport(),
+                },
+              ]
+            : []),
+          ...(!guestMode && !isAdministrator(state.session) && !mobile
+            ? [
+                {
+                  label: tr("Hidden notes"),
+                  icon: LockKeyhole,
+                  action: () => navigateTo("/hidden-notes"),
                 },
               ]
             : []),
