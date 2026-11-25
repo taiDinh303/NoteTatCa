@@ -1,7 +1,15 @@
 import { test, expect } from "@playwright/test";
 
+async function openVaultByPull(page: import("@playwright/test").Page) {
+  const view = page.locator(".note-card").first().locator(".note-card-identity");
+  await view.dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
+  await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 300 }] });
+  await view.dispatchEvent("touchend");
+}
+
 test("notes win priority; secondary pages deduplicate and hidden cache stays behind lock", async ({ page, request }) => {
   await request.post("http://127.0.0.1:5199/__fixture/reset");
+  await page.setViewportSize({ width: 393, height: 850 });
   let releaseStatus!: () => void;
   const statusGate = new Promise<void>(r => { releaseStatus = r; });
   let statusCalls = 0, sessionsCalls = 0, holdList = false;
@@ -18,8 +26,8 @@ test("notes win priority; secondary pages deduplicate and hidden cache stays beh
     await expect(page.locator(".note-card").first()).toBeVisible();
     await expect.poll(() => statusCalls).toBe(1);
     await expect.poll(() => sessionsCalls).toBe(1);
-    await page.getByRole("button", {name:"Account menu",exact:true}).click();
-    await page.getByRole("menuitem", {name:"Hidden notes",exact:true}).click();
+    await openVaultByPull(page);
+    await expect(page).toHaveURL(/\/hidden-notes/);
     await expect(page.locator(".vault-lock-form")).toHaveCount(0);
     expect(statusCalls).toBe(1);
     releaseStatus();
@@ -32,8 +40,7 @@ test("notes win priority; secondary pages deduplicate and hidden cache stays beh
     await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
     await page.getByRole("link", {name:"All notes",exact:true}).click();
     holdList = true;
-    await page.getByRole("button", {name:"Account menu",exact:true}).click();
-    await page.getByRole("menuitem", {name:"Hidden notes",exact:true}).click();
+    await openVaultByPull(page);
     await expect(page.locator(".vault-page .note-card")).toHaveCount(1);
     expect(statusCalls).toBe(1);
     releaseList();

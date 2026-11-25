@@ -1,5 +1,4 @@
 import { memo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useSortable } from "@dnd-kit/sortable";
 import {
   Bell,
@@ -47,7 +46,6 @@ export const NoteCard = memo(function NoteCard({
 }) {
   useLanguage();
   const guestMode = useAuth().status === "guest";
-  const navigateTo = useNavigate();
   const {
     setNodeRef,
     transform,
@@ -217,17 +215,12 @@ export const NoteCard = memo(function NoteCard({
               label={tr("Actions for {0}", title)}
               align="start"
               items={[
-                ...(!guestMode
+                ...(hidden
                   ? [
                       {
-                        label: tr(hidden ? "Unhide note" : "Hide note"),
+                        label: tr("Unhide note"),
                         icon: LockKeyhole,
-                        action: () =>
-                          hidden
-                            ? onUnhide?.(note)
-                            : navigateTo("/hidden-notes", {
-                                state: { hideNoteId: note.id },
-                              }),
+                        action: () => onUnhide?.(note),
                         disabled: busy,
                       },
                     ]

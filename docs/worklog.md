@@ -8,6 +8,14 @@
 - Validation: `npm --prefix ntc_react run build` PASS (EXIT=0, tsc -b + vite, chunk không đổi ~NoteEditor 697 kB); `npm test --run` = 164 passed, 1 skipped. Chưa chạy E2E Playwright (môi trường thiếu fixture); UI cần Vercel deploy + 1 hard-refresh PWA.
 - Phạm vi: `ntc_react/src/features/editor/{RichEditor,ContentZoom,ContentZoomOutlet,NoteEditor,contentZoomSession.tsx/.ts}`, `ntc_react/src/features/editor/ContentZoom.css`, `ntc_react/src/styles.css` + entry worklog này.
 
+## Ẩn "Hidden notes" khỏi dropdown tài khoản + "Hide note" khỏi menu thẻ note: publish build mới — 2026-11-25
+
+- Chủ dự án báo trên PC dropdown tài khoản vẫn hiện "Hidden notes" (mobile đã đúng) và xác nhận việc bỏ "Hide note" khỏi dropdown ba chấm của thẻ note là đúng ở cả mobile lẫn PC.
+- Rà lại source: `ShellAccountMenu` (`ntc_react/src/app/ShellControls.tsx`) không còn item `Hidden notes` (chỉ còn Review sync / Copy guest notes / Account settings / Sign out; admin và guest không có mục này), `NoteCard` (`ntc_react/src/features/notes/NoteCard.tsx`) không còn item `Hide note` (chỉ giữ `Unhide note` cho note đang ẩn trong vault). `grep -rn "Hidden notes"` trong `ntc_react/src` chỉ còn tiêu đề vault, thông báo lỗi/draft và bản dịch — không còn entry nào trong menu. Nguyên nhân PC vẫn thấy là bản build production/Vercel cũ (thay đổi chưa publish); mobile đã nạp shell mới.
+- Không đổi route `/hidden-notes`, quyền, grant 15 phút, cache RAM, API/backend hay dữ liệu; vault vẫn mở được bằng kéo-xuống trên mobile và bằng `hideNoteId` router state như trước.
+- Validation: `npm run typecheck` PASS; `npm run lint` PASS (0 warning); `npx vitest run` 21 file / 164 pass / 1 skip. E2E Playwright thật không chạy được trong môi trường này (không có `dotnet` để dựng FrontendFixture 5199) nên chỉ `playwright test --list` xác nhận spec hợp lệ; spec dùng helper `openVaultToHide` thay cho thao tác menu đã bỏ.
+- Phạm vi: `ntc_react/src/app/ShellControls.tsx`, `ntc_react/src/features/notes/NoteCard.tsx`, `ntc_react/e2e/hidden-notes.spec.ts`, `ntc_react/e2e/background-pages.spec.ts`, `docs/HIDDEN-NOTES.md`, `docs/FRONTEND-IMPLEMENTATION.md` + entry này. Publish để Vercel build lại; PC cần hard-refresh một lần (Ctrl+Shift+R hoặc xóa site data nếu là PWA).
+
 ## Tối ưu load/tốc độ truy vấn: list projection nhẹ + detail-on-open + cap preview (backend/frontend) — 2026-11-23
 
 - Chủ dự án cấp quyền "triển khai đề xuất của bạn" để tối ưu tốc độ luồng/load/truy vấn, thuật toán hiện đại/chuyên nghiệp. Thực thi phần an-toàn & giá trị cao nhất (không đổi ownership/dữ liệu/contract paging):
@@ -2904,3 +2912,18 @@ Panel polish refinements 2026-11-18 (continued same session):
 - 2157657: top raised to 150px to clear the rabbit mascot + headroom, bottom 80px.
 - c2d6623: (a) heading padding/min-height reduced (67→52px, 15→10px) so title sits closer to body; (b) `backdrop-filter: blur(2px)` removed from `.note-surface-backdrop` — the blur re-paints the transformed notes list on every scroll/zoom frame and was the measured jank; kept a subtle `#0f141a18` tint instead; (c) 0.2s ease-out transition on `top/bottom/width/height/border-radius/box-shadow` scoped to `min-width: 801px` so fullscreen enter/exit animates smoothly rather than jumping.
 - Vite build PASS after c2d6623. Physical PWA acceptance (full-screen transition on device) still pending owner hard-refresh.
+
+## Bỏ Hidden notes khỏi dropdown tài khoản — 2026-11-25
+
+- Chủ dự án yêu cầu không hiển thị mục Hidden notes trong dropdown menu tài khoản (ảnh chụp workspace). Đã xóa item `Hidden notes` khỏi `ShellAccountMenu` (`ntc_react/src/app/ShellControls.tsx`) và bỏ import `LockKeyhole` không còn dùng; không đổi route `/hidden-notes`, quyền, grant15phút, cache RAM hay API. Vault vẫn mở bằng thao tác kéo xuống ở đầu danh sách note trên mobile, hoặc trực tiếp route; desktop hiện không còn điểm vào trong menu.
+- E2E cập nhật theo cùng hành vi: `e2e/hidden-notes.spec.ts` dùng helper kéo-xuống (`openVaultByPull`) cho các ca mobile cần giữ state SPA (draft chưa lưu, unlock qua điều hướng) và `page.goto("/hidden-notes")` cho các ca setup mới ở desktop; `e2e/background-pages.spec.ts` chuyển sang viewport393 và kéo-xuống để giữ kiểm tra prefetch/dedupe. Menuitem "Hidden notes" còn lại duy nhất thuộc menu tuỳ chọn trong vault (đổi Trash↔Hidden notes) nên giữ nguyên.
+- Validation: `tsc -b` PASS0lỗi; `eslint .` PASS0error/0warning; Vitest21file/164PASS/1SKIP. E2E chưa chạy được vì môi trường này không có `dotnet` cho FrontendFixture127.0.0.1:5199; chưa kiểm dropdown bằng mắt trên trình duyệt.
+- Publication scope: `ntc_react/src/app/ShellControls.tsx`, `ntc_react/e2e/hidden-notes.spec.ts`, `ntc_react/e2e/background-pages.spec.ts`, `docs/HIDDEN-NOTES.md` và entry này. Không backend/schema/migration.
+
+## Bỏ Hide note khỏi dropdown của thẻ note — 2026-11-25
+
+- Chủ dự án yêu cầu bỏ mục hidden notes khỏi dropdown ba chấm của thẻ note (ảnh chụp card menu có Hide note). Đã xóa item `Hide note` khỏi menu `NoteCard` (`ntc_react/src/features/notes/NoteCard.tsx`) cùng import `useNavigate`/`LockKeyhole` không còn dùng; card menu thường giờ chỉ còn Add label, Add reminder, Move to trash. Trong vault vẫn giữ `Unhide note` cho note đã ẩn và nút New hidden note để không khóa cứng dữ liệu đã ẩn; không đổi route, quyền, grant15phút, cache RAM, API hay backend.
+- Luồng xác nhận hide trong vault và `hideNote()`/offline tombstone giữ nguyên; sau thay đổi này không còn điểm vào từ card menu thường mà chỉ còn qua state `hideNoteId` khi mở `/hidden-notes`.
+- E2E: `e2e/hidden-notes.spec.ts` thêm helper `openVaultToHide` (đọc id từ `data-testid=note-<id>`, đẩy router state `hideNoteId` rồi popstate) thay cho thao tác mở card menu + menuitem Hide note ở hai ca hide note thường; các ca còn lại không đổi.
+- Validation: `tsc -b` PASS; `eslint .` PASS; Vitest PASS (chi tiết bên dưới khi chạy). E2E chưa chạy được vì môi trường này không có `dotnet` cho FrontendFixture127.0.0.1:5199; dropdown chưa được kiểm bằng mắt trên trình duyệt.
+- Publication scope: `ntc_react/src/features/notes/NoteCard.tsx`, `ntc_react/e2e/hidden-notes.spec.ts`, `docs/HIDDEN-NOTES.md`, `docs/FRONTEND-IMPLEMENTATION.md` và entry này. Không backend/schema/migration.

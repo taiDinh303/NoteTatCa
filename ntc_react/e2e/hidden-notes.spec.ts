@@ -11,6 +11,30 @@ async function signIn(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/notes/);
 }
+async function openVaultByPull(page: import("@playwright/test").Page) {
+  const view = page.locator(".note-card").first().locator(".note-card-identity");
+  await view.dispatchEvent("touchstart", { touches: [{ identifier: 0, clientX: 100, clientY: 100 }] });
+  await view.dispatchEvent("touchmove", { touches: [{ identifier: 0, clientX: 100, clientY: 300 }] });
+  await view.dispatchEvent("touchend");
+  await expect(page).toHaveURL(/\/hidden-notes/);
+}
+// Card menus no longer offer Hide note, so enter the vault with the selected
+// note as router state to exercise the hide confirmation flow.
+async function openVaultToHide(
+  page: import("@playwright/test").Page,
+  card: import("@playwright/test").Locator,
+) {
+  const id = (await card.getAttribute("data-testid"))!.replace(/^note-/, "");
+  await page.evaluate((noteId) => {
+    const state = {
+      ...(window.history.state ?? {}),
+      usr: { hideNoteId: noteId },
+    };
+    window.history.pushState(state, "", "/hidden-notes");
+    window.dispatchEvent(new PopStateEvent("popstate", { state }));
+  }, id);
+  await expect(page).toHaveURL(/\/hidden-notes/);
+}
 for (const width of [320, 1440])
   test(`hidden PIN notes stay out of normal lists and survive lock ${width}`, async ({
     page,
@@ -25,10 +49,7 @@ for (const width of [320, 1440])
     const originalColor = await card.evaluate(
       (el) => getComputedStyle(el).backgroundColor,
     );
-    await card.getByRole("button", { name: /^Actions for / }).click();
-    await page
-      .getByRole("menuitem", { name: "Hide note", exact: true })
-      .click();
+    await openVaultToHide(page, card);
     await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
     await page.getByRole("button", { name: "Continue", exact: true }).click();
     await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
@@ -178,10 +199,7 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
   await request.post(base + "/__fixture/reset");
   await page.setViewportSize({ width: 393, height: 850 });
   await signIn(page);
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page
-    .getByRole("menuitem", { name: "Hidden notes", exact: true })
-    .click();
+  await openVaultByPull(page);
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
@@ -210,10 +228,7 @@ test("hidden drafts resume after locking and never enter the offline cache", asy
       { exact: true },
     ),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page
-    .getByRole("menuitem", { name: "Hidden notes", exact: true })
-    .click();
+  await openVaultByPull(page);
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Unlock", exact: true }).click();
   await page.locator(".vault-page .note-open").first().click();
@@ -312,10 +327,7 @@ test("email reset keeps hidden notes and hidden trash restores privately", async
   await request.post(base + "/__fixture/reset");
   await page.setViewportSize({ width: 1440, height: 1000 });
   await signIn(page);
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page
-    .getByRole("menuitem", { name: "Hidden notes", exact: true })
-    .click();
+  await page.goto("/hidden-notes");
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
@@ -420,8 +432,7 @@ test("ambiguous hide acknowledgement keeps offline content excluded and retries 
   await signIn(page);
   const card = page.locator(".note-card").first();
   const title = await card.getByRole("heading").innerText();
-  await card.getByRole("button", { name: /^Actions for / }).click();
-  await page.getByRole("menuitem", { name: "Hide note", exact: true }).click();
+  await openVaultToHide(page, card);
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
@@ -471,10 +482,7 @@ test("unlock survives switching tabs and app routes, expires after fifteen idle 
   await page.setViewportSize({ width: 393, height: 850 });
   await signIn(page);
   await page.clock.install();
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page
-    .getByRole("menuitem", { name: "Hidden notes", exact: true })
-    .click();
+  await openVaultByPull(page);
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
   await page.getByLabel("Six-digit PIN", { exact: true }).fill("123456");
@@ -500,10 +508,7 @@ test("unlock survives switching tabs and app routes, expires after fifteen idle 
     .getByRole("link", { name: /^All notes/ })
     .click();
   await expect(page).toHaveURL(/\/notes$/);
-  await page.getByRole("button", { name: "Account menu", exact: true }).click();
-  await page
-    .getByRole("menuitem", { name: "Hidden notes", exact: true })
-    .click();
+  await openVaultByPull(page);
   await expect(
     page.getByRole("button", { name: "Lock now", exact: true }),
   ).toBeVisible();
@@ -535,12 +540,7 @@ for (const width of [320, 1440])
     await request.post(base + "/__fixture/reset");
     await page.setViewportSize({ width, height: 900 });
     await signIn(page);
-    await page
-      .getByRole("button", { name: "Account menu", exact: true })
-      .click();
-    await page
-      .getByRole("menuitem", { name: "Hidden notes", exact: true })
-      .click();
+    await page.goto("/hidden-notes");
     await page.getByLabel("Lock type", { exact: true }).click();
     await page
       .getByRole("option", { name: "3 by 3 pattern", exact: true })

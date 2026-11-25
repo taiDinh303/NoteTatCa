@@ -6,7 +6,6 @@ import { t as tr, useLanguage } from "../shared/i18n";
 import { useRef, useSyncExternalStore } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  LockKeyhole,
   LogOut,
   Settings,
   RefreshCw,
@@ -101,7 +100,6 @@ export function ShellAccountMenu({
                 },
               ]
             : []),
-          ...(!guestMode && !isAdministrator(state.session) ? [{label:tr("Hidden notes"),icon:LockKeyhole,action:()=>navigateTo("/hidden-notes")}] : []),
           ...(!guestMode
             ? [
                 {
