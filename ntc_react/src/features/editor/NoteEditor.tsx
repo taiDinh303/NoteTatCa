@@ -107,7 +107,11 @@ function ZoomSession({ children }: { children: React.ReactNode }) {
   const percent = useRef(100);
   const scroll = useRef({ left: 0, top: 0 });
   const [target, setTarget] = useState<HTMLDivElement | null>(null);
-  const zoom = useMemo(() => ({ percent, scroll, target, setTarget }), [target]);
+  const [handTarget, setHandTarget] = useState<HTMLDivElement | null>(null);
+  const zoom = useMemo(
+    () => ({ percent, scroll, target, setTarget, handTarget, setHandTarget }),
+    [target, handTarget],
+  );
   return (
     <ContentZoomSession.Provider value={zoom}>
       <MascotAnimationSession>{children}</MascotAnimationSession>

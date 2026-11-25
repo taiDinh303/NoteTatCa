@@ -327,6 +327,24 @@ function DesktopContentZoom({
       Number.isFinite(value) ? Math.round(clamp(value)) : percent,
     );
   }
+  const toggleHand = () => {
+    hand.current = !hand.current;
+    setHandEnabled(hand.current);
+  };
+  const handButton = percent !== 100 ? (
+    <IconButton
+      icon={Hand}
+      className="content-zoom-pan"
+      label={tr("Pan content")}
+      aria-pressed={handEnabled}
+      active={handEnabled}
+      onClick={toggleHand}
+    />
+  ) : null;
+  // The editor toolbar exposes a dedicated hand slot next to the magnifier
+  // (handTarget). When it's absent (footer/popup view) the hand falls back to
+  // the zoom cluster so the pan control is never lost.
+  const handInSlot = !!session?.handTarget;
   const controls = (
     <div
       className="content-zoom-controls"
@@ -368,19 +386,7 @@ function DesktopContentZoom({
         disabled={percent >= 300}
         onClick={() => change.current(percent + 10)}
       />
-      {percent !== 100 ? (
-        <IconButton
-          icon={Hand}
-          className="content-zoom-pan"
-          label={tr("Pan content")}
-          aria-pressed={handEnabled}
-          active={handEnabled}
-          onClick={() => {
-            hand.current = !hand.current;
-            setHandEnabled(hand.current);
-          }}
-        />
-      ) : null}
+      {!handInSlot && handButton}
       <IconButton
         icon={RotateCcw}
         className="content-zoom-reset"
@@ -389,6 +395,10 @@ function DesktopContentZoom({
       />
     </div>
   );
+  const handSlot =
+    handInSlot && handButton
+      ? createPortal(handButton, session!.handTarget!)
+      : null;
   return (
     <div className="content-zoom">
       <div
@@ -407,6 +417,7 @@ function DesktopContentZoom({
       {!mobile && session?.target
         ? createPortal(controls, session.target)
         : null}
+      {handSlot}
     </div>
   );
 }

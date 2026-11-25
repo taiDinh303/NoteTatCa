@@ -1,3 +1,14 @@
+## Nút bàn tay (pan) ra bên cạnh kính lúp + chỉ hiện ≠100% (frontend) — 2026-11-25
+
+- Chủ dự án (ảnh 4): "bàn tay hiện bên phải cạnh nút kính lúp" + "chỉ hiện khi ≠ 100%" — trước đó (6ca290e) nút Hand nằm trong dropdown zoom. Nay đưa Hand thành **sibling pill** ngay bên phải trigger kính lúp (như `.bullet-list-control`), tách khỏi dropdown; dropdown chỉ còn `[−][%][+][reset]`.
+- **Session**: `contentZoomSession.ts` thêm `handTarget`/`setHandTarget` (slot portal riêng cho nút pan). `NoteEditor.tsx` `ZoomSession` provide `handTarget` state (tương tự `target`).
+- **`ContentZoom.tsx`**: tách `handButton` (chỉ render khi `percent !== 100`) ra khỏi cluster. Khi `session.handTarget` tồn tại (toolbar editor) → portal `handButton` sang slot sibling; khi không (footer/popup view) → fallback render trong cluster `!handInSlot && handButton` để không mất control. `data-hand` + cursor grab/grabbing giữ nguyên.
+- **`ContentZoomOutlet.tsx` (inline)**: wrap trigger vào `.content-zoom-pill` + `.content-zoom-pan-slot` (ref `attachHand` → `setHandTarget`). `.content-zoom-pan-slot` là div rỗng luôn render (slot mount); button chỉ hiện khi ≠100 vì `ContentZoom` quyết định render `handButton`. Popup mode giữ nguyên (không có slot).
+- **CSS `ContentZoom.css`**: `.content-zoom-pill` (border + radius + overflow, button con bỏ radius — y hệt `.bullet-list-control`), `.content-zoom-pan-slot` + sizing icon 28×29/svg 14 trong `.editor-toolbar`. Xóa không cần gì khác.
+- **E2E `content-zoom.spec.ts`**: test chrome (801/1024/1280) — toolbar nay có thể đổi width khi ≠100% (thêm pill pan), nên assertion `after == before` đổi thành: so `.editor-heading,.editor-footer` (chrome) + `.editor-toolbar` {height,y} ổn định; thêm assert "Pan content" visible + `.content-zoom-pan-slot` present khi zoom 200%. Hand-pan desktop test (line ~310) chạy ở view mode (popup, không có slot) → pan fallback vào cluster, spec vẫn hợp lệ.
+- Validation: `npm --prefix ntc_react run build` PASS (EXIT=0); `npm test` = 164 passed, 1 skipped; `npx playwright test --list e2e/content-zoom.spec.ts` = 13 tests hợp lệ. Chưa chạy e2e fixture; UI cần Vercel deploy + 1 hard-refresh.
+- Phạm vi: `contentZoomSession.ts`, `NoteEditor.tsx`, `ContentZoom.tsx`, `ContentZoomOutlet.tsx`, `ContentZoom.css` (features/editor), `e2e/content-zoom.spec.ts` + entry này.
+
 ## Nút kính lúp (content-zoom) mở dropdown như bullet (frontend) — 2026-11-25
 
 - Chủ dự án: "nút kính lúp chưa làm dropdown giống như bullets" — nút zoom trong editor (inline `ContentZoomOutlet`) trước dùng state `expanded` toggle ẩn/hiện div `.content-zoom-outlet` bên cạnh (kể cả CSS `[data-expanded="false"]` để ẩn cụm control khi collapsed).

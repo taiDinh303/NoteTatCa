@@ -120,6 +120,33 @@
   flex-shrink: 0;
   gap: 2px;
 }
+/* Editor toolbar: the magnifier trigger and the pan toggle read as one pill,
+   like the bullet-list control. The pan button is portaled into the empty
+   `.content-zoom-pan-slot` that sits beside the magnifier. */
+.content-zoom-pill {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.content-zoom-pill .icon-button {
+  border-radius: 0;
+}
+.content-zoom-pan-slot {
+  display: inline-flex;
+  align-items: center;
+}
+.editor-toolbar .content-zoom-pan-slot .icon-button {
+  width: 28px;
+  height: 29px;
+  padding: 4px;
+}
+.editor-toolbar .content-zoom-pan-slot .content-zoom-pan svg {
+  width: 14px;
+  height: 14px;
+}
 .content-zoom-menu {
   z-index: 180;
   padding: 8px;

@@ -18,9 +18,14 @@ export default function ContentZoomOutlet({
   const mobile = useMobileLayout();
   const session = useContext(ContentZoomSession);
   const setTarget = session?.setTarget;
+  const setHandTarget = session?.setHandTarget;
   const attach = useCallback(
     (node: HTMLDivElement | null) => setTarget?.(node),
     [setTarget],
+  );
+  const attachHand = useCallback(
+    (node: HTMLDivElement | null) => setHandTarget?.(node),
+    [setHandTarget],
   );
   const [expanded, setExpanded] = useState(false);
   const [boundary, setBoundary] = useState<HTMLElement | null>(null);
@@ -68,28 +73,31 @@ export default function ContentZoomOutlet({
       </Popover.Root>
     );
   return (
-    <Popover.Root open={expanded} onOpenChange={setExpanded}>
-      <div className="content-zoom-inline">
-        <Popover.Trigger asChild>
-          <IconButton
-            icon={ZoomIn}
-            label={tr("Content zoom")}
-            active={expanded}
-          />
-        </Popover.Trigger>
-      </div>
-      <Popover.Portal>
-        <Popover.Content
-          className="content-zoom-menu"
-          side="bottom"
-          align="start"
-          sideOffset={7}
-          collisionPadding={8}
-          aria-label={tr("Content zoom")}
-        >
-          <div className="content-zoom-outlet" ref={attach} />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+    <div className="content-zoom-pill">
+      <Popover.Root open={expanded} onOpenChange={setExpanded}>
+        <div className="content-zoom-inline">
+          <Popover.Trigger asChild>
+            <IconButton
+              icon={ZoomIn}
+              label={tr("Content zoom")}
+              active={expanded}
+            />
+          </Popover.Trigger>
+        </div>
+        <Popover.Portal>
+          <Popover.Content
+            className="content-zoom-menu"
+            side="bottom"
+            align="start"
+            sideOffset={7}
+            collisionPadding={8}
+            aria-label={tr("Content zoom")}
+          >
+            <div className="content-zoom-outlet" ref={attach} />
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+      <div className="content-zoom-pan-slot" ref={attachHand} />
+    </div>
   );
 }

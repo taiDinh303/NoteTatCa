@@ -57,15 +57,26 @@ for (const width of [801, 1024, 1280]) {
       dialog.getByText("Saved on this device", { exact: true }),
     ).toBeVisible();
     const markup = await content.innerHTML();
-    const before = await dialog
-      .locator(".editor-heading, .editor-toolbar, .editor-footer")
-      .evaluateAll((els) =>
-        els.map((el) => ({
-          width: el.getBoundingClientRect().width,
-          height: el.getBoundingClientRect().height,
-          y: el.getBoundingClientRect().y,
-        })),
-      );
+    // The note chrome (heading above, footer below) must stay put while the
+    // document zooms. The toolbar row may gain/lose the pan pill button at
+    // ≠100%, so its width is not compared; only its vertical box is.
+    const chrome = () =>
+      dialog
+        .locator(".editor-heading, .editor-footer")
+        .evaluateAll((els) =>
+          els.map((el) => ({
+            width: el.getBoundingClientRect().width,
+            height: el.getBoundingClientRect().height,
+            y: el.getBoundingClientRect().y,
+          })),
+        );
+    const toolbarBox = () =>
+      dialog.locator(".editor-toolbar").evaluate((el) => ({
+        height: el.getBoundingClientRect().height,
+        y: el.getBoundingClientRect().y,
+      }));
+    const before = await chrome();
+    const toolbarBefore = await toolbarBox();
     const boldX = (await dialog
       .getByRole("button", { name: "Bold", exact: true })
       .boundingBox())!.x;
@@ -82,16 +93,15 @@ for (const width of [801, 1024, 1280]) {
         .click();
     await expect(await zoomInput(page)).toHaveValue("200");
     await expect(content).toHaveJSProperty("innerHTML", markup);
-    const after = await dialog
-      .locator(".editor-heading, .editor-toolbar, .editor-footer")
-      .evaluateAll((els) =>
-        els.map((el) => ({
-          width: el.getBoundingClientRect().width,
-          height: el.getBoundingClientRect().height,
-          y: el.getBoundingClientRect().y,
-        })),
-      );
+    // At 200% the pan toggle appears beside the magnifier in the toolbar pill.
+    await expect(
+      dialog.getByRole("button", { name: "Pan content", exact: true }),
+    ).toBeVisible();
+    await expect(dialog.locator(".content-zoom-pan-slot")).not.toHaveCount(0);
+    const after = await chrome();
+    const toolbarAfter = await toolbarBox();
     expect(after).toEqual(before);
+    expect(toolbarAfter).toEqual(toolbarBefore);
     const viewport = dialog.locator(".content-zoom-viewport");
     await viewport.evaluate((el) => {
       el.scrollTop = 500;
