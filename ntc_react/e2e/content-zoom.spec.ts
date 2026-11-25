@@ -69,13 +69,13 @@ for (const width of [801, 1024, 1280]) {
     const boldX = (await dialog
       .getByRole("button", { name: "Bold", exact: true })
       .boundingBox())!.x;
+    // Opening the zoom dropdown must not shift the toolbar chrome.
     await zoomInput(page);
     expect(
       (await dialog
         .getByRole("button", { name: "Bold", exact: true })
         .boundingBox())!.x,
-    ).toBeGreaterThan(boldX + 100);
-    await expect(page.locator(".content-zoom-menu")).toHaveCount(0);
+    ).toBe(boldX);
     for (let i = 0; i < 10; i++)
       await page
         .getByRole("button", { name: "Zoom in content", exact: true })

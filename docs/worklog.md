@@ -1,3 +1,13 @@
+## Nút kính lúp (content-zoom) mở dropdown như bullet (frontend) — 2026-11-25
+
+- Chủ dự án: "nút kính lúp chưa làm dropdown giống như bullets" — nút zoom trong editor (inline `ContentZoomOutlet`) trước dùng state `expanded` toggle ẩn/hiện div `.content-zoom-outlet` bên cạnh (kể cả CSS `[data-expanded="false"]` để ẩn cụm control khi collapsed).
+- **Đổi inline outlet thành Radix `Popover` (dropdown)**: trigger = IconButton kính lúp (`ZoomIn`, `asChild`), mở panel `.content-zoom-menu` (class đã dùng ở chế độ popup footer view-note) chứa `.content-zoom-outlet` để `ContentZoom` portal cụm control `[−][%][+][hand][reset]` vào. `side="bottom" align="start" sideOffset={7}` giống dropdown bullet-style; không giữ `data-expanded` (portal chỉ mount khi mở, không cần CSS che khi closed).
+- **Bỏ** `id`/`useId`, `aria-controls`, `data-expanded`, và rule CSS `.editor-toolbar .content-zoom-outlet[data-expanded="false"] .content-zoom-controls { display: none; }` (không còn outlet inline cố định).
+- Chế độ `popup` (footer view-note) giữ nguyên. `attach`/`setTarget` giữ để portal controls.
+- E2E `content-zoom.spec.ts`: helper `zoomInput` click trigger khi chưa mở (vẫn dùng `aria-expanded` của Radix Popover trigger). Thay assertion "Bold bị đẩy sang phải khi mở" (hành vi cũ expand inline) → assertion "Bold không xê dịch khi mở dropdown" (chrome cố định), vì dropdown portal ra khỏi flow.
+- Validation: `npm --prefix ntc_react run build` PASS (EXIT=0, tsc -b + vite, ~1.06s); `npm test` = 164 passed, 1 skipped. Chưa chạy E2E Playwright (fixture server); UI cần Vercel deploy + 1 hard-refresh PWA.
+- Phạm vi: `ntc_react/src/features/editor/ContentZoomOutlet.tsx`, `ntc_react/src/features/editor/ContentZoom.css`, `ntc_react/e2e/content-zoom.spec.ts` + entry worklog này.
+
 ## Hidden notes trong dropdown tài khoản: giữ trên PC, bỏ trên mobile — 2026-11-25
 
 - Chủ dự án làm rõ mong đợi sau release trước: PC vẫn phải có mục Hidden notes trong dropdown tài khoản (lối vào vault khi không có pull-down), mobile thì không hiện vì đã có thao tác kéo xuống ở đầu danh sách note; mục Hide note trong dropdown ba chấm của thẻ note tiếp tục bỏ ở cả hai.

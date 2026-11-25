@@ -134,11 +134,6 @@
   width: 14px;
   height: 14px;
 }
-.editor-toolbar
-  .content-zoom-outlet[data-expanded="false"]
-  .content-zoom-controls {
-  display: none;
-}
 .note-view-actions .content-zoom-inline {
   flex-direction: row-reverse;
 }

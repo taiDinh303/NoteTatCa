@@ -1,5 +1,5 @@
 import { useMobileLayout } from "../../shared/useMobileLayout";
-import { useCallback, useContext, useId, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { ZoomIn } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import { notePalette } from "../../domain/color";
@@ -23,7 +23,6 @@ export default function ContentZoomOutlet({
     [setTarget],
   );
   const [expanded, setExpanded] = useState(false);
-  const id = useId();
   const [boundary, setBoundary] = useState<HTMLElement | null>(null);
   const attachRoot = useCallback((node: HTMLDivElement | null) => {
     setBoundary(node?.closest<HTMLElement>(".note-editor-modal") ?? null);
@@ -69,21 +68,28 @@ export default function ContentZoomOutlet({
       </Popover.Root>
     );
   return (
-    <div className="content-zoom-inline">
-      <IconButton
-        icon={ZoomIn}
-        label={tr("Content zoom")}
-        active={expanded}
-        aria-expanded={expanded}
-        aria-controls={id}
-        onClick={() => setExpanded((value) => !value)}
-      />
-      <div
-        id={id}
-        className="content-zoom-outlet"
-        data-expanded={expanded}
-        ref={attach}
-      />
-    </div>
+    <Popover.Root open={expanded} onOpenChange={setExpanded}>
+      <div className="content-zoom-inline">
+        <Popover.Trigger asChild>
+          <IconButton
+            icon={ZoomIn}
+            label={tr("Content zoom")}
+            active={expanded}
+          />
+        </Popover.Trigger>
+      </div>
+      <Popover.Portal>
+        <Popover.Content
+          className="content-zoom-menu"
+          side="bottom"
+          align="start"
+          sideOffset={7}
+          collisionPadding={8}
+          aria-label={tr("Content zoom")}
+        >
+          <div className="content-zoom-outlet" ref={attach} />
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 }
