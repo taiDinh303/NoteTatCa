@@ -31,6 +31,15 @@ export function useNotes(filter: NoteFilter) {
       cache.getQueryState(
         workspace.key("notes", filter.trash ? { trash: true } : {}),
       )?.dataUpdatedAt,
+    // Keep the previous list on screen while a new search/filter fetches, so
+    // typing or a sidebar toggle never tears it down into a full skeleton.
+    // The trash page is a different content domain; it must not borrow the
+    // regular list's notes.
+    placeholderData: (prev, prevQuery) => {
+      const previous = prevQuery?.queryKey[3] as NoteFilter | undefined;
+      if (filter.trash || previous?.trash) return;
+      return prev;
+    },
     initialPageParam: 1,
     getNextPageParam: (last) =>
       last.hasNextPage ? last.currentPage + 1 : undefined,

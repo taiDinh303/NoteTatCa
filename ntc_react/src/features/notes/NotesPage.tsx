@@ -394,9 +394,9 @@ export default function NotesPage({
           </div>}
         </div>
       </div>
-      {query.isPending ? (
+      {query.isPending && !query.data ? (
         <SkeletonCards />
-      ) : query.isError ? (
+      ) : query.isError && !query.data ? (
         <ErrorPanel error={query.error} retry={() => void query.refetch()} />
       ) : all.length === 0 ? (
         <EmptyState

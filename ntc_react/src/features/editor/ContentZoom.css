@@ -12,15 +12,28 @@
 .content-zoom-viewport {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  /* The vertical axis stays closed while the document fits; `auto` flashes a
+     rail for the 1-2 frames after a View<->Edit toggle when the stage is still
+     settling at its previous height. Only `data-scrollable="true"` (settled
+     content that genuinely overflows) reopens it, so a short note never
+     flashes a scrollbar. */
+  overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-gutter: stable;
   touch-action: pan-x pan-y;
   overscroll-behavior: contain;
 }
+.content-zoom-viewport[data-scrollable="true"] {
+  overflow-y: auto;
+}
 /* The mobile document fits its viewport at 100%; only desktop zoom needs a
-   horizontal scroll axis. Keep native vertical scrolling and its scrollbar. */
+   horizontal scroll axis. Keep native vertical scrolling and its scrollbar.
+   The `data-scrollable` gate is desktop-only: phones have no toolbar-mount
+   settle flash, and touch pan needs the vertical axis open whenever the
+   document is tall. */
 .content-zoom-viewport[data-mobile="true"] {
   overflow-x: hidden;
+  overflow-y: auto;
   touch-action: pan-y;
 }
 /* Tools remain horizontally scrollable without a native rail flashing as the

@@ -53,6 +53,12 @@ function DesktopContentZoom({
     let restoreScroll = savedScroll ? { ...savedScroll.current } : undefined;
     let restoreHeight = -1;
     let stableRestoreFrames = 0;
+    // Vertical-rail gate: the axis stays closed (`overflow-y: hidden`) until
+    // the *settled* document genuinely overflows, then reopens (`auto`).
+    // Because the default is hidden, the 1-2 frame stale stage that follows a
+    // View<->Edit toggle is clipped, not flashed; a short note never shows a
+    // rail, and a long one opens on the first settled overflow frame.
+    let overflowOpen = false;
     let anchor:
       { x: number; y: number; docX: number; docY: number } | undefined;
     let pinch: { ids: number[]; distance: number; base: number } | undefined;
@@ -81,6 +87,17 @@ function DesktopContentZoom({
       document.style.transform = `scale(${scale})`;
       space.style.width = `${width * scale}px`;
       space.style.height = `${height * scale}px`;
+      // Gate the vertical rail before restoring scroll: a `scrollTop` write
+      // is ignored while the axis is closed. The gate only ever sees settled
+      // geometry (RO-delivered `resize`/`paint`), so the 1-2 frame stale
+      // stage that follows a View<->Edit toggle never opens it; a genuinely
+      // tall document opens it on the first settled overflow frame, which is
+      // also what makes a saved scroll position restorable.
+      const overflows = height * scale > view.clientHeight + 1;
+      if (overflows !== overflowOpen) {
+        view.dataset.scrollable = overflows ? "true" : "false";
+        overflowOpen = overflows;
+      }
       if (restoreScroll && document.querySelector(".rich-editor")) {
         stableRestoreFrames =
           restoreHeight === height ? stableRestoreFrames + 1 : 0;
