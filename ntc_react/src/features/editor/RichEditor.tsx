@@ -77,6 +77,37 @@ const extensions = [
     link: { openOnClick: false, autolink: true, defaultProtocol: "https" },
   }),
   Extension.create({
+    name: "tabIndent",
+    addKeyboardShortcuts() {
+      return {
+        Tab: () => {
+          const { editor } = this;
+          if (!editor.isEditable) return false;
+          const { from, to } = editor.state.selection;
+          editor.view.dispatch(
+            editor.state.tr.insertText("\t", from, to),
+          );
+          return true;
+        },
+        "Shift-Tab": () => {
+          const { editor } = this;
+          if (!editor.isEditable) return false;
+          const { from } = editor.state.selection;
+          const position = from - 1;
+          const before =
+            position >= 0
+              ? editor.state.doc.textBetween(position, from)
+              : "";
+          if (before !== "\t") return false;
+          editor.view.dispatch(
+            editor.state.tr.delete(position, from).scrollIntoView(),
+          );
+          return true;
+        },
+      };
+    },
+  }),
+  Extension.create({
     name: "bulletStyle",
     addGlobalAttributes() {
       return [

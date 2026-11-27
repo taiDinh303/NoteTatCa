@@ -1,3 +1,12 @@
+## Bỏ viền bullet/zoom pill + double-click view→edit + Tab indent (frontend) — 2026-11-27
+
+- Chủ dự án (ảnh toolbar): "loại bỏ viền của bullet và zoom" + "nhấn chuột 2 lần vào nội dung view thì chuyển qua edit (giống điện thoại)" + "Tab nhấn vào sẽ cách khoảng trắng ra một khoảng".
+- **Bỏ viền pill**: `styles.css` — `.bullet-list-control` bỏ `border` + `border-radius` + `overflow` (chỉ còn inline-flex, icon tự giữ radius chuẩn toolbar); xóa rule con `.bullet-list-control .icon-button { border-radius:0 }`. `ContentZoom.css` — `.content-zoom-pill` bỏ `border` + `border-radius` + `overflow` + rule con (icon pan/magnifier đọc như các nút toolbar thường).
+- **Double-click view → edit**: `NoteEditor.tsx` — handler `onDoubleClick` trên `.editor-scroll` bỏ điều kiện `window.matchMedia(MOBILE_LAYOUT_QUERY).matches`; giờ mọi kích cỡ (PC + mobile) double-click nội dung (tránh `a,button,input,select,textarea,summary`) khi đang view → `beginEditing()`. Bỏ import `MOBILE_LAYOUT_QUERY` (chỉ còn dùng `useMobileLayout`).
+- **Tab / Shift+Tab indent**: `RichEditor.tsx` — extension `tabIndent` (addKeyboardShortcuts): `Tab` insert `"\t"` vào cursor/selection (`tr.insertText("\t", from, to)`), `Shift-Tab` xóa `\t` phía trước cursor nếu có (outdent). Chỉ khi `isEditable`; giữ cursor ổn định (scrollIntoView cho outdent). Không thêm package mới, dùng ProseMirror transaction.
+- Validation: `npm run build` PASS (tsc -b + vite); `npx vitest run` = 17 file / 143 pass / 1 skip (4 file khác báo "Failed to start forks worker" — lỗi pool vitest trên máy này, không liên quan thay đổi). E2E chưa chạy (fixture server). UI cần Vercel deploy + 1 hard-refresh.
+- Phạm vi: `ntc_react/src/styles.css`, `ntc_react/src/features/editor/ContentZoom.css`, `ntc_react/src/features/editor/NoteEditor.tsx`, `ntc_react/src/features/editor/RichEditor.tsx` + entry này.
+
 ## Gộp bullet list + bullet style thành MỘT icon (không chevron) — 2026-11-27
 
 - Chủ dự án: "chỉ hiện 1 nút icon, gộp bullet style + bullet list thành 1 (không có mũi tên xuống); nhấn vào hiện các style, nhấn style nào áp style đó".

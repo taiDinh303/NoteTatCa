@@ -127,12 +127,6 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.content-zoom-pill .icon-button {
-  border-radius: 0;
 }
 .content-zoom-pan-slot {
   display: inline-flex;

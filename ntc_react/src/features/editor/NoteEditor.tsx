@@ -65,7 +65,7 @@ import ContentZoomOutlet from "./ContentZoomOutlet";
 import RichEditor from "./RichEditorLoader";
 import ReadOnlyContent from "./ReadOnlyContent";
 import NoteToolPanel from "./NoteToolPanel";
-import { MOBILE_LAYOUT_QUERY, useMobileLayout } from "../../shared/useMobileLayout";
+import { useMobileLayout } from "../../shared/useMobileLayout";
 export type NoteOpenAction = "labels" | "reminder";
 export type NoteEditorProps = {
   noteId?: string;
@@ -724,7 +724,7 @@ function EditorSession({
             </div>
           </div>
         ) : null}
-        <div className="editor-scroll" onDoubleClick={event => { if (window.matchMedia(MOBILE_LAYOUT_QUERY).matches && !editing && !(event.target as HTMLElement).closest("a,button,input,select,textarea,summary")) beginEditing(); }} onFocusCapture={event => {
+        <div className="editor-scroll" onDoubleClick={event => { if (!editing && !(event.target as HTMLElement).closest("a,button,input,select,textarea,summary")) beginEditing(); }} onFocusCapture={event => {
           if ((event.target as HTMLElement).closest(".rich-editor")) insertionTarget.current = "content";
         }}>
           <Suspense fallback={<Spinner label={tr("Loading editor…")} />}>
