@@ -25,7 +25,6 @@ import {
   AlignRight,
   AlignJustify,
   Check,
-  ChevronDown,
   Bold,
   CheckSquare,
   Code2,
@@ -393,18 +392,13 @@ export default memo(function RichEditor({
           />
         </div>
         <div className="bullet-list-control">
-          <IconButton
-            icon={List}
-            label={tr("Bullet list")}
-            active={state?.bullet}
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-          />
           <Dropdown.Root>
             <Dropdown.Trigger asChild>
               <IconButton
                 className="bullet-style-trigger"
-                icon={ChevronDown}
+                icon={List}
                 label={tr("Bullet style")}
+                active={state?.bullet}
               />
             </Dropdown.Trigger>
             <Dropdown.Portal>

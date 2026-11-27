@@ -1,3 +1,12 @@
+## Gộp bullet list + bullet style thành MỘT icon (không chevron) — 2026-11-27
+
+- Chủ dự án: "chỉ hiện 1 nút icon, gộp bullet style + bullet list thành 1 (không có mũi tên xuống); nhấn vào hiện các style, nhấn style nào áp style đó".
+- `RichEditor.tsx`: xóa IconButton List riêng (toggle) + IconButton chevron riêng — nay chỉ 1 trigger `.bullet-style-trigger` (icon List, label "Bullet style", `active` khi đang ở bullet list) bọc trong `Dropdown.Root`. Nhấn icon → dropdown hiện Dot/Circle/Square/Dash; chọn style vẫn tự `toggleBulletList()` nếu chưa bật + `updateAttributes` (giữ nguyên hành vi cũ). Xóa import `ChevronDown`.
+- `styles.css`: bỏ rule `.editor-toolbar .bullet-style-trigger { width:22px }` (pill nay chỉ chứa 1 icon, kích thước chuẩn toolbar).
+- E2E `list-formatting` dùng "Bullet style" (trigger mới giữ đúng label) → không cần sửa spec. "Bullet list" chỉ còn trong messages.ts (i18n, không dùng UI nữa).
+- Validation: build PASS; vitest 164 passed / 1 skipped.
+- Phạm vi: `RichEditor.tsx`, `styles.css` + entry này.
+
 ## Nút bàn tay (pan) ra bên cạnh kính lúp + chỉ hiện ≠100% (frontend) — 2026-11-25
 
 - Chủ dự án (ảnh 4): "bàn tay hiện bên phải cạnh nút kính lúp" + "chỉ hiện khi ≠ 100%" — trước đó (6ca290e) nút Hand nằm trong dropdown zoom. Nay đưa Hand thành **sibling pill** ngay bên phải trigger kính lúp (như `.bullet-list-control`), tách khỏi dropdown; dropdown chỉ còn `[−][%][+][reset]`.
